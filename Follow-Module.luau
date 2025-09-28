@@ -30,7 +30,7 @@ Decode = nil
 Decode = game:GetService("HttpService"):JSONDecode(game:HttpGet(ReturnURL(1, Decode["nextPageCursor"]))) or game:GetService("HttpService"):JSONDecode(game:HttpGet(ReturnURL("backup", Decode["nextPageCursor"])))
 end
 until Decode["nextPageCursor"] == nil
-if table.find(ft,tonumber(RequiredUserID)) then
+if table.find(ft,tonumber(userid)) then
 return true, "Success."
 end
 return false, "Fail."
