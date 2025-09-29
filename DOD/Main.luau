@@ -305,3 +305,38 @@ game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Remote
 AbilityModule.CreateAbility(AbilityDatas[tostring(ability)])
 end
 end; })
+
+Tab_3:CreateSection("Get Cards")
+
+local CardSettings = {
+    [1] = {[1]="Revolver",[2]="Caretaker"}
+    [2] = {[1]="BonusPad",[2]="Caretaker"}
+    [3] = {[1]="Revolver",[2]="Punch"}
+}
+Tab_3:CreateLabel("First Card Settings")
+Tab_3:CreateDropdown({Name = "First Ability"; Options = AbilityNames; CurrentOption = "Revolver"; MultiSelection = false; Callback = function(Value)
+CardSettings[1][1] = ConvertDropdownValue(Value)
+end; }))
+Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOption = "Caretaker"; MultiSelection = false; Callback = function(Value)
+CardSettings[1][2] = ConvertDropdownValue(Value)
+end; }))
+
+Tab_3:CreateLabel("Second Card Settings")
+Tab_3:CreateDropdown({Name = "First Ability"; Options = AbilityNames; CurrentOption = "BonusPad"; MultiSelection = false; Callback = function(Value)
+CardSettings[2][1] = ConvertDropdownValue(Value)
+end; }))
+Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOption = "Caretaker"; MultiSelection = false; Callback = function(Value)
+CardSettings[2][2] = ConvertDropdownValue(Value)
+end; }))
+
+Tab_3:CreateLabel("Third Card Settings")
+Tab_3:CreateDropdown({Name = "First Ability"; Options = AbilityNames; CurrentOption = "Revolver"; MultiSelection = false; Callback = function(Value)
+CardSettings[3][1] = ConvertDropdownValue(Value)
+end; }))
+Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOption = "Punch"; MultiSelection = false; Callback = function(Value)
+CardSettings[3][2] = ConvertDropdownValue(Value)
+end; }))
+
+Tab_3:CreateButton({Name = "Summon Chosen Cards"; Callback = function()
+UIModule.AbilitySelection(unpack(CardSettings))
+end; })
