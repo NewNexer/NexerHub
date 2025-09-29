@@ -224,8 +224,21 @@ SetStaminaProperty("Fatigue", true)
 end
 end; })
 
-local Tab_2 = Window:CreateTab("Emotes",0)
 
+
+
+
+
+
+--------------------------------
+
+
+
+
+
+
+
+local Tab_2 = Window:CreateTab("Emotes",0)
 Tab_2:CreateParagraph({Title = "Emotes", Content = "Functions that are related to emotes."})
 
 Tab_2:CreateSection("ITZZZZ PARTY TIME!!!!")
@@ -254,3 +267,41 @@ end; })
 Tab_2:CreateButton({Name = "Use Tornado"; Callback = function()
 game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("Emote"):FireServer("Tornado")
 end; })
+
+
+
+--------------------------------
+
+
+local AbilityNames = {
+	[1] = "Cloak",
+	[2] = "Punch",
+	[3] = "Taunt",
+	[4] = "BonusPad",
+	[5] = "Block",
+	[6] = "Caretaker",
+	[7] = "Dash",
+	[8] = "Hotdog",
+	[9] = "Revolver",
+	[10] = "Adrenaline",
+    [11] = "Banana"
+}
+
+AbilityDatas = {
+    ["Adrenaline"] = {Name = "Adrenaline",InputShown = "",Tip = "Get a temporary speed boost for 6 seconds, highlighting you to your teamates and slowing you down after it\'s over.",Cooldown = 35,Icon = "rbxassetid://116399911657417",DisplayName = "Adrenaline"};
+    ["Punch"] = {Name = "Punch",InputShown = "",Tip = "Swing foward stunning any killers hit for 3 seconds, if missed you\'ll get severe endlag.",Cooldown = 40,Icon = "rbxassetid://97428323453639",DisplayName = "Punch"};
+    ["Caretaker"] = {Name = "Caretaker",InputShown = "",Tip = "Splash a potion infront of you, any survivors hit will heal 20 HP in total. Having this ability makes you lose 75 max health though!",Cooldown = 30,Icon = "rbxassetid://90712805517714",DisplayName = "Caretaker"};
+    ["Cloak"] = {Name = "Cloak",InputShown = "",Tip = "Becoming heavily slowed but invisible for a short amount of time, Killers can still hit you though!",Cooldown = 50,Icon = "rbxassetid://90476367580326",DisplayName = "Cloak"};
+    ["Block"] = {Name = "Block",InputShown = "",Tip = "Try blocking any form of damage, if successful heal 10 HP, get a speed boost and negate all the damage.",Cooldown = 40,Icon = "rbxassetid://120929805037270",DisplayName = "Block"};
+    ["Dash"] = {Name = "Dash",InputShown = "",Tip = "Dash foward, after you will get fatigue for 2 seconds which slows stamina regeneration and makes it drain faster.",Cooldown = 20,Icon = "rbxassetid://73777691791017",DisplayName = "Dash"};
+    ["BonusPad"] = {Name = "BonusPad",InputShown = "",Tip = "Build a temporary speed pad that speeds up any survivor who steps on it. Having this ability makes you lose 10 max health though!",Cooldown = 70,Icon = "rbxassetid://86775625332300",DisplayName = "BonusPad"};
+    ["Hotdog"] = {Name = "Hotdog",InputShown = "",Tip = "Eat a hotdog, healing 15 HP at the cost of 10 stamina.",Cooldown = 15,Icon = "rbxassetid://134322360499381",DisplayName = "Hotdog"};
+    ["Revolver"] = {Name = "Revolver",InputShown = "",Tip = "Shoot with your revolver stunning any killers hit for 2 seconds, you\'ll have to reload after. Having this ability makes you lose 20 max stamina though!",Cooldown = 15,Icon = "rbxassetid://107624957891469",DisplayName = "Revolver"};
+    ["Taunt"] = {Name = "Taunt",InputShown = "",Tip = "Taunt the killer gaining a forcefield, highlighting the killer, and slowing them down for 5 seconds or until you\'re hit for the duration of the effect (1.25x damage).",Cooldown = 25,Icon = "rbxassetid://85436299122876",DisplayName = "Taunt"};
+    ["Banana"] = {Name = "Banana",InputShown = "",Tip = "Toss a banana onto the floor, if the killer or the civilian who made it touch the banana, they will slip and be briefly stunned, the banana will naturally decay over time.",Cooldown = 20,Icon = "rbxassetid://96202444819611",DisplayName = "Banana Peel"};
+}
+
+local Tab_3 = Window:CreateTab("Abilities",0)
+Tab_3:CreateParagraph({Title = "Abilities", Content = "You can give yourself abilities or cards with abilities."})
+Tab_3:CreateSection("Get Ability")
+
