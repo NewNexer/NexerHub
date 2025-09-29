@@ -230,7 +230,18 @@ end; })
 
 
 
---------------------------------
+
+
+
+
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+
+
+
+
+
 
 
 
@@ -270,7 +281,28 @@ end; })
 
 
 
---------------------------------
+
+
+
+
+
+
+
+
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
 
 
 local AbilityNames = {"Cloak","Punch","Taunt","BonusPad","Block","Caretaker","Dash","Hotdog","Revolver","Adrenaline","Banana"}
@@ -340,3 +372,610 @@ end; }))
 Tab_3:CreateButton({Name = "Summon Chosen Cards"; Callback = function()
 UIModule.AbilitySelection(unpack(CardSettings))
 end; })
+
+
+Tab_3:CreateSection("Spam Ability")
+
+local SpamAbility = "Hotdog"
+Tab_3:CreateDropdown({Name = "Ability to Spam"; Options = AbilityNames; CurrentOption = "Hotdog"; MultiSelection = false; Callback = function(Value)
+SpamAbility = ConvertDropdownValue(Value)
+end; })
+
+Tab_3:CreateToggle({Name = "Spam Ability"; CurrentValue = false; Callback = function(Value)
+AutoSpamAbility = Value
+if AutoSpamAbility == true then
+repeat task.wait(0.15)
+pcall(function()
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(unpack({{tostring(SpamAbility)}}))
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteFunctions"):WaitForChild("UseAbility"):InvokeServer(unpack({tostring(SpamAbility)}))
+end)
+until AutoSpamAbility == false
+end
+end; })
+
+
+
+
+
+
+
+
+
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+if not game:GetService("CoreGui"):FindFirstChild("DOD_ESP_HANDLER") then
+Instance.new("Folder", game:GetService("CoreGui")).Name = "DOD_ESP_HANDLER"
+end
+
+_G.ESPenabledHandler = false
+_G.ESPtransHandler = 0.3
+
+function CreateHighlight(plr)
+task.spawn(function()
+for i,v in pairs(game:GetService("CoreGui"):FindFirstChild("DOD_ESP_HANDLER"):GetChildren()) do
+if v and v.Name == ("sillyfolder_"..plr.Name) then
+v:Destroy()
+end
+end
+repeat task.wait() until game:GetService("CoreGui"):WaitForChild("DOD_ESP_HANDLER"):FindFirstChild("sillyfolder_"..plr.Name) == nil
+local esp_folder = Instance.new("Folder")
+esp_folder.Name = "sillyfolder_"..plr.Name
+esp_folder.Parent = game:GetService("CoreGui"):FindFirstChild("DOD_ESP_HANDLER")
+      
+repeat task.wait() until plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChildOfClass("Humanoid")
+local plr_char = plr.Character or plr.CharacterAdded:Wait()
+for i,v in pairs(plr_char:GetChildren()) do
+if v and v:IsA("BasePart") and (v.Name == "Left Leg" or v.Name == "Left Arm" or v.Name == "Right Leg" or v.Name == "Right Arm" or v.Name == "Torso" or v.Name == "Head") then
+local esp = Instance.new("BoxHandleAdornment")
+esp.Name = "sillygirl_"..plr.Name
+esp.Adornee = v
+esp.AlwaysOnTop = true
+esp.ZIndex = 10 or 1
+esp.Size = v.Size
+esp.Transparency = (plr_char.Parent.Name == "Workspace" and 1) or tonumber(_G.ESPtransHandler)
+esp.Color = (plr_char.Parent.Name == "Killer" and BrickColor.new("Bright red")) or (plr_char.Parent.Name == "Ghost" and BrickColor.new("White")) or BrickColor.new("Bright green")
+esp.Parent = game:GetService("CoreGui"):WaitForChild("DOD_ESP_HANDLER"):FindFirstChild("sillyfolder_"..plr.Name)
+end
+end
+      
+local char_connection, team_connection, dstr_connection
+char_connection = plr.CharacterAdded:Connect(function()
+if game:GetService("CoreGui"):WaitForChild("DOD_ESP_HANDLER"):FindFirstChild("sillyfolder_"..plr.Name) then
+game:GetService("CoreGui"):WaitForChild("DOD_ESP_HANDLER"):FindFirstChild("sillyfolder_"..plr.Name):Destroy()
+end
+dstr_connection:Disconnect()
+team_connection:Disconnect()
+repeat task.wait(1.25) until plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChildOfClass("Humanoid")
+CreateHighlight(plr)
+char_connection:Disconnect()
+end)
+
+team_connection = plr:GetPropertyChangedSignal("TeamColor"):Connect(function()
+if game:GetService("CoreGui"):WaitForChild("DOD_ESP_HANDLER"):FindFirstChild("sillyfolder_"..plr.Name) then
+game:GetService("CoreGui"):WaitForChild("DOD_ESP_HANDLER"):FindFirstChild("sillyfolder_"..plr.Name):Destroy()
+end
+dstr_connection:Disconnect()
+char_connection:Disconnect()
+repeat task.wait(1.25) until plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChildOfClass("Humanoid")
+CreateHighlight(plr)
+team_connection:Disconnect()
+end)
+
+dstr_connection = game:GetService("CoreGui").ChildRemoved:Connect(function(child)
+if child.Name == "DOD_ESP_HANDLER" then
+Instance.new("Folder", game:GetService("CoreGui")).Name = "DOD_ESP_HANDLER"
+team_connection:Disconnect()
+char_connection:Disconnect()
+dstr_connection:Disconnect()
+end      
+end)
+
+end)
+end
+
+function ChangeTransparency(trans)
+for i,v in pairs(game:GetService("CoreGui"):FindFirstChild("DOD_ESP_HANDLER"):GetDescendants()) do
+if v and v:IsA("BoxHandleAdornment") then
+v.Transparency = trans
+end
+end
+end
+
+local Tab_4 = Window:CreateTab("Visual",0)
+
+Tab_4:CreateParagraph({Title = "Visual", Content = "You can change some of the visual parts of the game here."})
+Tab_4:CreateSection("ESP")
+
+Tab_4:CreateSlider({Name = "ESP Transparency (in %)"; Range = {0, 100}; Increment = 5; Suffix = "%"; CurrentValue = 30; Callback = function(Value)
+_G.ESPtransHandler = (tonumber(Value) / 100)
+ChangeTransparency(tonumber(_G.ESPtransHandler))
+end; })
+
+plradded_esp = nil
+plrremoved_esp = nil
+Tab_4:CreateToggle({Name = "Turn On/Off ESP"; CurrentValue = false; Callback = function(Value)
+_G.ESPenabledHandler = Value
+if _G.ESPenabledHandler == true then
+for i,v in pairs(game:GetService("Players"):GetPlayers()) do
+if v and v ~= game:GetService("Players").LocalPlayer then
+CreateHighlight(v)
+end
+end
+plradded_esp = game:GetService("Players").PlayerAdded:Connect(function(plr)
+CreateHighlight(plr)
+end)
+plrremoved_esp = game:GetService("Players").PlayerRemoving:Connect(function(plr)
+if game:GetService("CoreGui"):WaitForChild("DOD_ESP_HANDLER"):FindFirstChild("sillyfolder_"..plr.Name) then
+game:GetService("CoreGui"):WaitForChild("DOD_ESP_HANDLER"):FindFirstChild("sillyfolder_"..plr.Name):Destroy()
+end
+end)
+elseif _G.ESPenabledHandler == false then
+game:GetService("CoreGui"):FindFirstChild("DOD_ESP_HANDLER"):Destroy()
+if plradded_esp ~= nil then
+plradded_esp:Disconnect()
+plradded_esp = nil
+end
+if plrremoved_esp ~= nil then
+plrremoved_esp:Disconnect()
+plrremoved_esp = nil
+end
+end
+end; })
+
+Visual:CreateSection("Gui Management ε=( o｀ω′)ノ")
+
+Tab_4:CreateButton({Name = "Open Shop"; Callback = function()
+UIModule.OpenShop()
+end; })
+Tab_4:CreateToggle({Name = "Teammate Death Effect Enabled"; CurrentValue = true; Callback = function(Value)
+if TestRequire() ~= true then
+ErrorRequire()
+return nil
+end
+DeathEffectEnabled = Value
+if DeathEffectEnabled == true then
+UIModule["TeamateDeathEffect"] = function()
+	game:GetService("Lighting").TeamateDeathEffect.Enabled = true
+	game:GetService("Lighting").TeamateDeathEffect.Contrast = 0
+	game:GetService("Lighting").TeamateDeathEffect.TintColor = Color3.fromRGB(255, 255, 255)
+	game:GetService("TweenService"):Create(game:GetService("Lighting").TeamateDeathEffect, TweenInfo.new(0.5), {
+		["Contrast"] = 1
+	}):Play()
+	game:GetService("TweenService"):Create(game:GetService("Lighting").TeamateDeathEffect, TweenInfo.new(0.5), {
+		["TintColor"] = Color3.fromRGB(255, 52, 52)
+	}):Play()
+	task.wait(0.5)
+	game:GetService("TweenService"):Create(game:GetService("Lighting").TeamateDeathEffect, TweenInfo.new(2), {
+		["Contrast"] = 0
+	}):Play()
+	game:GetService("TweenService"):Create(game:GetService("Lighting").TeamateDeathEffect, TweenInfo.new(2), {
+		["TintColor"] = Color3.fromRGB(255, 255, 255)
+	}):Play()
+end
+Notify("Success!", "Enabled!", 3, true)
+elseif DeathEffectEnabled == false then
+UIModule["TeamateDeathEffect"] = function() return nil end
+Notify("Success!", "Disabled!", 3, true)
+end
+end; })
+
+function AwardPoints(points, reason)
+	local Template = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("UI"):WaitForChild("PlayerPoints"):Clone()
+	Template.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui").PlayerPoints
+	Template.Frame.Title.Text = "<font color=\'rgb(255, 64, 67)\'>"..tostring(points).." Points</font> Awarded "..tostring(reason)
+	Template.Frame.Title.TextTransparency = 1
+	Template.Frame.Title.UIStroke.Transparency = 1
+	Template.Frame.Cash.ImageTransparency = 1
+	game:GetService("Debris"):AddItem(Template, 10)
+	game:GetService("TweenService"):Create(Template.Frame.Cash, TweenInfo.new(10, Enum.EasingStyle.Linear), {
+		["Rotation"] = 360
+	}):Play()
+	pcall(function()
+		for _ = 0,5 do
+			task.wait(0.2)
+			local Title = Template.Frame.Title
+			Title.TextTransparency = Title.TextTransparency - 0.2
+			local Stroke = Template.Frame.Title.UIStroke
+			Stroke.Transparency = Stroke.Transparency - 0.2
+			local Cash = Template.Frame.Cash
+			Cash.ImageTransparency = Cash.ImageTransparency - 0.2
+		end
+		task.wait(6)
+		for _ = 0,5 do
+			task.wait(0.5)
+			local Title = Template.Frame.Title
+			Title.TextTransparency = Title.TextTransparency + 0.2
+			local Stroke = Template.Frame.Title.UIStroke
+			Stroke.Transparency = Stroke.Transparency + 0.2
+			local Cash = Template.Frame.Cash
+			Cash.ImageTransparency = Cash.ImageTransparency + 0.2
+		end
+	end)
+end
+MoneyToGet = 10
+ReasonForMoney = "for surviving for atleast 60 seconds."
+
+Tab_4:CreateLabel("Money Giver ( Visual )")
+
+Tab_4:CreateInput({Name = "Money amount"; PlaceholderText = "10"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+MoneyToGet = tonumber(Value)
+end; })
+
+Tab_4:CreateInput({Name = "Reason for getting money"; PlaceholderText = "for surviving for atleast 60 seconds."; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+ReasonForMoney = tostring(Value)
+end; })
+
+Tab_4:CreateButton({Name = "Give money"; Callback = function()
+AwardPoints(MoneyToGet, ReasonForMoney)
+end; })
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+local Tab_5 = Window:CreateTab("Anti / Immunities",0)
+Tab_5:CreateParagraph({Title = "Anti / Immunities", Content = "You can get immunities to multiple things yeah."})
+Tab_5:CreateSection("Server")
+
+local AntiWalls
+AntiWalls = false
+Tab_5:CreateToggle({Name = "Anti-Artful Walls"; CurrentValue = false; Callback = function(Value)
+AntiWalls = Value
+if AntiWalls == true then
+for i,v in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Other"):GetDescendants()) do
+if v and v.Name == "HumanoidRootPart" and v.Anchored == true then
+v.CanCollide = false
+v.CanTouch = false
+v.Transparency = 0.5
+end
+end
+end
+end; })
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Other").DescendantAdded:Connect(function(descendant)
+if descendant and descendant.Name == "HumanoidRootPart" and descendant.Anchored == true and AntiWalls == true then
+descendant.CanCollide = false
+descendant.CanTouch = false
+descendant.Transparency = 0.5
+end
+end)
+
+local AntiComputer
+AntiComputer = false
+Tab_5:CreateToggle({Name = "Anti Cooldown in Badware Computer Prompts"; CurrentValue = false; Callback = function(Value)
+AntiComputer = Value
+if AntiComputer == true then
+for _,descendant in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable"):GetDescendants()) do
+if descendant and descendant:IsA("ProximityPrompt") and descendant.Parent and descendant.Parent.Name == "Primary" then
+pcall(function()
+descendant.HoldDuration = 0
+descendant.RequiresLineOfSight = false
+descendant.Enabled = true
+end)
+end
+end
+end
+end; })
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable").DescendantAdded:Connect(function(descendant)
+if descendant and descendant:IsA("ProximityPrompt") and descendant.Parent and descendant.Parent.Name == "Primary" and AntiComputer == true then
+pcall(function()
+descendant.HoldDuration = 0
+descendant.RequiresLineOfSight = false
+descendant.Enabled = true
+end)
+end
+end)
+
+local AntiEvilScary
+AntiEvilScary = false
+Tab_5:CreateToggle({Name = "Anti Evil Scary"; CurrentValue = false; Callback = function(Value)
+AntiEvilScary = Value
+if AntiEvilScary == true then
+for i,v in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable"):GetChildren()) do
+if v and v.Name == "EvilScary" then
+for _,trans in pairs(v:GetChildren()) do
+if trans and trans:IsA("TouchTransmitter") then
+trans:Destroy()
+end
+end
+for _,part in pairs(v:GetChildren()) do
+if part and part:IsA("BasePart") then
+part.CanCollide = false
+part.CanTouch = false
+pcall(function()
+part.CanQuery = false
+end)
+part:Destroy()
+end
+end
+v.CanCollide = false
+v.CanTouch = false
+pcall(function()
+v.CanQuery = false
+end)
+v:Destroy()
+end
+end
+end
+end; })
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable").ChildAdded:Connect(function(child)
+if child and child.Name == "EvilScary" and AntiEvilScary == true then
+for _,trans in pairs(child:GetChildren()) do
+if trans and trans:IsA("TouchTransmitter") then
+trans:Destroy()
+end
+end
+for _,part in pairs(child:GetChildren()) do
+if part and part:IsA("BasePart") then
+part.CanCollide = false
+part.CanTouch = false
+pcall(function()
+part.CanQuery = false
+end)
+part:Destroy()
+end
+end
+child.CanCollide = false
+child.CanTouch = false
+pcall(function()
+child.CanQuery = false
+end)
+child:Destroy()
+end
+end)
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+local function ReturnAnimFolder()
+if Character:FindFirstChild("Animations") then
+return Character:WaitForChild("Animations")
+end
+return nil
+end
+
+local Tab_6 = Window:CreateTab("Animations",0)
+Tab_6:CreateParagraph({Title = "Animations", Content = "You can change your anims here."})
+Tab_6:CreateSection("Animations Changer")
+
+local function SetAnim(run, walk, idle)
+pcall(function()
+local stopper = Humanoid or Character:FindFirstChildOfClass("AnimationController")
+for i,v in next, stopper:GetPlayingAnimationTracks() do
+v:Stop()
+end
+end)
+local AnimationFolder = ReturnAnimFolder()
+pcall(function()
+if AnimationFolder:FindFirstChild("HurtSprint") then
+AnimationFolder:FindFirstChild("HurtSprint").AnimationId = run
+end
+end)
+pcall(function()
+if AnimationFolder:FindFirstChild("NormalSprint") then
+AnimationFolder:FindFirstChild("NormalSprint").AnimationId = run
+end
+end)
+pcall(function()
+if AnimationFolder:FindFirstChild("OldSprint") then
+AnimationFolder:FindFirstChild("OldSprint").AnimationId = run
+end
+end)
+pcall(function()
+if AnimationFolder:FindFirstChild("Sprint") then
+AnimationFolder:FindFirstChild("Sprint").AnimationId = run
+end
+end)
+pcall(function()
+if AnimationFolder:FindFirstChild("Idle") then
+AnimationFolder:FindFirstChild("Idle").AnimationId = idle
+end
+end)
+pcall(function()
+if AnimationFolder:FindFirstChild("OldIdle") then
+AnimationFolder:FindFirstChild("OldIdle").AnimationId = idle
+end
+end)
+pcall(function()
+if AnimationFolder:FindFirstChild("Walk") then
+AnimationFolder:FindFirstChild("Walk").AnimationId = walk
+end
+end)
+pcall(function()
+if AnimationFolder:FindFirstChild("OldWalk") then
+AnimationFolder:FindFirstChild("OldWalk").AnimationId = walk
+end
+end)
+pcall(function()
+Character.Animate.Disabled = true
+task.wait()
+Character.Animate.Disabled = false
+end)
+pcall(function()
+LocalPlayer.PlayerScripts.ClientAnimations.Disabled = true
+task.wait()
+LocalPlayer.PlayerScripts.ClientAnimations.Disabled = false
+end)
+end
+
+Tab_6:CreateLabel("Civilian animations")
+Tab_6:CreateButton({Name = "Apply New Civilian Animations"; Callback = function()
+local RunAnim = "rbxassetid://137375023685630"
+local WalkAnim = "rbxassetid://84388941697203"
+local IdleAnim = "rbxassetid://100930402371608"
+task.spawn(function()
+SetAnim(RunAnim, WalkAnim, IdleAnim)
+end)
+Notify("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
+end; })
+Tab_6:CreateButton({Name = "Apply Old Civilian animations"; Callback = function()
+local RunAnim = "rbxassetid://79488319304371"
+local WalkAnim = "rbxassetid://138161225743614"
+local IdleAnim = "rbxassetid://74309548749074"
+task.spawn(function()
+SetAnim(RunAnim, WalkAnim, IdleAnim)
+end)
+Notify("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
+end; })
+
+Tab_6:CreateLabel("Ghost Animations")
+Tab_6:CreateButton({Name = "Apply Ghost animations"; Callback = function()
+local RunAnim = "rbxassetid://124260679864309"
+local WalkAnim = "rbxassetid://124260679864309"
+local IdleAnim = "rbxassetid://110395159339100"
+task.spawn(function()
+SetAnim(RunAnim, WalkAnim, IdleAnim)
+end)
+Notify("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
+end; })
+
+pcall(function()
+for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
+Tab_6:CreateLabel(v.Name.." Animations")
+for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
+Tab_6:CreateButton({Name = "Apply "..e.Name.." animations"; Callback = function()
+local RunAnim = e:WaitForChild("Animations"):WaitForChild("Sprint").AnimationId or e:WaitForChild("Animations"):WaitForChild("OldSprint").AnimationId or e:WaitForChild("Animations"):WaitForChild("NormalSprint").AnimationId or e:WaitForChild("Animations"):WaitForChild("HurtSprint").AnimationId
+local WalkAnim = e:WaitForChild("Animations"):WaitForChild("Walk").AnimationId or e:WaitForChild("Animations"):WaitForChild("OldWalk").AnimationId
+local IdleAnim = e:WaitForChild("Animations"):WaitForChild("Idle").AnimationId or e:WaitForChild("Animations"):WaitForChild("OldIdle").AnimationId
+task.spawn(function()
+SetAnim(RunAnim, WalkAnim, IdleAnim)
+end)
+Notify("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
+end; })
+end; end
+end; end
+end)
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+
+
+
+
+
+
+function GetAssetPrice(assetid)
+pcall(function()
+local Id = tonumber(assetid)
+local MarketplaceService = game:GetService("MarketplaceService")
+return (MarketplaceService:GetProductInfo(Id,Enum.InfoType.Asset).PriceInRobux)
+end)
+end
+local PremiumPrice = GetAssetPrice(1264479709) or 39
+local HavePremium = false
+if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(LocalPlayer.UserId, 1264479709) then
+HavePremium = true
+end
+
+local Tab_7 = Window:CreateTab("Premium",0)
+Tab_7:CreateParagraph({Title = "Premium", Content = "Premium content here!"})
+
+Tab_7:CreateLabel("There are currently 2 ways to unlock premium features.")
+Tab_7:CreateLabel("")
+Tab_7:CreateLabel("Buy the gamepass to unlock premium features! [ Cost "..tostring(PremiumPrice).." robux! ]")
+
+Tab_7:CreateButton({Name = "Open Gamepass Link"; Callback = function()
+if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(LocalPlayer.UserId, 1264479709) then
+    HavePremium = true
+    Notify("Error!", "Arleady have gamepass!", 2)
+else
+    OpenLink("https://www.roblox.com/game-pass/1264479709")
+end
+end; })
+
+Tab_7:CreateButton({Name = "Copy Gamepass Link"; Callback = function()
+if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(LocalPlayer.UserId, 1264479709) then
+    HavePremium = true
+    Notify("Error!", "Arleady have gamepass!", 2)
+else
+    setclipboard(tostring("https://www.roblox.com/game-pass/1264479709"))
+    Notify("Success!", "Copied Link!", 3, true)
+end
+end; })
+
+Tab_7:CreateLabel("or join our discord server to unlock premium features!")
+
+Tab_7:CreateButton({Name = "Copy Discord Server Link"; Callback = function()
+if game:GetService("Players").LocalPlayer:IsInGroup(35649714) then
+    Notify("Error!", "Arleady joined group!", 4)
+else
+    setclipboard(tostring("https://discord.gg/R6TWSu87Aw"))
+    Notify("Success!", "Copied Link!", 10, true)
+end
+end; })
+
+Tab_7:CreateLabel("")
+
+
+
+
+Tab_7:CreateSection("Advanced Anti / Immunities")
+
+
