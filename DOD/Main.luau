@@ -273,21 +273,9 @@ end; })
 --------------------------------
 
 
-local AbilityNames = {
-	[1] = "Cloak",
-	[2] = "Punch",
-	[3] = "Taunt",
-	[4] = "BonusPad",
-	[5] = "Block",
-	[6] = "Caretaker",
-	[7] = "Dash",
-	[8] = "Hotdog",
-	[9] = "Revolver",
-	[10] = "Adrenaline",
-    [11] = "Banana"
-}
+local AbilityNames = {"Cloak","Punch","Taunt","BonusPad","Block","Caretaker","Dash","Hotdog","Revolver","Adrenaline","Banana"}
 
-AbilityDatas = {
+local AbilityDatas = {
     ["Adrenaline"] = {Name = "Adrenaline",InputShown = "",Tip = "Get a temporary speed boost for 6 seconds, highlighting you to your teamates and slowing you down after it\'s over.",Cooldown = 35,Icon = "rbxassetid://116399911657417",DisplayName = "Adrenaline"};
     ["Punch"] = {Name = "Punch",InputShown = "",Tip = "Swing foward stunning any killers hit for 3 seconds, if missed you\'ll get severe endlag.",Cooldown = 40,Icon = "rbxassetid://97428323453639",DisplayName = "Punch"};
     ["Caretaker"] = {Name = "Caretaker",InputShown = "",Tip = "Splash a potion infront of you, any survivors hit will heal 20 HP in total. Having this ability makes you lose 75 max health though!",Cooldown = 30,Icon = "rbxassetid://90712805517714",DisplayName = "Caretaker"};
@@ -305,3 +293,15 @@ local Tab_3 = Window:CreateTab("Abilities",0)
 Tab_3:CreateParagraph({Title = "Abilities", Content = "You can give yourself abilities or cards with abilities."})
 Tab_3:CreateSection("Get Ability")
 
+Tab_3:CreateDropdown({Name = "Get Ability"; Options = AbilityNames; CurrentOption = ""; MultiSelection = false; Callback = function(Value)
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(unpack({{tostring(ConvertDropdownValue(Value));}}))
+AbilityModule.CreateAbility(AbilityDatas[tostring(ConvertDropdownValue(Value))])
+end; })
+
+Tab_3:CreateButton({Name = "Get All Abilities"; Callback = function()
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(unpack({{tostring(AbilityNames[math.random(1, 11)]);tostring(AbilityNames[math.random(1, 11)]);}}))
+for _,ability in pairs(AbilityNames) do
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(unpack({{tostring(ability);}}))
+AbilityModule.CreateAbility(AbilityDatas[tostring(ability)])
+end
+end; })
