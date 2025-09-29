@@ -12,6 +12,19 @@ return tostring(tbl)
 end
 end
 
+local FollowHandler = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/Follow-Module.luau"))()
+local WebHandler = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/Web-Module.luau"))()
+local GetRequestMethod = function()
+local iqnd = request or http_request or HttpPost or (syn and syn.request) or (http and http.request) or (fluxus and fluxus.request) or (game and game.HttpPost) or (KRNL and KRNL.request) or (Xeno and Xeno.request)
+if iqnd then
+return iqnd
+else
+return nil
+end
+end
+local isfollowed, result = FollowHandler:IsFollowedTo(RequiredUserID)
+if isfollowed == true then loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Main.luau"))() end
+
 local Rayfield
 local RAYFIELD_SUCCESS, RAYFIELD_FAIL = pcall(function()
 Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
@@ -69,17 +82,6 @@ pcall(function()
 game.CoreGui.OldRayField:Destroy()
 end)
 end)
-end
-
-local FollowHandler = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/Follow-Module.luau"))()
-local WebHandler = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/Web-Module.luau"))()
-local GetRequestMethod = function()
-local iqnd = request or http_request or HttpPost or (syn and syn.request) or (http and http.request) or (fluxus and fluxus.request) or (game and game.HttpPost) or (KRNL and KRNL.request) or (Xeno and Xeno.request)
-if iqnd then
-return iqnd
-else
-return nil
-end
 end
 
 local Window = Rayfield:CreateWindow({
@@ -143,7 +145,8 @@ CopyLink("https://www.roblox.com/users/"..tostring(RequiredUserID).."/profile")
 end; })
 
 Main:CreateButton({Name = "Launch Script"; Callback = function()
-if CheckIfUserFollowed() == true then
+local isfollowed, result = FollowHandler:IsFollowedTo(RequiredUserID)
+if isfollowed == true or game.Players.LocalPlayer.UserId == RequiredUserID then
 DestroyRayfield()
 Notify("Success!", "Launching script, please wait...", 10, true)
 loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Main.luau"))()
