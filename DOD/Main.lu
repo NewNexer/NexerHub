@@ -188,7 +188,7 @@ SetStaminaProperty("Stamina", (1/0))
 end; })
 
 Tab_1:CreateButton({Name = "Become Fast"; Callback = function()
-SetStaminaProperty("WalkSpeed", 50)
+Humanoid.WalkSpeed = 50
 SetStaminaProperty("SprintSpeed", 70)
 end; })
 
@@ -211,7 +211,7 @@ SetStaminaProperty("Stamina", tonumber(Value))
 end; })
 
 Tab_1:CreateInput({Name = "Walk Speed"; PlaceholderText = "Type Here!"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = true; Callback = function(Value)
-SetStaminaProperty("WalkSpeed", tonumber(Value))
+Humanoid.WalkSpeed = tonumber(Value)
 end; })
 
 Tab_1:CreateInput({Name = "Sprint Speed"; PlaceholderText = "Type Here!"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = true; Callback = function(Value)
@@ -562,7 +562,7 @@ end
 end
 end; })
 
-Visual:CreateSection("Gui Management ε=( o｀ω′)ノ")
+Tab_4:CreateSection("Gui Management ε=( o｀ω′)ノ")
 
 Tab_4:CreateButton({Name = "Open Shop"; Callback = function()
 UIModule.OpenShop()
