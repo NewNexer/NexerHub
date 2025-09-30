@@ -23,7 +23,10 @@ return nil
 end
 end
 local isfollowed, result = FollowHandler:IsFollowedTo(RequiredUserID)
-if isfollowed == true then loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Main.luau"))() end
+if isfollowed == true then
+loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Main.luau"))()
+return
+end
 
 local Rayfield
 local RAYFIELD_SUCCESS, RAYFIELD_FAIL = pcall(function()
