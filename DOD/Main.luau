@@ -138,6 +138,7 @@ Humanoid, Hum = Character.Humanoid, Character.Humanoid
 end)
 
 LocalPlayer.CharacterAdded:Connect(function()
+pcall(function()
 Character, Char = nil, nil
 HumanoidRootPart, HRP = nil, nil
 Humanoid, Hum = nil, nil
@@ -150,6 +151,7 @@ HumanoidRootPart, HRP = Character.HumanoidRootPart, Character.HumanoidRootPart
 task.wait()
 repeat task.wait() until Character:FindFirstChild("Humanoid")
 Humanoid, Hum = Character.Humanoid, Character.Humanoid
+end)
 end)
 
 pcall(function()
@@ -279,7 +281,33 @@ Tab_2:CreateButton({Name = "Use Tornado"; Callback = function()
 game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("Emote"):FireServer("Tornado")
 end; })
 
-
+Tab_2:CreateButton({Name = "Use Rainbow Waves ( NO VFX / SFX )"; Callback = function()
+local anim = Instance.new("Animation")
+anim.AnimationId = "rbxassetid://75513960644342"
+local planim = Humanoid:LoadAnimation(anim)
+planim:Play()
+local song = Instance.new("Sound")
+song.Volume = 1.5
+song.Looped = true
+song.SoundId = "rbxassetid://137048834753046"
+song.Parent = HumanoidRootPart
+song:Play()
+local TooLate = false
+LocalPlayer.CharacterAdded:Once(function()
+	if TooLate then return end
+	TooLate = true
+	song:Destroy()
+planim:Stop()
+	anim:Destroy()
+end)
+Humanoid.Running:Once(function()
+	if TooLate then return end
+	TooLate = true
+	song:Destroy()
+planim:Stop()
+	anim:Destroy()
+end)
+end; })
 
 
 
