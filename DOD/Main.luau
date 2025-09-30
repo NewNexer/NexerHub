@@ -963,11 +963,13 @@ end; })
 Tab_7:CreateLabel("or join our discord server to unlock premium features!")
 
 Tab_7:CreateButton({Name = "Copy Discord Server Link"; Callback = function()
-if game:GetService("Players").LocalPlayer:IsInGroup(35649714) then
-    Notify("Error!", "Arleady joined group!", 4)
-else
-    setclipboard(tostring("https://discord.gg/R6TWSu87Aw"))
-    Notify("Success!", "Copied Link!", 10, true)
+setclipboard(tostring("https://discord.gg/R6TWSu87Aw"))
+Notify("Success!", "Copied Link!", 3, true)
+end; })
+
+Stamina:CreateInput({Name = "Sprint Speed"; PlaceholderText = "Type Here!"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = true; Callback = function(Value)
+if tostring(Value) == loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Module.luau"))():GetKey() then
+
 end
 end; })
 
