@@ -967,9 +967,10 @@ setclipboard(tostring("https://discord.gg/R6TWSu87Aw"))
 Notify("Success!", "Copied Link!", 3, true)
 end; })
 
-Stamina:CreateInput({Name = "Sprint Speed"; PlaceholderText = "Type Here!"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = true; Callback = function(Value)
+Tab_7:CreateInput({Name = "Input Key"; PlaceholderText = "Type Here!"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = true; Callback = function(Value)
 if tostring(Value) == loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Module.luau"))():GetKey() then
-
+HavePremium = true
+Notify("Success!", "Redeemed key, enjoy your premium!", 5, true)
 end
 end; })
 
