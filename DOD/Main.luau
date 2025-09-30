@@ -935,7 +935,7 @@ HavePremium = true
 end
 
 local Tab_7 = Window:CreateTab("Premium",0)
-Tab_7:CreateParagraph({Title = "Premium", Content = "Premium content here!"})
+Tab_7:CreateParagraph({Title = "Premium", Content = "Premium content here! Premium content like: Invisibility, "})
 
 Tab_7:CreateLabel("There are currently 2 ways to unlock premium features.")
 Tab_7:CreateLabel("")
@@ -976,9 +976,106 @@ end; })
 
 Tab_7:CreateLabel("")
 
-
-
-
 Tab_7:CreateSection("Advanced Anti / Immunities")
+Tab_7:CreateToggle({Name = "Anti-Stun"; CurrentValue = false; Callback = function(Value)
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/R6TWSu87Aw")) return end
+AntiStun = Value
+if AntiStun == true then
+Notify("Success!", "Anti-Stun is now enabled!", 2, true)
+repeat task.wait(.003)
+Char:SetAttribute("WalkSpeedModifier", 0)
+Char:SetAttribute("StaminaModifier", 0)
+until AntiStun == false
+end
+end; })
+
+Tab_7:CreateSection("Invisibility")
+noclip_connection = nil
+Tab_7:CreateToggle({Name = "Turn On/Off Invisibility"; CurrentValue = false; Callback = function(Value)
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/R6TWSu87Aw")) return end
+if Value == false then
+task.spawn(function()
+for i,v in next, Humanoid:GetPlayingAnimationTracks() do
+v.Priority = Enum.AnimationPriority.Core
+v:AdjustSpeed(tonumber(0))
+v:Stop(tonumber(0))
+end
+end)
+if noclip_connection then
+noclip_connection:Disconnect()
+noclip_connection = nil
+end
+Notify("Success!", "Disabled invisibility!", 2, true)
+elseif Value == true then
+local function nocollision()
+for i,v in pairs(LP.Character:GetDescendants()) do
+if v and v:IsA("BasePart") and v.CanCollide == true and v.Name ~= "HumanoidRootPart" then
+v.CanCollide = false
+end
+end
+if LP.Character:FindFirstChild("HumanoidRootPart") then
+LP.Character:FindFirstChild("HumanoidRootPart").CanCollide = true
+end
+end
+noclip_connection = game:GetService("RunService").Stepped:Connect(nocollision)
+local Anim = Instance.new("Animation")
+Anim.AnimationId = "rbxassetid://90444351114401"
+local loadedanim = LP.Character:FindFirstChildOfClass("Humanoid"):LoadAnimation(Anim)
+loadedanim.Priority = Enum.AnimationPriority.Action4
+repeat task.wait() until loadedanim.Length > 0	
+loadedanim:Play()
+repeat task.wait() until loadedanim.IsPlaying
+loadedanim:AdjustSpeed(tonumber(0))
+loadedanim.TimePosition = 2.2
+Notify("Success!", "Applied invisibility!", 2, true)
+end
+end; })
 
 
+function StudsIntoPower(studs)
+return (studs * 6)
+end
+Tab_7:CreateSection("Hitbox Extender")
+Tab_7:CreateToggle({Name = "Extend Hitbox"; CurrentValue = false; Callback = function(Value)
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/R6TWSu87Aw")) return end
+ExtendHitbox = Value
+if ExtendHitbox == true then
+local distance = StudsIntoPower(1)
+repeat game:GetService("RunService").Heartbeat:Wait()
+local vel, movel = nil, 0.1
+while not (game:GetService("Players").LocalPlayer.Character and game:GetService("Players").LocalPlayer.Character.Parent and game:GetService("Players").LocalPlayer.Character.HumanoidRootPart and game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Parent) do
+game:GetService("RunService").Heartbeat:Wait()
+end
+vel = game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Velocity
+game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Velocity = vel * distance + (game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame.LookVector * distance)
+game:GetService("RunService").RenderStepped:Wait()
+if (game:GetService("Players").LocalPlayer.Character and game:GetService("Players").LocalPlayer.Character.Parent and game:GetService("Players").LocalPlayer.Character.HumanoidRootPart and game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Parent) then
+game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Velocity = vel
+end
+until ExtendHitbox == false
+end
+end; })
+
+function MorphIntoGhost()
+    local a = game:GetService("ReplicatedStorage").Characters.Other.Ghost:Clone()
+    a.Name = LocalPlayer.Name
+    a.Parent = game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost")
+    pcall(function()
+    a:WaitForChild("Humanoid").DisplayDistanceType = "None"
+    end)
+    a:WaitForChild("HumanoidRootPart").CFrame = game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChildOfClass("Model"):WaitForChild("HumanoidRootPart").CFrame
+    pcall(function()
+    for i,v in pairs(a:GetDescendants()) do
+    if (v:IsA("BasePart") or v:IsA("Decal")) and (v.Name ~= "HumanoidRootPart" and (not v:FindFirstChild("Face") and v.Name ~= "Hurtbox")) then
+	v.Transparency = 0.5
+	end
+    end
+    end)
+    task.wait(1)
+    LocalPlayer.Character = a
+    LocalPlayer.CharacterAdded:Once(function()
+    a:Destroy()
+    end)
+    task.wait(1)
+end
+Tab_7:CreateSection("FE Server Breaker / Ability Breaker / Hitbox Breaker")
