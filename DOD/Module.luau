@@ -1,4 +1,4 @@
-local key = "hamburger"
+local key = "cheeseburger"
 
 local module = {}
 
