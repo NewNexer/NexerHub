@@ -854,7 +854,7 @@ local Tab_6 = Window:CreateTab("Animations",0)
 Tab_6:CreateParagraph({Title = "Animations", Content = "You can change your anims here."})
 Tab_6:CreateSection("Animations Changer")
 
-local function SetAnim(run, walk, idle)
+function SetRunAnim(run)
 pcall(function()
 local stopper = Humanoid or Character:FindFirstChildOfClass("AnimationController")
 for i,v in next, stopper:GetPlayingAnimationTracks() do
@@ -882,16 +882,16 @@ if AnimationFolder:FindFirstChild("Sprint") then
 AnimationFolder:FindFirstChild("Sprint").AnimationId = run
 end
 end)
+end
+
+function SetWalkAnim(walk)
 pcall(function()
-if AnimationFolder:FindFirstChild("Idle") then
-AnimationFolder:FindFirstChild("Idle").AnimationId = idle
+local stopper = Humanoid or Character:FindFirstChildOfClass("AnimationController")
+for i,v in next, stopper:GetPlayingAnimationTracks() do
+v:Stop()
 end
 end)
-pcall(function()
-if AnimationFolder:FindFirstChild("OldIdle") then
-AnimationFolder:FindFirstChild("OldIdle").AnimationId = idle
-end
-end)
+local AnimationFolder = ReturnAnimFolder()
 pcall(function()
 if AnimationFolder:FindFirstChild("Walk") then
 AnimationFolder:FindFirstChild("Walk").AnimationId = walk
@@ -902,11 +902,35 @@ if AnimationFolder:FindFirstChild("OldWalk") then
 AnimationFolder:FindFirstChild("OldWalk").AnimationId = walk
 end
 end)
+end
+
+function SetIdleAnim(idle)
+pcall(function()
+local stopper = Humanoid or Character:FindFirstChildOfClass("AnimationController")
+for i,v in next, stopper:GetPlayingAnimationTracks() do
+v:Stop()
+end
+end)
+local AnimationFolder = ReturnAnimFolder()
+pcall(function()
+if AnimationFolder:FindFirstChild("Idle") then
+AnimationFolder:FindFirstChild("Idle").AnimationId = idle
+end
+end)
+pcall(function()
+if AnimationFolder:FindFirstChild("OldIdle") then
+AnimationFolder:FindFirstChild("OldIdle").AnimationId = idle
+end
+end)
+end
+
+function ApplyNewAnimations()
 pcall(function()
 Character.Animate.Disabled = true
 task.wait()
 Character.Animate.Disabled = false
 end)
+task.wait()
 pcall(function()
 LocalPlayer.PlayerScripts.ClientAnimations.Disabled = true
 task.wait()
@@ -963,7 +987,7 @@ end; end
 end)
 
 
-
+Tab_6:CreateSection("Advanced")
 
 
 
