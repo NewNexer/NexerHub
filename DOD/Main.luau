@@ -1142,7 +1142,53 @@ MorphIntoGhost()
 Notify("Auto-Softlock Enabled!", "Check the label above to see when will specific killers get softlocked.", 5, true)
 end; })
 
+function IsFacingTowards(part)
+local unit = ((HumanoidRootPart.Position - part.Position) * Vector3.new(1,0,1)).Unit
+local lookvector = part.CFrame.LookVector * Vector3.new(1,0,1)
+return (lookvector:Dot(unit) > 0.85)
+end
 
+function GetMagnitudeDifference(part)
+return (part.Position - HumanoidRootPart.Position).Magnitude
+end
+
+local attacks = {"Swing","Cleave","Bolt","Shoot"}
+
+
+local AutoBlock = false
+workspace.GameAssets.Teams.Killer.ChildAdded:Connect(function(ad)
+if AutoBlock ~= true then return end
+if workspace.GameAssets.Teams.Killer:FindFirstChild(LocalPlayer.Name) then return end
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(unpack({{tostring("Block")}}))
+task.wait()
+if ad.Name == tostring(LocalPlayer.Name) then return end
+local AutoBlock_con_1, AutoBlock_con_2
+if not game.Players:GetPlayerFromCharacter(ad) then return end
+repeat task.wait() until ad:FindFirstChild("Humanoid")
+AutoBlock_con_1 = ad:FindFirstChild("Humanoid"):FindFirstChildOfClass("Animator").AnimationPlayed:Connect(function(track)
+if not track.Animation then return end
+local function IsAttacking()
+local y = false
+local attacks = {"rbxassetid://86688899212031","rbxassetid://86688899212031","rbxassetid://86688899212031","rbxassetid://86688899212031","rbxassetid://86688899212031","rbxassetid://86688899212031","rbxassetid://86688899212031","rbxassetid://86688899212031","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://90169934219103","rbxassetid://78618685223511","rbxassetid://77146551800119","rbxassetid://77146551800119","rbxassetid://77146551800119","rbxassetid://77146551800119","rbxassetid://77146551800119","rbxassetid://99333140295180","rbxassetid://77146551800119","rbxassetid://77146551800119","rbxassetid://77146551800119","rbxassetid://77146551800119","rbxassetid://77146551800119","rbxassetid://77146551800119","rbxassetid://85336854929158","rbxassetid://84850475824455","rbxassetid://85336854929158","rbxassetid://84850475824455","rbxassetid://84850475824455","rbxassetid://84850475824455","rbxassetid://85336854929158","rbxassetid://84850475824455","rbxassetid://84850475824455","rbxassetid://85336854929158","rbxassetid://84850475824455","rbxassetid://124579722663415","rbxassetid://108527178823496","rbxassetid://108527178823496","rbxassetid://124579722663415","rbxassetid://108527178823496","rbxassetid://124579722663415","rbxassetid://108527178823496","rbxassetid://124579722663415","rbxassetid://108527178823496","rbxassetid://124579722663415","rbxassetid://108527178823496","rbxassetid://124579722663415","rbxassetid://108527178823496","rbxassetid://124579722663415","rbxassetid://108527178823496","rbxassetid://124579722663415","rbxassetid://108527178823496","rbxassetid://124579722663415","rbxassetid://108527178823496","rbxassetid://124579722663415","rbxassetid://124579722663415","rbxassetid://108527178823496","rbxassetid://71896478910022","rbxassetid://89729648321106","rbxassetid://130037883107006","rbxassetid://89729648321106","rbxassetid://130037883107006","rbxassetid://89729648321106","rbxassetid://130037883107006","rbxassetid://89729648321106","rbxassetid://130037883107006","rbxassetid://89729648321106","rbxassetid://84565422738230","rbxassetid://89729648321106","rbxassetid://130037883107006","rbxassetid://89729648321106","rbxassetid://130037883107006","rbxassetid://89729648321106","rbxassetid://78618685223511","rbxassetid://89729648321106","rbxassetid://100896558622404","rbxassetid://89729648321106","rbxassetid://78618685223511","rbxassetid://89729648321106","rbxassetid://89729648321106","rbxassetid://78618685223511","rbxassetid://78618685223511","rbxassetid://89729648321106","rbxassetid://130037883107006","rbxassetid://89729648321106","rbxassetid://130037883107006","rbxassetid://89729648321106","rbxassetid://130037883107006","rbxassetid://89729648321106","rbxassetid://78618685223511","rbxassetid://89729648321106","rbxassetid://78618685223511","rbxassetid://89729648321106"}
+if table.find(attacks, track.Animation.AnimationId) then
+y = true
+end
+return y
+end
+
+if IsAttacking() and IsFacingTowards(ad:FindFirstChild("HumanoidRootPart")) and GetMagnitudeDifference(ad:FindFirstChild("HumanoidRootPart")) < 13 then
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteFunctions"):WaitForChild("UseAbility"):InvokeServer("Block")
+end
+end)
+
+AutoBlock_con_2 = workspace.GameAssets.Teams.Killer.ChildRemoved:Connect(function(dd)
+if ad == dd then
+AutoBlock_con_1:Disconnect()
+AutoBlock_con_2:Disconnect()
+end
+end)
+
+end)
 
 
 
