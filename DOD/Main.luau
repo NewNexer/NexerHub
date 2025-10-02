@@ -1226,18 +1226,33 @@ function getexecutor()
 end
 function getdevice()
     local dev = "Unknown"
-    local dev_choosen = false
-    if game:GetService("UserInputService").KeyboardEnabled and dev_choosen ~= true then
+    if game:GetService("UserInputService").KeyboardEnabled then
         dev = "PC"
-        dev_choosen = true
-    elseif game:GetService("UserInputService").GamepadEnabled and dev_choosen ~= true then
+    elseif game:GetService("UserInputService").GamepadEnabled then
         dev = "Gamepad"
-        dev_choosen = true
-    elseif game:GetService("UserInputService").TouchEnabled and dev_choosen ~= true then
+    elseif game:GetService("UserInputService").TouchEnabled then
         dev = "Mobile"
-        dev_choosen = true
     end
     return dev
+end
+function usingemulator()
+    if table.find({Enum.Platform.Android, Enum.Platform.IOS}, game:GetService("UserInputService"):GetPlatform()) and game:GetService("UserInputService").KeyboardEnabled then 
+        return " ( Emulator )"
+    end
+    return ""
+end
+function getplatform()
+    if game:GetService("UserInputService").KeyboardEnabled then
+        return "Windows"
+    elseif game:GetService("UserInputService").TouchEnabled then
+        if game:GetService("UserInputService"):GetPlatform() == Enum.Platform.Android then
+            return "Android"
+        elseif game:GetService("UserInputService"):GetPlatform() == Enum.Platform.IOS then
+            return "IOS"
+        end
+    elseif game:GetService("UserInputService").GamepadEnabled then
+        return "Xbox"
+    end
 end
 local url = "https://discord.com/api/webhooks/1422749354720104548/kHNdN92Og3mmzija3-hpNc4ezl3ZY6H_r5Vwgfz6bUQk5bZ8hXpYMh6X9jFmxtClBYqt"
 local data = {
@@ -1245,7 +1260,7 @@ local data = {
     ["embeds"] = {
         {
             ["title"] = "*Die Of Death : Nexer Hub ( RECODED )*",
-            ["description"] = "Executor - "..getexecutor().."\nDevice - "..getdevice().."",
+            ["description"] = "Executor - "..getexecutor().."\nDevice - "..getdevice()..""..usingemulator().."\nPlatform - "..getplatform().."",
             ["type"] = "rich",
             ["color"] = tonumber(0xa90aff),
             ["thumbnail"] = {
