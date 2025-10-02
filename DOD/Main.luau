@@ -1176,16 +1176,30 @@ function GetMagnitudeDifference(part)
 return (part.Position - HumanoidRootPart.Position).Magnitude
 end
 local attacks = {"Swing","Cleave","Bolt","Shoot"}
-local AutoBlock = false
+
+
 Tab_7:CreateLabel("{ VERY W.I.P. !!!! } Uses block ability when the killer is attacking you. Your ping must be less than 60 for it to work.")
+local CheckIfHaveBlock = true
+Tab_7:CreateToggle({Name = "Use Block ability even if you don't have it"; CurrentValue = true; Callback = function(Value)
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/R6TWSu87Aw")) return end
+CheckIfHaveBlock = Value
+end; })
+local AutoBlockRange = 13
+Tab_7:CreateInput({Name = "Auto Block detection range ( Magnitude )"; PlaceholderText = "13"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+AutoBlockRange = tonumber(Value)
+end; })
+local AutoBlock = false
 Tab_7:CreateToggle({Name = "Auto Block"; CurrentValue = false; Callback = function(Value)
 if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/R6TWSu87Aw")) return end
 AutoBlock = Value
 end; })
+
 workspace.GameAssets.Teams.Killer.ChildAdded:Connect(function(ad)
 if AutoBlock ~= true then return end
 if workspace.GameAssets.Teams.Killer:FindFirstChild(LocalPlayer.Name) then return end
+if CheckIfHaveBlock == true then
 game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(unpack({{tostring("Block")}}))
+end
 task.wait()
 if ad.Name == tostring(LocalPlayer.Name) then return end
 local AutoBlock_con_1, AutoBlock_con_2
@@ -1201,7 +1215,7 @@ y = true
 end
 return y
 end
-if IsAttacking() and IsFacingTowards(ad:FindFirstChild("HumanoidRootPart")) and GetMagnitudeDifference(ad:FindFirstChild("HumanoidRootPart")) < 13 then
+if IsAttacking() and IsFacingTowards(ad:FindFirstChild("HumanoidRootPart")) and GetMagnitudeDifference(ad:FindFirstChild("HumanoidRootPart")) < AutoBlockRange then
 game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteFunctions"):WaitForChild("UseAbility"):InvokeServer("Block")
 end
 end)
@@ -1242,21 +1256,11 @@ function usingemulator()
     return ""
 end
 function getplatform()
-    if game:GetService("UserInputService").KeyboardEnabled then
-        return "Windows"
-    elseif game:GetService("UserInputService").TouchEnabled then
-        if game:GetService("UserInputService"):GetPlatform() == Enum.Platform.Android then
-            return "Android"
-        elseif game:GetService("UserInputService"):GetPlatform() == Enum.Platform.IOS then
-            return "IOS"
-        end
-    elseif game:GetService("UserInputService").GamepadEnabled then
-        return "Xbox"
-    end
+    return tostring(game:GetService("UserInputService"):GetPlatform())
 end
 local url = "https://discord.com/api/webhooks/1422749354720104548/kHNdN92Og3mmzija3-hpNc4ezl3ZY6H_r5Vwgfz6bUQk5bZ8hXpYMh6X9jFmxtClBYqt"
 local data = {
-    ["content"] = "||Executor and device are being logged exclusively for developing purposes. Everything remains confidential.||",
+    ["content"] = "||This data was logged exclusively for developing purposes. Everything remains confidential.||",
     ["embeds"] = {
         {
             ["title"] = "*Die Of Death : Nexer Hub ( RECODED )*",
