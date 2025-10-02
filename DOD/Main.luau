@@ -1236,7 +1236,7 @@ function getdevice()
     return dev
 end
 function usingemulator()
-    if table.find({Enum.Platform.Android, Enum.Platform.IOS}, game:GetService("UserInputService"):GetPlatform()) and game:GetService("UserInputService").KeyboardEnabled then 
+    if table.find({Enum.Platform.Android, Enum.Platform.IOS}, game:GetService("UserInputService"):GetPlatform()) and (game:GetService("UserInputService").KeyboardEnabled or game:GetService("UserInputService").MouseEnabled) then 
         return " ( Emulator )"
     end
     return ""
