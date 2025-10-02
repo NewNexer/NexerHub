@@ -791,12 +791,37 @@ child:Destroy()
 end
 end)
 
+Tab_5:CreateToggle({Name = "Anti Taunt"; CurrentValue = false; Callback = function(Value)
+pcall(function()
+if Value == true then
+game:GetService("ReplicatedStorage").Events.RemoteEvents.TauntEffect.Parent = game.LogService
+else
+game.LogService.TauntEffect.Parent = game:GetService("ReplicatedStorage").Events.RemoteEvents
+end
+end)
+end; })
 
+local AutoRemoveBarriers = false
+Tab_5:CreateToggle({Name = "Anti Barriers"; CurrentValue = false; Callback = function(Value)
+AutoRemoveBarriers = Value
+pcall(function()
+if Value == true then
+workspace.GameAssets.Map.Config.Barriers:Destroy()
+end
+end)
+end; })
 
-
-
-
-
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams").DescendantAdded:Connect(function(d)
+task.wait()
+if d.Name == LocalPlayer.Name then
+task.wait(1)
+pcall(function()
+if AutoRemoveBarriers == true then
+workspace.GameAssets.Map.Config.Barriers:Destroy()
+end
+end)
+end
+end)
 
 
 
@@ -1147,15 +1172,16 @@ local unit = ((HumanoidRootPart.Position - part.Position) * Vector3.new(1,0,1)).
 local lookvector = part.CFrame.LookVector * Vector3.new(1,0,1)
 return (lookvector:Dot(unit) > 0.85)
 end
-
 function GetMagnitudeDifference(part)
 return (part.Position - HumanoidRootPart.Position).Magnitude
 end
-
 local attacks = {"Swing","Cleave","Bolt","Shoot"}
-
-
 local AutoBlock = false
+Tab_7:CreateLabel("{ VERY W.I.P. !!!! } Uses block ability when the killer is attacking you. Your ping must be less than 60 for it to work.")
+Tab_7:CreateToggle({Name = "Auto Block"; CurrentValue = false; Callback = function(Value)
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/R6TWSu87Aw")) return end
+AutoBlock = Value
+end; })
 workspace.GameAssets.Teams.Killer.ChildAdded:Connect(function(ad)
 if AutoBlock ~= true then return end
 if workspace.GameAssets.Teams.Killer:FindFirstChild(LocalPlayer.Name) then return end
@@ -1175,19 +1201,16 @@ y = true
 end
 return y
 end
-
 if IsAttacking() and IsFacingTowards(ad:FindFirstChild("HumanoidRootPart")) and GetMagnitudeDifference(ad:FindFirstChild("HumanoidRootPart")) < 13 then
 game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteFunctions"):WaitForChild("UseAbility"):InvokeServer("Block")
 end
 end)
-
 AutoBlock_con_2 = workspace.GameAssets.Teams.Killer.ChildRemoved:Connect(function(dd)
 if ad == dd then
 AutoBlock_con_1:Disconnect()
 AutoBlock_con_2:Disconnect()
 end
 end)
-
 end)
 
 
