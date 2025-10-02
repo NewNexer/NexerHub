@@ -944,7 +944,11 @@ local RunAnim = "rbxassetid://137375023685630"
 local WalkAnim = "rbxassetid://84388941697203"
 local IdleAnim = "rbxassetid://100930402371608"
 task.spawn(function()
-SetAnim(RunAnim, WalkAnim, IdleAnim)
+SetRunAnim(RunAnim)
+SetWalkAnim(WalkAnim)
+SetIdleAnim(IdleAnim)
+task.wait()
+ApplyNewAnimations()
 end)
 Notify("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
 end; })
@@ -953,7 +957,11 @@ local RunAnim = "rbxassetid://79488319304371"
 local WalkAnim = "rbxassetid://138161225743614"
 local IdleAnim = "rbxassetid://74309548749074"
 task.spawn(function()
-SetAnim(RunAnim, WalkAnim, IdleAnim)
+SetRunAnim(RunAnim)
+SetWalkAnim(WalkAnim)
+SetIdleAnim(IdleAnim)
+task.wait()
+ApplyNewAnimations()
 end)
 Notify("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
 end; })
@@ -964,7 +972,11 @@ local RunAnim = "rbxassetid://124260679864309"
 local WalkAnim = "rbxassetid://124260679864309"
 local IdleAnim = "rbxassetid://110395159339100"
 task.spawn(function()
-SetAnim(RunAnim, WalkAnim, IdleAnim)
+SetRunAnim(RunAnim)
+SetWalkAnim(WalkAnim)
+SetIdleAnim(IdleAnim)
+task.wait()
+ApplyNewAnimations()
 end)
 Notify("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
 end; })
@@ -978,7 +990,11 @@ local RunAnim = e:WaitForChild("Animations"):WaitForChild("Sprint").AnimationId 
 local WalkAnim = e:WaitForChild("Animations"):WaitForChild("Walk").AnimationId or e:WaitForChild("Animations"):WaitForChild("OldWalk").AnimationId
 local IdleAnim = e:WaitForChild("Animations"):WaitForChild("Idle").AnimationId or e:WaitForChild("Animations"):WaitForChild("OldIdle").AnimationId
 task.spawn(function()
-SetAnim(RunAnim, WalkAnim, IdleAnim)
+SetRunAnim(RunAnim)
+SetWalkAnim(WalkAnim)
+SetIdleAnim(IdleAnim)
+task.wait()
+ApplyNewAnimations()
 end)
 Notify("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
 end; })
@@ -990,8 +1006,20 @@ end)
 Tab_6:CreateSection("Advanced")
 
 
-
-
+function GetAllRunAnims()
+local temp_table = {}
+temp_table["Civilian Run"] = "rbxassetid://137375023685630"
+temp_table["Old Civilian Run"] = "rbxassetid://79488319304371"
+temp_table["Ghost Run"] = "rbxassetid://124260679864309"
+for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
+for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
+local RunAnim = e:WaitForChild("Animations"):WaitForChild("Sprint").AnimationId or e:WaitForChild("Animations"):WaitForChild("OldSprint").AnimationId or e:WaitForChild("Animations"):WaitForChild("NormalSprint").AnimationId or e:WaitForChild("Animations"):WaitForChild("HurtSprint").AnimationId
+local AnimName = ""..e.Name.." "..v.Name.." Run"
+temp_table[AnimName] = RunAnim
+end; end
+end; end
+return temp_table
+end
 
 
 
