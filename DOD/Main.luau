@@ -890,7 +890,7 @@ end
 
 local Tab_6 = Window:CreateTab("Animations",0)
 Tab_6:CreateParagraph({Title = "Animations", Content = "You can change your anims here."})
-Tab_6:CreateSection("Animations Changer")
+
 
 function SetRunAnim(run)
 pcall(function()
@@ -1269,6 +1269,7 @@ LP.Character:FindFirstChild("HumanoidRootPart").CanCollide = true
 end
 end
 noclip_connection = game:GetService("RunService").Stepped:Connect(nocollision)
+workspace.CurrentCamera.CameraSubject = Humanoid
 local Anim = Instance.new("Animation")
 Anim.AnimationId = "rbxassetid://90444351114401" -- If you will use my invis, please credit me.
 local loadedanim = LP.Character:FindFirstChildOfClass("Humanoid"):LoadAnimation(Anim)
