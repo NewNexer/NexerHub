@@ -489,7 +489,7 @@ esp_stat.Adornee = v
 esp_stat.AlwaysOnTop = true
 esp_stat.Parent = esp
 esp_stat.Size = UDim2.new(0, 80, 0, 130)
-esp_stat.StudsOffset = Vector3.new(0, .5, 0)
+esp_stat.StudsOffset = Vector3.new(0, .7, 0)
 stat_text.ZIndex = 10
 stat_text.BackgroundTransparency = 1
 stat_text.Position = UDim2.new(0, 0, 0, -50)
@@ -500,7 +500,11 @@ stat_text.TextColor3 = Color3.new(1, 1, 1)
 stat_text.TextStrokeTransparency = 0
 stat_text.TextYAlignment = Enum.TextYAlignment.Bottom
 stat_text.Parent = esp_stat
-stat_text.Text = "Name: "..plr.Name
+pcall(function()
+while task.wait(.05) do
+stat_text.Text = "Name: "..plr.Name.."\nHealth: "..plr_char.Humanoid.Health..""
+end
+end)
 end
 
 end
