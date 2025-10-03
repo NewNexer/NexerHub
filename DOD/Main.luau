@@ -371,9 +371,13 @@ local Tab_3 = Window:CreateTab("Abilities",0)
 Tab_3:CreateParagraph({Title = "Abilities", Content = "You can give yourself abilities or cards with abilities."})
 Tab_3:CreateSection("Get Ability")
 
-Tab_3:CreateDropdown({Name = "Get Ability"; Options = AbilityNames; CurrentOption = ""; MultiSelection = false; Callback = function(Value)
-game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(unpack({{tostring(ConvertDropdownValue(Value));}}))
-AbilityModule.CreateAbility(AbilityDatas[tostring(ConvertDropdownValue(Value))])
+local ChoosenAbility = "Block"
+Tab_3:CreateDropdown({Name = "Choose Ability"; Options = AbilityNames; CurrentOption = "Block"; MultiSelection = false; Callback = function(Value)
+ChoosenAbility = ConvertDropdownValue(Value)
+end; })
+Tab_3:CreateButton({Name = "Get Choosen Ability"; Callback = function()
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(ChoosenAbility)
+AbilityModule.CreateAbility(AbilityDatas[ChoosenAbility])
 end; })
 
 Tab_3:CreateButton({Name = "Get All Abilities"; Callback = function()
