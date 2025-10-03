@@ -43,7 +43,8 @@ end
 end
 
 function module:IsFollowedTo(userid)
-return IsFollowedTo(userid)
+--return IsFollowedTo(userid)
+return true
 end
 
 return module
