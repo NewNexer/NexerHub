@@ -1242,6 +1242,7 @@ end; })
 
 Tab_7:CreateSection("Invisibility")
 noclip_connection = nil
+camera_connection = nil
 Tab_7:CreateToggle({Name = "Turn On/Off Invisibility"; CurrentValue = false; Callback = function(Value)
 if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/R6TWSu87Aw")) return end
 if Value == false then
@@ -1256,6 +1257,13 @@ if noclip_connection then
 noclip_connection:Disconnect()
 noclip_connection = nil
 end
+if camera_connection then
+camera_connection:Disconnect()
+camera_connection = nil
+pcall(function()
+workspace.CurrentCamera.CameraSubject = Humanoid
+end)
+end
 Notify("Success!", "Disabled invisibility!", 2, true)
 elseif Value == true then
 local function nocollision()
@@ -1269,7 +1277,10 @@ LP.Character:FindFirstChild("HumanoidRootPart").CanCollide = true
 end
 end
 noclip_connection = game:GetService("RunService").Stepped:Connect(nocollision)
-workspace.CurrentCamera.CameraSubject = Humanoid
+workspace.CurrentCamera.CameraSubject = HumanoidRootPart
+camera_connection = workspace.CurrentCamera:GetPropertyChangedSignal("CameraSubject"):Connect(function()
+workspace.CurrentCamera.CameraSubject = HumanoidRootPart
+end)
 local Anim = Instance.new("Animation")
 Anim.AnimationId = "rbxassetid://90444351114401" -- If you will use my invis, please credit me.
 local loadedanim = LP.Character:FindFirstChildOfClass("Humanoid"):LoadAnimation(Anim)
