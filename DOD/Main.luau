@@ -733,8 +733,8 @@ AntiComputer = false
 Tab_5:CreateToggle({Name = "Anti Cooldown in Badware Computer Prompts"; CurrentValue = false; Callback = function(Value)
 AntiComputer = Value
 if AntiComputer == true then
-for _,descendant in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable"):GetDescendants()) do
-if descendant and descendant:IsA("ProximityPrompt") and descendant.Parent and descendant.Parent.Name == "Primary" then
+for _,descendant in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):GetDescendants()) do
+if descendant and descendant:IsA("ProximityPrompt") and AntiComputer == true then
 pcall(function()
 descendant.HoldDuration = 0
 descendant.RequiresLineOfSight = false
@@ -744,8 +744,8 @@ end
 end
 end
 end; })
-game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable").DescendantAdded:Connect(function(descendant)
-if descendant and descendant:IsA("ProximityPrompt") and descendant.Parent and descendant.Parent.Name == "Primary" and AntiComputer == true then
+game:GetService("Workspace"):WaitForChild("GameAssets").DescendantAdded:Connect(function(descendant)
+if descendant and descendant:IsA("ProximityPrompt") and AntiComputer == true then
 pcall(function()
 descendant.HoldDuration = 0
 descendant.RequiresLineOfSight = false
