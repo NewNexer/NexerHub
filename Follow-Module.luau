@@ -17,7 +17,7 @@ ft = {}
 Decode = nil
 repeat
 if Decode == nil then
-Decode = game:GetService("HttpService"):JSONDecode(game:HttpGet(ReturnURL(1))) or game:GetService("HttpService"):JSONDecode(game:HttpGet(ReturnURL("backup")))
+Decode = game:GetService("HttpService"):JSONDecode(game:HttpGet(valid_url(1))) or game:GetService("HttpService"):JSONDecode(game:HttpGet(valid_url("backup")))
 end
 if not Decode["data"] or Decode["errors"] then return false end
 for i,v in pairs(Decode["data"]) do
@@ -27,7 +27,7 @@ end
 end
 if Decode["nextPageCursor"] ~= nil then
 Decode = nil
-Decode = game:GetService("HttpService"):JSONDecode(game:HttpGet(ReturnURL(1, Decode["nextPageCursor"]))) or game:GetService("HttpService"):JSONDecode(game:HttpGet(ReturnURL("backup", Decode["nextPageCursor"])))
+Decode = game:GetService("HttpService"):JSONDecode(game:HttpGet(valid_url(1, Decode["nextPageCursor"]))) or game:GetService("HttpService"):JSONDecode(game:HttpGet(valid_url("backup", Decode["nextPageCursor"])))
 end
 until Decode["nextPageCursor"] == nil
 if table.find(ft,tonumber(userid)) then
