@@ -489,7 +489,7 @@ esp_stat.Adornee = v
 esp_stat.AlwaysOnTop = true
 esp_stat.Parent = esp
 esp_stat.Size = UDim2.new(0, 80, 0, 130)
-esp_stat.StudsOffset = Vector3.new(0, 1, 0)
+esp_stat.StudsOffset = Vector3.new(0, .5, 0)
 stat_text.ZIndex = 10
 stat_text.BackgroundTransparency = 1
 stat_text.Position = UDim2.new(0, 0, 0, -50)
@@ -1266,7 +1266,7 @@ function MorphIntoGhost()
     end)
 end
 
-Tab_7:CreateSection("FE Server Breaker / Ability Breaker / Hitbox Breaker")
+Tab_7:CreateSection("FE Hitbox Breaker")
 
 
 -- Code is obfuscated to prevent those methods to get patched
@@ -1282,6 +1282,8 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/Pro666Pro/Modules/ref
 Notify("Broke hitboxes!", "Everyone's hitboxes are now must be broken.", 3, true)
 end; })
 
+
+Tab_7:CreateSection("FE Server Glitcher / Softlock Utility")
 Tab_7:CreateLabel("Only Harken, Badware and Killdroid can be softlocked. Harken will softlock if she uses Immolate or Tangle. Badware will softlock if he uses Rift. All Killdroid Deploys will get softlocked.")
 Tab_7:CreateLabel("WARNING! You will play as ghost after activating this feature.")
 Tab_7:CreateButton({Name = "FE Softlock Killers"; Callback = function()
@@ -1305,6 +1307,7 @@ end
 local attacks = {"Swing","Cleave","Bolt","Shoot"}
 
 
+Tab_7:CreateSection("Auto Block")
 Tab_7:CreateLabel("{ VERY W.I.P. !!!! } Uses block ability when the killer is attacking you. Your ping must be less than 60 for it to work.")
 local CheckIfHaveBlock = true
 Tab_7:CreateToggle({Name = "Use Block ability even if you don't have it"; CurrentValue = true; Callback = function(Value)
