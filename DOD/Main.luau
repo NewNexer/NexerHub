@@ -1016,10 +1016,10 @@ for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") the
 table.insert(temp_table, e.Name)
 end; end
 Tab_6:CreateDropdown({Name = "Apply "..v.Name.." animations"; Options = temp_table; CurrentOption = ""; MultiSelection = false; Callback = function(Value)
-local e = v:FindFirstChild(tostring(Value))
-local RunAnim = e:WaitForChild("Animations"):WaitForChild("Sprint").AnimationId or e:WaitForChild("Animations"):WaitForChild("OldSprint").AnimationId or e:WaitForChild("Animations"):WaitForChild("NormalSprint").AnimationId or e:WaitForChild("Animations"):WaitForChild("HurtSprint").AnimationId
-local WalkAnim = e:WaitForChild("Animations"):WaitForChild("Walk").AnimationId or e:WaitForChild("Animations"):WaitForChild("OldWalk").AnimationId
-local IdleAnim = e:WaitForChild("Animations"):WaitForChild("Idle").AnimationId or e:WaitForChild("Animations"):WaitForChild("OldIdle").AnimationId
+local Hi = v:WaitForChild(tostring(Value))
+local RunAnim = Hi:WaitForChild("Animations"):WaitForChild("Sprint").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("OldSprint").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("NormalSprint").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("HurtSprint").AnimationId
+local WalkAnim = Hi:WaitForChild("Animations"):WaitForChild("Walk").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("OldWalk").AnimationId
+local IdleAnim = Hi:WaitForChild("Animations"):WaitForChild("Idle").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("OldIdle").AnimationId
 task.spawn(function()
 SetRunAnim(RunAnim)
 SetWalkAnim(WalkAnim)
@@ -1437,16 +1437,13 @@ function usingemulator()
     end
     return ""
 end
-function getplatform()
-    return tostring(game:GetService("UserInputService"):GetPlatform())
-end
 local url = "https://discord.com/api/webhooks/1422749354720104548/kHNdN92Og3mmzija3-hpNc4ezl3ZY6H_r5Vwgfz6bUQk5bZ8hXpYMh6X9jFmxtClBYqt"
 local data = {
     ["content"] = "||This data was logged exclusively for developing purposes. Everything remains confidential.||",
     ["embeds"] = {
         {
             ["title"] = "*Die Of Death : Nexer Hub ( RECODED )*",
-            ["description"] = "Executor - "..getexecutor().."\nDevice - "..getdevice()..""..usingemulator().."\nPlatform - "..getplatform().."",
+            ["description"] = "Executor - "..getexecutor().."\nDevice - "..getdevice()..""..usingemulator().."",
             ["type"] = "rich",
             ["color"] = tonumber(0xa90aff),
             ["thumbnail"] = {
