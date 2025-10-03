@@ -126,7 +126,7 @@ local Window = Rayfield:CreateWindow({
 
 pcall(function()
 local Announcements = Window:CreateTab("Announce",0)
-Announcements:CreateParagraph({Title = "Hi there!", Content = "This script was fully recoded and fixed. Thank you for using my script. ❤️\n\nAlso join our discord server for early updates, free premium access and many other things..."})
+Announcements:CreateParagraph({Title = "Hi there!", Content = "Script Version: 2.1\n\nThis script was fully recoded and fixed. Thank you for using my script. ❤️\n\nAlso join our discord server for early updates, free premium access and many other things..."})
 Announcements:CreateButton({Name = "Copy Discord Server Link"; Callback = function()
 setclipboard(tostring("https://discord.gg/7u5GRNw3xn"))
 Notify("Success!", "Copied Link!", 3, true)
@@ -182,6 +182,8 @@ elseif property == "WalkSpeed" then
 Hum.WalkSpeed = value
 elseif property == "SprintSpeed" then
 Char:SetAttribute("SprintSpeed", value)
+elseif property == "WalkSpeed" then
+Char:SetAttribute("WalkSpeed", value)
 elseif property == "CanJump" then
 if value == true then Hum.JumpPower = 50 else Hum.JumpPower = 0 end
 end
@@ -211,7 +213,29 @@ SetStaminaProperty("CanJump", false)
 end
 end; })
 
-Tab_1:CreateSection("Advanced Editing")
+Tab_1:CreateToggle({Name = "No Stamina Loss"; CurrentValue = false; Callback = function(Value)
+NoStaminaLoss = Value
+if NoStaminaLoss == true then
+repeat task.wait(0.003)
+if Character and Character:GetAttribute("MaxStamina") then
+SetStaminaProperty("Stamina", Character:GetAttribute("MaxStamina"))
+end
+until NoStaminaLoss == false
+end
+end; })
+
+Tab_1:CreateToggle({Name = "No Fatigue"; CurrentValue = false; Callback = function(Value)
+NoFatigue = Value
+if NoFatigue == true then
+repeat task.wait(0.003)
+if Character and Character:GetAttribute("Fatigue") and Character:GetAttribute("Fatigue") == true then
+SetStaminaProperty("Fatigue", false)
+end
+until NoFatigue == false
+end
+end; })
+
+Tab_1:CreateSection("Advanced")
 
 Tab_1:CreateInput({Name = "Max Stamina"; PlaceholderText = "Type Here!"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = true; Callback = function(Value)
 SetStaminaProperty("MaxStamina", tonumber(Value))
@@ -222,23 +246,52 @@ SetStaminaProperty("Stamina", tonumber(Value))
 end; })
 
 Tab_1:CreateInput({Name = "Walk Speed"; PlaceholderText = "Type Here!"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = true; Callback = function(Value)
-Humanoid.WalkSpeed = tonumber(Value)
+SetStaminaProperty("WalkSpeed", tonumber(Value))
 end; })
 
 Tab_1:CreateInput({Name = "Sprint Speed"; PlaceholderText = "Type Here!"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = true; Callback = function(Value)
 SetStaminaProperty("SprintSpeed", tonumber(Value))
 end; })
 
-Tab_1:CreateButton({Name = "Enable/Disable Fatigue"; Callback = function()
-if Char:GetAttribute("Fatigue") and Char:GetAttribute("Fatigue") == true then
-SetStaminaProperty("Fatigue", false)
-else
-SetStaminaProperty("Fatigue", true)
-end
+Tab_1:CreateSection("Auto Injection")
+local AI_MaxStamina, AI_WalkSpeed, AI_SprintSpeed, AutoInjectStamina
+
+Tab_1:CreateLabel("Stamina settings will automatically be applied to your character 21.5 seconds after the round starts.")
+
+Tab_1:CreateToggle({Name = "Auto Inject"; CurrentValue = false; Callback = function(Value)
+AutoInjectStamina = Value
 end; })
 
+Tab_1:CreateInput({Name = "Max Stamina"; PlaceholderText = "Type Here!"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+AI_MaxStamina = Value
+end; })
 
+Tab_1:CreateInput({Name = "Walk Speed"; PlaceholderText = "Type Here!"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+AI_WalkSpeed = Value
+end; })
 
+Tab_1:CreateInput({Name = "Sprint Speed"; PlaceholderText = "Type Here!"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+AI_SprintSpeed = Value
+end; })
+
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams").DescendantAdded:Connect(function(descendant)
+task.wait()
+if descendant.Name == ""..LP.Name.."" and not descendant.Parent.Name == "Ghost" and AutoInjectStamina == true then
+task.wait(21.5)
+pcall(function()
+SetStaminaProperty("MaxStamina", AI_MaxStamina)
+end)
+pcall(function()
+SetStaminaProperty("Stamina", AI_MaxStamina)
+end)
+pcall(function()
+SetStaminaProperty("WalkSpeed", AI_WalkSpeed)
+end)
+pcall(function()
+SetStaminaProperty("SprintSpeed", AI_SprintSpeed)
+end)
+end
+end)
 
 
 
@@ -443,7 +496,31 @@ until AutoSpamAbility == false
 end
 end; })
 
+Tab_3:CreateSection("Auto Ability Injection")
+local AI_Ability_1, AI_Ability_2, AutoInjectAbility
 
+Tab_3:CreateLabel("Ability will automatically get equipped ( along side with their accessories ) 5 seconds after the round starts.")
+
+Tab_3:CreateToggle({Name = "Auto Inject"; CurrentValue = false; Callback = function(Value)
+AutoInjectAbility = Value
+end; })
+
+Tab_3:CreateDropdown({Name = "First Ability"; Options = AbilityNames; CurrentOption = ""; MultiSelection = false; Callback = function(Value)
+AI_Ability_1 = ConvertDropdownValue(Value)
+end; })
+Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOption = ""; MultiSelection = false; Callback = function(Value)
+AI_Ability_2 = ConvertDropdownValue(Value)
+end; })
+
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams").DescendantAdded:Connect(function(descendant)
+task.wait()
+if descendant.Name == ""..LP.Name.."" and not descendant.Parent.Name == "Ghost" and AutoInjectAbility == true then
+task.wait(5)
+pcall(function()
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(unpack({{tostring(AI_Ability_1);tostring(AI_Ability_2);}}))
+end)
+end
+end)
 
 
 
@@ -1223,7 +1300,9 @@ Notify("Success!", "Copied Link!", 3, true)
 end; })
 
 Tab_7:CreateInput({Name = "Input Key"; PlaceholderText = "Type Here!"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = true; Callback = function(Value)
-if tostring(Value) == loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Module.luau"))():GetKey() then
+local key_module = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Module.luau"))()
+local key = key_module:GetKey()
+if tostring(Value) == tostring(key) then
 HavePremium = true
 Notify("Success!", "Redeemed key, enjoy your premium!", 5, true)
 end
