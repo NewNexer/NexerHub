@@ -1021,7 +1021,61 @@ end; end
 return temp_table
 end
 
+function GetAllWalkAnims()
+local temp_table = {}
+temp_table["Civilian Walk"] = "rbxassetid://84388941697203"
+temp_table["Old Civilian Walk"] = "rbxassetid://138161225743614"
+temp_table["Ghost Walk"] = "rbxassetid://124260679864309"
+for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
+for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
+local WalkAnim = e:WaitForChild("Animations"):WaitForChild("Walk").AnimationId or e:WaitForChild("Animations"):WaitForChild("OldWalk").AnimationId
+local AnimName = ""..e.Name.." "..v.Name.." Walk"
+temp_table[AnimName] = WalkAnim
+end; end
+end; end
+return temp_table
+end
 
+function GetAllIdleAnims()
+local temp_table = {}
+temp_table["Civilian Idle"] = "rbxassetid://100930402371608"
+temp_table["Old Civilian Idle"] = "rbxassetid://74309548749074"
+temp_table["Ghost Idle"] = "rbxassetid://110395159339100"
+for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
+for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
+local IdleAnim = e:WaitForChild("Animations"):WaitForChild("Idle").AnimationId or e:WaitForChild("Animations"):WaitForChild("OldIdle").AnimationId
+local AnimName = ""..e.Name.." "..v.Name.." Idle"
+temp_table[AnimName] = IdleAnim
+end; end
+end; end
+return temp_table
+end
+
+local ChoosenRunAnim = "Civilian Run"
+Tab_6:CreateDropdown({Name = "Run Animation"; Options = GetAllRunAnims(); CurrentOption = "Civilian Run"; MultiSelection = false; Callback = function(Value)
+ChoosenRunAnim = tostring(ConvertDropdownValue(Value))
+end; })
+
+local ChoosenWalkAnim = "Civilian Walk"
+Tab_6:CreateDropdown({Name = "Walk Animation"; Options = GetAllWalkAnims(); CurrentOption = "Civilian Walk"; MultiSelection = false; Callback = function(Value)
+ChoosenWalkAnim = tostring(ConvertDropdownValue(Value))
+end; })
+
+local ChoosenIdleAnim = "Civilian Idle"
+Tab_6:CreateDropdown({Name = "Idle Animation"; Options = GetAllIdleAnims(); CurrentOption = "Civilian Idle"; MultiSelection = false; Callback = function(Value)
+ChoosenIdleAnim = tostring(ConvertDropdownValue(Value))
+end; })
+
+Tab_6:CreateButton({Name = "Apply Animations"; Callback = function()
+task.spawn(function()
+SetRunAnim(GetAllRunAnims()[ChoosenRunAnim])
+SetWalkAnim(GetAllWalkAnims()[ChoosenWalkAnim])
+SetIdleAnim(GetAllIdleAnims()[ChoosenIdleAnim])
+task.wait()
+ApplyNewAnimations()
+end)
+Notify("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
+end; })
 
 
 ----------------------------------------------------------------------------------------------
