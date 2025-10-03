@@ -1076,18 +1076,60 @@ end; end
 return temp_table
 end
 
+function GetAllRunNames()
+local temp_table = {}
+table.insert(temp_table, "Civilian Run")
+table.insert(temp_table, "Old Civilian Run")
+table.insert(temp_table, "Ghost Run")
+for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
+for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
+local AnimName = ""..e.Name.." "..v.Name.." Run"
+table.insert(temp_table, AnimName)
+end; end
+end; end
+return temp_table
+end
+
+function GetAllWalkNames()
+local temp_table = {}
+table.insert(temp_table, "Civilian Walk")
+table.insert(temp_table, "Old Civilian Walk")
+table.insert(temp_table, "Ghost Walk")
+for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
+for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
+local AnimName = ""..e.Name.." "..v.Name.." Walk"
+table.insert(temp_table, AnimName)
+end; end
+end; end
+return temp_table
+end
+
+function GetAllIdleNames()
+local temp_table = {}
+table.insert(temp_table, "Civilian Idle")
+table.insert(temp_table, "Old Civilian Idle")
+table.insert(temp_table, "Ghost Idle")
+for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
+for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
+local AnimName = ""..e.Name.." "..v.Name.." Idle"
+table.insert(temp_table, AnimName)
+end; end
+end; end
+return temp_table
+end
+
 local ChoosenRunAnim = "Civilian Run"
-Tab_6:CreateDropdown({Name = "Run Animation"; Options = GetAllRunAnims(); CurrentOption = "Civilian Run"; MultiSelection = false; Callback = function(Value)
+Tab_6:CreateDropdown({Name = "Run Animation"; Options = GetAllRunNames(); CurrentOption = "Civilian Run"; MultiSelection = false; Callback = function(Value)
 ChoosenRunAnim = tostring(ConvertDropdownValue(Value))
 end; })
 
 local ChoosenWalkAnim = "Civilian Walk"
-Tab_6:CreateDropdown({Name = "Walk Animation"; Options = GetAllWalkAnims(); CurrentOption = "Civilian Walk"; MultiSelection = false; Callback = function(Value)
+Tab_6:CreateDropdown({Name = "Walk Animation"; Options = GetAllWalkNames(); CurrentOption = "Civilian Walk"; MultiSelection = false; Callback = function(Value)
 ChoosenWalkAnim = tostring(ConvertDropdownValue(Value))
 end; })
 
 local ChoosenIdleAnim = "Civilian Idle"
-Tab_6:CreateDropdown({Name = "Idle Animation"; Options = GetAllIdleAnims(); CurrentOption = "Civilian Idle"; MultiSelection = false; Callback = function(Value)
+Tab_6:CreateDropdown({Name = "Idle Animation"; Options = GetAllIdleNames(); CurrentOption = "Civilian Idle"; MultiSelection = false; Callback = function(Value)
 ChoosenIdleAnim = tostring(ConvertDropdownValue(Value))
 end; })
 
@@ -1127,8 +1169,9 @@ HavePremium = true
 end
 
 local Tab_7 = Window:CreateTab("Premium",0)
-Tab_7:CreateParagraph({Title = "Premium", Content = "Premium content here! Premium content like: Invisibility, "})
+Tab_7:CreateParagraph({Title = "Premium", Content = "Premium content here! Very exploitable features."})
 
+Tab_7:CreateLabel("")
 Tab_7:CreateLabel("There are currently 2 ways to unlock premium features.")
 Tab_7:CreateLabel("")
 Tab_7:CreateLabel("Buy the gamepass to unlock premium features! [ Cost "..tostring(PremiumPrice).." robux! ]")
@@ -1211,7 +1254,7 @@ end
 end
 noclip_connection = game:GetService("RunService").Stepped:Connect(nocollision)
 local Anim = Instance.new("Animation")
-Anim.AnimationId = "rbxassetid://90444351114401"
+Anim.AnimationId = "rbxassetid://90444351114401" -- If you will use my invis, please credit me.
 local loadedanim = LP.Character:FindFirstChildOfClass("Humanoid"):LoadAnimation(Anim)
 loadedanim.Priority = Enum.AnimationPriority.Action4
 repeat task.wait() until loadedanim.Length > 0	
