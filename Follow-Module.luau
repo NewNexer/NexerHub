@@ -37,6 +37,7 @@ return false, "Fail."
 end)
 
 if not Success then
+warn("Error checking followings :: "..Fail)
 return true, "Unknown error occured."
 end
 end
