@@ -1352,6 +1352,7 @@ Tab_7:CreateSection("FE Hitbox Breaker")
 
 
 Tab_7:CreateLabel("I recommend using hitbox breaker during double trouble / one bounce / die nation for more fun!")
+Tab_7:CreateLabel("WARNING! You need to equip killdroid.")
 Tab_7:CreateButton({Name = "FE Break Game Hitboxes"; Callback = function()
 if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/R6TWSu87Aw")) return end
 if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChild(LocalPlayer.Name) then Notify("Error!", "You must be killer!", 4, false) return end
