@@ -1016,7 +1016,7 @@ for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") the
 table.insert(temp_table, e.Name)
 end; end
 Tab_6:CreateDropdown({Name = "Apply "..v.Name.." animations"; Options = temp_table; CurrentOption = ""; MultiSelection = false; Callback = function(Value)
-local Hi = v:WaitForChild(tostring(Value))
+local Hi = v:WaitForChild(ConvertDropdownValue(Value))
 local RunAnim = Hi:WaitForChild("Animations"):WaitForChild("Sprint").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("OldSprint").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("NormalSprint").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("HurtSprint").AnimationId
 local WalkAnim = Hi:WaitForChild("Animations"):WaitForChild("Walk").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("OldWalk").AnimationId
 local IdleAnim = Hi:WaitForChild("Animations"):WaitForChild("Idle").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("OldIdle").AnimationId
@@ -1414,6 +1414,14 @@ Tab_8:CreateParagraph({Title = "Fun", Content = "Funny things will be here here 
 Tab_8:CreateSection("Coming soon...")
 
 
+local Tab_9 = Window:CreateTab("Other",0)
+Tab_9:CreateParagraph({Title = "Other", Content = "Other random thingiez"})
+Tab_9:CreateDropdown({Name = "Gui Theme"; Options = {"Amethyst","Default","AmberGlow","Bloom","DarkBlue","Green","Light","Ocean","Serenity"}; CurrentOption = "Amethyst"; MultiSelection = false; Callback = function(Value)
+Window.ModifyTheme(TableFirstElementToString(Value))
+end; })
+Tab_9:CreateButton({Name = "Close Hub"; Callback = function()
+DestroyRayfield()
+end; })
 
 -- @numantf6 Is this safe now? FYI: I didn't even do anything with usernames. All old data was deleted and will remain confidential. And also don't make '' free premium '' again. I put a lot of hard work into those, have some respect.
 
