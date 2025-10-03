@@ -91,9 +91,9 @@ end)
 end
 
 local Window = Rayfield:CreateWindow({
-   Name = "Die of Death : Nexer Hub",
+   Name = "Nexer Hub : RECODE",
    Icon = 0,    
-   LoadingTitle = "DOD:NH",
+   LoadingTitle = "NH:R",
    LoadingSubtitle = "by nexer",
    Theme = "Amethyst",
    DisableRayfieldPrompts = true,
@@ -122,6 +122,17 @@ local Window = Rayfield:CreateWindow({
       Key = {"cheese"}
    }
 })
+
+
+pcall(function()
+local Announcements = Window:CreateTab("Announce",0)
+Announcements:CreateParagraph({Title = "Hi there!", Content = "This script was fully recoded and fixed. Thank you for using my script. ❤️\n\nAlso join our discord server for early updates, free premium access and many other things..."})
+Announcements:CreateButton({Name = "Copy Discord Server Link"; Callback = function()
+setclipboard(tostring("https://discord.gg/R6TWSu87Aw"))
+Notify("Success!", "Copied Link!", 3, true)
+end; })
+end)
+
 
 local LocalPlayer, LP = game.Players.LocalPlayer, game.Players.LocalPlayer
 local Character, Char
@@ -495,7 +506,7 @@ stat_text.BackgroundTransparency = 1
 stat_text.Position = UDim2.new(0, 0, 0, -50)
 stat_text.Size = UDim2.new(0, 80, 0, 80)
 stat_text.Font = Enum.Font.SourceSansSemibold
-stat_text.TextSize = 14
+stat_text.TextSize = 15
 stat_text.TextColor3 = Color3.new(1, 1, 1)
 stat_text.TextStrokeTransparency = 0
 stat_text.TextYAlignment = Enum.TextYAlignment.Bottom
