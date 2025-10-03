@@ -128,7 +128,7 @@ pcall(function()
 local Announcements = Window:CreateTab("Announce",0)
 Announcements:CreateParagraph({Title = "Hi there!", Content = "This script was fully recoded and fixed. Thank you for using my script. ❤️\n\nAlso join our discord server for early updates, free premium access and many other things..."})
 Announcements:CreateButton({Name = "Copy Discord Server Link"; Callback = function()
-setclipboard(tostring("https://discord.gg/R6TWSu87Aw"))
+setclipboard(tostring("https://discord.gg/7u5GRNw3xn"))
 Notify("Success!", "Copied Link!", 3, true)
 end; })
 end)
@@ -1218,7 +1218,7 @@ end; })
 Tab_7:CreateLabel("or join our discord server to unlock premium features!")
 
 Tab_7:CreateButton({Name = "Copy Discord Server Link"; Callback = function()
-setclipboard(tostring("https://discord.gg/R6TWSu87Aw"))
+setclipboard(tostring("https://discord.gg/7u5GRNw3xn"))
 Notify("Success!", "Copied Link!", 3, true)
 end; })
 
@@ -1233,7 +1233,7 @@ Tab_7:CreateSection("")
 
 Tab_7:CreateSection("Advanced Anti / Immunities")
 Tab_7:CreateToggle({Name = "Anti-Stun"; CurrentValue = false; Callback = function(Value)
-if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/R6TWSu87Aw")) return end
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
 AntiStun = Value
 if AntiStun == true then
 Notify("Success!", "Anti-Stun is now enabled!", 2, true)
@@ -1248,7 +1248,7 @@ Tab_7:CreateSection("Invisibility")
 noclip_connection = nil
 camera_connection = nil
 Tab_7:CreateToggle({Name = "Turn On/Off Invisibility"; CurrentValue = false; Callback = function(Value)
-if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/R6TWSu87Aw")) return end
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
 if Value == false then
 task.spawn(function()
 for i,v in next, Humanoid:GetPlayingAnimationTracks() do
@@ -1304,7 +1304,7 @@ return (studs * 6)
 end
 Tab_7:CreateSection("Hitbox Extender")
 Tab_7:CreateToggle({Name = "Extend Hitbox"; CurrentValue = false; Callback = function(Value)
-if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/R6TWSu87Aw")) return end
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
 ExtendHitbox = Value
 if ExtendHitbox == true then
 local distance = 9
@@ -1354,7 +1354,7 @@ Tab_7:CreateSection("FE Hitbox Breaker")
 Tab_7:CreateLabel("I recommend using hitbox breaker during double trouble / one bounce / die nation for more fun!")
 Tab_7:CreateLabel("WARNING! You need to equip killdroid.")
 Tab_7:CreateButton({Name = "FE Break Game Hitboxes"; Callback = function()
-if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/R6TWSu87Aw")) return end
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
 if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChild(LocalPlayer.Name) then Notify("Error!", "You must be killer!", 4, false) return end
 Notify("Breaking hitboxes...", "Please wait!", 7, true)
 --If you're not a skid, you can easily de-obfuscate that.
@@ -1367,7 +1367,7 @@ Tab_7:CreateSection("FE Server Glitcher / Softlock Utility")
 Tab_7:CreateLabel("Only Harken, Badware and Killdroid can be softlocked. Harken will softlock if she uses Immolate or Tangle. Badware will softlock if he uses Rift. All Killdroid Deploys will get softlocked.")
 Tab_7:CreateLabel("WARNING! You will play as ghost after activating this feature.")
 Tab_7:CreateButton({Name = "FE Softlock Killers"; Callback = function()
-if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/R6TWSu87Aw")) return end
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
 if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChildWhichIsA("Model") then Notify("Error!", "No Killers!", 3, false) return end
 Notify("Enabling Auto-Softlock...", "Please wait!", 7, true)
 --If you're not a skid, you can easily de-obfuscate that.
@@ -1391,7 +1391,7 @@ Tab_7:CreateSection("Auto Block")
 Tab_7:CreateLabel("{ VERY W.I.P. !!!! } Uses block ability when the killer is attacking you. Your ping must be less than 60 for it to work.")
 local CheckIfHaveBlock = true
 Tab_7:CreateToggle({Name = "Use Block ability even if you don't have it"; CurrentValue = true; Callback = function(Value)
-if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/R6TWSu87Aw")) return end
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
 CheckIfHaveBlock = Value
 end; })
 local AutoBlockRange = 13
@@ -1400,7 +1400,7 @@ AutoBlockRange = tonumber(Value)
 end; })
 local AutoBlock = false
 Tab_7:CreateToggle({Name = "Auto Block"; CurrentValue = false; Callback = function(Value)
-if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/R6TWSu87Aw")) return end
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
 AutoBlock = Value
 end; })
 
