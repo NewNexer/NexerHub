@@ -489,7 +489,7 @@ esp_stat.Adornee = v
 esp_stat.AlwaysOnTop = true
 esp_stat.Parent = esp
 esp_stat.Size = UDim2.new(0, 80, 0, 130)
-esp_stat.StudsOffset = Vector3.new(0, .7, 0)
+esp_stat.StudsOffset = Vector3.new(0, .2, 0)
 stat_text.ZIndex = 10
 stat_text.BackgroundTransparency = 1
 stat_text.Position = UDim2.new(0, 0, 0, -50)
@@ -500,10 +500,12 @@ stat_text.TextColor3 = Color3.new(1, 1, 1)
 stat_text.TextStrokeTransparency = 0
 stat_text.TextYAlignment = Enum.TextYAlignment.Bottom
 stat_text.Parent = esp_stat
+task.spawn(function()
 pcall(function()
 while task.wait(.05) do
 stat_text.Text = "Name: "..plr.Name.."\nHealth: "..plr_char.Humanoid.Health..""
 end
+end)
 end)
 end
 
@@ -1009,8 +1011,12 @@ end; })
 pcall(function()
 for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
 Tab_6:CreateLabel(v.Name.." Animations")
+local temp_table = {}
 for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
-Tab_6:CreateButton({Name = "Apply "..e.Name.." animations"; Callback = function()
+table.insert(temp_table, e.Name)
+end; end
+Tab_6:CreateDropdown({Name = "Apply "..v.Name.." animations"; Options = temp_table; CurrentOption = ""; MultiSelection = false; Callback = function(Value)
+local e = v:FindFirstChild(tostring(Value))
 local RunAnim = e:WaitForChild("Animations"):WaitForChild("Sprint").AnimationId or e:WaitForChild("Animations"):WaitForChild("OldSprint").AnimationId or e:WaitForChild("Animations"):WaitForChild("NormalSprint").AnimationId or e:WaitForChild("Animations"):WaitForChild("HurtSprint").AnimationId
 local WalkAnim = e:WaitForChild("Animations"):WaitForChild("Walk").AnimationId or e:WaitForChild("Animations"):WaitForChild("OldWalk").AnimationId
 local IdleAnim = e:WaitForChild("Animations"):WaitForChild("Idle").AnimationId or e:WaitForChild("Animations"):WaitForChild("OldIdle").AnimationId
@@ -1023,7 +1029,6 @@ ApplyNewAnimations()
 end)
 Notify("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
 end; })
-end; end
 end; end
 end)
 
