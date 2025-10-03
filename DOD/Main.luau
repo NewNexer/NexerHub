@@ -488,14 +488,14 @@ local stat_text = Instance.new("TextLabel")
 esp_stat.Adornee = v
 esp_stat.AlwaysOnTop = true
 esp_stat.Parent = esp
-esp_stat.Size = UDim2.new(0, 80, 0, 130)
+esp_stat.Size = UDim2.new(0, 80, 0, 50)
 esp_stat.StudsOffset = Vector3.new(0, .2, 0)
 stat_text.ZIndex = 10
 stat_text.BackgroundTransparency = 1
 stat_text.Position = UDim2.new(0, 0, 0, -50)
 stat_text.Size = UDim2.new(0, 80, 0, 80)
 stat_text.Font = Enum.Font.SourceSansSemibold
-stat_text.TextSize = 18
+stat_text.TextSize = 14
 stat_text.TextColor3 = Color3.new(1, 1, 1)
 stat_text.TextStrokeTransparency = 0
 stat_text.TextYAlignment = Enum.TextYAlignment.Bottom
@@ -965,7 +965,7 @@ LocalPlayer.PlayerScripts.ClientAnimations.Disabled = false
 end)
 end
 
-Tab_6:CreateLabel("Civilian animations")
+Tab_6:CreateSection("Civilian animations")
 Tab_6:CreateButton({Name = "Apply New Civilian Animations"; Callback = function()
 local RunAnim = "rbxassetid://137375023685630"
 local WalkAnim = "rbxassetid://84388941697203"
@@ -993,7 +993,7 @@ end)
 Notify("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
 end; })
 
-Tab_6:CreateLabel("Ghost Animations")
+Tab_6:CreateSection("Ghost Animations")
 Tab_6:CreateButton({Name = "Apply Ghost animations"; Callback = function()
 local RunAnim = "rbxassetid://124260679864309"
 local WalkAnim = "rbxassetid://124260679864309"
@@ -1010,7 +1010,7 @@ end; })
 
 pcall(function()
 for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
-Tab_6:CreateLabel(v.Name.." Animations")
+Tab_6:CreateSection(v.Name.." Animations")
 local temp_table = {}
 for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
 table.insert(temp_table, e.Name)
@@ -1280,7 +1280,7 @@ Tab_7:CreateToggle({Name = "Extend Hitbox"; CurrentValue = false; Callback = fun
 if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/R6TWSu87Aw")) return end
 ExtendHitbox = Value
 if ExtendHitbox == true then
-local distance = StudsIntoPower(2)
+local distance = 9
 repeat game:GetService("RunService").Heartbeat:Wait()
 local vel, movel = nil, 0.1
 while not (game:GetService("Players").LocalPlayer.Character and game:GetService("Players").LocalPlayer.Character.Parent and game:GetService("Players").LocalPlayer.Character.HumanoidRootPart and game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Parent) do
