@@ -96,8 +96,8 @@ local Window = Rayfield:CreateWindow({
    LoadingTitle = "DOD:NH",
    LoadingSubtitle = "by nexer",
    Theme = "Amethyst",
-   DisableRayfieldPrompts = false,
-   DisableBuildWarnings = false,
+   DisableRayfieldPrompts = true,
+   DisableBuildWarnings = true,
 
    ConfigurationSaving = {
       Enabled = false,
@@ -1176,9 +1176,9 @@ end
 local Tab_7 = Window:CreateTab("Premium",0)
 Tab_7:CreateParagraph({Title = "Premium", Content = "Premium content here! Very exploitable features."})
 
-Tab_7:CreateLabel("")
+Tab_7:CreateSection("")
 Tab_7:CreateLabel("There are currently 2 ways to unlock premium features.")
-Tab_7:CreateLabel("")
+Tab_7:CreateSection("")
 Tab_7:CreateLabel("Buy the gamepass to unlock premium features! [ Cost "..tostring(PremiumPrice).." robux! ]")
 
 Tab_7:CreateButton({Name = "Open Gamepass Link"; Callback = function()
@@ -1214,7 +1214,7 @@ Notify("Success!", "Redeemed key, enjoy your premium!", 5, true)
 end
 end; })
 
-Tab_7:CreateLabel("")
+Tab_7:CreateSection("")
 
 Tab_7:CreateSection("Advanced Anti / Immunities")
 Tab_7:CreateToggle({Name = "Anti-Stun"; CurrentValue = false; Callback = function(Value)
@@ -1408,6 +1408,10 @@ AutoBlock_con_2:Disconnect()
 end
 end)
 end)
+
+local Tab_8 = Window:CreateTab("Fun",0)
+Tab_8:CreateParagraph({Title = "Fun", Content = "Funny things will be here here soon muehehehe"})
+Tab_8:CreateSection("Coming soon...")
 
 
 
