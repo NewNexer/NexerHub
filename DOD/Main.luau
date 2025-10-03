@@ -482,6 +482,27 @@ esp.Size = v.Size
 esp.Transparency = (plr_char.Parent.Name == "Workspace" and 1) or tonumber(_G.ESPtransHandler)
 esp.Color = (plr_char.Parent.Name == "Killer" and BrickColor.new("Bright red")) or (plr_char.Parent.Name == "Ghost" and BrickColor.new("White")) or BrickColor.new("Bright green")
 esp.Parent = game:GetService("CoreGui"):WaitForChild("DOD_ESP_HANDLER"):FindFirstChild("sillyfolder_"..plr.Name)
+if v.Name == "Head" then
+local esp_stat = Instance.new("BillboardGui")
+local stat_text = Instance.new("TextLabel")
+esp_stat.Adornee = v
+esp_stat.AlwaysOnTop = true
+esp_stat.Parent = esp
+esp_stat.Size = UDim2.new(0, 80, 0, 130)
+esp_stat.StudsOffset = Vector3.new(0, 1, 0)
+stat_text.ZIndex = 10
+stat_text.BackgroundTransparency = 1
+stat_text.Position = UDim2.new(0, 0, 0, -50)
+stat_text.Size = UDim2.new(0, 80, 0, 80)
+stat_text.Font = Enum.Font.SourceSansSemibold
+stat_text.TextSize = 18
+stat_text.TextColor3 = Color3.new(1, 1, 1)
+stat_text.TextStrokeTransparency = 0
+stat_text.TextYAlignment = Enum.TextYAlignment.Bottom
+stat_text.Parent = esp_stat
+stat_text.Text = "Name: "..plr.Name
+end
+
 end
 end
       
