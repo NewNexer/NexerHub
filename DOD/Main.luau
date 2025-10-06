@@ -1608,10 +1608,14 @@ local imageButton = Instance.new("ImageButton", ff_button)
 		imageButton.Position = UDim2.new(0.5, 0, 0.5, 0)
 		imageButton.Image = "rbxthumb://type=Asset&id=2714338264&w=150&h=150"
 ff_connection = imageButton.Activated:Connect(Flip)
+sausageHolder.Size = UDim2.new(0, originalSize + 48, 0, sausageHolder.Size.Y.Offset)
+task.wait()
+buttonFrame.Position = UDim2.new(0, sausageHolder.Size.X.Offset, 0, 0)
 task.spawn(function()
 pcall(function()
-repeat task.wait()
+repeat
 sausageHolder.Size = UDim2.new(0, originalSize + 48, 0, sausageHolder.Size.Y.Offset)
+task.wait()
 buttonFrame.Position = UDim2.new(0, sausageHolder.Size.X.Offset, 0, 0)
 until ff_enabled == false
 end)
@@ -1626,6 +1630,7 @@ ff_button:Destroy()
 ff_button = nil
 end
 sausageHolder.Size = UDim2.new(0, originalSize - 48, 0, sausageHolder.Size.Y.Offset)
+task.wait()
 buttonFrame.Position = UDim2.new(0, sausageHolder.Size.X.Offset, 0, 0)
 end
 end
