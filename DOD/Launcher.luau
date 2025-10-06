@@ -22,7 +22,7 @@ else
 return nil
 end
 end
-local isfollowed, result = FollowHandler:IsFollowedTo(RequiredUserID)
+local isfollowed = FollowHandler:IsFollowedTo(RequiredUserID)
 if isfollowed == true then
 loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Main.luau"))()
 return
@@ -148,7 +148,7 @@ CopyLink("https://www.roblox.com/users/"..tostring(RequiredUserID).."/profile")
 end; })
 
 Main:CreateButton({Name = "Launch Script"; Callback = function()
-local isfollowed, result = FollowHandler:IsFollowedTo(RequiredUserID)
+local isfollowed = FollowHandler:IsFollowedTo(RequiredUserID)
 if isfollowed == true or game.Players.LocalPlayer.UserId == RequiredUserID then
 DestroyRayfield()
 Notify("Success!", "Launching script, please wait...", 10, true)
