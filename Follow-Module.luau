@@ -31,20 +31,19 @@ Decode = game:GetService("HttpService"):JSONDecode(game:HttpGet(valid_url(1, Dec
 end
 until Decode["nextPageCursor"] == nil
 if table.find(ft,tonumber(userid)) then
-return true, "Success."
+return true
 end
-return false, "Fail."
+return false
 end)
-
-if not Success then
-warn("Error checking followings :: "..Fail)
-return true, "Unknown error occured."
-end
+return Success, Fail
 end
 
 function module:IsFollowedTo(userid)
---return IsFollowedTo(userid)
+local decodeddata, value = IsFollowedTo(userid)
+if decodeddata ~= true then
 return true
+end
+return value
 end
 
 return module
