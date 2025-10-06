@@ -1610,13 +1610,13 @@ local imageButton = Instance.new("ImageButton", ff_button)
 ff_connection = imageButton.Activated:Connect(Flip)
 sausageHolder.Size = UDim2.new(0, originalSize + 48, 0, sausageHolder.Size.Y.Offset)
 task.wait()
-buttonFrame.Position = UDim2.new(0, sausageHolder.Size.X.Offset, 0, 0)
+buttonFrame.Position = UDim2.new(0, sausageHolder.Size.X.Offset - 48, 0, 0)
 task.spawn(function()
 pcall(function()
 repeat
 sausageHolder.Size = UDim2.new(0, originalSize + 48, 0, sausageHolder.Size.Y.Offset)
 task.wait()
-buttonFrame.Position = UDim2.new(0, sausageHolder.Size.X.Offset, 0, 0)
+buttonFrame.Position = UDim2.new(0, sausageHolder.Size.X.Offset - 48, 0, 0)
 until ff_enabled == false
 end)
 end)
@@ -1629,7 +1629,7 @@ if ff_button then
 ff_button:Destroy()
 ff_button = nil
 end
-sausageHolder.Size = UDim2.new(0, originalSize - 48, 0, sausageHolder.Size.Y.Offset)
+sausageHolder.Size = UDim2.new(0, originalSize, 0, sausageHolder.Size.Y.Offset)
 task.wait()
 buttonFrame.Position = UDim2.new(0, sausageHolder.Size.X.Offset, 0, 0)
 end
