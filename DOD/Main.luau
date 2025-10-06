@@ -1516,9 +1516,127 @@ end
 end)
 end)
 
+local ff_connection = nil
+local ff_enabled = false
+local ff_cd = false
+
+function Flip()
+	if ff_cd then
+		return
+	end
+	ff_cd = true
+	local character = Character
+	local hrp = HumanoidRootPart
+	local animator = Humanoid:FindFirstChildOfClass("Animator")
+	if not hrp or not Humanoid then
+		ff_cd = false
+		return
+	end
+	local savedTracks = {}
+	if animator then
+		for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
+			savedTracks[#savedTracks + 1] = { track = track, time = track.TimePosition }
+			track:Stop(0)
+		end
+	end
+    Humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+	Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+	Humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall, false)
+	Humanoid:SetStateEnabled(Enum.HumanoidStateType.Running, false)
+	Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+	Humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing, false)
+	local duration = 0.45
+	local steps = 120
+	local startCFrame = hrp.CFrame
+	local forwardVector = startCFrame.LookVector
+	local upVector = Vector3.new(0, 1, 0)
+	task.spawn(function()
+		local startTime = tick()
+		for i = 1, steps do
+			local t = i / steps
+			local height = 4 * (t - t ^ 2) * 10
+			local nextPos = startCFrame.Position + forwardVector * (35 * t) + upVector * height	
+            local rotation = startCFrame.Rotation * CFrame.Angles(-math.rad(i * (360 / steps)), 0, 0)
+
+			hrp.CFrame = CFrame.new(nextPos) * rotation
+			local elapsedTime = tick() - startTime
+			local expectedTime = (duration / steps) * i
+			local waitTime = expectedTime - elapsedTime
+			if waitTime > 0 then
+				task.wait(waitTime)
+			end
+		end
+
+		hrp.CFrame = CFrame.new(startCFrame.Position + forwardVector * 35) * startCFrame.Rotation
+		Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, true)
+		Humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall, true)
+		Humanoid:SetStateEnabled(Enum.HumanoidStateType.Running, true)
+		Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+		Humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing, true)
+		Humanoid:ChangeState(Enum.HumanoidStateType.Running)
+
+		if animator then
+			for _, data in ipairs(savedTracks) do
+				local track = data.track
+				track:Play()
+				track.TimePosition = data.time
+			end
+		end
+		task.wait(0.25)
+		ff_cd = false
+	end)
+end
+
+local sausageHolder = game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.UnibarMenu["2"]
+local originalSize = sausageHolder.Size.X.Offset
+local ff_button = nil
+function SetFrontFlip(bool)
+ff_enabled = bool
+if ff_enabled == true then
+sausageHolder = game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.UnibarMenu["2"]
+originalSize = sausageHolder.Size.X.Offset
+ff_button = Instance.new("Frame", sausageHolder)
+		ff_button.Size = UDim2.new(0, 48, 0, 44)
+		ff_button.BackgroundTransparency = 1
+		ff_button.BorderSizePixel = 0
+		ff_button.Position = UDim2.new(0, sausageHolder.Size.X.Offset - 48, 0, 0)
+local imageButton = Instance.new("ImageButton", ff_button)
+		imageButton.BackgroundTransparency = 1
+		imageButton.BorderSizePixel = 0
+		imageButton.Size = UDim2.new(0, 36, 0, 36)
+		imageButton.AnchorPoint = Vector2.new(0.5, 0.5)
+		imageButton.Position = UDim2.new(0.5, 0, 0.5, 0)
+		imageButton.Image = "rbxthumb://type=Asset&id=2714338264&w=150&h=150"
+ff_connection = imageButton.Activated:Connect(Flip)
+task.spawn(function()
+pcall(function()
+repeat task.wait()
+sausageHolder.Size = UDim2.new(0, originalSize + 48, 0, sausageHolder.Size.Y.Offset)
+buttonFrame.Position = UDim2.new(0, sausageHolder.Size.X.Offset - 48, 0, 0)
+until ff_enabled == false
+end)
+end)
+elseif ff_enabled == false then
+if ff_connection then
+ff_connection:Disconnect()
+ff_connection = nil
+end
+if ff_button then
+ff_button:Disconnect()
+ff_button = nil
+end
+sausageHolder.Size = UDim2.new(0, originalSize - 48, 0, sausageHolder.Size.Y.Offset)
+buttonFrame.Position = UDim2.new(0, sausageHolder.Size.X.Offset + 48, 0, 0)
+end
+end
+
 local Tab_8 = Window:CreateTab("Fun",0)
 Tab_8:CreateParagraph({Title = "Fun", Content = "Funny things will be here here soon muehehehe"})
-Tab_8:CreateSection("Coming soon...")
+Tab_8:CreateSection("Movement")
+Tab_8:CreateToggle({Name = "Frontflip"; CurrentValue = true; Callback = function(Value)
+SetFrontFlip(Value)
+end; })
+SetFrontFlip(true)
 
 
 local Tab_9 = Window:CreateTab("Other",0)
