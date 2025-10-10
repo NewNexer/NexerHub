@@ -1533,7 +1533,7 @@ end
 
 function CheckPlayingAnims(killer, killername)
 local attacks = MainModule:GetAnimationTriggers(killername)
-for _,q in pairs(killer:FindFirstChildOfClass("Humanoid"):GetPlayingAnimationTracks()) do
+for _,q in pairs(killer:FindFirstChild("Humanoid"):GetPlayingAnimationTracks()) do
 if (q and q.Animation and q.Animation.AnimationId) and table.find(attacks, q.Animation.AnimationId) then
 return q.Animation.AnimationId
 end
@@ -1553,7 +1553,7 @@ end
 
 function HookAttributes(killer)
 if AutoBlock ~= true then return end
-if not killer or not killer:FindFirstChild("HumanoidRootPart") then return end
+if not killer or not killer:FindFirstChild("HumanoidRootPart") or not killer:FindFirstChild("Humanoid") then warn("not found") return end
 local ab_connection_1, ab_connection_2 = nil, nil
 ab_connection_1 = killer.AttributeChanged:Connect(function(trigger)
 if trigger == "WalkSpeedModifier" then
