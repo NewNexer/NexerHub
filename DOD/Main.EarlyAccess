@@ -1123,7 +1123,7 @@ local temp_table = {}
 for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
 table.insert(temp_table, e.Name)
 end; end
-Tab_6:CreateDropdown({Name = "Choose "..v.Name.." animations"; Options = temp_table; CurrentOption = ""; MultiSelection = false; Callback = function(Value)
+Tab_6:CreateDropdown({Name = "Choose "..v.Name.." animations"; Options = temp_table; CurrentOption = "Default"; MultiSelection = false; Callback = function(Value)
 local Hi = v:WaitForChild(ConvertDropdownValue(Value))
 end; })
 
@@ -1279,7 +1279,7 @@ return (MarketplaceService:GetProductInfo(Id,Enum.InfoType.Asset).PriceInRobux)
 end)
 end
 local PremiumPrice = GetAssetPrice(1264479709) or 39
--- If you will change this to true i will genuinely get you
+-- YOU CHANGE IT = YOU MIKU BAKA
 local HavePremium = false
 if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(LocalPlayer.UserId, 1264479709) then
 HavePremium = true
@@ -1507,14 +1507,23 @@ if table.find(killer:FindFirstChildOfClass("Humanoid"):GetPlayingAnimationTracks
 return i
 end
 end
+for i,v in pairs(MainModule:GetAnimationTriggers(killername)) do
+print(i,v)
+end
+for i,v in pairs(killer:FindFirstChildOfClass("Humanoid"):GetPlayingAnimationTracks()) do
+print(i,v)
+end
 return nil
 end
 
 function CheckRequirements(killer, killername)
 local a = CheckPlayingAnims(killername)
-if GetMagnitudeDifference(killer) < 14 and IsFacingTowards(killer) and a ~= nil then
+local b = (GetMagnitudeDifference(killer) < 14)
+local c = IsFacingTowards(killer)
+if a ~= nil and b == true and c == true then
 return true
 end
+warn(a,b,c)
 return false
 end
 
