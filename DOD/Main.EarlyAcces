@@ -1501,6 +1501,10 @@ local AutoBlockRange = 12
 Tab_7:CreateInput({Name = "Auto Block detection range ( Magnitude )"; PlaceholderText = "12"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 AutoBlockRange = tonumber(Value)
 end; })
+local AutoRangeSet = false
+Tab_7:CreateToggle({Name = "Auto Range Set"; CurrentValue = false; Callback = function(Value)
+AutoRangeSet = Value
+end; })
 local AutoBlock = false
 local UnHookAttributes = nil
 Tab_7:CreateToggle({Name = "Auto Block"; CurrentValue = false; Callback = function(Value)
@@ -1546,8 +1550,31 @@ end
 return nil
 end
 
+function GetPartSpeed(part)
+local speed = 0
+pcall(function()
+local velocity = part.Velocity
+local horizontalvelocity = Vector3.new(velocity.X,0,velocity.Z)
+speed = horizontalvelocity.Magnitude
+end)
+return speed
+end
+
 function CheckRequirements(killer, killername)
-local b = (GetMagnitudeDifference(killer) < tonumber(AutoBlockRange))
+local as = GetPartSpeed(killer:FindFirstChild("HumanoidRootPart"))
+if as == 0 then
+as = 11
+elseif as < 10 then
+as = as * 2
+elseif as < 30 then
+as = as
+end
+local b
+if AutoRangeSet == true then
+b = (GetMagnitudeDifference(killer) < tonumber(as))
+else
+b = (GetMagnitudeDifference(killer) < tonumber(AutoBlockRange))
+end
 local c = IsFacingTowards(killer)
 if b == true and c == true then
 return true
@@ -1731,53 +1758,3 @@ Tab_9:CreateButton({Name = "Close Hub"; Callback = function()
 DestroyRayfield()
 end; })
 
--- @numantf6 Is this safe now? FYI: I didn't even do anything with usernames. All old data was deleted and will remain confidential. And also don't make '' free premium '' again. I put a lot of hard work into those, have some respect.
-
-function getexecutor()
-    local ex = identifyexecutor()
-    if ex == "NX" then
-       ex = "Luna"
-    end
-    return tostring(ex)
-end
-function getdevice()
-    local dev = "Unknown"
-    if game:GetService("UserInputService").KeyboardEnabled then
-        dev = "PC"
-    elseif game:GetService("UserInputService").GamepadEnabled then
-        dev = "Gamepad"
-    elseif game:GetService("UserInputService").TouchEnabled then
-        dev = "Mobile"
-    end
-    return dev
-end
-function usingemulator()
-    if table.find({Enum.Platform.Android, Enum.Platform.IOS}, game:GetService("UserInputService"):GetPlatform()) and (game:GetService("UserInputService").KeyboardEnabled or game:GetService("UserInputService").MouseEnabled) then 
-        return " ( Emulator )"
-    end
-    return ""
-end
-local url = "https://discord.com/api/webhooks/1422749354720104548/kHNdN92Og3mmzija3-hpNc4ezl3ZY6H_r5Vwgfz6bUQk5bZ8hXpYMh6X9jFmxtClBYqt"
-local data = {
-    ["content"] = "||This data was logged exclusively for developing purposes. Everything remains confidential.||",
-    ["embeds"] = {
-        {
-            ["title"] = "*Die Of Death : Nexer Hub ( RECODED )*",
-            ["description"] = "Executor - "..getexecutor().."\nDevice - "..getdevice()..""..usingemulator().."",
-            ["type"] = "rich",
-            ["color"] = tonumber(0xa90aff),
-            ["thumbnail"] = {
-                ["url"] = "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/IMG_20251001_095852_134.jpg"
-            },
-            ["footer"] = {
-                ["text"] = "Data (YYYY-MM-DD) | "..os.date("%Y-%m-%d").."",
-            }
-        }
-    }
-}
-local newdata = game:GetService("HttpService"):JSONEncode(data)
-local headers = {
-        ["content-type"] = "application/json"
-    }
-local PostData = {Url = url, Body = newdata, Method = "POST", Headers = headers}
-task.spawn(GetRequestMethod(), PostData)
