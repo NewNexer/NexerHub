@@ -1502,6 +1502,7 @@ Tab_7:CreateInput({Name = "Auto Block detection range ( Magnitude )"; Placeholde
 AutoBlockRange = tonumber(Value)
 end; })
 local AutoBlock = false
+local UnHookAttributes = nil
 Tab_7:CreateToggle({Name = "Auto Block"; CurrentValue = false; Callback = function(Value)
 if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
 AutoBlock = Value
@@ -1511,6 +1512,12 @@ for i,v in pairs(workspace:WaitForChild("GameAssets"):WaitForChild("Teams"):Wait
 if v then
 HookAttributes(v)
 end
+end
+elseif Value == false then
+if UnHookAttributes ~= nil then
+pcall(function()
+UnHookAttributes()
+end)
 end
 end
 end; })
@@ -1574,10 +1581,12 @@ end
 end)
 ab_connection_2 = workspace:WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer").ChildRemoved:Connect(function(abcd)
 if abcd == killer then
+UnHookAttributes = nil
 ab_connection_1:Disconnect()
 ab_connection_2:Disconnect()
 end
 end)
+UnHookAttributes = function() ab_connection_1:Disconnect() ab_connection_2:Disconnect() UnHookAttributes = nil end
 end
 
 workspace:WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer").ChildAdded:Connect(HookAttributes)
