@@ -1659,7 +1659,7 @@ function SetFrontFlip(bool)
 ff_enabled = bool
 if ff_enabled == true then
 TopBar = game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.UnibarMenu["2"]
-OrigSize = sausageHolder.Size.X.Offset
+OrigSize = TopBar.Size.X.Offset
 ff_button = Instance.new("Frame", TopBar)
 		ff_button.Size = UDim2.new(0, 48, 0, 44)
 		ff_button.BackgroundTransparency = 1
