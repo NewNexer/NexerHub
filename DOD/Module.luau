@@ -9,36 +9,36 @@ end
 function module:GetAnimationTriggers(killer)
 if killer == "Badware" then
 return {
-[1] = "rbxassetid://110344161345188"; -- Badware Rift;
-[2] = "rbxassetid://135746886198865"; -- Badware BoltStartup;
-[3] = "rbxassetid://108527178823496"; -- Badware Swing;
+["Rift"] = "rbxassetid://110344161345188"; -- Badware Rift;
+["BoltStartup"] = "rbxassetid://135746886198865"; -- Badware BoltStartup;
+["Swing"] = "rbxassetid://108527178823496"; -- Badware Swing;
 }
 elseif killer == "Pursuer" then
 return {
-[1] = "rbxassetid://89729648321106"; -- Pursuer Cleave
-[2] = "rbxassetid://78618685223511"; -- Pursuer Swing 1
-[3] = "rbxassetid://84565422738230"; -- Pursuer Swing 2
-[4] = "rbxassetid://130037883107006"; -- Pursuer Swing 3
-[5] = "rbxassetid://100896558622404"; -- Pursuer Swing 4
-[6] = "rbxassetid://71896478910022"; -- Pursuer Swing 5
+["Cleave"] = "rbxassetid://89729648321106"; -- Pursuer Cleave
+["Swing1"] = "rbxassetid://78618685223511"; -- Pursuer Swing 1
+["Swing2"] = "rbxassetid://84565422738230"; -- Pursuer Swing 2
+["Swing3"] = "rbxassetid://130037883107006"; -- Pursuer Swing 3
+["Swing4"] = "rbxassetid://100896558622404"; -- Pursuer Swing 4
+["Swing5"] = "rbxassetid://71896478910022"; -- Pursuer Swing 5
 }
 elseif killer == "Artful" then
 return {
-[1] = "rbxassetid://112076293590914"; -- Artful RepurposeSwing 1
-[2] = "rbxassetid://110762388652484"; -- Artful RepurposeSwing 2
-[3] = "rbxassetid://80787680522855"; -- Artful Swing
+["RepurposeSwing1"] = "rbxassetid://112076293590914"; -- Artful RepurposeSwing 1
+["RepurposeSwing2"] = "rbxassetid://110762388652484"; -- Artful RepurposeSwing 2
+["Swing"] = "rbxassetid://80787680522855"; -- Artful Swing
 }
 elseif killer == "Harken" then
 return {
-[1] = "rbxassetid://77146551800119"; -- Harken Swing 1
-[2] = "rbxassetid://99333140295180"; -- Harken Swing 2
+["Swing1"] = "rbxassetid://77146551800119"; -- Harken Swing 1
+["Swing2"] = "rbxassetid://99333140295180"; -- Harken Swing 2
 }
 elseif killer == "Killdroid" then
-return {[1] = "rbxassetid://84850475824455"} -- Killdroid Eject
+return {["Eject"] = "rbxassetid://84850475824455"} -- Killdroid Eject
 elseif killer == "MR.O.B." then
-return {[1] = "rbxassetid://78618685223511"} -- MR.O.B. Swing
+return {["Swing"] = "rbxassetid://78618685223511"} -- MR.O.B. Swing
 elseif killer == "Paranoy" then
-return {[2] = "rbxassetid://90169934219103"} -- Paranoy Swing
+return {["Swing"] = "rbxassetid://90169934219103"} -- Paranoy Swing
 end
 end
 
