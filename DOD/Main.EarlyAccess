@@ -926,15 +926,29 @@ child:Destroy()
 end
 end)
 
+local BackupEffect = game:GetService("ReplicatedStorage").Events.RemoteEvents.TauntEffect:Clone()
+BackupEffect.Parent = game.LogService
+local AntiTaunt = false
 Tab_5:CreateToggle({Name = "Anti Taunt"; CurrentValue = false; Callback = function(Value)
-pcall(function()
-if Value == true then
-game:GetService("Players").LocalPlayer.PlayerGui.MainGui.RoundUI.TauntTemplate.Parent = game.LogService
+AntiTaunt = Value
+if AntiTaunt == true then
+LocalPlayer.PlayerGui.MainGui.RoundUI.TauntTemplate:Destroy()
 else
-game.LogService.TauntTemplate.Parent = game:GetService("Players").LocalPlayer.PlayerGui.MainGui.RoundUI
+if LocalPlayer.PlayerGui.MainGui.RoundUI:FindFirstChild("TauntTemplate") == nil then
+local a = BackupEffect:Clone()
+a.Parent = LocalPlayer.PlayerGui.MainGui.RoundUI
+end
+end
+end; })
+
+LocalPlayer.PlayerGui.MainGui.RoundUI.ChildAdded:Connect(function(child)
+if child.Name == "TauntTemplate" and AntiTaunt == true then
+child:Destroy()
+if Character:GetAttribute("WalkSpeedModifier") and tonumber(Character:GetAttribute("WalkSpeedModifier")) < 0 then
+Character:SetAttribute("WalkSpeedModifier", 0)
+end
 end
 end)
-end; })
 
 local AutoRemoveBarriers = false
 Tab_5:CreateToggle({Name = "Anti Barriers"; CurrentValue = false; Callback = function(Value)
@@ -1279,7 +1293,10 @@ return (MarketplaceService:GetProductInfo(Id,Enum.InfoType.Asset).PriceInRobux)
 end)
 end
 local PremiumPrice = GetAssetPrice(1264479709) or 39
--- YOU CHANGE IT = YOU MIKU BAKA
+-- WAIT PLEASE LISTEN
+-- YOU CAN GET PREMIUM FOR FREE BY ENTERING A KEY
+-- KEY IS IN MY DISCORD SERVER 😭🙏
+-- AAAAAAH!!!!!!!!!!!!
 local HavePremium = false
 if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(LocalPlayer.UserId, 1264479709) then
 HavePremium = true
@@ -1336,8 +1353,12 @@ AntiStun = Value
 if AntiStun == true then
 Notify("Success!", "Anti-Stun is now enabled!", 2, true)
 repeat task.wait(.003)
-Char:SetAttribute("WalkSpeedModifier", 0)
-Char:SetAttribute("StaminaModifier", 0)
+if Character:GetAttribute("WalkSpeedModifier") and tonumber(Character:GetAttribute("WalkSpeedModifier")) < 0 then
+Character:SetAttribute("WalkSpeedModifier", 0)
+end
+if Character:GetAttribute("StaminaModifier") and tonumber(Character:GetAttribute("StaminaModifier")) < 0 then
+Character:SetAttribute("StaminaModifier", 0)
+end
 until AntiStun == false
 end
 end; })
@@ -1502,16 +1523,11 @@ AB_UA:InvokeServer("Block")
 end
 
 function CheckPlayingAnims(killer, killername)
-for i,v in pairs(MainModule:GetAnimationTriggers(killername)) do
-if table.find(killer:FindFirstChildOfClass("Humanoid"):GetPlayingAnimationTracks(), v) then
-return i
+local attacks = MainModule:GetAnimationTriggers(killername)
+for _,q in pairs(killer:FindFirstChildOfClass("Humanoid"):GetPlayingAnimationTracks()) do
+if (q and q.Animation and q.Animation.AnimationId) and table.find(attacks, q.Animation.AnimationId) then
+return q.Animation.AnimationId
 end
-end
-for i,v in pairs(MainModule:GetAnimationTriggers(killername)) do
-print(i,v)
-end
-for i,v in pairs(killer:FindFirstChildOfClass("Humanoid"):GetPlayingAnimationTracks()) do
-print(i,v)
 end
 return nil
 end
@@ -1523,7 +1539,6 @@ local c = IsFacingTowards(killer)
 if a ~= nil and b == true and c == true then
 return true
 end
-warn(a,b,c)
 return false
 end
 
