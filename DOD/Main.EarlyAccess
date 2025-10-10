@@ -1137,8 +1137,9 @@ local temp_table = {}
 for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
 table.insert(temp_table, e.Name)
 end; end
+local Hi
 Tab_6:CreateDropdown({Name = "Choose "..v.Name.." animations"; Options = temp_table; CurrentOption = "Default"; MultiSelection = false; Callback = function(Value)
-local Hi = v:WaitForChild(ConvertDropdownValue(Value))
+Hi = v:WaitForChild(ConvertDropdownValue(Value))
 end; })
 
 Tab_6:CreateButton({Name = "Apply "..v.Name.." animations"; Callback = function()
@@ -1504,6 +1505,14 @@ local AutoBlock = false
 Tab_7:CreateToggle({Name = "Auto Block"; CurrentValue = false; Callback = function(Value)
 if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
 AutoBlock = Value
+task.wait()
+if Value == true then
+for i,v in pairs(workspace:WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):GetChildren()) do
+if v then
+HookAttributes(v)
+end
+end
+end
 end; })
 
 local AB_UA = game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteFunctions"):WaitForChild("UseAbility")
@@ -1564,10 +1573,18 @@ end
 end)
 end
 
+workspace:WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer").ChildAdded:Connect(HookAttributes)
+for i,v in pairs(workspace:WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):GetChildren()) do
+if v then
+HookAttributes(v)
+end
+end
+
 local ff_connection = nil
 local ff_enabled = false
 local ff_cd = false
 
+-- Credits to whoever created this, appreciate this.
 function Flip()
 	if ff_cd then
 		return
@@ -1635,19 +1652,19 @@ function Flip()
 	end)
 end
 
-local sausageHolder = game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.UnibarMenu["2"]
-local originalSize = sausageHolder.Size.X.Offset
+local TopBar = game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.UnibarMenu["2"]
+local OrigSize = sausageHolder.Size.X.Offset
 local ff_button = nil
 function SetFrontFlip(bool)
 ff_enabled = bool
 if ff_enabled == true then
-sausageHolder = game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.UnibarMenu["2"]
-originalSize = sausageHolder.Size.X.Offset
-ff_button = Instance.new("Frame", sausageHolder)
+TopBar = game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.UnibarMenu["2"]
+OrigSize = sausageHolder.Size.X.Offset
+ff_button = Instance.new("Frame", TopBar)
 		ff_button.Size = UDim2.new(0, 48, 0, 44)
 		ff_button.BackgroundTransparency = 1
 		ff_button.BorderSizePixel = 0
-		ff_button.Position = UDim2.new(0, sausageHolder.Size.X.Offset - 48, 0, 0)
+		ff_button.Position = UDim2.new(0, TopBar.Size.X.Offset - 48, 0, 0)
 local imageButton = Instance.new("ImageButton", ff_button)
 		imageButton.BackgroundTransparency = 1
 		imageButton.BorderSizePixel = 0
@@ -1656,15 +1673,15 @@ local imageButton = Instance.new("ImageButton", ff_button)
 		imageButton.Position = UDim2.new(0.5, 0, 0.5, 0)
 		imageButton.Image = "rbxthumb://type=Asset&id=2714338264&w=150&h=150"
 ff_connection = imageButton.Activated:Connect(Flip)
-sausageHolder.Size = UDim2.new(0, originalSize + 48, 0, sausageHolder.Size.Y.Offset)
+TopBar.Size = UDim2.new(0, OrigSize + 48, 0, TopBar.Size.Y.Offset)
 task.wait()
-ff_button.Position = UDim2.new(0, sausageHolder.Size.X.Offset - 48, 0, 0)
+ff_button.Position = UDim2.new(0, TopBar.Size.X.Offset - 48, 0, 0)
 task.spawn(function()
 pcall(function()
 repeat
-sausageHolder.Size = UDim2.new(0, originalSize + 48, 0, sausageHolder.Size.Y.Offset)
+TopBar.Size = UDim2.new(0, OrigSize + 48, 0, TopBar.Size.Y.Offset)
 task.wait()
-ff_button.Position = UDim2.new(0, sausageHolder.Size.X.Offset - 48, 0, 0)
+ff_button.Position = UDim2.new(0, TopBar.Size.X.Offset - 48, 0, 0)
 until ff_enabled == false
 end)
 end)
@@ -1677,7 +1694,7 @@ if ff_button then
 ff_button:Destroy()
 ff_button = nil
 end
-sausageHolder.Size = UDim2.new(0, originalSize, 0, sausageHolder.Size.Y.Offset)
+TopBar.Size = UDim2.new(0, OrigSize, 0, TopBar.Size.Y.Offset)
 end
 end
 
