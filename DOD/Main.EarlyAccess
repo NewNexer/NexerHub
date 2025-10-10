@@ -1542,7 +1542,7 @@ return nil
 end
 
 function CheckRequirements(killer, killername)
-local a = CheckPlayingAnims(killername)
+local a = CheckPlayingAnims(killer, killername)
 local b = (GetMagnitudeDifference(killer) < 14)
 local c = IsFacingTowards(killer)
 if a ~= nil and b == true and c == true then
@@ -1653,7 +1653,7 @@ function Flip()
 end
 
 local TopBar = game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.UnibarMenu["2"]
-local OrigSize = sausageHolder.Size.X.Offset
+local OrigSize = TopBar.Size.X.Offset
 local ff_button = nil
 function SetFrontFlip(bool)
 ff_enabled = bool
