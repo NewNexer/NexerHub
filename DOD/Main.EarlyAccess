@@ -1561,7 +1561,6 @@ if not a then return nil end
 if a.Stats:FindFirstChild("IsKiller") and a.Stats:FindFirstChild("IsKiller").Value == true then
 return tostring(a.Stats:FindFirstChild("EquippedKiller").Value)
 end
-end
 return nil
 end
 
