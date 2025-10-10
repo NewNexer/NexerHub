@@ -1527,10 +1527,6 @@ function GetMagnitudeDifference(killer)
 return (killer.HumanoidRootPart.Position - HumanoidRootPart.Position).Magnitude or (1/0)
 end
 
-function Block()
-AB_UA:InvokeServer("Block")
-end
-
 function CheckPlayingAnims(killer, killername)
 local attacks = MainModule:GetAnimationTriggers(killername)
 for _,q in pairs(killer:FindFirstChild("Humanoid"):GetPlayingAnimationTracks()) do
@@ -1552,6 +1548,16 @@ end
 return false
 end
 
+function GetKillerName(killer)
+local a = game.Players:GetPlayerFromCharacter(killer)
+if not a then return nil end
+if a.Stats:FindFirstChild("IsKiller") and a.Stats:FindFirstChild("IsKiller").Value == true then
+return tostring(a.Stats:FindFirstChild("EquippedKiller").Value)
+end
+end
+return nil
+end
+
 function HookAttributes(killer)
 if AutoBlock ~= true then return end
 if not killer or not killer:FindFirstChild("HumanoidRootPart") or not killer:FindFirstChild("Humanoid") then warn("not found") return end
@@ -1559,10 +1565,10 @@ local ab_connection_1, ab_connection_2 = nil, nil
 ab_connection_1 = killer.AttributeChanged:Connect(function(trigger)
 if trigger == "WalkSpeedModifier" then
 if not killer then return end
-local kn = killer:GetAttribute("KillerName")
-if not kn then warn("not name") return end
-if table.find(MainModule:GetWalkSpeedModData(kn), tonumber(killer:GetAttribute("WalkSpeedModifier"))) then
-Block()
+local kn = GetKillerName(killer)
+if not kn then warn("no name") return end
+if CheckRequirements(killer, kn) and table.find(MainModule:GetWalkSpeedModData(kn), tonumber(killer:GetAttribute("WalkSpeedModifier"))) then
+AB_UA:InvokeServer("Block")
 end
 end
 end)
