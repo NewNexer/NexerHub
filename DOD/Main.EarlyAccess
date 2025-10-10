@@ -1534,8 +1534,10 @@ end
 function CheckPlayingAnims(killer, killername)
 local attacks = MainModule:GetAnimationTriggers(killername)
 for _,q in pairs(killer:FindFirstChild("Humanoid"):GetPlayingAnimationTracks()) do
-if (q and q.Animation and q.Animation.AnimationId) and table.find(attacks, q.Animation.AnimationId) then
-return q.Animation.AnimationId
+for i,v in pairs(attacks) do
+if v == tostring(q.Animation.AnimationId) then
+return i
+end
 end
 end
 return nil
@@ -1548,6 +1550,7 @@ local c = IsFacingTowards(killer)
 if a ~= nil and b == true and c == true then
 return true
 end
+warn(a,b,c)
 return false
 end
 
@@ -1559,7 +1562,7 @@ ab_connection_1 = killer.AttributeChanged:Connect(function(trigger)
 if trigger == "WalkSpeedModifier" then
 if not killer then return end
 local kn = killer:GetAttribute("KillerName")
-if not killer:FindFirstChild("HumanoidRootPart") or not kn then return end
+if not kn then warn("not name") return end
 if CheckRequirements(killer, kn) then
 Block()
 end
