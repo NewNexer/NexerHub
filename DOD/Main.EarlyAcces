@@ -1,3 +1,9 @@
+if getgenv then
+getgenv().dod_developer_key = "Nexer"
+else
+_G.dod_developer_key = "Nexer"
+end
+
 function ConvertDropdownValue(tbl)
 if type(tbl) == "table" then
 for _,element in ipairs(tbl) do
@@ -92,9 +98,9 @@ end)
 end
 
 local Window = Rayfield:CreateWindow({
-   Name = "Nexer Hub : RECODE",
+   Name = ""..((getgenv and getgenv().dod_developer_key) or ((_G.dod_developer_key ~= nil and _G.dod_developer_key) or "Unknown")).." Hub : Die Of Death",
    Icon = 0,    
-   LoadingTitle = "NH:R",
+   LoadingTitle = "NH:DOD",
    LoadingSubtitle = "by nexer",
    Theme = "Amethyst",
    DisableRayfieldPrompts = true,
@@ -1001,7 +1007,7 @@ end
 
 local Tab_6 = Window:CreateTab("Animations",0)
 Tab_6:CreateParagraph({Title = "Animations", Content = "You can change your anims here."})
-
+Tab_6:CreateSection("Pre-loaded animations")
 
 function SetRunAnim(run)
 pcall(function()
@@ -1087,7 +1093,7 @@ LocalPlayer.PlayerScripts.ClientAnimations.Disabled = false
 end)
 end
 
-Tab_6:CreateSection("Civilian animations")
+Tab_6:CreateLabel("Civilian animations")
 Tab_6:CreateButton({Name = "Apply New Civilian Animations"; Callback = function()
 local RunAnim = "rbxassetid://137375023685630"
 local WalkAnim = "rbxassetid://84388941697203"
@@ -1115,7 +1121,7 @@ end)
 Notify("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
 end; })
 
-Tab_6:CreateSection("Ghost Animations")
+Tab_6:CreateLabel("Ghost Animations")
 Tab_6:CreateButton({Name = "Apply Ghost animations"; Callback = function()
 local RunAnim = "rbxassetid://124260679864309"
 local WalkAnim = "rbxassetid://124260679864309"
@@ -1132,7 +1138,7 @@ end; })
 
 pcall(function()
 for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
-Tab_6:CreateSection(v.Name.." Animations")
+Tab_6:CreateLabel(v.Name.." Animations")
 local temp_table = {}
 for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
 table.insert(temp_table, e.Name)
@@ -1276,6 +1282,77 @@ end)
 Notify("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
 end; })
 
+Tab_6:CreateSection("Ability Changer")
+
+local AbilityAnimData = {
+["Punch"] = "rbxassetid://124781750889573" -- Civilian Animations Punch;
+["Adrenaline"] = "rbxassetid://77399794134778" -- Civilian Animations Adrenaline;
+["AdrenalineEnd"] = "rbxassetid://92333601998082" -- Civilian Animations AdrenalineEnd;
+["Caretaker"] = "rbxassetid://128767098320893" -- Civilian Animations Caretaker;
+["CloakStart"] = "rbxassetid://133960698072483" -- Civilian Animations CloakStart;
+["BlockStart"] = "rbxassetid://134233326423882" -- Civilian Animations BlockStart;
+["Dash"] = "rbxassetid://78278813483757" -- Civilian Animations Dash;
+["PadBuild"] = "rbxassetid://79104831518074" -- Civilian Animations PadBuild;
+["Hotdog"] = "rbxassetid://78595119178919" -- Civilian Animations Hotdog;
+["Revolver"] = "rbxassetid://74108653904830" -- Civilian Animations Revolver;
+["Taunt"] = "rbxassetid://113732291990231" -- Civilian Animations Taunt;
+["RevolverReload"] = "rbxassetid://79026181033717" -- Civilian Animations RevolverReload;
+["CloakEnd"] = "rbxassetid://120142279051418" -- Civilian Animations CloakEnd;
+["DynamiteWindup"] = "rbxassetid://133960279206605" -- Civilian Animations DynamiteWindup;
+["DynamiteThrow"] = "rbxassetid://99551865645121" -- Civilian Animations DynamiteThrow;
+["DynamiteHold"] = "rbxassetid://137091713941325" -- Civilian Animations DynamiteHold;
+["Banana"] = "rbxassetid://95775571866935" -- Civilian Animations Banana;
+["BlockLand"] = "rbxassetid://94027412516651" -- Civilian Animations BlockLand;
+}
+
+local AbilityAnimNames = {"Punch","Adrenaline","AdrenalineEnd","Caretaker","CloakStart","BlockStart","Dash","PadBuild","Hotdog","Revolver","Taunt","RevolverReload","CloakEnd","DynamiteWindup","DynamiteThrow","DynamiteHold","Banana","BlockLand"}
+
+local ReplaceWhatAbil = "Punch"
+Tab_6:CreateDropdown({Name = "Replace what"; Options = AbilityAnimNames; CurrentOption = "Punch"; MultiSelection = false; Callback = function(Value)
+ReplaceWhatAbil = ConvertDropdownValue(Value)
+end; })
+
+local ReplaceWithWhatAbil = "BlockStart"
+Tab_6:CreateDropdown({Name = "Replace with what"; Options = AbilityAnimNames; CurrentOption = "BlockStart"; MultiSelection = false; Callback = function(Value)
+ReplaceWithWhatAbil = ConvertDropdownValue(Value)
+end; })
+
+Tab_6:CreateButton({Name = "Replace animation"; Callback = function()
+task.spawn(function()
+Character.Animations.Abilities[ReplaceWhatAbil].AnimationId = tostring(AbilityAnimData[ReplaceWithWhatAbil])
+task.wait()
+ApplyNewAnimations()
+end)
+Notify("Success!", "Applying replacion, it may take up to 10 seconds.", 3, true)
+end; })
+
+
+Tab_6:CreateSection("Miscellaneous")
+
+
+Tab_6:CreateButton({Name = "No animations [ THIS CANNOT BE REVERTED! ]"; Callback = function()
+local Anim = Instance.new("Animation")
+Anim.AnimationId = "rbxassetid://100930402371608"
+local loadedanim = Humanoid:LoadAnimation(Anim)
+loadedanim.Priority = Enum.AnimationPriority.Action4
+repeat task.wait() until loadedanim.Length > 0	
+loadedanim:Play()
+repeat task.wait() until loadedanim.IsPlaying
+loadedanim:AdjustSpeed(tonumber(0))
+loadedanim.TimePosition = 0.01
+end; })
+
+Tab_6:CreateButton({Name = "Fast animations [ THIS CANNOT BE REVERTED! ]"; Callback = function()
+pcall(function()
+while task.wait() do
+local a = Humanoid or Character:FindFirstChildOfClass("AnimationController")
+for i,v in next, a:GetPlayingAnimationTracks() do
+v:AdjustSpeed(10)
+end
+end
+end)
+end; })
+
 
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
@@ -1364,12 +1441,10 @@ until AntiStun == false
 end
 end; })
 
-Tab_7:CreateSection("Invisibility")
-noclip_connection = nil
-camera_connection = nil
-Tab_7:CreateToggle({Name = "Turn On/Off Invisibility"; CurrentValue = false; Callback = function(Value)
-if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
-if Value == false then
+local noclip_connection = nil
+local camera_connection = nil
+function ApplyInvisibility(bool)
+if bool == false then
 task.spawn(function()
 for i,v in next, Humanoid:GetPlayingAnimationTracks() do
 v.Priority = Enum.AnimationPriority.Core
@@ -1388,8 +1463,7 @@ pcall(function()
 workspace.CurrentCamera.CameraSubject = Humanoid
 end)
 end
-Notify("Success!", "Disabled invisibility!", 2, true)
-elseif Value == true then
+elseif bool == true then
 local function nocollision()
 for i,v in pairs(LP.Character:GetDescendants()) do
 if v and v:IsA("BasePart") and v.CanCollide == true and v.Name ~= "HumanoidRootPart" then
@@ -1407,17 +1481,76 @@ workspace.CurrentCamera.CameraSubject = HumanoidRootPart
 end)
 local Anim = Instance.new("Animation")
 Anim.AnimationId = "rbxassetid://90444351114401" -- If you will use my invis, please credit me.
-local loadedanim = LP.Character:FindFirstChildOfClass("Humanoid"):LoadAnimation(Anim)
+local loadedanim = Humanoid:LoadAnimation(Anim)
 loadedanim.Priority = Enum.AnimationPriority.Action4
 repeat task.wait() until loadedanim.Length > 0	
 loadedanim:Play()
 repeat task.wait() until loadedanim.IsPlaying
 loadedanim:AdjustSpeed(tonumber(0))
 loadedanim.TimePosition = 2.2
+end
+end
+
+Tab_7:CreateSection("Invisibility")
+Tab_7:CreateToggle({Name = "Turn On/Off Invisibility"; CurrentValue = false; Callback = function(Value)
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
+if Value == false then
+ApplyInvisibility(Value)
+Notify("Success!", "Disabled invisibility!", 2, true)
+elseif Value == true then
+ApplyInvisibility(Value)
 Notify("Success!", "Applied invisibility!", 2, true)
 end
 end; })
 
+Tab_7:CreateToggle({Name = "Infinity Cloak"; CurrentValue = false; Callback = function(Value)
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
+InfinityCloak = Value
+end; })
+
+workspace:WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor").ChildAdded:Connect(function(d)
+if d.Name == ""..LP.Name.."" and InfinityCloak == true then
+local temp_humanoid = d:WaitForChild("Humanoid")
+local oldhealth = temp_humanoid.Health
+local temp_connection = nil
+local temp_con = nil
+
+temp_connection = temp_humanoid.AnimationPlayed:Connect(function(track)
+if not track then return end
+local loggedanim = track.Animation
+if loggedanim then
+local loggedanimid = loggedanim.AnimationId
+if loggedanimid ~= nil and loggedanimid == "rbxassetid://133960698072483" then
+task.wait(3)
+if d.Torso.Transparency == 1 then
+ApplyInvisibility(true)
+d.HumanoidRootPart.CloakEnd.Played:Once(function()
+d.HumanoidRootPart.CloakEnd:Stop()
+end)
+
+task.spawn(function()
+pcall(function()
+repeat task.wait() until not d:IsDescendantOf(workspace) or temp_humanoid.Health ~= oldhealth or InfinityCloak == false
+ApplyInvisibility(false)
+temp_connection:Disconnect()
+temp_con:Disconnect()
+end)
+end)
+
+end
+end
+end
+end)
+
+temp_con = workspace:WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor").ChildRemoved:Connect(function(c)
+if c == d then
+temp_connection:Disconnect()
+temp_con:Disconnect()
+end
+end)
+
+end
+end)
 
 function StudsIntoPower(studs)
 return (studs * 6)
@@ -1596,7 +1729,7 @@ if AutoBlock ~= true then return end
 if not killer or not killer:FindFirstChild("HumanoidRootPart") or not killer:FindFirstChild("Humanoid") then warn("not found") return end
 local ab_connection_1, ab_connection_2 = nil, nil
 ab_connection_1 = killer.AttributeChanged:Connect(function(trigger)
-if trigger == "WalkSpeedModifier" then
+if trigger == "WalkSpeedModifier" and AutoBlock == true then
 if not killer then return end
 local kn = GetKillerName(killer)
 if not kn then warn("no name") return end
