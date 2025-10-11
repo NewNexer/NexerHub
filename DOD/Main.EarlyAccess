@@ -1526,7 +1526,6 @@ if d.Torso.Transparency == 1 then
 ApplyInvisibility(true)
 d.HumanoidRootPart.CloakEnd.Played:Once(function()
 d.HumanoidRootPart.CloakEnd:Stop()
-end)
 
 task.spawn(function()
 pcall(function()
