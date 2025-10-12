@@ -1285,24 +1285,24 @@ end; })
 Tab_6:CreateSection("Ability Changer")
 
 local AbilityAnimData = {
-["Punch"] = "rbxassetid://124781750889573", -- Civilian Animations Punch;
-["Adrenaline"] = "rbxassetid://77399794134778", -- Civilian Animations Adrenaline;
-["AdrenalineEnd"] = "rbxassetid://92333601998082", -- Civilian Animations AdrenalineEnd;
-["Caretaker"] = "rbxassetid://128767098320893", -- Civilian Animations Caretaker;
-["CloakStart"] = "rbxassetid://133960698072483", -- Civilian Animations CloakStart;
-["BlockStart"] = "rbxassetid://134233326423882", -- Civilian Animations BlockStart;
-["Dash"] = "rbxassetid://78278813483757", -- Civilian Animations Dash;
-["PadBuild"] = "rbxassetid://79104831518074", -- Civilian Animations PadBuild;
-["Hotdog"] = "rbxassetid://78595119178919", -- Civilian Animations Hotdog;
-["Revolver"] = "rbxassetid://74108653904830", -- Civilian Animations Revolver;
-["Taunt"] = "rbxassetid://113732291990231", -- Civilian Animations Taunt;
-["RevolverReload"] = "rbxassetid://79026181033717", -- Civilian Animations RevolverReload;
-["CloakEnd"] = "rbxassetid://120142279051418", -- Civilian Animations CloakEnd;
-["DynamiteWindup"] = "rbxassetid://133960279206605", -- Civilian Animations DynamiteWindup;
-["DynamiteThrow"] = "rbxassetid://99551865645121", -- Civilian Animations DynamiteThrow;
-["DynamiteHold"] = "rbxassetid://137091713941325", -- Civilian Animations DynamiteHold;
-["Banana"] = "rbxassetid://95775571866935", -- Civilian Animations Banana;
-["BlockLand"] = "rbxassetid://94027412516651" -- Civilian Animations BlockLand;
+["Punch"] = "rbxassetid://124781750889573", -- Civilian Animations Punch
+["Adrenaline"] = "rbxassetid://77399794134778", -- Civilian Animations Adrenaline
+["AdrenalineEnd"] = "rbxassetid://92333601998082", -- Civilian Animations AdrenalineEnd
+["Caretaker"] = "rbxassetid://128767098320893", -- Civilian Animations Caretaker
+["CloakStart"] = "rbxassetid://133960698072483", -- Civilian Animations CloakStart
+["BlockStart"] = "rbxassetid://134233326423882", -- Civilian Animations BlockStart
+["Dash"] = "rbxassetid://78278813483757", -- Civilian Animations Dash
+["PadBuild"] = "rbxassetid://79104831518074", -- Civilian Animations PadBuild
+["Hotdog"] = "rbxassetid://78595119178919", -- Civilian Animations Hotdog
+["Revolver"] = "rbxassetid://74108653904830", -- Civilian Animations Revolver
+["Taunt"] = "rbxassetid://113732291990231", -- Civilian Animations Taunt
+["RevolverReload"] = "rbxassetid://79026181033717", -- Civilian Animations RevolverReload
+["CloakEnd"] = "rbxassetid://120142279051418", -- Civilian Animations CloakEnd
+["DynamiteWindup"] = "rbxassetid://133960279206605", -- Civilian Animations DynamiteWindup
+["DynamiteThrow"] = "rbxassetid://99551865645121", -- Civilian Animations DynamiteThrow
+["DynamiteHold"] = "rbxassetid://137091713941325", -- Civilian Animations DynamiteHold
+["Banana"] = "rbxassetid://95775571866935", -- Civilian Animations Banana
+["BlockLand"] = "rbxassetid://94027412516651" -- Civilian Animations BlockLand
 }
 
 local AbilityAnimNames = {"Punch","Adrenaline","AdrenalineEnd","Caretaker","CloakStart","BlockStart","Dash","PadBuild","Hotdog","Revolver","Taunt","RevolverReload","CloakEnd","DynamiteWindup","DynamiteThrow","DynamiteHold","Banana","BlockLand"}
