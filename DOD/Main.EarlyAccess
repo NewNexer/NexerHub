@@ -1331,15 +1331,11 @@ Tab_6:CreateSection("Miscellaneous")
 
 
 Tab_6:CreateButton({Name = "No animations [ THIS CANNOT BE REVERTED! ]"; Callback = function()
-local Anim = Instance.new("Animation")
-Anim.AnimationId = "rbxassetid://100930402371608"
-local loadedanim = Humanoid:LoadAnimation(Anim)
-loadedanim.Priority = Enum.AnimationPriority.Action4
-repeat task.wait() until loadedanim.Length > 0	
-loadedanim:Play()
-repeat task.wait() until loadedanim.IsPlaying
-loadedanim:AdjustSpeed(tonumber(0))
-loadedanim.TimePosition = 0.01
+pcall(function()
+while task.wait() do
+Character.Animate.Disabled = true
+end
+end)
 end; })
 
 Tab_6:CreateButton({Name = "Fast animations [ THIS CANNOT BE REVERTED! ]"; Callback = function()
