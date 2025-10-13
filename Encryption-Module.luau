@@ -60,7 +60,7 @@ function module:Encode(method, data)
   if method == "BINARY" then
     local result = ""
     for i = 1, #data do
-        local byte = string.byte(text, i)
+        local byte = string.byte(data, i)
         local bits = ""
         for j = 7, 0, -1 do
             bits = bits .. (byte // (2^j) % 2)
