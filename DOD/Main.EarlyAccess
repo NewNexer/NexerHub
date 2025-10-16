@@ -1973,7 +1973,7 @@ end; })
 Tab_10:CreateSection("Custom LMS ( settings )")
 local lms_file_name = "Type Here!"
 Tab_10:CreateParagraph({Title = "How to add your own music?", Content = "Find your executor's folder in your phone's explorer, then find the ''workspace'' folder, and inside it you must find ''NexerHub'' folder, now go inside it, then click ''Assets'' and ''LMS''. And now, in this folder, input your mp3 music."})
-Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here!"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = true; Callback = function(Value)
+Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here!"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 lms_file_name = ConvertDropdownValue(Value)
 end; })
 Tab_10:CreateButton({Name = "Add File"; Callback = function()
