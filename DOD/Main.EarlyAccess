@@ -1869,7 +1869,7 @@ end
 
 
 -- Functions were created fully by me. No AI contributions.
-local Execute = function(f, ...) return function (f, ...) return task.spawn(f, ...) end end
+local Execute = function(f, ...) return function(f, ...) return task.spawn(f, ...) end end
 local HaveWorkspaceAccess = function() if (isfile and writefile and readfile) and (isfolder and makefolder) then return true end return false end
 local CreateFile = fuction(f,c) writefile(f,c) end
 local IsFile = fuction(f) return isfile(f) end
