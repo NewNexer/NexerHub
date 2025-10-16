@@ -1878,7 +1878,7 @@ local IsFile = function(f) return isfile(f) end
 local GetFile = function(f,m) local gca = (getcustomasset or get_custom_asset); return ((m=="gca" and gca(f)) or readfile(f)) end
 local TableToLuauString = function(tbl,showkeys) local h_1 = ""; h_1 = "return {"..h_1; for i,v in pairs(tbl) do h_1 = h_1..'\n"'..v..'";' end; h_1 = h_1.."\n}"; local h_2 = ""; h_2 = "return {"..h_2; for i,v in pairs(tbl) do h_2 = h_2..'\n["'..i..'"] = "'..v..'";' end; h_2 = h_2.."\n}"; return ((showkeys and h_2) or h_1) end
 local InsertElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); table.insert(temp_table,element); CreateFile(tf, TableToLuauString(temp_table,false)) end
-local RemoveElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); temp_table[element] = nil; CreateFile(tf, TableToLuauString(temp_table,false)) end
+local RemoveElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); for i,v in pairs(temp_table) do if v == element then temp_table[i]=nil end end; CreateFile(tf, TableToLuauString(temp_table,false)) end
 --local InsertElement_test = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); temp_table[element] = value; CreateFile(tf, TableToLuauString(temp_table,false)) end
 
 if HaveWorkspaceAccess() then
@@ -1923,7 +1923,22 @@ if HaveWorkspaceAccess() and not IsFile("NexerHub/DieOfDeath/Assets/LMS/data.lua
     "Vigilante Shootdown";
     "Eternity V2";
     "Hero";
-}]]) end
+}]])
+local temp_table = {
+    "One Bounce";
+    "Showtime";
+    "Omega's Final Stand";
+    "A Retro Soul";
+    "Teapot Palace Tour";
+    "Careless";
+    "Vigilante Shootdown";
+    "Eternity V2";
+    "Hero";
+}
+for i,v in pairs(temp_table) do
+CreateFile("NexerHub/DieOfDeath/Assets/LMS/"..v..".mp3",game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Assets/"..(string.gsub(v, " ", "%%20"))..".mp3"))
+end
+end
 if HaveWorkspaceAccess() and not IsFile("NexerHub/DieOfDeath/Assets/Chases/data.luau") then CreateFile("NexerHub/DieOfDeath/Assets/Chases/data.luau", [[return {
     "A God with No Time";
     "Derptastic";
@@ -1935,7 +1950,23 @@ if HaveWorkspaceAccess() and not IsFile("NexerHub/DieOfDeath/Assets/Chases/data.
     "Pretence";
     "Screw Time";
     "Middle Big Brother";
-}]]) end
+}]])
+local temp_table = {
+    "A God with No Time";
+    "Derptastic";
+    "Omega's Final Stand";
+    "FAKEOUT";
+    "HELLFIRE V2";
+    "MISO";
+    "Orchestra";
+    "Pretence";
+    "Screw Time";
+    "Middle Big Brother";
+}
+for i,v in pairs(temp_table) do
+CreateFile("NexerHub/DieOfDeath/Assets/Chases/"..v..".mp3",game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Assets/"..(string.gsub(v, " ", "%%20"))..".mp3"))
+end
+end
 
 local Tab_10 = Window:CreateTab("Audio",0)
 if HaveWorkspaceAccess() ~= true then
@@ -1949,7 +1980,6 @@ LMSes_Backup.Parent = game.CoreGui.DOD_Assets
 
 Tab_10:CreateParagraph({Title = "Audio", Content = "Audio Management ( Mostly LMS and chases )"})
 Tab_10:CreateSection("Custom LMS")
-local CustomLMSBackup = game:GetService("ReplicatedStorage").Sounds.Songs.LMSSongs:Clone()
 local choosen_lms = ""
 local LMS_Audios = Tab_10:CreateDropdown({Name = "LMS Audios"; Options = loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))(); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
 choosen_lms = ConvertDropdownValue(Value)
@@ -1982,6 +2012,13 @@ end
 game.CoreGui.DOD_Assets.LMSSongs:Clone().Parent = game:GetService("ReplicatedStorage").Sounds.Songs
 Notify("Success!","Restored!",3,true)
 end; })
+Tab_10:CreateSlider({Name = "LMS Volume"; Range = {0, 10}; Increment = .5; Suffix = ""; CurrentValue = 1; Callback = function(Value)
+for i,v in next, game:GetService("ReplicatedStorage").Sounds.Songs:GetChildren() do
+if v and v:IsA("Sound") then
+v.Volume = tonumber(Value)
+end
+end
+end; })
 
 
 
@@ -1992,8 +2029,8 @@ Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here!"; NumbersO
 lms_file_name = ConvertDropdownValue(Value)
 end; })
 Tab_10:CreateButton({Name = "Add File"; Callback = function()
-if not IsFile("NexerHub/DieOfDeath/Assets/LMS/"..lms_file_name.."") then
-Notify("Error!","File not found! ( Did you entered name correctly? )",3,false)
+if not IsFile("NexerHub/DieOfDeath/Assets/LMS/"..lms_file_name..".mp3") then
+Notify("Error!","File not found! ( Did you entered name correctly? Make sure it is mp3. )",3,false)
 return
 end
 local temp_table = loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))()
@@ -2016,6 +2053,70 @@ end; })
 
 
 
+
+Tab_10:CreateSection("Custom Chase Themes")
+local choosen_chase = ""
+local Chases_Audios = Tab_10:CreateDropdown({Name = "Chase Themes"; Options = loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))(); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
+choosen_lms = ConvertDropdownValue(Value)
+end; })
+Tab_10:CreateButton({Name = "Reload LMS Audios"; Callback = function()
+Chases_Audios:Refresh(loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))())
+Notify("Success!","Reloading LMS Audios...",3,true)
+end; })
+Tab_10:CreateButton({Name = "Set Custom Chase Theme"; Callback = function()
+if (choosen_chase == nil or choosen_chase == "") then
+Notify("Error!","Choose Audio!",3,false)
+return
+end
+local temp_table = loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))()
+if not table.find(temp_table, choosen_chase) then
+Notify("Error!","File isn't added! ( Please reload chase themes and choose again. )",3,false)
+return
+end
+for i,v in next, workspace:WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):GetDescendants() do
+if v and v:IsA("Sound") and v.Name == "ChaseTheme" then
+v.SoundId = GetFile("NexerHub/DieOfDeath/Assets/Chases/"..choosen_chase.."","gca")
+end
+end
+Notify("Success!","Set ''"..choosen_chase.."'' as new custom chase!",4,true)
+end; })
+Tab_10:CreateSlider({Name = "Chase Themes Volume"; Range = {0, 10}; Increment = .5; Suffix = ""; CurrentValue = 1; Callback = function(Value)
+for i,v in next, workspace:WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):GetDescendants() do
+if v and v:IsA("Sound") and v.Name == "ChaseTheme" then
+v.Volume = tonumber(Value)
+end
+end
+end; })
+
+
+Tab_10:CreateSection("Custom Chase Themes ( settings )")
+local chase_file_name = "Type Here!"
+Tab_10:CreateParagraph({Title = "How to add your own music?", Content = "Find your executor's folder in your phone's explorer, then find the ''workspace'' folder, and inside it you must find ''NexerHub'' folder, now go inside it, then click ''Assets'' and ''Chases''. And now, in this folder, input your mp3 music."})
+Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here!"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+chase_file_name = ConvertDropdownValue(Value)
+end; })
+Tab_10:CreateButton({Name = "Add File"; Callback = function()
+if not IsFile("NexerHub/DieOfDeath/Assets/Chases/"..chase_file_name..".mp3") then
+Notify("Error!","File not found! ( Did you entered name correctly? Make sure it is mp3. )",3,false)
+return
+end
+local temp_table = loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))()
+if table.find(temp_table, chase_file_name) then
+Notify("Error!","This file is already added!",3,false)
+return
+end
+InsertElement("NexerHub/DieOfDeath/Assets/Chases/data.luau", chase_file_name)
+Notify("Success!","Added File!",3,true)
+end; })
+Tab_10:CreateButton({Name = "Remove File"; Callback = function()
+local temp_table = loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))()
+if not table.find(temp_table, chase_file_name) then
+Notify("Error!","File isn't added! ( Did you entered name correctly? )",3,false)
+return
+end
+RemoveElement("NexerHub/DieOfDeath/Assets/Chases/data.luau", chase_file_name)
+Notify("Success!","Removed File!",3,true)
+end; })
 
 end
 
