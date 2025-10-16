@@ -261,7 +261,7 @@ SetStaminaProperty("SprintSpeed", tonumber(Value))
 end; })
 
 Tab_1:CreateSection("Auto Injection")
-local AI_MaxStamina, AI_WalkSpeed, AI_SprintSpeed, AutoInjectStamina
+local AI_MaxStamina, AI_WalkSpeed, AI_SprintSpeed
 
 Tab_1:CreateLabel("Stamina settings will automatically be applied to your character 21.5 seconds after the round starts.")
 
@@ -281,9 +281,9 @@ Tab_1:CreateInput({Name = "Sprint Speed"; PlaceholderText = "Type Here!"; Number
 AI_SprintSpeed = Value
 end; })
 
-game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams").DescendantAdded:Connect(function(descendant)
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor").ChildAdded:Connect(function()
 task.wait()
-if descendant.Name == ""..LP.Name.."" and not descendant.Parent.Name == "Ghost" and AutoInjectStamina == true then
+if AutoInjectStamina == true then
 task.wait(21.5)
 pcall(function()
 SetStaminaProperty("MaxStamina", AI_MaxStamina)
@@ -1330,11 +1330,9 @@ end; })
 Tab_6:CreateSection("Miscellaneous")
 
 
-Tab_6:CreateButton({Name = "No animations [ THIS CANNOT BE REVERTED! ]"; Callback = function()
+Tab_6:CreateButton({Name = "No animations [ Apply any animation to revert! ]"; Callback = function()
 pcall(function()
-while task.wait() do
-Character.Animate.Disabled = true
-end
+LocalPlayer.PlayerScripts.ClientAnimations.Disabled = true
 end)
 end; })
 
@@ -1549,14 +1547,14 @@ end
 end)
 
 function StudsIntoPower(studs)
-return (studs * 6)
+return (studs * 5)
 end
 Tab_7:CreateSection("Hitbox Extender")
 Tab_7:CreateToggle({Name = "Extend Hitbox"; CurrentValue = false; Callback = function(Value)
 if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
 ExtendHitbox = Value
 if ExtendHitbox == true then
-local distance = 9
+local distance = StudsIntoPower(2)
 repeat game:GetService("RunService").Heartbeat:Wait()
 local vel, movel = nil, 0.1
 while not (game:GetService("Players").LocalPlayer.Character and game:GetService("Players").LocalPlayer.Character.Parent and game:GetService("Players").LocalPlayer.Character.HumanoidRootPart and game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Parent) do
@@ -1869,6 +1867,138 @@ TopBar.Size = UDim2.new(0, OrigSize, 0, TopBar.Size.Y.Offset)
 end
 end
 
+
+-- Functions were created fully by me. No AI contributions.
+local Execute = function(f, ...) return function (f, ...) return task.spawn(f, ...) end end
+local HaveWorkspaceAccess = function() if (isfile and writefile and readfile) and (isfolder and makefolder) then return true end return false end
+local CreateFile = fuction(f,c) writefile(f,c) end
+local IsFile = fuction(f) return isfile(f) end
+local GetFile = fuction(f,m) local gca = (getcustomasset or get_custom_asset); return ((m=="gca" and gca(f)) or readfile(f)) end
+local TableToLuauString = function(tbl,showkeys) local h_1 = ""; h_1 = "return {"..h_1; for i,v in pairs(tbl) do h_1 = h_1..'\n"'..v..'";' end; h_1 = h_1.."\n}"; local h_2 = ""; h_2 = "return {"..h_2; for i,v in pairs(tbl) do h_2 = h_2..'\n["'..i..'"] = "'..v..'";' end; h_2 = h_2.."\n}"; return ((showkeys and h_2) or h_1) end
+local InsertElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); table.insert(temp_table,element); CreateFile(tf, TableToLuauString(temp_table,false)) end
+local RemoveElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); temp_table[element] = nil; CreateFile(tf, TableToLuauString(temp_table,false)) end
+local InsertElement_test = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); temp_table[element] = value; CreateFile(tf, TableToLuauString(temp_table,false)) end
+
+if HaveWorkspaceAccess() then
+if not isfolder("NexerHub") then
+makefolder("NexerHub")
+repeat task.wait(.1) until isfolder("NexerHub")
+makefolder("NexerHub/DieOfDeath")
+repeat task.wait(.1) until isfolder("NexerHub/DieOfDeath")
+makefolder("NexerHub/DieOfDeath/Assets")
+repeat task.wait(.1) until isfolder("NexerHub/DieOfDeath/Assets")
+makefolder("NexerHub/DieOfDeath/Assets/LMS")
+makefolder("NexerHub/DieOfDeath/Assets/Chases")
+elseif isfolder("NexerHub") and not isfolder("NexerHub/DieOfDeath") then
+makefolder("NexerHub/DieOfDeath")
+repeat task.wait(.1) until isfolder("NexerHub/DieOfDeath")
+makefolder("NexerHub/DieOfDeath/Assets")
+repeat task.wait(.1) until isfolder("NexerHub/DieOfDeath/Assets")
+makefolder("NexerHub/DieOfDeath/Assets/LMS")
+makefolder("NexerHub/DieOfDeath/Assets/Chases")
+elseif isfolder("NexerHub") and isfolder("NexerHub/DieOfDeath") and not isfolder("NexerHub/DieOfDeath/Assets") then
+makefolder("NexerHub/DieOfDeath/Assets")
+repeat task.wait(.1) until isfolder("NexerHub/DieOfDeath/Assets")
+makefolder("NexerHub/DieOfDeath/Assets/LMS")
+makefolder("NexerHub/DieOfDeath/Assets/Chases")
+elseif isfolder("NexerHub") and isfolder("NexerHub/DieOfDeath") and isfolder("NexerHub/DieOfDeath/Assets") and (not isfolder("NexerHub/DieOfDeath/Assets/LMS") or not isfolder("NexerHub/DieOfDeath/Assets/Chases")) then
+if isfolder("NexerHub") and isfolder("NexerHub/DieOfDeath") and isfolder("NexerHub/DieOfDeath/Assets") and not isfolder("NexerHub/DieOfDeath/Assets/LMS") then
+makefolder("NexerHub/DieOfDeath/Assets/LMS")
+end
+if isfolder("NexerHub") and isfolder("NexerHub/DieOfDeath") and isfolder("NexerHub/DieOfDeath/Assets") and not isfolder("NexerHub/DieOfDeath/Assets/Chases") then
+makefolder("NexerHub/DieOfDeath/Assets/Chases")
+end
+end
+end
+
+if HaveWorkspaceAccess() and not IsFile("NexerHub/DieOfDeath/Assets/LMS/data.luau") then CreateFile("NexerHub/DieOfDeath/Assets/LMS/data.luau", [[return {
+    "One Bounce";
+    "Showtime";
+    "Omega's Final Stand";
+    "A Retro Soul";
+    "Teapot Palace Tour";
+    "Careless";
+    "Vigilante Shootdown";
+    "Eternity V2";
+    "Hero";
+}]]) end
+if HaveWorkspaceAccess() and not IsFile("NexerHub/DieOfDeath/Assets/Chases/data.luau") then CreateFile("NexerHub/DieOfDeath/Assets/Chases/data.luau", [[return {
+    "A God with No Time";
+    "Derptastic";
+    "Omega's Final Stand";
+    "FAKEOUT";
+    "HELLFIRE V2";
+    "MISO";
+    "Orchestra";
+    "Pretence";
+    "Screw Time";
+    "Middle Big Brother";
+}]]) end
+
+if HaveWorkspaceAccess() then
+local Tab_10 = Window:CreateTab("Audio",0)
+Tab_10:CreateParagraph({Title = "Audio", Content = "Audio Management ( Mostly LMS and chases )"})
+
+
+
+Tab_10:CreateSection("Custom LMS")
+local choosen_lms = ""
+local LMS_Audios = Tab_10:CreateDropdown({Name = "LMS Audios"; Options = loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))(); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
+choosen_lms = ConvertDropdownValue(Value)
+end; })
+Tab_10:CreateButton({Name = "Reload LMS Audios"; Callback = function()
+LMS_Audios:Refresh(loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))())
+Notify("Success!","Reloading LMS Audios...",3,true)
+end; })
+Tab_10:CreateButton({Name = "Set Custom LMS"; Callback = function()
+if (choosen_lms == nil or choosen_lms == "") then then
+Notify("Error!","Choose Audio!",3,false)
+end
+local temp_table = loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))()
+if not table.find(temp_table, choosen_lms) then
+Notify("Error!","File isn't added! ( Please reload lms audios and choose again. )",3,false)
+end
+--choosen_lms
+Notify("Success!","Set ''"..choosen_lms.."'' as new custom LMS!",4,true)
+end; })
+Tab_10:CreateButton({Name = "Revert Changes"; Callback = function()
+--haha
+Notify("Success!","Reverted Changes!",3,true)
+end; })
+
+
+
+Tab_10:CreateSection("Custom LMS ( settings )")
+local lms_file_name = "Type Here!"
+Tab_10:CreateParagraph({Title = "How to add your own music?", Content = "Find your executor's folder in your phone's explorer, then find the ''workspace'' folder, and inside it you must find ''NexerHub'' folder, now go inside it, then click ''Assets'' and ''LMS''. And now, in this folder, input your mp3 music."})
+Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here!"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = true; Callback = function(Value)
+lms_file_name = ConvertDropdownValue(Value)
+end; })
+Tab_10:CreateButton({Name = "Add File"; Callback = function()
+if not IsFile("NexerHub/DieOfDeath/Assets/LMS/"..lms_file_name.."") then
+Notify("Error!","File not found! ( Did you entered name correctly? )",3,false)
+end
+local temp_table = loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))()
+if table.find(temp_table, lms_file_name) then
+Notify("Error!","This file is already added!",3,false)
+end
+InsertElement("NexerHub/DieOfDeath/Assets/LMS/data.luau", lms_file_name)
+Notify("Success!","Added File!",3,true)
+end; })
+Tab_10:CreateButton({Name = "Remove File"; Callback = function()
+local temp_table = loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))()
+if not table.find(temp_table, lms_file_name) then
+Notify("Error!","File isn't added! ( Did you entered name correctly? )",3,false)
+end
+RemoveElement("NexerHub/DieOfDeath/Assets/LMS/data.luau", lms_file_name)
+Notify("Success!","Removed File!",3,true)
+end; })
+
+
+
+
+end
+
 local Tab_8 = Window:CreateTab("Fun",0)
 Tab_8:CreateParagraph({Title = "Fun", Content = "Funny things will be here here soon muehehehe"})
 Tab_8:CreateSection("Movement")
@@ -1881,7 +2011,7 @@ SetFrontFlip(true)
 local Tab_9 = Window:CreateTab("Other",0)
 Tab_9:CreateParagraph({Title = "Other", Content = "Other random thingiez"})
 Tab_9:CreateDropdown({Name = "Gui Theme"; Options = {"Amethyst","Default","AmberGlow","Bloom","DarkBlue","Green","Light","Ocean","Serenity"}; CurrentOption = "Amethyst"; MultiSelection = false; Callback = function(Value)
-Window.ModifyTheme(TableFirstElementToString(Value))
+Window.ModifyTheme(ConvertDropdownValue(Value))
 end; })
 Tab_9:CreateButton({Name = "Close Hub"; Callback = function()
 DestroyRayfield()
