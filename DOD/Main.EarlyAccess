@@ -1877,7 +1877,7 @@ local GetFile = fuction(f,m) local gca = (getcustomasset or get_custom_asset); r
 local TableToLuauString = function(tbl,showkeys) local h_1 = ""; h_1 = "return {"..h_1; for i,v in pairs(tbl) do h_1 = h_1..'\n"'..v..'";' end; h_1 = h_1.."\n}"; local h_2 = ""; h_2 = "return {"..h_2; for i,v in pairs(tbl) do h_2 = h_2..'\n["'..i..'"] = "'..v..'";' end; h_2 = h_2.."\n}"; return ((showkeys and h_2) or h_1) end
 local InsertElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); table.insert(temp_table,element); CreateFile(tf, TableToLuauString(temp_table,false)) end
 local RemoveElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); temp_table[element] = nil; CreateFile(tf, TableToLuauString(temp_table,false)) end
-local InsertElement_test = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); temp_table[element] = value; CreateFile(tf, TableToLuauString(temp_table,false)) end
+--local InsertElement_test = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); temp_table[element] = value; CreateFile(tf, TableToLuauString(temp_table,false)) end
 
 if HaveWorkspaceAccess() then
 if not isfolder("NexerHub") then
@@ -1951,12 +1951,14 @@ LMS_Audios:Refresh(loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau"
 Notify("Success!","Reloading LMS Audios...",3,true)
 end; })
 Tab_10:CreateButton({Name = "Set Custom LMS"; Callback = function()
-if (choosen_lms == nil or choosen_lms == "") then then
+if (choosen_lms == nil or choosen_lms == "") then
 Notify("Error!","Choose Audio!",3,false)
+return
 end
 local temp_table = loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))()
 if not table.find(temp_table, choosen_lms) then
 Notify("Error!","File isn't added! ( Please reload lms audios and choose again. )",3,false)
+return
 end
 --choosen_lms
 Notify("Success!","Set ''"..choosen_lms.."'' as new custom LMS!",4,true)
@@ -1977,10 +1979,12 @@ end; })
 Tab_10:CreateButton({Name = "Add File"; Callback = function()
 if not IsFile("NexerHub/DieOfDeath/Assets/LMS/"..lms_file_name.."") then
 Notify("Error!","File not found! ( Did you entered name correctly? )",3,false)
+return
 end
 local temp_table = loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))()
 if table.find(temp_table, lms_file_name) then
 Notify("Error!","This file is already added!",3,false)
+return
 end
 InsertElement("NexerHub/DieOfDeath/Assets/LMS/data.luau", lms_file_name)
 Notify("Success!","Added File!",3,true)
@@ -1989,6 +1993,7 @@ Tab_10:CreateButton({Name = "Remove File"; Callback = function()
 local temp_table = loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))()
 if not table.find(temp_table, lms_file_name) then
 Notify("Error!","File isn't added! ( Did you entered name correctly? )",3,false)
+return
 end
 RemoveElement("NexerHub/DieOfDeath/Assets/LMS/data.luau", lms_file_name)
 Notify("Success!","Removed File!",3,true)
