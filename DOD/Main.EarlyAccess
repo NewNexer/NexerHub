@@ -1875,7 +1875,7 @@ local Execute = function(f, ...) return function(f, ...) return task.spawn(f, ..
 local HaveWorkspaceAccess = function() return (isfile and writefile and readfile and isfolder and makefolder and (getcustomasset or get_custom_asset)) end
 local CreateFile = function(f,c) writefile(f,c) end
 local IsFile = function(f) return isfile(f) end
-local GetFile = function(f,m) local gca = (getcustomasset or get_custom_asset); return ((m=="gca" and gca(f)) or readfile(f)) end
+local GetFile = function(f,m) local gca = (getcustomasset or get_custom_asset); return ((m=="gca" and (gca(f))) or readfile(f)) end
 local TableToLuauString = function(tbl,showkeys) local h_1 = ""; h_1 = "return {"..h_1; for i,v in pairs(tbl) do h_1 = h_1..'\n"'..v..'";' end; h_1 = h_1.."\n}"; local h_2 = ""; h_2 = "return {"..h_2; for i,v in pairs(tbl) do h_2 = h_2..'\n["'..i..'"] = "'..v..'";' end; h_2 = h_2.."\n}"; return ((showkeys and h_2) or h_1) end
 local InsertElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); table.insert(temp_table,element); CreateFile(tf, TableToLuauString(temp_table,false)) end
 local RemoveElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); for i,v in pairs(temp_table) do if v == element then temp_table[i]=nil end end; CreateFile(tf, TableToLuauString(temp_table,false)) end
@@ -2000,7 +2000,7 @@ return
 end
 for i,v in next, game:GetService("ReplicatedStorage").Sounds.Songs:GetChildren() do
 if v and v:IsA("Sound") then
-v.SoundId = GetFile("NexerHub/DieOfDeath/Assets/LMS/"..choosen_lms.."","gca")
+v.SoundId = GetFile("NexerHub/DieOfDeath/Assets/LMS/"..choosen_lms..".mp3","gca")
 end
 end
 Notify("Success!","Set ''"..choosen_lms.."'' as new custom LMS!",4,true)
@@ -2057,11 +2057,11 @@ end; })
 Tab_10:CreateSection("Custom Chase Themes")
 local choosen_chase = ""
 local Chases_Audios = Tab_10:CreateDropdown({Name = "Chase Themes"; Options = loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))(); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
-choosen_lms = ConvertDropdownValue(Value)
+choosen_chase = ConvertDropdownValue(Value)
 end; })
-Tab_10:CreateButton({Name = "Reload LMS Audios"; Callback = function()
+Tab_10:CreateButton({Name = "Reload Chase Themes"; Callback = function()
 Chases_Audios:Refresh(loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))())
-Notify("Success!","Reloading LMS Audios...",3,true)
+Notify("Success!","Reloading Chase Themes...",3,true)
 end; })
 Tab_10:CreateButton({Name = "Set Custom Chase Theme"; Callback = function()
 if (choosen_chase == nil or choosen_chase == "") then
@@ -2075,7 +2075,7 @@ return
 end
 for i,v in next, workspace:WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):GetDescendants() do
 if v and v:IsA("Sound") and v.Name == "ChaseTheme" then
-v.SoundId = GetFile("NexerHub/DieOfDeath/Assets/Chases/"..choosen_chase.."","gca")
+v.SoundId = GetFile("NexerHub/DieOfDeath/Assets/Chases/"..choosen_chase..".mp3","gca")
 end
 end
 Notify("Success!","Set ''"..choosen_chase.."'' as new custom chase!",4,true)
