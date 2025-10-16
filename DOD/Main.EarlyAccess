@@ -4,6 +4,8 @@ else
 _G.dod_developer_key = "Nexer"
 end
 
+Instance.new("Folder",game:GetService("CoreGui")).Name = "DOD_Assets"
+
 function ConvertDropdownValue(tbl)
 if type(tbl) == "table" then
 for _,element in ipairs(tbl) do
@@ -1870,7 +1872,7 @@ end
 
 -- Functions were created fully by me. No AI contributions.
 local Execute = function(f, ...) return function(f, ...) return task.spawn(f, ...) end end
-local HaveWorkspaceAccess = function() return (isfile and writefile and readfile and isfolder and makefolder) end
+local HaveWorkspaceAccess = function() return (isfile and writefile and readfile and isfolder and makefolder and (getcustomasset or get_custom_asset)) end
 local CreateFile = function(f,c) writefile(f,c) end
 local IsFile = function(f) return isfile(f) end
 local GetFile = function(f,m) local gca = (getcustomasset or get_custom_asset); return ((m=="gca" and gca(f)) or readfile(f)) end
@@ -1935,13 +1937,19 @@ if HaveWorkspaceAccess() and not IsFile("NexerHub/DieOfDeath/Assets/Chases/data.
     "Middle Big Brother";
 }]]) end
 
-if HaveWorkspaceAccess() then
 local Tab_10 = Window:CreateTab("Audio",0)
+if HaveWorkspaceAccess() ~= true then
+Tab_10:CreateParagraph({Title = "Not Supported", Content = "Your executor doesn't support those functions: workspace access or getcustomasset"})
+end
+
+if HaveWorkspaceAccess() then
+local LMSes_Backup = game:GetService("ReplicatedStorage").Sounds.Songs.LMSSongs:Clone()
+LMSes_Backup.Name = "LMSSongs"
+LMSes_Backup.Parent = game.CoreGui.DOD_Assets
+
 Tab_10:CreateParagraph({Title = "Audio", Content = "Audio Management ( Mostly LMS and chases )"})
-
-
-
 Tab_10:CreateSection("Custom LMS")
+local CustomLMSBackup = game:GetService("ReplicatedStorage").Sounds.Songs.LMSSongs:Clone()
 local choosen_lms = ""
 local LMS_Audios = Tab_10:CreateDropdown({Name = "LMS Audios"; Options = loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))(); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
 choosen_lms = ConvertDropdownValue(Value)
@@ -1960,12 +1968,19 @@ if not table.find(temp_table, choosen_lms) then
 Notify("Error!","File isn't added! ( Please reload lms audios and choose again. )",3,false)
 return
 end
---choosen_lms
+for i,v in next, game:GetService("ReplicatedStorage").Sounds.Songs:GetChildren() do
+if v and v:IsA("Sound") then
+v.SoundId = GetFile("NexerHub/DieOfDeath/Assets/LMS/"..choosen_lms.."","gca")
+end
+end
 Notify("Success!","Set ''"..choosen_lms.."'' as new custom LMS!",4,true)
 end; })
-Tab_10:CreateButton({Name = "Revert Changes"; Callback = function()
---haha
-Notify("Success!","Reverted Changes!",3,true)
+Tab_10:CreateButton({Name = "Restore Normal LMS"; Callback = function()
+if game:GetService("ReplicatedStorage").Sounds.Songs:FindFirstChild("LMSSongs") then
+game:GetService("ReplicatedStorage").Sounds.Songs.LMSSongs:Destroy()
+end
+game.CoreGui.DOD_Assets.LMSSongs:Clone().Parent = game:GetService("ReplicatedStorage").Sounds.Songs
+Notify("Success!","Restored!",3,true)
 end; })
 
 
