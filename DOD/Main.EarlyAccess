@@ -2155,19 +2155,21 @@ local old_ss = 26
 Humanoid.Parent:SetAttribute("WalkSpeed",0)
 Humanoid.Parent:SetAttribute("SprintSpeed",0)
 stalk_start:Play()
+for i = 1,2 do
 local temp_rndm = math.random(1,4)
 if temp_rndm == 1 then
 HumanoidRootPart["Stalk"]:Play()
 else
 HumanoidRootPart["Stalk"..tostring(temp_rndm)]:Play()
 end
+end
 task.wait(2)
 task.delay(.6, function()
 Humanoid.Parent:SetAttribute("WalkSpeed",(old_ws/1.5))
 Humanoid.Parent:SetAttribute("SprintSpeed",(old_ss/1.5))
 task.wait(1.2)
-Humanoid.Parent:SetAttribute("WalkSpeed",old_ws*3)
-Humanoid.Parent:SetAttribute("SprintSpeed",old_ss*3)
+Humanoid.Parent:SetAttribute("WalkSpeed",27)
+Humanoid.Parent:SetAttribute("SprintSpeed",55)
 end)
 stalk_loop:Play()
 for i = 1,10 do
@@ -2230,15 +2232,15 @@ repeat task.wait() until HumanoidRootPart:FindFirstChild("DashPE")
 local function EmitDash()
 for i,v in next, HumanoidRootPart:FindFirstChild("DashPE"):GetChildren() do
 if v then
-v:Emit(1)
+v:Emit(2)
 end
 end
 for i,v in next, HumanoidRootPart:FindFirstChild("DashSmokePE"):GetChildren() do
 if v then
-v:Emit(1)
+v:Emit(25)
 end
 end
-HumanoidRootPart:FindFirstChild("DashPE3"):Emit(1)
+HumanoidRootPart:FindFirstChild("DashPE3"):Emit(2)
 HumanoidRootPart:FindFirstChild("Dash"):Play()
 end
 local BodyVelocity = Instance.new("BodyVelocity")
