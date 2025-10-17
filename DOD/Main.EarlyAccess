@@ -2130,7 +2130,7 @@ SetFrontFlip(true)
 
 
 
-Tab_9:CreateButton({Name = "Give yourself stalk"; Callback = function()
+Tab_8:CreateButton({Name = "Give yourself stalk"; Callback = function()
 local function Stalk()
 local function TempAnim(id)
 local temp_anim = Instance.new("Animation")
@@ -2195,7 +2195,7 @@ end; })
 
 
 
-Tab_9:CreateButton({Name = "Give yourself dash without cooldown"; Callback = function()
+Tab_8:CreateButton({Name = "Give yourself dash without cooldown"; Callback = function()
 local function Dash()
 if not HumanoidRootPart:FindFirstChild("DashPE") then
 game:GetService("ReplicatedStorage").Characters.Survivor.Civilian.HumanoidRootPart.Particles.DashPE:Clone().Parent = HumanoidRootPart
