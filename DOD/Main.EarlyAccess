@@ -2139,18 +2139,35 @@ return temp_anim
 end
 local stalk_start = Humanoid:LoadAnimation(TempAnim("rbxassetid://130725432915474"))
 local stalk_loop =  Humanoid:LoadAnimation(TempAnim("rbxassetid://102302720518230"))
+for i = 1,4 do
+if i == 1 then
+if not HumanoidRootPart:FindFirstChild("Stalk") then
+game:GetService("ReplicatedStorage").Characters.Killer.Pursuer.Avoider.HumanoidRootPart.Stalk:Clone().Parent = HumanoidRootPart
+end
+else
+if not HumanoidRootPart:FindFirstChild("Stalk"..tostring(i)) then
+game:GetService("ReplicatedStorage").Characters.Killer.Pursuer.Avoider.HumanoidRootPart["Stalk"..tostring(i)]:Clone().Parent = HumanoidRootPart
+end
+end
+end
 local old_ws = 10
 local old_ss = 26
 Humanoid.Parent:SetAttribute("WalkSpeed",0)
 Humanoid.Parent:SetAttribute("SprintSpeed",0)
 stalk_start:Play()
+local temp_rndm = math.random(1,4)
+if temp_rndm == 1 then
+HumanoidRootPart["Stalk"]:Play()
+else
+HumanoidRootPart["Stalk"..tostring(temp_rndm)]:Play()
+end
 task.wait(2)
 task.delay(.6, function()
 Humanoid.Parent:SetAttribute("WalkSpeed",(old_ws/1.5))
 Humanoid.Parent:SetAttribute("SprintSpeed",(old_ss/1.5))
-task.wait(1)
-Humanoid.Parent:SetAttribute("WalkSpeed",old_ws)
-Humanoid.Parent:SetAttribute("SprintSpeed",old_ss)
+task.wait(1.2)
+Humanoid.Parent:SetAttribute("WalkSpeed",old_ws*3)
+Humanoid.Parent:SetAttribute("SprintSpeed",old_ss*3)
 end)
 stalk_loop:Play()
 for i = 1,10 do
@@ -2165,7 +2182,7 @@ task.wait(.13)
 end
 stalk_loop:Stop()
 ApplyInvisibility(true)
-task.wait(11)
+task.wait(10)
 ApplyInvisibility(false)
 stalk_loop:Play()
 Humanoid.Parent:SetAttribute("WalkSpeed",(old_ws/2))
@@ -2200,6 +2217,15 @@ local function Dash()
 if not HumanoidRootPart:FindFirstChild("DashPE") then
 game:GetService("ReplicatedStorage").Characters.Survivor.Civilian.HumanoidRootPart.Particles.DashPE:Clone().Parent = HumanoidRootPart
 end
+if not HumanoidRootPart:FindFirstChild("DashPE3") then
+game:GetService("ReplicatedStorage").Characters.Survivor.Civilian.HumanoidRootPart.Particles["DashPE3"]:Clone().Parent = HumanoidRootPart
+end
+if not HumanoidRootPart:FindFirstChild("DashSmokePE") then
+game:GetService("ReplicatedStorage").Characters.Survivor.Civilian.HumanoidRootPart.Particles.DashSmokePE:Clone().Parent = HumanoidRootPart
+end
+if not HumanoidRootPart:FindFirstChild("Dash") then
+game:GetService("ReplicatedStorage").Characters.Survivor.Civilian.HumanoidRootPart.Sounds.Dash:Clone().Parent = HumanoidRootPart
+end
 repeat task.wait() until HumanoidRootPart:FindFirstChild("DashPE")
 local function EmitDash()
 for i,v in next, HumanoidRootPart:FindFirstChild("DashPE"):GetChildren() do
@@ -2207,13 +2233,20 @@ if v then
 v:Emit(1)
 end
 end
+for i,v in next, HumanoidRootPart:FindFirstChild("DashSmokePE"):GetChildren() do
+if v then
+v:Emit(1)
+end
+end
+HumanoidRootPart:FindFirstChild("DashPE3"):Emit(1)
+HumanoidRootPart:FindFirstChild("Dash"):Play()
 end
 local BodyVelocity = Instance.new("BodyVelocity")
 BodyVelocity.MaxForce = Vector3.new(1000000,1000,1000000)
 BodyVelocity.P = 1250
 BodyVelocity.Velocity = HumanoidRootPart.CFrame.LookVector * 80
 BodyVelocity.Parent = HumanoidRootPart
-game.Debris:AddItem(BodyVelocity, .3)
+game.Debris:AddItem(BodyVelocity, .35)
 EmitDash()
 end
 AbilityModule.CreateAbility({Name = "Dash_NH",InputShown = "",Tip = "Dash foward, and gain no cooldown.",Cooldown = .2, Icon = "rbxassetid://73777691791017",DisplayName = "Dash without cooldown"})
