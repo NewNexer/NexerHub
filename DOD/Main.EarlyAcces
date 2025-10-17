@@ -1893,7 +1893,7 @@ end
 
 -- Functions were created fully by me. No AI contributions.
 local Execute = function(f, ...) return function(f, ...) return task.spawn(f, ...) end end
-local HaveWorkspaceAccess = function() return (isfile and writefile and readfile and isfolder and makefolder and (getcustomasset or get_custom_asset)) end
+local HaveWorkspaceAccess = function() if isfile and writefile and readfile and isfolder and makefolder and (getcustomasset or get_custom_asset) then return true end return false end
 local CreateFile = function(f,c) writefile(f,c) end
 local IsFile = function(f) return isfile(f) end
 local GetFile = function(f,m) local gca = (getcustomasset or get_custom_asset); return ((m=="gca" and (gca(f))) or readfile(f)) end
