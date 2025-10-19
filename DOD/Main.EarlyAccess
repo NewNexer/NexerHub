@@ -6,7 +6,7 @@ end
 
 local asset_counter = 0
 local temp_msg = Instance.new("Message",game.CoreGui)
-temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/23)"
+temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/24)"
 
 -- Functions were created fully by me. No AI contributions.
 local Execute = function(f, ...) return function(f, ...) return task.spawn(f, ...) end end
@@ -50,7 +50,7 @@ makefolder("NexerHub/DieOfDeath/Assets/Chases")
 end
 end
 asset_counter = 5
-temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/23)"
+temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/24)"
 end
 
 if HaveWorkspaceAccess() and not IsFile("NexerHub/DieOfDeath/Assets/LMS/data.luau") then CreateFile("NexerHub/DieOfDeath/Assets/LMS/data.luau", [[return {
@@ -78,7 +78,7 @@ local temp_table = {
 for i,v in pairs(temp_table) do
 CreateFile("NexerHub/DieOfDeath/Assets/LMS/"..v..".mp3",game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Assets/"..(string.gsub(v, " ", "%%20"))..".mp3"))
 asset_counter += 1
-temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/23)"
+temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/24)"
 end
 end
 if HaveWorkspaceAccess() and not IsFile("NexerHub/DieOfDeath/Assets/Chases/data.luau") then CreateFile("NexerHub/DieOfDeath/Assets/Chases/data.luau", [[return {
@@ -108,7 +108,7 @@ local temp_table = {
 for i,v in pairs(temp_table) do
 CreateFile("NexerHub/DieOfDeath/Assets/Chases/"..v..".mp3",game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Assets/"..(string.gsub(v, " ", "%%20"))..".mp3"))
 asset_counter += 1
-temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/23)"
+temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/24)"
 end
 end
 
@@ -2466,6 +2466,9 @@ end
 task.spawn(function()
 local dashanim = Humanoid:LoadAnimation(TempAnim("rbxassetid://78278813483757"))
 dashanim:Play()
+task.delay(.42, function()
+dashanim:Stop()
+end)
 end)
 if not HumanoidRootPart:FindFirstChild("DashPE") then
 game:GetService("ReplicatedStorage").Characters.Survivor.Civilian.HumanoidRootPart.Particles.DashPE:Clone().Parent = HumanoidRootPart
@@ -3160,7 +3163,7 @@ game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.ID.Visible = 
 game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.PlaceVersion.Visible = true
 game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.Ping.Visible = true
 while task.wait(1) do
-game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.ID.Text = "Information Powered by Nexer Hub"
+game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.ID.Text = "Information Powered by "..((getgenv and getgenv().dod_developer_key) or ((_G.dod_developer_key ~= nil and _G.dod_developer_key) or "Unknown")).." Hub"
 game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.PlaceVersion.Text = "Place Version: "..game.PlaceVersion..""
 game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.Ping.Text = "Ping: "..tonumber(math.round(string.split(game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString(), "(")[1])).."ms (round-trip)"
 end
