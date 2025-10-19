@@ -543,9 +543,8 @@ task.wait()
 if descendant.Name == ""..LP.Name.."" and descendant.Parent.Name == "Survivor" and AutoInjectAbility == true then
 task.wait(8)
 pcall(function()
-game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(unpack({{tostring("Taunt");tostring("Taunt");}}))
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(AI_Abilities)
 for _,ability in pairs(AI_Abilities) do
-game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(unpack({{tostring(ability);}}))
 AbilityModule.CreateAbility(AbilityDatas[tostring(ability)])
 end
 end)
