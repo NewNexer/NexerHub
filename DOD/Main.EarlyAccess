@@ -2084,7 +2084,7 @@ ChoosenKillerTarget = nil
 ChoosenSurvivorTarget = nil
 ChoosenGhostTarget = nil
 local TeleportToKillerDropdown = Tab_12:CreateDropdown({Name = "Target Killer"; Options = GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer")); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
-ChoosenKillerTarget = TableFirstElementToString(Value)
+ChoosenKillerTarget = ConvertDropdownValue(Value)
 end; })
 Tab_12:CreateButton({Name = "Teleport to Killer"; Callback = function()
 if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChildOfClass("Model") then
@@ -2109,7 +2109,7 @@ end)
 end)
 
 local TeleportToSurvivorDropdown = Tab_12:CreateDropdown({Name = "Target Survivor"; Options = GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor")); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
-ChoosenSurvivorTarget = TableFirstElementToString(Value)
+ChoosenSurvivorTarget = ConvertDropdownValue(Value)
 end; })
 Tab_12:CreateButton({Name = "Teleport to Survivor"; Callback = function()
 if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor"):FindFirstChildOfClass("Model") then
@@ -2134,7 +2134,7 @@ end)
 end)
 
 local TeleportToGhostDropdown = Tab_12:CreateDropdown({Name = "Target Ghost"; Options = GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost")); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
-ChoosenGhostTarget = TableFirstElementToString(Value)
+ChoosenGhostTarget = ConvertDropdownValue(Value)
 end; })
 Tab_12:CreateButton({Name = "Teleport to Ghost"; Callback = function()
 if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost"):FindFirstChildOfClass("Model") then
