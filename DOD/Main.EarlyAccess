@@ -4,6 +4,10 @@ else
 _G.dod_developer_key = "Nexer"
 end
 
+local asset_counter = 0
+local temp_msg = Instance.new("Message",game.CoreGui)
+temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/23)"
+
 -- Functions were created fully by me. No AI contributions.
 local Execute = function(f, ...) return function(f, ...) return task.spawn(f, ...) end end
 local HaveWorkspaceAccess = function() if isfile and writefile and readfile and isfolder and makefolder and (getcustomasset or get_custom_asset) then return true end return false end
@@ -45,6 +49,8 @@ if isfolder("NexerHub") and isfolder("NexerHub/DieOfDeath") and isfolder("NexerH
 makefolder("NexerHub/DieOfDeath/Assets/Chases")
 end
 end
+asset_counter = 5
+temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/23)"
 end
 
 if HaveWorkspaceAccess() and not IsFile("NexerHub/DieOfDeath/Assets/LMS/data.luau") then CreateFile("NexerHub/DieOfDeath/Assets/LMS/data.luau", [[return {
@@ -71,6 +77,8 @@ local temp_table = {
 }
 for i,v in pairs(temp_table) do
 CreateFile("NexerHub/DieOfDeath/Assets/LMS/"..v..".mp3",game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Assets/"..(string.gsub(v, " ", "%%20"))..".mp3"))
+asset_counter += 1
+temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/23)"
 end
 end
 if HaveWorkspaceAccess() and not IsFile("NexerHub/DieOfDeath/Assets/Chases/data.luau") then CreateFile("NexerHub/DieOfDeath/Assets/Chases/data.luau", [[return {
@@ -99,6 +107,8 @@ local temp_table = {
 }
 for i,v in pairs(temp_table) do
 CreateFile("NexerHub/DieOfDeath/Assets/Chases/"..v..".mp3",game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Assets/"..(string.gsub(v, " ", "%%20"))..".mp3"))
+asset_counter += 1
+temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/23)"
 end
 end
 
@@ -114,9 +124,13 @@ return tostring(tbl)
 end
 end
 
+temp_msg.Text = "Loading Modules... (0/3)"
 local Encryptor = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/Encryption-Center/refs/heads/main/Main.luau"))()
+temp_msg.Text = "Loading Modules... (1/3)"
 local WebHandler = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/Web-Module.luau"))()
+temp_msg.Text = "Loading Modules... (2/3)"
 local MainModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Module.luau"))()
+temp_msg.Text = "Loading Modules... (3/3)"
 
 function RequestModule(module)
 local result = nil
@@ -159,6 +173,7 @@ CopyLink(url)
 end
 end
 
+temp_msg.Text = "Loading Rayfield..."
 local Rayfield
 local RAYFIELD_SUCCESS, RAYFIELD_FAIL = pcall(function()
 Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
@@ -177,6 +192,7 @@ game:GetService("StarterGui"):SetCore("SendNotification",{
 return
 end
 end
+temp_msg:Destroy()
 
 function Notify(title, content, time, mode)
 time = time or 4
