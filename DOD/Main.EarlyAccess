@@ -2665,7 +2665,7 @@ end)
 npc.Name = tostring(game.Players:GetChildren()[math.random(1,#game.Players:GetChildren())].Name)
 npc.Parent = workspace.GameAssets.Teams.Survivor
 if workspace.GameAssets:FindFirstChild("Map") then
-npc:WaitForChild("HumanoidRootPart").CFrame = workspace.GameAssets:WaitForChild("Map"):WaitForChild("Config"):WaitForChild("SurvivorSpawns"):GetChildren()[math.random(1,#workspace.GameAssets:WaitForChild("Map"):WaitForChild("Config"):WaitForChild("SurvivorSpawns"):GetChildren())].CFrame * CFrame.new(0,10,0)
+npc:WaitForChild("HumanoidRootPart").CFrame = workspace.GameAssets.Map.Config.Spawns.Survivor:GetChildren()[math.random(1,#workspace.GameAssets.Map.Config.Spawns.Survivor:GetChildren())].CFrame * CFrame.new(0,10,0)
 else
 npc:WaitForChild("HumanoidRootPart").CFrame = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame
 end
