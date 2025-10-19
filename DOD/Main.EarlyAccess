@@ -2693,7 +2693,7 @@ npc:WaitForChild("HumanoidRootPart").CanTouch = true
 local alr_jumpscared = false
 local touch_connection = npc:WaitForChild("HumanoidRootPart").Touched:Connect(function(child)
 local magnitude = (npc:WaitForChild("HumanoidRootPart").Position - game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").Position).magnitude
-if child and child:IsA("BasePart") and child.Name == "Part" and child.Color == Color3.fromRGB(255,0,0) and child.Material == Enum.Material.ForceField and magnitude < 25 then
+if child and child:IsA("BasePart") and child.Name == "Hitbox" and child.Color == Color3.fromRGB(255,0,0) and child.Material == Enum.Material.ForceField and magnitude < 25 then
 loadedanim_idle:Stop()
 loadedanim_idle:AdjustSpeed(tonumber(0))
 alr_jumpscared = true
