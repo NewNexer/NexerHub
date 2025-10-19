@@ -1,3 +1,119 @@
+if getgenv then
+getgenv().dod_developer_key = "Nexer"
+else
+_G.dod_developer_key = "Nexer"
+end
+
+local asset_counter = 0
+local temp_msg = Instance.new("Message",game.CoreGui)
+temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/24)"
+
+-- Functions were created fully by me. No AI contributions.
+local Execute = function(f, ...) return function(f, ...) return task.spawn(f, ...) end end
+local HaveWorkspaceAccess = function() if isfile and writefile and readfile and isfolder and makefolder and (getcustomasset or get_custom_asset) then return true end return false end
+local CreateFile = function(f,c) writefile(f,c) end
+local IsFile = function(f) return isfile(f) end
+local GetFile = function(f,m) local gca = (getcustomasset or get_custom_asset); return ((m=="gca" and (gca(f))) or readfile(f)) end
+local TableToLuauString = function(tbl,showkeys) local h_1 = ""; h_1 = "return {"..h_1; for i,v in pairs(tbl) do h_1 = h_1..'\n"'..v..'";' end; h_1 = h_1.."\n}"; local h_2 = ""; h_2 = "return {"..h_2; for i,v in pairs(tbl) do h_2 = h_2..'\n["'..i..'"] = "'..v..'";' end; h_2 = h_2.."\n}"; return ((showkeys and h_2) or h_1) end
+local InsertElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); table.insert(temp_table,element); CreateFile(tf, TableToLuauString(temp_table,false)) end
+local RemoveElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); for i,v in pairs(temp_table) do if v == element then temp_table[i]=nil end end; CreateFile(tf, TableToLuauString(temp_table,false)) end
+--local InsertElement_test = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); temp_table[element] = value; CreateFile(tf, TableToLuauString(temp_table,false)) end
+
+if HaveWorkspaceAccess() then
+if not isfolder("NexerHub") then
+makefolder("NexerHub")
+repeat task.wait(.1) until isfolder("NexerHub")
+makefolder("NexerHub/DieOfDeath")
+repeat task.wait(.1) until isfolder("NexerHub/DieOfDeath")
+makefolder("NexerHub/DieOfDeath/Assets")
+repeat task.wait(.1) until isfolder("NexerHub/DieOfDeath/Assets")
+makefolder("NexerHub/DieOfDeath/Assets/LMS")
+makefolder("NexerHub/DieOfDeath/Assets/Chases")
+elseif isfolder("NexerHub") and not isfolder("NexerHub/DieOfDeath") then
+makefolder("NexerHub/DieOfDeath")
+repeat task.wait(.1) until isfolder("NexerHub/DieOfDeath")
+makefolder("NexerHub/DieOfDeath/Assets")
+repeat task.wait(.1) until isfolder("NexerHub/DieOfDeath/Assets")
+makefolder("NexerHub/DieOfDeath/Assets/LMS")
+makefolder("NexerHub/DieOfDeath/Assets/Chases")
+elseif isfolder("NexerHub") and isfolder("NexerHub/DieOfDeath") and not isfolder("NexerHub/DieOfDeath/Assets") then
+makefolder("NexerHub/DieOfDeath/Assets")
+repeat task.wait(.1) until isfolder("NexerHub/DieOfDeath/Assets")
+makefolder("NexerHub/DieOfDeath/Assets/LMS")
+makefolder("NexerHub/DieOfDeath/Assets/Chases")
+elseif isfolder("NexerHub") and isfolder("NexerHub/DieOfDeath") and isfolder("NexerHub/DieOfDeath/Assets") and (not isfolder("NexerHub/DieOfDeath/Assets/LMS") or not isfolder("NexerHub/DieOfDeath/Assets/Chases")) then
+if isfolder("NexerHub") and isfolder("NexerHub/DieOfDeath") and isfolder("NexerHub/DieOfDeath/Assets") and not isfolder("NexerHub/DieOfDeath/Assets/LMS") then
+makefolder("NexerHub/DieOfDeath/Assets/LMS")
+end
+if isfolder("NexerHub") and isfolder("NexerHub/DieOfDeath") and isfolder("NexerHub/DieOfDeath/Assets") and not isfolder("NexerHub/DieOfDeath/Assets/Chases") then
+makefolder("NexerHub/DieOfDeath/Assets/Chases")
+end
+end
+asset_counter = 5
+temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/24)"
+end
+
+if HaveWorkspaceAccess() and not IsFile("NexerHub/DieOfDeath/Assets/LMS/data.luau") then CreateFile("NexerHub/DieOfDeath/Assets/LMS/data.luau", [[return {
+    "One Bounce";
+    "Showtime";
+    "Omega's Final Stand";
+    "A Retro Soul";
+    "Teapot Palace Tour";
+    "Careless";
+    "Vigilante Shootdown";
+    "Eternity V2";
+    "Hero";
+}]])
+local temp_table = {
+    "One Bounce";
+    "Showtime";
+    "Omega's Final Stand";
+    "A Retro Soul";
+    "Teapot Palace Tour";
+    "Careless";
+    "Vigilante Shootdown";
+    "Eternity V2";
+    "Hero";
+}
+for i,v in pairs(temp_table) do
+CreateFile("NexerHub/DieOfDeath/Assets/LMS/"..v..".mp3",game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Assets/"..(string.gsub(v, " ", "%%20"))..".mp3"))
+asset_counter += 1
+temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/24)"
+end
+end
+if HaveWorkspaceAccess() and not IsFile("NexerHub/DieOfDeath/Assets/Chases/data.luau") then CreateFile("NexerHub/DieOfDeath/Assets/Chases/data.luau", [[return {
+    "A God with No Time";
+    "Derptastic";
+    "Omega's Final Stand";
+    "FAKEOUT";
+    "HELLFIRE V2";
+    "MISO";
+    "Orchestra";
+    "Pretence";
+    "Screw Time";
+    "Middle Big Brother";
+}]])
+local temp_table = {
+    "A God with No Time";
+    "Derptastic";
+    "Omega's Final Stand";
+    "FAKEOUT";
+    "HELLFIRE V2";
+    "MISO";
+    "Orchestra";
+    "Pretence";
+    "Screw Time";
+    "Middle Big Brother";
+}
+for i,v in pairs(temp_table) do
+CreateFile("NexerHub/DieOfDeath/Assets/Chases/"..v..".mp3",game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Assets/"..(string.gsub(v, " ", "%%20"))..".mp3"))
+asset_counter += 1
+temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/24)"
+end
+end
+
+Instance.new("Folder",game:GetService("CoreGui")).Name = "DOD_Assets"
+
 function ConvertDropdownValue(tbl)
 if type(tbl) == "table" then
 for _,element in ipairs(tbl) do
@@ -8,9 +124,35 @@ return tostring(tbl)
 end
 end
 
+temp_msg.Text = "Loading Modules... (0/3)"
+local Encryptor = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/Encryption-Center/refs/heads/main/Main.luau"))()
+temp_msg.Text = "Loading Modules... (1/3)"
 local WebHandler = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/Web-Module.luau"))()
+temp_msg.Text = "Loading Modules... (2/3)"
+local MainModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Module.luau"))()
+temp_msg.Text = "Loading Modules... (3/3)"
+
+function RequestModule(module)
+local result = nil
+local Success, Error = pcall(function()
+result = require(module)
+end)
+if Success then
+return result
+elseif not Success then
+if decompile then
+pcall(function()
+result = loadstring(decompile(module))()
+return result
+end)
+else
+return {}
+end
+end
+end
+
 local GetRequestMethod = function()
-local iqnd = request or http_request or HttpPost or (syn and syn.request) or (http and http.request) or (fluxus and fluxus.request) or (game and game.HttpPost) or (KRNL and KRNL.request) or (Xeno and Xeno.request)
+local iqnd = request or http_request or HttpPost or (syn and syn.request) or (http and http.request) or (fluxus and fluxus.request) or (KRNL and KRNL.request) or (Xeno and Xeno.request) or (game and game.HttpPost)
 if iqnd then
 return iqnd
 else
@@ -31,6 +173,7 @@ CopyLink(url)
 end
 end
 
+temp_msg.Text = "Loading Rayfield..."
 local Rayfield
 local RAYFIELD_SUCCESS, RAYFIELD_FAIL = pcall(function()
 Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
@@ -49,6 +192,7 @@ game:GetService("StarterGui"):SetCore("SendNotification",{
 return
 end
 end
+temp_msg:Destroy()
 
 function Notify(title, content, time, mode)
 time = time or 4
@@ -91,9 +235,9 @@ end)
 end
 
 local Window = Rayfield:CreateWindow({
-   Name = "Nexer Hub : RECODE",
+   Name = ""..((getgenv and getgenv().dod_developer_key) or ((_G.dod_developer_key ~= nil and _G.dod_developer_key) or "Unknown")).." Hub : Die Of Death",
    Icon = 0,    
-   LoadingTitle = "NH:R",
+   LoadingTitle = "NH:DOD",
    LoadingSubtitle = "by nexer",
    Theme = "Amethyst",
    DisableRayfieldPrompts = true,
@@ -126,7 +270,7 @@ local Window = Rayfield:CreateWindow({
 
 pcall(function()
 local Announcements = Window:CreateTab("Announce",0)
-Announcements:CreateParagraph({Title = "Hi there!", Content = "Script Version: 2.112\n\nThis script was fully recoded and fixed. Thank you for using my script. ❤️\n\nAlso join our discord server for early updates, free premium access and many other things..."})
+Announcements:CreateParagraph({Title = "Hi there!", Content = "Script Version: 2.2 ( WORK IN PROGRESS, EXCEPT A LOT OF BUGS )\n\nThis script was fully recoded and fixed. Thank you for using my script. ❤️\n\nAlso join our discord server for early updates, free premium access and many other things..."})
 Announcements:CreateButton({Name = "Copy Discord Server Link"; Callback = function()
 setclipboard(tostring("https://discord.gg/7u5GRNw3xn"))
 Notify("Success!", "Copied Link!", 3, true)
@@ -166,7 +310,7 @@ end)
 end)
 
 pcall(function()
-StaminaModule = require(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("Movement"))
+StaminaModule = RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("Movement"))
 end)
 
 function SetStaminaProperty(property, value)
@@ -254,7 +398,7 @@ SetStaminaProperty("SprintSpeed", tonumber(Value))
 end; })
 
 Tab_1:CreateSection("Auto Injection")
-local AI_MaxStamina, AI_WalkSpeed, AI_SprintSpeed, AutoInjectStamina
+local AI_MaxStamina, AI_WalkSpeed, AI_SprintSpeed
 
 Tab_1:CreateLabel("Stamina settings will automatically be applied to your character 21.5 seconds after the round starts.")
 
@@ -274,9 +418,9 @@ Tab_1:CreateInput({Name = "Sprint Speed"; PlaceholderText = "Type Here!"; Number
 AI_SprintSpeed = Value
 end; })
 
-game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams").DescendantAdded:Connect(function(descendant)
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor").ChildAdded:Connect(function()
 task.wait()
-if descendant.Name == ""..LP.Name.."" and not descendant.Parent.Name == "Ghost" and AutoInjectStamina == true then
+if AutoInjectStamina == true then
 task.wait(21.5)
 pcall(function()
 SetStaminaProperty("MaxStamina", AI_MaxStamina)
@@ -414,10 +558,10 @@ local AbilityDatas = {
 }
 
 pcall(function()
-AbilityModule = require(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("Ability"))
+AbilityModule = RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("Ability"))
 end)
 pcall(function()
-UIModule = require(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("UI"))
+UIModule = RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("UI"))
 end)
 
 local Tab_3 = Window:CreateTab("Abilities",0)
@@ -487,9 +631,8 @@ end; })
 Tab_3:CreateToggle({Name = "Spam Ability"; CurrentValue = false; Callback = function(Value)
 AutoSpamAbility = Value
 if AutoSpamAbility == true then
-repeat task.wait(0.15)
+repeat task.wait(0.1)
 pcall(function()
-game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(unpack({{tostring(SpamAbility)}}))
 game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteFunctions"):WaitForChild("UseAbility"):InvokeServer(unpack({tostring(SpamAbility)}))
 end)
 until AutoSpamAbility == false
@@ -497,27 +640,27 @@ end
 end; })
 
 Tab_3:CreateSection("Auto Ability Injection")
-local AI_Ability_1, AI_Ability_2, AutoInjectAbility
+local AI_Abilities, AutoInjectAbility
 
-Tab_3:CreateLabel("Ability will automatically get equipped ( along side with their accessories ) 5 seconds after the round starts.")
+Tab_3:CreateLabel("Ability will automatically get equipped ( along side with their accessories ) 8 seconds after the round starts.")
 
 Tab_3:CreateToggle({Name = "Auto Inject"; CurrentValue = false; Callback = function(Value)
 AutoInjectAbility = Value
 end; })
 
-Tab_3:CreateDropdown({Name = "First Ability"; Options = AbilityNames; CurrentOption = ""; MultiSelection = false; Callback = function(Value)
-AI_Ability_1 = ConvertDropdownValue(Value)
-end; })
-Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOption = ""; MultiSelection = false; Callback = function(Value)
-AI_Ability_2 = ConvertDropdownValue(Value)
+Tab_3:CreateDropdown({Name = "Abilities"; Options = AbilityNames; CurrentOption = ""; MultiSelection = true; Callback = function(Value)
+AI_Abilities = Value
 end; })
 
 game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams").DescendantAdded:Connect(function(descendant)
 task.wait()
-if descendant.Name == ""..LP.Name.."" and not descendant.Parent.Name == "Ghost" and AutoInjectAbility == true then
-task.wait(5)
+if descendant.Name == ""..LP.Name.."" and descendant.Parent.Name == "Survivor" and AutoInjectAbility == true then
+task.wait(8)
 pcall(function()
-game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(unpack({{tostring(AI_Ability_1);tostring(AI_Ability_2);}}))
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(AI_Abilities)
+for _,ability in pairs(AI_Abilities) do
+AbilityModule.CreateAbility(AbilityDatas[tostring(ability)])
+end
 end)
 end
 end)
@@ -548,6 +691,9 @@ end
 
 _G.ESPenabledHandler = false
 _G.ESPtransHandler = 0.3
+_G.ESPshowusers = true
+_G.ESPshowhealth = true
+
 
 function CreateHighlight(plr)
 task.spawn(function()
@@ -595,7 +741,7 @@ stat_text.Parent = esp_stat
 task.spawn(function()
 pcall(function()
 while task.wait(.05) do
-stat_text.Text = "Name: "..plr.Name.."\nHealth: "..plr_char.Humanoid.Health..""
+stat_text.Text = ((_G.ESPshowusers == true and "Name: "..plr.Name.."") or "")..""..((_G.ESPshowusers == true and _G.ESPshowhealth == true and "\n") or "")..""..((_G.ESPshowhealth == true and "Health: "..plr_char.Humanoid.Health.."") or "")
 end
 end)
 end)
@@ -655,6 +801,14 @@ Tab_4:CreateSection("ESP")
 Tab_4:CreateSlider({Name = "ESP Transparency (in %)"; Range = {0, 100}; Increment = 5; Suffix = "%"; CurrentValue = 30; Callback = function(Value)
 _G.ESPtransHandler = (tonumber(Value) / 100)
 ChangeTransparency(tonumber(_G.ESPtransHandler))
+end; })
+
+Tab_4:CreateToggle({Name = "Show Username"; CurrentValue = true; Callback = function(Value)
+_G.ESPshowusers = Value
+end; })
+
+Tab_4:CreateToggle({Name = "Show Health"; CurrentValue = true; Callback = function(Value)
+_G.ESPshowhealth = Value
 end; })
 
 plradded_esp = nil
@@ -761,7 +915,7 @@ end
 MoneyToGet = 10
 ReasonForMoney = "for surviving for atleast 60 seconds."
 
-Tab_4:CreateLabel("Money Giver ( Visual )")
+Tab_4:CreateSection("Money Giver ( Visual )")
 
 Tab_4:CreateInput({Name = "Money amount"; PlaceholderText = "10"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 MoneyToGet = tonumber(Value)
@@ -773,6 +927,33 @@ end; })
 
 Tab_4:CreateButton({Name = "Give money"; Callback = function()
 AwardPoints(MoneyToGet, ReasonForMoney)
+end; })
+
+Tab_4:CreateSection("Custom Skins")
+
+Tab_4:CreateLabel("soon...")
+
+Tab_4:CreateSection("Intro / Special Round Starter")
+
+killerintro = "Pursuer"
+Tab_4:CreateDropdown({Name = "Killer Intro"; Options = {"Pursuer","Artful","Badware","Killdroid","Harken"}; CurrentOption = "Pursuer"; MultiSelection = false; Callback = function(Value)
+killerintro = ConvertDropdownValue(Value)
+end; })
+
+Tab_4:CreateButton({Name = "Start Intro"; Callback = function()
+if not firesignal then return end
+firesignal(game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("KillerIntro").OnClientEvent, game:GetService("Players").LocalPlayer,killerintro,killerintro,"Default",1)
+end; })
+
+
+specialroundevent = "Double Trouble"
+Tab_4:CreateDropdown({Name = "Special Round Event"; Options = {"Double Trouble","Evil Scary","One Bounce","Gunslinger","Dienation"}; CurrentOption = "Double Trouble"; MultiSelection = false; Callback = function(Value)
+specialroundevent = ConvertDropdownValue(Value)
+end; })
+
+Tab_4:CreateButton({Name = "Start Special Round Event"; Callback = function()
+if not firesignal then return end
+firesignal(game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("GamemodeUI").OnClientEvent, specialroundevent)
 end; })
 
 
@@ -831,7 +1012,7 @@ AntiComputer = false
 Tab_5:CreateToggle({Name = "Anti Cooldown in Badware Computer Prompts"; CurrentValue = false; Callback = function(Value)
 AntiComputer = Value
 if AntiComputer == true then
-for _,descendant in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):GetDescendants()) do
+for _,descendant in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Other"):GetDescendants()) do
 if descendant and descendant:IsA("ProximityPrompt") and AntiComputer == true then
 pcall(function()
 descendant.HoldDuration = 0
@@ -842,7 +1023,7 @@ end
 end
 end
 end; })
-game:GetService("Workspace"):WaitForChild("GameAssets").DescendantAdded:Connect(function(descendant)
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Other").DescendantAdded:Connect(function(descendant)
 if descendant and descendant:IsA("ProximityPrompt") and AntiComputer == true then
 pcall(function()
 descendant.HoldDuration = 0
@@ -910,15 +1091,42 @@ child:Destroy()
 end
 end)
 
+local BackupEffect = game:GetService("ReplicatedStorage").Events.RemoteEvents.TauntEffect:Clone()
+BackupEffect.Parent = game.LogService
+local AntiTaunt = false
 Tab_5:CreateToggle({Name = "Anti Taunt"; CurrentValue = false; Callback = function(Value)
-pcall(function()
-if Value == true then
-game:GetService("ReplicatedStorage").Events.RemoteEvents.TauntEffect.Parent = game.LogService
+AntiTaunt = Value
+if AntiTaunt == true then
+LocalPlayer.PlayerGui.MainGui.RoundUI.TauntTemplate:Destroy()
 else
-game.LogService.TauntEffect.Parent = game:GetService("ReplicatedStorage").Events.RemoteEvents
+if LocalPlayer.PlayerGui.MainGui.RoundUI:FindFirstChild("TauntTemplate") == nil then
+local a = BackupEffect:Clone()
+a.Parent = LocalPlayer.PlayerGui.MainGui.RoundUI
+end
+end
+end; })
+
+LocalPlayer.PlayerGui.MainGui.RoundUI.ChildAdded:Connect(function(child)
+if child.Name == "TauntTemplate" and AntiTaunt == true then
+child:Destroy()
+Character:SetAttribute("WalkSpeedModifier", 0)
 end
 end)
+
+local AntiFallDamage = false
+Tab_5:CreateToggle({Name = "Anti Fall Damage"; CurrentValue = false; Callback = function(Value)
+AntiFallDamage = Value
+for i,v in next, workspace.GameAssets:GetDescendants() do
+if v.Name == "FallDamage" and v:IsA("BasePart") and AntiFallDamage == true then
+v:Destroy()
+end
+end
 end; })
+workspace.GameAssets.DescendantAdded:Connect(function(child)
+if child.Name == "FallDamage" and child:IsA("BasePart") and AntiFallDamage == true then
+child:Destroy()
+end
+end)
 
 local AutoRemoveBarriers = false
 Tab_5:CreateToggle({Name = "Anti Barriers"; CurrentValue = false; Callback = function(Value)
@@ -971,7 +1179,7 @@ end
 
 local Tab_6 = Window:CreateTab("Animations",0)
 Tab_6:CreateParagraph({Title = "Animations", Content = "You can change your anims here."})
-
+Tab_6:CreateSection("Pre-loaded animations")
 
 function SetRunAnim(run)
 pcall(function()
@@ -1057,7 +1265,7 @@ LocalPlayer.PlayerScripts.ClientAnimations.Disabled = false
 end)
 end
 
-Tab_6:CreateSection("Civilian animations")
+Tab_6:CreateLabel("Civilian animations")
 Tab_6:CreateButton({Name = "Apply New Civilian Animations"; Callback = function()
 local RunAnim = "rbxassetid://137375023685630"
 local WalkAnim = "rbxassetid://84388941697203"
@@ -1085,7 +1293,7 @@ end)
 Notify("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
 end; })
 
-Tab_6:CreateSection("Ghost Animations")
+Tab_6:CreateLabel("Ghost Animations")
 Tab_6:CreateButton({Name = "Apply Ghost animations"; Callback = function()
 local RunAnim = "rbxassetid://124260679864309"
 local WalkAnim = "rbxassetid://124260679864309"
@@ -1102,13 +1310,17 @@ end; })
 
 pcall(function()
 for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
-Tab_6:CreateSection(v.Name.." Animations")
+Tab_6:CreateLabel(v.Name.." Animations")
 local temp_table = {}
 for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
 table.insert(temp_table, e.Name)
 end; end
-Tab_6:CreateDropdown({Name = "Apply "..v.Name.." animations"; Options = temp_table; CurrentOption = ""; MultiSelection = false; Callback = function(Value)
-local Hi = v:WaitForChild(ConvertDropdownValue(Value))
+local Hi = v:WaitForChild("Default")
+Tab_6:CreateDropdown({Name = "Choose "..v.Name.." animations"; Options = temp_table; CurrentOption = "Default"; MultiSelection = false; Callback = function(Value)
+Hi = v:WaitForChild(ConvertDropdownValue(Value))
+end; })
+
+Tab_6:CreateButton({Name = "Apply "..v.Name.." animations"; Callback = function()
 local RunAnim = Hi:WaitForChild("Animations"):WaitForChild("Sprint").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("OldSprint").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("NormalSprint").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("HurtSprint").AnimationId
 local WalkAnim = Hi:WaitForChild("Animations"):WaitForChild("Walk").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("OldWalk").AnimationId
 local IdleAnim = Hi:WaitForChild("Animations"):WaitForChild("Idle").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("OldIdle").AnimationId
@@ -1121,6 +1333,7 @@ ApplyNewAnimations()
 end)
 Notify("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
 end; })
+
 end; end
 end)
 
@@ -1241,6 +1454,71 @@ end)
 Notify("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
 end; })
 
+Tab_6:CreateSection("Ability Changer")
+
+local AbilityAnimData = {
+["Punch"] = "rbxassetid://124781750889573", -- Civilian Animations Punch
+["Adrenaline"] = "rbxassetid://77399794134778", -- Civilian Animations Adrenaline
+["AdrenalineEnd"] = "rbxassetid://92333601998082", -- Civilian Animations AdrenalineEnd
+["Caretaker"] = "rbxassetid://128767098320893", -- Civilian Animations Caretaker
+["CloakStart"] = "rbxassetid://133960698072483", -- Civilian Animations CloakStart
+["BlockStart"] = "rbxassetid://134233326423882", -- Civilian Animations BlockStart
+["Dash"] = "rbxassetid://78278813483757", -- Civilian Animations Dash
+["PadBuild"] = "rbxassetid://79104831518074", -- Civilian Animations PadBuild
+["Hotdog"] = "rbxassetid://78595119178919", -- Civilian Animations Hotdog
+["Revolver"] = "rbxassetid://74108653904830", -- Civilian Animations Revolver
+["Taunt"] = "rbxassetid://113732291990231", -- Civilian Animations Taunt
+["RevolverReload"] = "rbxassetid://79026181033717", -- Civilian Animations RevolverReload
+["CloakEnd"] = "rbxassetid://120142279051418", -- Civilian Animations CloakEnd
+["DynamiteWindup"] = "rbxassetid://133960279206605", -- Civilian Animations DynamiteWindup
+["DynamiteThrow"] = "rbxassetid://99551865645121", -- Civilian Animations DynamiteThrow
+["DynamiteHold"] = "rbxassetid://137091713941325", -- Civilian Animations DynamiteHold
+["Banana"] = "rbxassetid://95775571866935", -- Civilian Animations Banana
+["BlockLand"] = "rbxassetid://94027412516651" -- Civilian Animations BlockLand
+}
+
+local AbilityAnimNames = {"Punch","Adrenaline","AdrenalineEnd","Caretaker","CloakStart","BlockStart","Dash","PadBuild","Hotdog","Revolver","Taunt","RevolverReload","CloakEnd","DynamiteWindup","DynamiteThrow","DynamiteHold","Banana","BlockLand"}
+
+local ReplaceWhatAbil = "Punch"
+Tab_6:CreateDropdown({Name = "Replace what"; Options = AbilityAnimNames; CurrentOption = "Punch"; MultiSelection = false; Callback = function(Value)
+ReplaceWhatAbil = ConvertDropdownValue(Value)
+end; })
+
+local ReplaceWithWhatAbil = "BlockStart"
+Tab_6:CreateDropdown({Name = "Replace with what"; Options = AbilityAnimNames; CurrentOption = "BlockStart"; MultiSelection = false; Callback = function(Value)
+ReplaceWithWhatAbil = ConvertDropdownValue(Value)
+end; })
+
+Tab_6:CreateButton({Name = "Replace animation"; Callback = function()
+task.spawn(function()
+Character.Animations.Abilities[ReplaceWhatAbil].AnimationId = tostring(AbilityAnimData[ReplaceWithWhatAbil])
+task.wait()
+ApplyNewAnimations()
+end)
+Notify("Success!", "Applying replacion, it may take up to 10 seconds.", 3, true)
+end; })
+
+
+Tab_6:CreateSection("Miscellaneous")
+
+
+Tab_6:CreateButton({Name = "No animations [ Apply any animation to revert! ]"; Callback = function()
+pcall(function()
+LocalPlayer.PlayerScripts.ClientAnimations.Disabled = true
+end)
+end; })
+
+Tab_6:CreateButton({Name = "Fast animations [ THIS CANNOT BE REVERTED! ]"; Callback = function()
+pcall(function()
+while task.wait() do
+local a = Humanoid or Character:FindFirstChildOfClass("AnimationController")
+for i,v in next, a:GetPlayingAnimationTracks() do
+v:AdjustSpeed(10)
+end
+end
+end)
+end; })
+
 
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
@@ -1259,7 +1537,10 @@ return (MarketplaceService:GetProductInfo(Id,Enum.InfoType.Asset).PriceInRobux)
 end)
 end
 local PremiumPrice = GetAssetPrice(1264479709) or 39
--- If you will change this to true i will genuinely get you
+-- WAIT PLEASE LISTEN
+-- YOU CAN GET PREMIUM FOR FREE BY ENTERING A KEY
+-- KEY IS IN MY DISCORD SERVER 😭🙏
+-- AAAAAAH!!!!!!!!!!!!
 local HavePremium = false
 if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(LocalPlayer.UserId, 1264479709) then
 HavePremium = true
@@ -1300,8 +1581,7 @@ Notify("Success!", "Copied Link!", 3, true)
 end; })
 
 Tab_7:CreateInput({Name = "Input Key"; PlaceholderText = "Type Here!"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = true; Callback = function(Value)
-local key_module = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Module.luau"))()
-local key = key_module:GetKey()
+local key = MainModule:GetKey()
 if tostring(Value) == tostring(key) then
 HavePremium = true
 Notify("Success!", "Redeemed key, enjoy your premium!", 5, true)
@@ -1310,6 +1590,10 @@ end; })
 
 Tab_7:CreateSection("")
 
+Tab_7:CreateSection("Aimbot")
+
+Tab_7:CreateLabel("coming soon")
+
 Tab_7:CreateSection("Advanced Anti / Immunities")
 Tab_7:CreateToggle({Name = "Anti-Stun"; CurrentValue = false; Callback = function(Value)
 if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
@@ -1317,18 +1601,16 @@ AntiStun = Value
 if AntiStun == true then
 Notify("Success!", "Anti-Stun is now enabled!", 2, true)
 repeat task.wait(.003)
-Char:SetAttribute("WalkSpeedModifier", 0)
-Char:SetAttribute("StaminaModifier", 0)
+Character:SetAttribute("WalkSpeedModifier", 0)
+Character:SetAttribute("StaminaModifier", 0)
 until AntiStun == false
 end
 end; })
 
-Tab_7:CreateSection("Invisibility")
-noclip_connection = nil
-camera_connection = nil
-Tab_7:CreateToggle({Name = "Turn On/Off Invisibility"; CurrentValue = false; Callback = function(Value)
-if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
-if Value == false then
+local noclip_connection = nil
+local camera_connection = nil
+function ApplyInvisibility(bool)
+if bool == false then
 task.spawn(function()
 for i,v in next, Humanoid:GetPlayingAnimationTracks() do
 v.Priority = Enum.AnimationPriority.Core
@@ -1347,8 +1629,7 @@ pcall(function()
 workspace.CurrentCamera.CameraSubject = Humanoid
 end)
 end
-Notify("Success!", "Disabled invisibility!", 2, true)
-elseif Value == true then
+elseif bool == true then
 local function nocollision()
 for i,v in pairs(LP.Character:GetDescendants()) do
 if v and v:IsA("BasePart") and v.CanCollide == true and v.Name ~= "HumanoidRootPart" then
@@ -1366,27 +1647,87 @@ workspace.CurrentCamera.CameraSubject = HumanoidRootPart
 end)
 local Anim = Instance.new("Animation")
 Anim.AnimationId = "rbxassetid://90444351114401" -- If you will use my invis, please credit me.
-local loadedanim = LP.Character:FindFirstChildOfClass("Humanoid"):LoadAnimation(Anim)
+local loadedanim = Humanoid:LoadAnimation(Anim)
 loadedanim.Priority = Enum.AnimationPriority.Action4
 repeat task.wait() until loadedanim.Length > 0	
 loadedanim:Play()
 repeat task.wait() until loadedanim.IsPlaying
 loadedanim:AdjustSpeed(tonumber(0))
 loadedanim.TimePosition = 2.2
+end
+end
+
+Tab_7:CreateSection("Invisibility")
+Tab_7:CreateToggle({Name = "Turn On/Off Invisibility"; CurrentValue = false; Callback = function(Value)
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
+if Value == false then
+ApplyInvisibility(Value)
+Notify("Success!", "Disabled invisibility!", 2, true)
+elseif Value == true then
+ApplyInvisibility(Value)
 Notify("Success!", "Applied invisibility!", 2, true)
 end
 end; })
 
+Tab_7:CreateToggle({Name = "Infinity Cloak"; CurrentValue = false; Callback = function(Value)
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
+InfinityCloak = Value
+end; })
+
+workspace:WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor").ChildAdded:Connect(function(d)
+if d.Name == ""..LP.Name.."" and InfinityCloak == true then
+local temp_humanoid = d:WaitForChild("Humanoid")
+local oldhealth = temp_humanoid.Health
+local temp_connection = nil
+local temp_con = nil
+
+temp_connection = temp_humanoid.AnimationPlayed:Connect(function(track)
+if not track then return end
+local loggedanim = track.Animation
+if loggedanim then
+local loggedanimid = loggedanim.AnimationId
+if loggedanimid ~= nil and loggedanimid == "rbxassetid://133960698072483" then
+task.wait(3)
+if d.Torso.Transparency == 1 then
+ApplyInvisibility(true)
+d.HumanoidRootPart.CloakEnd.Played:Once(function()
+d.HumanoidRootPart.CloakEnd:Stop()
+end)
+
+task.spawn(function()
+pcall(function()
+repeat task.wait() until not d:IsDescendantOf(workspace) or temp_humanoid.Health ~= oldhealth or InfinityCloak == false
+ApplyInvisibility(false)
+temp_connection:Disconnect()
+temp_con:Disconnect()
+end)
+end)
+
+end
+end
+end
+end)
+
+temp_con = workspace:WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor").ChildRemoved:Connect(function(c)
+if c == d then
+temp_connection:Disconnect()
+temp_con:Disconnect()
+end
+end)
+
+end
+end)
 
 function StudsIntoPower(studs)
-return (studs * 6)
+return (studs * 5)
 end
 Tab_7:CreateSection("Hitbox Extender")
+Tab_7:CreateLabel("ONLY WORKS FOR KILLER! EXTENDS SLIGHTLY!")
 Tab_7:CreateToggle({Name = "Extend Hitbox"; CurrentValue = false; Callback = function(Value)
 if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
 ExtendHitbox = Value
 if ExtendHitbox == true then
-local distance = 9
+local distance = StudsIntoPower(2)
 repeat game:GetService("RunService").Heartbeat:Wait()
 local vel, movel = nil, 0.1
 while not (game:GetService("Players").LocalPlayer.Character and game:GetService("Players").LocalPlayer.Character.Parent and game:GetService("Players").LocalPlayer.Character.HumanoidRootPart and game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Parent) do
@@ -1430,15 +1771,14 @@ Tab_7:CreateSection("FE Hitbox Breaker")
 -- Code is obfuscated to prevent those methods to get patched
 
 
-Tab_7:CreateLabel("I recommend using hitbox breaker during double trouble / one bounce / die nation for more fun!")
-Tab_7:CreateLabel("WARNING! You need to equip killdroid.")
-Tab_7:CreateButton({Name = "FE Break Game Hitboxes"; Callback = function()
+Tab_7:CreateLabel("Invincibility / God Mode only can be applied only during dienation gamemode, and you must be killdroid!")
+Tab_7:CreateButton({Name = "FE Invincibility / God Mode"; Callback = function()
 if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
 if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChild(LocalPlayer.Name) then Notify("Error!", "You must be killer!", 4, false) return end
-Notify("Breaking hitboxes...", "Please wait!", 7, true)
+Notify("Applying Invincibility...", "Please wait!", 7, true)
 --If you're not a skid, you can easily de-obfuscate that.
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Pro666Pro/Modules/refs/heads/main/obf-handler.rbx"))().load("\51\48\51\48\51\49\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\48\51\49")
-Notify("Broke hitboxes!", "Everyone's hitboxes are now must be broken.", 3, true)
+Encryptor.load("\48\48\49\49\48\48\49\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\48\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\49\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\49\48\48\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\48\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\49\48\48\48\49\49\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\48\48\49\48\48\48\49\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\48\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\48\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\49\48\49\48\48\48\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\48\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\48\48\49\48\48\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\49\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\48\48\48")
+Notify("Applied Invincibility!", "Now no one can damage you.", 3, true)
 end; })
 
 
@@ -1450,76 +1790,144 @@ if not HavePremium then Notify("Error!", "You need premium to unlock this featur
 if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChildWhichIsA("Model") then Notify("Error!", "No Killers!", 3, false) return end
 Notify("Enabling Auto-Softlock...", "Please wait!", 7, true)
 --If you're not a skid, you can easily de-obfuscate that.
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Pro666Pro/Modules/refs/heads/main/obf-handler.rbx"))().load("\51\48\51\48\51\49\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\49\51\48\51\49\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\49\51\48\51\48\51\48\51\49\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\48\51\49\51\49\51\48\51\49\51\49\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\48\51\48\51\48\51\48\51\49\51\49\51\48\51\49\51\48\51\49\51\48\51\48\51\49\51\49\51\48\51\48\51\48\51\48\51\49")
+Encryptor.load("\48\48\49\49\48\48\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\49\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\48\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\49\48\49\48\48\48\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\49\48\48\48\49\48\48\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\49\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\48\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\49\48\48\48\49\49\48\49\49\49\48\49\48\48\48\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\48\48\48\49\48\48\48\49\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\49\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\49\49\48\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\48\49\48\49\48\48\48\48\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\48\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\48\48\49\48\48\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\48\48\49\48\48\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\48\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\48\48\48\49\49\49\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\48\49")
 MorphIntoGhost()
 Notify("Auto-Softlock Enabled!", "Check the label above to see when will specific killers get softlocked.", 5, true)
 end; })
 
-function IsFacingTowards(part)
-local unit = ((HumanoidRootPart.Position - part.Position) * Vector3.new(1,0,1)).Unit
-local lookvector = part.CFrame.LookVector * Vector3.new(1,0,1)
-return (lookvector:Dot(unit) > 0.85)
-end
-function GetMagnitudeDifference(part)
-return (part.Position - HumanoidRootPart.Position).Magnitude
-end
-local attacks = {"Swing","Cleave","Bolt","Shoot"}
-
-
 Tab_7:CreateSection("Auto Block")
 Tab_7:CreateLabel("{ VERY W.I.P. !!!! } Uses block ability when the killer is attacking you. Your ping must be less than 60 for it to work.")
-local CheckIfHaveBlock = true
-Tab_7:CreateToggle({Name = "Use Block ability even if you don't have it"; CurrentValue = true; Callback = function(Value)
-if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
-CheckIfHaveBlock = Value
-end; })
-local AutoBlockRange = 13
-Tab_7:CreateInput({Name = "Auto Block detection range ( Magnitude )"; PlaceholderText = "13"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+Tab_7:CreateLabel("ONLY BLOCKS SWING!!! CAN'T BLOCK BADWARE AND KILLDROID!!! please wait until i update it 😔")
+local AutoBlockRange = 20
+Tab_7:CreateInput({Name = "Auto Block detection range ( Magnitude )"; PlaceholderText = "20"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 AutoBlockRange = tonumber(Value)
 end; })
+local AutoRangeSet = false
+Tab_7:CreateToggle({Name = "Auto Range Set"; CurrentValue = false; Callback = function(Value)
+AutoRangeSet = Value
+end; })
 local AutoBlock = false
+local UnHookAttributes = nil
 Tab_7:CreateToggle({Name = "Auto Block"; CurrentValue = false; Callback = function(Value)
 if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
 AutoBlock = Value
+task.wait()
+if Value == true then
+for i,v in pairs(workspace:WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):GetChildren()) do
+if v then
+HookAttributes(v)
+end
+end
+elseif Value == false then
+if UnHookAttributes ~= nil then
+pcall(function()
+UnHookAttributes()
+end)
+end
+end
 end; })
 
-workspace.GameAssets.Teams.Killer.ChildAdded:Connect(function(ad)
+local AB_UA = game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteFunctions"):WaitForChild("UseAbility")
+
+function IsFacingTowards(killer)
+local unit = ((HumanoidRootPart.Position - killer.HumanoidRootPart.Position) * Vector3.new(1,0,1)).Unit
+local lookvector = killer.HumanoidRootPart.CFrame.LookVector * Vector3.new(1,0,1)
+return (lookvector:Dot(unit) > 0.85)
+end
+
+function GetMagnitudeDifference(killer)
+return (killer.HumanoidRootPart.Position - HumanoidRootPart.Position).Magnitude or (1/0)
+end
+
+function CheckPlayingAnims(killer, killername)
+local attacks = MainModule:GetAnimationTriggers(killername)
+for _,q in pairs(killer:FindFirstChild("Humanoid"):GetPlayingAnimationTracks()) do
+for i,v in pairs(attacks) do
+if v == tostring(q.Animation.AnimationId) then
+return i
+end
+end
+end
+return nil
+end
+
+function GetPartSpeed(part)
+local speed = 0
+pcall(function()
+local velocity = part.Velocity
+local horizontalvelocity = Vector3.new(velocity.X,0,velocity.Z)
+speed = horizontalvelocity.Magnitude
+end)
+return speed
+end
+
+function CheckRequirements(killer, killername)
+local as = GetPartSpeed(killer:FindFirstChild("HumanoidRootPart"))
+if as == 0 then
+as = 11
+elseif as < 10 then
+as = as * 2
+elseif as < 30 then
+as = as
+end
+local b
+if AutoRangeSet == true then
+b = (GetMagnitudeDifference(killer) < tonumber(as))
+else
+b = (GetMagnitudeDifference(killer) < tonumber(AutoBlockRange))
+end
+local c = IsFacingTowards(killer)
+if b == true and c == true then
+return true
+end
+return false
+end
+
+function GetKillerName(killer)
+local a = game.Players:GetPlayerFromCharacter(killer)
+if not a then return nil end
+if a.Stats:FindFirstChild("IsKiller") and a.Stats:FindFirstChild("IsKiller").Value == true then
+return tostring(a.Stats:FindFirstChild("EquippedKiller").Value)
+end
+return nil
+end
+
+function HookAttributes(killer)
 if AutoBlock ~= true then return end
-if workspace.GameAssets.Teams.Killer:FindFirstChild(LocalPlayer.Name) then return end
-if CheckIfHaveBlock == true then
-game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(unpack({{tostring("Block")}}))
+if not killer or not killer:FindFirstChild("HumanoidRootPart") or not killer:FindFirstChild("Humanoid") then warn("not found") return end
+local ab_connection_1, ab_connection_2 = nil, nil
+ab_connection_1 = killer.AttributeChanged:Connect(function(trigger)
+if trigger == "WalkSpeedModifier" and AutoBlock == true then
+if not killer then return end
+local kn = GetKillerName(killer)
+if not kn then warn("no name") return end
+if CheckRequirements(killer, kn) and table.find(MainModule:GetWalkSpeedModData(kn), tonumber(killer:GetAttribute("WalkSpeedModifier"))) then
+AB_UA:InvokeServer("Block")
 end
-task.wait()
-if ad.Name == tostring(LocalPlayer.Name) then return end
-local AutoBlock_con_1, AutoBlock_con_2
-if not game.Players:GetPlayerFromCharacter(ad) then return end
-repeat task.wait() until ad:FindFirstChild("Humanoid")
-AutoBlock_con_1 = ad:FindFirstChild("Humanoid"):FindFirstChildOfClass("Animator").AnimationPlayed:Connect(function(track)
-if not track.Animation then return end
-local function IsAttacking()
-local y = false
-local attacks = {"rbxassetid://86688899212031","rbxassetid://86688899212031","rbxassetid://86688899212031","rbxassetid://86688899212031","rbxassetid://86688899212031","rbxassetid://86688899212031","rbxassetid://86688899212031","rbxassetid://86688899212031","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://80787680522855","rbxassetid://90169934219103","rbxassetid://78618685223511","rbxassetid://77146551800119","rbxassetid://77146551800119","rbxassetid://77146551800119","rbxassetid://77146551800119","rbxassetid://77146551800119","rbxassetid://99333140295180","rbxassetid://77146551800119","rbxassetid://77146551800119","rbxassetid://77146551800119","rbxassetid://77146551800119","rbxassetid://77146551800119","rbxassetid://77146551800119","rbxassetid://85336854929158","rbxassetid://84850475824455","rbxassetid://85336854929158","rbxassetid://84850475824455","rbxassetid://84850475824455","rbxassetid://84850475824455","rbxassetid://85336854929158","rbxassetid://84850475824455","rbxassetid://84850475824455","rbxassetid://85336854929158","rbxassetid://84850475824455","rbxassetid://124579722663415","rbxassetid://108527178823496","rbxassetid://108527178823496","rbxassetid://124579722663415","rbxassetid://108527178823496","rbxassetid://124579722663415","rbxassetid://108527178823496","rbxassetid://124579722663415","rbxassetid://108527178823496","rbxassetid://124579722663415","rbxassetid://108527178823496","rbxassetid://124579722663415","rbxassetid://108527178823496","rbxassetid://124579722663415","rbxassetid://108527178823496","rbxassetid://124579722663415","rbxassetid://108527178823496","rbxassetid://124579722663415","rbxassetid://108527178823496","rbxassetid://124579722663415","rbxassetid://124579722663415","rbxassetid://108527178823496","rbxassetid://71896478910022","rbxassetid://89729648321106","rbxassetid://130037883107006","rbxassetid://89729648321106","rbxassetid://130037883107006","rbxassetid://89729648321106","rbxassetid://130037883107006","rbxassetid://89729648321106","rbxassetid://130037883107006","rbxassetid://89729648321106","rbxassetid://84565422738230","rbxassetid://89729648321106","rbxassetid://130037883107006","rbxassetid://89729648321106","rbxassetid://130037883107006","rbxassetid://89729648321106","rbxassetid://78618685223511","rbxassetid://89729648321106","rbxassetid://100896558622404","rbxassetid://89729648321106","rbxassetid://78618685223511","rbxassetid://89729648321106","rbxassetid://89729648321106","rbxassetid://78618685223511","rbxassetid://78618685223511","rbxassetid://89729648321106","rbxassetid://130037883107006","rbxassetid://89729648321106","rbxassetid://130037883107006","rbxassetid://89729648321106","rbxassetid://130037883107006","rbxassetid://89729648321106","rbxassetid://78618685223511","rbxassetid://89729648321106","rbxassetid://78618685223511","rbxassetid://89729648321106"}
-if table.find(attacks, track.Animation.AnimationId) then
-y = true
-end
-return y
-end
-if IsAttacking() and IsFacingTowards(ad:FindFirstChild("HumanoidRootPart")) and GetMagnitudeDifference(ad:FindFirstChild("HumanoidRootPart")) < AutoBlockRange then
-game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteFunctions"):WaitForChild("UseAbility"):InvokeServer("Block")
 end
 end)
-AutoBlock_con_2 = workspace.GameAssets.Teams.Killer.ChildRemoved:Connect(function(dd)
-if ad == dd then
-AutoBlock_con_1:Disconnect()
-AutoBlock_con_2:Disconnect()
+ab_connection_2 = workspace:WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer").ChildRemoved:Connect(function(abcd)
+if abcd == killer then
+UnHookAttributes = nil
+ab_connection_1:Disconnect()
+ab_connection_2:Disconnect()
 end
 end)
-end)
+UnHookAttributes = function() ab_connection_1:Disconnect() ab_connection_2:Disconnect() UnHookAttributes = nil end
+end
+
+workspace:WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer").ChildAdded:Connect(HookAttributes)
+for i,v in pairs(workspace:WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):GetChildren()) do
+if v then
+HookAttributes(v)
+end
+end
 
 local ff_connection = nil
 local ff_enabled = false
 local ff_cd = false
 
+-- Credits to whoever created this, appreciate this.
 function Flip()
 	if ff_cd then
 		return
@@ -1587,19 +1995,19 @@ function Flip()
 	end)
 end
 
-local sausageHolder = game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.UnibarMenu["2"]
-local originalSize = sausageHolder.Size.X.Offset
+local TopBar = game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.UnibarMenu["2"]
+local OrigSize = TopBar.Size.X.Offset
 local ff_button = nil
 function SetFrontFlip(bool)
 ff_enabled = bool
 if ff_enabled == true then
-sausageHolder = game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.UnibarMenu["2"]
-originalSize = sausageHolder.Size.X.Offset
-ff_button = Instance.new("Frame", sausageHolder)
+TopBar = game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.UnibarMenu["2"]
+OrigSize = TopBar.Size.X.Offset
+ff_button = Instance.new("Frame", TopBar)
 		ff_button.Size = UDim2.new(0, 48, 0, 44)
 		ff_button.BackgroundTransparency = 1
 		ff_button.BorderSizePixel = 0
-		ff_button.Position = UDim2.new(0, sausageHolder.Size.X.Offset - 48, 0, 0)
+		ff_button.Position = UDim2.new(0, TopBar.Size.X.Offset - 48, 0, 0)
 local imageButton = Instance.new("ImageButton", ff_button)
 		imageButton.BackgroundTransparency = 1
 		imageButton.BorderSizePixel = 0
@@ -1608,15 +2016,15 @@ local imageButton = Instance.new("ImageButton", ff_button)
 		imageButton.Position = UDim2.new(0.5, 0, 0.5, 0)
 		imageButton.Image = "rbxthumb://type=Asset&id=2714338264&w=150&h=150"
 ff_connection = imageButton.Activated:Connect(Flip)
-sausageHolder.Size = UDim2.new(0, originalSize + 48, 0, sausageHolder.Size.Y.Offset)
+TopBar.Size = UDim2.new(0, OrigSize + 48, 0, TopBar.Size.Y.Offset)
 task.wait()
-ff_button.Position = UDim2.new(0, sausageHolder.Size.X.Offset - 48, 0, 0)
+ff_button.Position = UDim2.new(0, TopBar.Size.X.Offset - 48, 0, 0)
 task.spawn(function()
 pcall(function()
 repeat
-sausageHolder.Size = UDim2.new(0, originalSize + 48, 0, sausageHolder.Size.Y.Offset)
+TopBar.Size = UDim2.new(0, OrigSize + 48, 0, TopBar.Size.Y.Offset)
 task.wait()
-ff_button.Position = UDim2.new(0, sausageHolder.Size.X.Offset - 48, 0, 0)
+ff_button.Position = UDim2.new(0, TopBar.Size.X.Offset - 48, 0, 0)
 until ff_enabled == false
 end)
 end)
@@ -1629,8 +2037,326 @@ if ff_button then
 ff_button:Destroy()
 ff_button = nil
 end
-sausageHolder.Size = UDim2.new(0, originalSize, 0, sausageHolder.Size.Y.Offset)
+TopBar.Size = UDim2.new(0, OrigSize, 0, TopBar.Size.Y.Offset)
 end
+end
+
+
+
+
+
+
+
+
+local Tab_12 = Window:CreateTab("Teleport",0)
+
+Tab_12:CreateParagraph({Title = "Teleports", Content = "Teleport to killer / survivors and others."})
+
+function SafeTeleport(model)
+pcall(function()
+local time = tick()
+while tick() - time < 1 do
+for i,v in pairs(Character:GetDescendants()) do
+if v and v:IsA("BasePart") then
+v.Velocity = Vector3.new(0,0,0)
+v.RotVelocity = Vector3.new(0,0,0)
+end
+end
+HumanoidRootPart.CFrame = model.CFrame
+task.wait()
+end
+end)
+end
+
+function GetChildNames(model)
+local coolbalt = {}
+for i,v in pairs(model:GetChildren()) do
+if v then
+table.insert(coolbalt, tostring(v.Name))
+end
+end
+return coolbalt
+end
+
+Tab_12:CreateSection("Team Teleport")
+
+ChoosenKillerTarget = nil
+ChoosenSurvivorTarget = nil
+ChoosenGhostTarget = nil
+local TeleportToKillerDropdown = Tab_12:CreateDropdown({Name = "Target Killer"; Options = GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer")); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
+ChoosenKillerTarget = ConvertDropdownValue(Value)
+end; })
+Tab_12:CreateButton({Name = "Teleport to Killer"; Callback = function()
+if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChildOfClass("Model") then
+Notify("Error!", "There are no killers!", 3, false)
+return nil
+end
+if ChoosenKillerTarget == nil or ChoosenKillerTarget == "" or not ChoosenKillerTarget then
+Notify("Error!", "Choose your target!", 3, false)
+return nil
+end
+SafeTeleport(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChild(ChoosenKillerTarget):WaitForChild("HumanoidRootPart"))
+end; })
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer").ChildAdded:Connect(function(child)
+pcall(function()
+TeleportToKillerDropdown:Refresh(GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer")))
+end)
+end)
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer").ChildRemoved:Connect(function(child)
+pcall(function()
+TeleportToKillerDropdown:Refresh(GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer")))
+end)
+end)
+
+local TeleportToSurvivorDropdown = Tab_12:CreateDropdown({Name = "Target Survivor"; Options = GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor")); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
+ChoosenSurvivorTarget = ConvertDropdownValue(Value)
+end; })
+Tab_12:CreateButton({Name = "Teleport to Survivor"; Callback = function()
+if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor"):FindFirstChildOfClass("Model") then
+Notify("Error!", "There are no survivors!", 3, false)
+return nil
+end
+if ChoosenSurvivorTarget == nil or ChoosenSurvivorTarget == "" or not ChoosenSurvivorTarget then
+Notify("Error!", "Choose your target!", 3, false)
+return nil
+end
+SafeTeleport(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor"):FindFirstChild(ChoosenSurvivorTarget):WaitForChild("HumanoidRootPart"))
+end; })
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor").ChildAdded:Connect(function(child)
+pcall(function()
+TeleportToSurvivorDropdown:Refresh(GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor")))
+end)
+end)
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor").ChildRemoved:Connect(function(child)
+pcall(function()
+TeleportToSurvivorDropdown:Refresh(GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor")))
+end)
+end)
+
+local TeleportToGhostDropdown = Tab_12:CreateDropdown({Name = "Target Ghost"; Options = GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost")); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
+ChoosenGhostTarget = ConvertDropdownValue(Value)
+end; })
+Tab_12:CreateButton({Name = "Teleport to Ghost"; Callback = function()
+if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost"):FindFirstChildOfClass("Model") then
+Notify("Error!", "There are no ghosts!", 3, false)
+return nil
+end
+if ChoosenGhostTarget == nil or ChoosenGhostTarget == "" or not ChoosenGhostTarget then
+Notify("Error!", "Choose your target!", 3, false)
+return nil
+end
+SafeTeleport(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost"):FindFirstChild(ChoosenGhostTarget):WaitForChild("HumanoidRootPart"))
+end; })
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost").ChildAdded:Connect(function(child)
+pcall(function()
+TeleportToGhostDropdown:Refresh(GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost")))
+end)
+end)
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost").ChildRemoved:Connect(function(child)
+pcall(function()
+TeleportToGhostDropdown:Refresh(GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost")))
+end)
+end)
+
+Tab_12:CreateSection("Specific Teleports")
+
+Tab_12:CreateButton({Name = "Teleport to Survivor with caretaker"; Callback = function()
+if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor"):FindFirstChildOfClass("Model") then
+Notify("Error!", "There are no caretakers!", 3, false)
+return nil
+end
+local plrwithcaretaker = nil
+for i,v in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor"):GetChildren()) do
+if v and v.Parent and (v:WaitForChild("Vanities"):WaitForChild("Caretaker").Transparency ~= 1 or v:WaitForChild("Vanities"):WaitForChild("Aussie Slouch"):WaitForChild("Mesh").TextureId == "rbxassetid://130388665159057") then
+plrwithcaretaker = v
+end
+end
+if plrwithcaretaker then
+SafeTeleport(plrwithcaretaker:WaitForChild("HumanoidRootPart"))
+else
+Notify("Error!", "There are no caretakers!", 3, false)
+end
+end; })
+
+Tab_12:CreateButton({Name = "Teleport to Injured survivor"; Callback = function()
+local injuredplr = nil
+for i,v in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor"):GetChildren()) do
+if v and v.Parent and (v:WaitForChild("Humanoid").Health < tonumber(v:WaitForChild("Humanoid").MaxHealth)) then
+injuredplr = v
+end
+end
+if injuredplr then
+SafeTeleport(injuredplr:WaitForChild("HumanoidRootPart"))
+else
+Notify("Error!", "There are no injured players!", 3, false)
+end
+end; })
+
+Tab_12:CreateButton({Name = "Teleport to Bonus Pad"; Callback = function()
+if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable"):FindFirstChild("BonusPad") then
+Notify("Error!", "There are no bonus pads!", 3, false)
+return nil
+end
+SafeTeleport(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable"):WaitForChild("BonusPad"):WaitForChild("Pad"))
+end; })
+
+
+
+
+
+
+
+
+local Tab_10 = Window:CreateTab("Audio",0)
+if HaveWorkspaceAccess() ~= true then
+Tab_10:CreateParagraph({Title = "Not Supported", Content = "Your executor doesn't support those functions: workspace access or getcustomasset"})
+end
+
+if HaveWorkspaceAccess() then
+local LMSes_Backup = game:GetService("ReplicatedStorage").Sounds.Songs.LMSSongs:Clone()
+LMSes_Backup.Name = "LMSSongs"
+LMSes_Backup.Parent = game.CoreGui.DOD_Assets
+
+Tab_10:CreateParagraph({Title = "Audio", Content = "Audio Management ( Mostly LMS and chases )"})
+Tab_10:CreateSection("Custom LMS")
+local choosen_lms = ""
+local LMS_Audios = Tab_10:CreateDropdown({Name = "LMS Audios"; Options = loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))(); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
+choosen_lms = ConvertDropdownValue(Value)
+end; })
+Tab_10:CreateButton({Name = "Reload LMS Audios"; Callback = function()
+LMS_Audios:Refresh(loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))())
+Notify("Success!","Reloading LMS Audios...",3,true)
+end; })
+Tab_10:CreateButton({Name = "Set Custom LMS"; Callback = function()
+if (choosen_lms == nil or choosen_lms == "") then
+Notify("Error!","Choose Audio!",3,false)
+return
+end
+local temp_table = loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))()
+if not table.find(temp_table, choosen_lms) then
+Notify("Error!","File isn't added! ( Please reload lms audios and choose again. )",3,false)
+return
+end
+for i,v in next, game:GetService("ReplicatedStorage").Sounds.Songs.LMSSongs:GetChildren() do
+if v and v:IsA("Sound") then
+v.SoundId = GetFile("NexerHub/DieOfDeath/Assets/LMS/"..choosen_lms..".mp3","gca")
+end
+end
+Notify("Success!","Set ''"..choosen_lms.."'' as new custom LMS!",4,true)
+end; })
+Tab_10:CreateButton({Name = "Restore Normal LMS"; Callback = function()
+if game:GetService("ReplicatedStorage").Sounds.Songs:FindFirstChild("LMSSongs") then
+game:GetService("ReplicatedStorage").Sounds.Songs.LMSSongs:Destroy()
+end
+game.CoreGui.DOD_Assets.LMSSongs:Clone().Parent = game:GetService("ReplicatedStorage").Sounds.Songs
+Notify("Success!","Restored!",3,true)
+end; })
+Tab_10:CreateSlider({Name = "LMS Volume"; Range = {0, 10}; Increment = .5; Suffix = ""; CurrentValue = 1; Callback = function(Value)
+for i,v in next, game:GetService("ReplicatedStorage").Sounds.Songs.LMSSongs:GetChildren() do
+if v and v:IsA("Sound") then
+v.Volume = tonumber(Value)
+end
+end
+end; })
+
+
+
+Tab_10:CreateSection("Custom LMS ( settings )")
+local lms_file_name = "Type Here!"
+Tab_10:CreateParagraph({Title = "How to add your own music?", Content = "Find your executor's folder in your phone's explorer, then find the ''workspace'' folder, and inside it you must find ''NexerHub'' folder, now go inside it, then click ''Assets'' and ''LMS''. And now, in this folder, input your mp3 music."})
+Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here!"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+lms_file_name = ConvertDropdownValue(Value)
+end; })
+Tab_10:CreateButton({Name = "Add File"; Callback = function()
+if not IsFile("NexerHub/DieOfDeath/Assets/LMS/"..lms_file_name..".mp3") then
+Notify("Error!","File not found! ( Did you entered name correctly? Make sure it is mp3. )",3,false)
+return
+end
+local temp_table = loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))()
+if table.find(temp_table, lms_file_name) then
+Notify("Error!","This file is already added!",3,false)
+return
+end
+InsertElement("NexerHub/DieOfDeath/Assets/LMS/data.luau", lms_file_name)
+Notify("Success!","Added File!",3,true)
+end; })
+Tab_10:CreateButton({Name = "Remove File"; Callback = function()
+local temp_table = loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))()
+if not table.find(temp_table, lms_file_name) then
+Notify("Error!","File isn't added! ( Did you entered name correctly? )",3,false)
+return
+end
+RemoveElement("NexerHub/DieOfDeath/Assets/LMS/data.luau", lms_file_name)
+Notify("Success!","Removed File!",3,true)
+end; })
+
+
+
+
+Tab_10:CreateSection("Custom Chase Themes")
+local choosen_chase = ""
+local Chases_Audios = Tab_10:CreateDropdown({Name = "Chase Themes"; Options = loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))(); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
+choosen_chase = ConvertDropdownValue(Value)
+end; })
+Tab_10:CreateButton({Name = "Reload Chase Themes"; Callback = function()
+Chases_Audios:Refresh(loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))())
+Notify("Success!","Reloading Chase Themes...",3,true)
+end; })
+Tab_10:CreateButton({Name = "Set Custom Chase Theme"; Callback = function()
+if (choosen_chase == nil or choosen_chase == "") then
+Notify("Error!","Choose Audio!",3,false)
+return
+end
+local temp_table = loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))()
+if not table.find(temp_table, choosen_chase) then
+Notify("Error!","File isn't added! ( Please reload chase themes and choose again. )",3,false)
+return
+end
+for i,v in next, workspace:WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):GetDescendants() do
+if v and v:IsA("Sound") and v.Name == "ChaseTheme" then
+v.SoundId = GetFile("NexerHub/DieOfDeath/Assets/Chases/"..choosen_chase..".mp3","gca")
+end
+end
+Notify("Success!","Set ''"..choosen_chase.."'' as new custom chase!",4,true)
+end; })
+Tab_10:CreateSlider({Name = "Chase Themes Volume"; Range = {0, 10}; Increment = .5; Suffix = ""; CurrentValue = 1; Callback = function(Value)
+for i,v in next, workspace:WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):GetDescendants() do
+if v and v:IsA("Sound") and v.Name == "ChaseTheme" then
+v.Volume = tonumber(Value)
+end
+end
+end; })
+
+
+Tab_10:CreateSection("Custom Chase Themes ( settings )")
+local chase_file_name = "Type Here!"
+Tab_10:CreateParagraph({Title = "How to add your own music?", Content = "Find your executor's folder in your phone's explorer, then find the ''workspace'' folder, and inside it you must find ''NexerHub'' folder, now go inside it, then click ''Assets'' and ''Chases''. And now, in this folder, input your mp3 music."})
+Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here!"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+chase_file_name = ConvertDropdownValue(Value)
+end; })
+Tab_10:CreateButton({Name = "Add File"; Callback = function()
+if not IsFile("NexerHub/DieOfDeath/Assets/Chases/"..chase_file_name..".mp3") then
+Notify("Error!","File not found! ( Did you entered name correctly? Make sure it is mp3. )",3,false)
+return
+end
+local temp_table = loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))()
+if table.find(temp_table, chase_file_name) then
+Notify("Error!","This file is already added!",3,false)
+return
+end
+InsertElement("NexerHub/DieOfDeath/Assets/Chases/data.luau", chase_file_name)
+Notify("Success!","Added File!",3,true)
+end; })
+Tab_10:CreateButton({Name = "Remove File"; Callback = function()
+local temp_table = loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))()
+if not table.find(temp_table, chase_file_name) then
+Notify("Error!","File isn't added! ( Did you entered name correctly? )",3,false)
+return
+end
+RemoveElement("NexerHub/DieOfDeath/Assets/Chases/data.luau", chase_file_name)
+Notify("Success!","Removed File!",3,true)
+end; })
+
 end
 
 local Tab_8 = Window:CreateTab("Fun",0)
@@ -1642,79 +2368,804 @@ end; })
 SetFrontFlip(true)
 
 
+
+Tab_8:CreateButton({Name = "Give yourself stalk"; Callback = function()
+local function Stalk()
+local function TempAnim(id)
+local temp_anim = Instance.new("Animation")
+temp_anim.AnimationId = id
+return temp_anim
+end
+local stalk_start = Humanoid:LoadAnimation(TempAnim("rbxassetid://130725432915474"))
+local stalk_loop =  Humanoid:LoadAnimation(TempAnim("rbxassetid://102302720518230"))
+for i = 1,4 do
+if i == 1 then
+if not HumanoidRootPart:FindFirstChild("Stalk") then
+game:GetService("ReplicatedStorage").Characters.Killer.Pursuer.Avoider.HumanoidRootPart.Stalk:Clone().Parent = HumanoidRootPart
+end
+else
+if not HumanoidRootPart:FindFirstChild("Stalk"..tostring(i)) then
+game:GetService("ReplicatedStorage").Characters.Killer.Pursuer.Avoider.HumanoidRootPart["Stalk"..tostring(i)]:Clone().Parent = HumanoidRootPart
+end
+end
+end
+local old_ws = 10
+local old_ss = 26
+Humanoid.Parent:SetAttribute("WalkSpeed",0)
+Humanoid.Parent:SetAttribute("SprintSpeed",0)
+stalk_start:Play()
+for i = 1,2 do
+if i == 2 then
+task.wait(1.5)
+end
+local temp_rndm = math.random(1,4)
+if temp_rndm == 1 then
+HumanoidRootPart["Stalk"]:Play()
+else
+HumanoidRootPart["Stalk"..tostring(temp_rndm)]:Play()
+end
+end
+task.wait(2)
+task.delay(.6, function()
+Humanoid.Parent:SetAttribute("WalkSpeed",(old_ws/1.5))
+Humanoid.Parent:SetAttribute("SprintSpeed",(old_ss/1.5))
+task.wait(1.2)
+Humanoid.Parent:SetAttribute("WalkSpeed",27)
+Humanoid.Parent:SetAttribute("SprintSpeed",55)
+end)
+stalk_loop:Play()
+for i = 1,10 do
+for i,v in next, Humanoid.Parent:GetDescendants() do
+if v and v:IsA("BasePart") or v:IsA("SpecialMesh") and v.Name ~= "HumanoidRootPart" then
+pcall(function()
+v.Transparency += 0.1
+end)
+end
+end
+task.wait(.13)
+end
+stalk_loop:Stop()
+ApplyInvisibility(true)
+task.wait(10)
+ApplyInvisibility(false)
+stalk_loop:Play()
+Humanoid.Parent:SetAttribute("WalkSpeed",(old_ws/2))
+Humanoid.Parent:SetAttribute("SprintSpeed",(old_ss/2))
+for i = 1,10 do
+for i,v in next, Humanoid.Parent:GetDescendants() do
+if v and v:IsA("BasePart") or v:IsA("SpecialMesh") and v.Name ~= "HumanoidRootPart" then
+pcall(function()
+v.Transparency -= 0.1
+end)
+end
+end
+task.wait(.13)
+end
+task.wait(.5)
+stalk_loop:Stop()
+Humanoid.Parent:SetAttribute("WalkSpeed",old_ws)
+Humanoid.Parent:SetAttribute("SprintSpeed",old_ss)
+end
+AbilityModule.CreateAbility({Name = "Stalk_NH",InputShown = "",Tip = "Turn invisible and gain speed, cant use abilities and a long endlag after.",Cooldown = 15, Icon = "rbxassetid://92577246919936", DisplayName = "Stalk"})
+repeat task.wait() until LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Stalk_NH")
+LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Stalk_NH").MouseButton1Down:Connect(function()
+Stalk()
+AbilityModule.PutOnCooldown("Stalk_NH",15)
+end)
+end; })
+
+
+
+Tab_8:CreateButton({Name = "Give yourself dash without cooldown"; Callback = function()
+local function Dash()
+local function TempAnim(id)
+local temp_anim = Instance.new("Animation")
+temp_anim.AnimationId = id
+return temp_anim
+end
+task.spawn(function()
+local dashanim = Humanoid:LoadAnimation(TempAnim("rbxassetid://78278813483757"))
+dashanim:Play()
+task.delay(.42, function()
+dashanim:Stop()
+end)
+end)
+if not HumanoidRootPart:FindFirstChild("DashPE") then
+game:GetService("ReplicatedStorage").Characters.Survivor.Civilian.HumanoidRootPart.Particles.DashPE:Clone().Parent = HumanoidRootPart
+end
+if not HumanoidRootPart:FindFirstChild("DashPE3") then
+game:GetService("ReplicatedStorage").Characters.Survivor.Civilian.HumanoidRootPart.Particles["DashPE3"]:Clone().Parent = HumanoidRootPart
+end
+if not HumanoidRootPart:FindFirstChild("DashSmokePE") then
+game:GetService("ReplicatedStorage").Characters.Survivor.Civilian.HumanoidRootPart.Particles.DashSmokePE:Clone().Parent = HumanoidRootPart
+end
+if not HumanoidRootPart:FindFirstChild("Dash") then
+game:GetService("ReplicatedStorage").Characters.Survivor.Civilian.HumanoidRootPart.Sounds.Dash:Clone().Parent = HumanoidRootPart
+end
+repeat task.wait() until HumanoidRootPart:FindFirstChild("DashPE")
+local function EmitDash()
+for i,v in next, HumanoidRootPart:FindFirstChild("DashPE"):GetChildren() do
+if v then
+v:Emit(2)
+end
+end
+for i,v in next, HumanoidRootPart:FindFirstChild("DashSmokePE"):GetChildren() do
+if v then
+v:Emit(25)
+end
+end
+HumanoidRootPart:FindFirstChild("DashPE3"):Emit(2)
+HumanoidRootPart:FindFirstChild("Dash"):Play()
+end
+local BodyVelocity = Instance.new("BodyVelocity")
+BodyVelocity.MaxForce = Vector3.new(1000000,1000,1000000)
+BodyVelocity.P = 1250
+BodyVelocity.Velocity = HumanoidRootPart.CFrame.LookVector * 80
+BodyVelocity.Parent = HumanoidRootPart
+game.Debris:AddItem(BodyVelocity, .35)
+EmitDash()
+end
+AbilityModule.CreateAbility({Name = "Dash_NH",InputShown = "",Tip = "Dash foward, and gain no cooldown.",Cooldown = .2, Icon = "rbxassetid://73777691791017",DisplayName = "Dash without cooldown"})
+repeat task.wait() until LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Dash_NH")
+LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Dash_NH").MouseButton1Down:Connect(function()
+Dash()
+AbilityModule.PutOnCooldown("Dash_NH",.2)
+end)
+end; })
+
+
+-- Dont skid baka
+function ReplaceModel(Model1, Model2)
+if not game.Players:GetPlayerFromCharacter(Model1) then return end
+for i,v in pairs(Model1:GetChildren()) do
+	if v and game:GetService("ReplicatedStorage").Characters.Killer:FindFirstChild(v.Name, true) then
+		if game:GetService("ReplicatedStorage").Characters.Killer:FindFirstChild(v.Name, true):IsA("Model") then
+			v:Destroy()
+		end
+	end
+end
+local function setnewchanges()
+pcall(function()
+game.Players:GetPlayerFromCharacter(Model1).Character.Animate.Disabled = true
+task.wait()
+game.Players:GetPlayerFromCharacter(Model1).Character.Animate.Disabled = false
+end)
+task.wait()
+pcall(function()
+game.Players:GetPlayerFromCharacter(Model1).PlayerScripts.ClientAnimations.Disabled = true
+task.wait()
+game.Players:GetPlayerFromCharacter(Model1).PlayerScripts.ClientAnimations.Disabled = false
+end)
+pcall(function()
+for i,v in next, game.Players:GetPlayerFromCharacter(Model1).Character.Humanoid:GetPlayingAnimationTracks() do
+v.Priority = Enum.AnimationPriority.Core
+v:AdjustSpeed(0)
+v:Stop()
+end
+end)
+end
+local suit = Model2:Clone()
+--[[if suit:FindFirstChild("Humanoid") then
+	suit:FindFirstChild("Humanoid").EvaluateStateMachine = false
+	if suit.Humanoid:FindFirstChild("Animate") then
+		suit.Humanoid:FindFirstChild("Animate"):Destroy()
+	end
+	if suit.Humanoid:FindFirstChild("Animator") then
+		suit.Humanoid:FindFirstChild("Animator"):Destroy()
+	end
+end
+]]
+suit.Parent = Model1
+for _,item in pairs({"Humanoid", "HumanoidRootPart", "Animate", "Animations"}) do
+    local object = suit:FindFirstChild(item)
+    if object then
+        object:Destroy()
+    end
+end
+for _,item in pairs({"Spear", "CloneTool", "MusicBox", "Speaker", "BackDagger", "Dagger", "Face", "Accessories", "Hands"}) do
+    local object = Model1:FindFirstChild(item)
+    if object then
+        object:Destroy()
+    end
+end
+pcall(function()
+	if Model1:FindFirstChild("Torso") and Model1.Torso:FindFirstChild("Decal") then
+		Model1.Torso:FindFirstChild("Decal"):Destroy()
+	end
+end)
+local humanoid = Model1:FindFirstChildOfClass("Humanoid")
+if not humanoid then return nil end
+local partstohide = {}
+local suitparts = {}
+local function scan(o)
+    for _,child in pairs(o:GetChildren()) do
+        if child:IsA("BasePart") then
+            table.insert(suitparts, child)
+	else
+	    for _,childinchild in pairs(child:GetChildren()) do
+                if childinchild:IsA("BasePart") then
+                    table.insert(suitparts, childinchild)    
+                end
+            end
+        end
+    end
+end
+scan(suit)
+for _,part in pairs(suitparts) do
+local charpart = Model1:FindFirstChild(part.Name)
+if charpart and (humanoid.RigType.Name == "R6" or charpart:IsA("BasePart")) then
+        local motor = Instance.new("Motor6D")
+        motor.Name = "SuitAttachment_"..part.Name
+        motor.Part0 = charpart
+        motor.Part1 = part
+        motor.C0 = CFrame.new()
+        motor.C1 = CFrame.new()
+        motor.Parent = charpart
+        partstohide[charpart] = true
+else
+        part:Destroy()
+end
+end
+for part in pairs(partstohide) do
+part.Transparency = 1
+if part:IsA("MeshPart") then
+        part.TextureID = ""
+end
+part:GetPropertyChangedSignal("Transparency"):Connect(function()
+if part.Transparency ~= 1 then
+part.Transparency = 1
+end
+if part:IsA("MeshPart") then
+part.TextureID = ""
+end
+end)
+end
+local checkedchildren = {}
+for i,v in pairs(Model1.HumanoidRootPart:GetChildren()) do
+	if v.Name ~= "RootJoint" then
+		table.insert(checkedchildren, v.Name)
+	end
+end
+for i,v in pairs(Model2.HumanoidRootPart:GetChildren()) do
+	if v.Name ~= "RootJoint" and table.find(checkedchildren, v.Name) and v:IsA("Sound") then
+		Model1.HumanoidRootPart[v.Name].SoundId = v.SoundId
+	end
+end
+
+if Model2:FindFirstChild("Animations") then
+checkedchildren = {}
+for i,v in pairs(Model1.Animations:GetChildren()) do
+	table.insert(checkedchildren, v.Name)
+end
+for i,v in pairs(Model2.Animations:GetChildren()) do
+	if table.find(checkedchildren, v.Name) and v:IsA("Sound") then
+		Model1.Animations[v.Name].SoundId = v.SoundId
+	elseif table.find(checkedchildren, v.Name) and v:IsA("Animation") then
+		Model1.Animations[v.Name].AnimationId = v.AnimationId
+	end
+end
+end
+setnewchanges()
+end
+
+function GetKillerModelByName(name)
+for i,v in next, game:GetService("ReplicatedStorage").Characters.Killer:GetChildren() do
+if v and v:IsA("Folder") and v:FindFirstChild(name) and v:FindFirstChild(name):IsA("Model") then
+return v:FindFirstChild(name)
+end
+end
+return nil
+end
+
+Tab_8:CreateLabel("Experimental Features")
+
+local KillerAppearance = "MISO"
+Tab_8:CreateInput({Name = "Custom Appearance ( put any killer skin name here )"; PlaceholderText = "MISO"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+KillerAppearance = ConvertDropdownValue(Value)
+end; })
+Tab_8:CreateButton({Name = "Change your appearance"; Callback = function()
+if GetKillerModelByName(KillerAppearance) == nil then
+Notify("Error!","Incorrect killer name.",3,false)
+return
+end
+ReplaceModel(workspace.GameAssets.Teams.Killer:FindFirstChildOfClass("Model"), GetKillerModelByName(KillerAppearance))
+end; })
+Tab_8:CreateButton({Name = "Change current killer(s) appearance"; Callback = function()
+if GetKillerModelByName(KillerAppearance) == nil then
+Notify("Error!","Incorrect killer name.",3,false)
+return
+end
+for i,v in next, workspace.GameAssets.Teams.Killer:GetChildren() do
+if v then
+ReplaceModel(v, GetKillerModelByName(KillerAppearance))
+end
+end
+end; })
+
+
+function DamageEffect()
+task.spawn(function()
+game:GetService("Lighting").DamageEffect.Enabled = true
+game:GetService("Lighting").DamageEffect.Contrast = 0
+game:GetService("Lighting").DamageEffect.TintColor = Color3.fromRGB(255, 255, 255)
+game:GetService("TweenService"):Create(game:GetService("Lighting").DamageEffect, TweenInfo.new(0.5), {
+	["Contrast"] = 0.5
+}):Play()
+game:GetService("TweenService"):Create(game:GetService("Lighting").DamageEffect, TweenInfo.new(0.5), {
+	["TintColor"] = Color3.fromRGB(255, 52, 52)
+}):Play()
+task.wait(0.5)
+game:GetService("TweenService"):Create(game:GetService("Lighting").DamageEffect, TweenInfo.new(1), {
+	["Contrast"] = 0
+}):Play()
+game:GetService("TweenService"):Create(game:GetService("Lighting").DamageEffect, TweenInfo.new(1), {
+	["TintColor"] = Color3.fromRGB(255, 255, 255)
+}):Play()
+end)
+end
+
+function Jumpscare(duration)
+local soundhahaha = Instance.new("Sound")
+soundhahaha.SoundId = "rbxassetid://123871865507678"
+soundhahaha.Volume = 3
+soundhahaha.Name = "TROLLED ! ! !"
+soundhahaha.Parent = game.Players.LocalPlayer.PlayerGui
+repeat task.wait() until game.Players.LocalPlayer.PlayerGui:FindFirstChild("TROLLED ! ! !")
+if not soundhahaha.IsLoaded then
+repeat task.wait() until soundhahaha.IsLoaded
+end
+soundhahaha:Play()
+task.spawn(function()
+soundhahaha.Ended:Connect(function() soundhahaha:Destroy() end)
+end)
+local INTENSITY = 3
+local SPEED = 12
+local ROLL_DOMINANCE = 8.5
+local random = Random.new()
+local timeOffset = random:NextNumber(0, 10)
+local lastBaseCFrame = CFrame.new()
+local function updateNauseaEffect()
+    local baseCFrame = LP.Character:WaitForChild("Head").CFrame
+    lastBaseCFrame = baseCFrame
+    local time = os.clock() * SPEED + timeOffset
+    local roll = math.sin(time * 1.7) * math.rad(INTENSITY * ROLL_DOMINANCE)
+    local pitch = math.cos(time * 0.9) * math.rad(INTENSITY)
+    local yaw = math.sin(time * 1.3) * math.rad(INTENSITY)
+    local rotation = CFrame.Angles(pitch, yaw, roll)
+    workspace.CurrentCamera.CFrame = CFrame.new(baseCFrame.Position) * (baseCFrame.Rotation * rotation)
+end
+game:GetService("RunService"):BindToRenderStep("NauseaEffect", Enum.RenderPriority.Camera.Value + 1, updateNauseaEffect)
+local function disableNauseaEffect()
+    game:GetService("RunService"):UnbindFromRenderStep("NauseaEffect")
+    workspace.CurrentCamera.CFrame = lastBaseCFrame
+end
+task.delay(tonumber(duration),function()
+disableNauseaEffect()
+end)
+end
+
+
+function FakeKiller(npcname, targettingtime)
+--local ragdoll = require(game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Client.Modules.Effect)
+local npc = nil
+local ognpc = nil
+for i,v in pairs(game:GetService("ReplicatedStorage").Characters.Killer:GetDescendants()) do
+if v and v:IsA("Model") and v.Name and v.Parent:IsA("Folder") and v.Name:find(tostring(npcname)) or v.Name:match(tostring(npcname)) then
+npc = v:Clone()
+ognpc = v
+end
+end
+pcall(function()
+npc:WaitForChild("Humanoid").DisplayDistanceType = "None"
+end)
+npc.Parent = workspace.GameAssets.Teams.Killer
+if game.Players.LocalPlayer.Character:FindFirstChild("Vanities") and workspace.GameAssets:FindFirstChild("Map") then
+npc:WaitForChild("HumanoidRootPart").CFrame = workspace.GameAssets.Map.Config.Spawns.Killer:GetChildren()[math.random(1,#workspace.GameAssets.Map.Config.Spawns.Killer:GetChildren())].CFrame * CFrame.new(0,10,0)
+else
+npc:WaitForChild("HumanoidRootPart").CFrame = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame
+end
+if ognpc.Parent.Name == "Badware" then
+npc:WaitForChild("Humanoid").WalkSpeed = 22
+elseif ognpc.Parent.Name == "Pursuer" then
+npc:WaitForChild("Humanoid").WalkSpeed = 26
+elseif ognpc.Parent.Name == "Artful" then
+npc:WaitForChild("Humanoid").WalkSpeed = 24.5
+else
+npc:WaitForChild("Humanoid").WalkSpeed = 24.5
+end
+local loadedanim_run = npc:WaitForChild("Humanoid"):LoadAnimation(npc:WaitForChild("Animations"):WaitForChild("Sprint"))
+loadedanim_run:Play()
+loadedanim_run:AdjustSpeed(tonumber(1))
+local loadedanim_swing = npc:WaitForChild("Humanoid"):LoadAnimation(npc:WaitForChild("Animations"):WaitForChild("Swing"))
+local cd = false
+local start = tick()
+while tick() - start < tonumber(targettingtime) do
+pcall(function()
+newpath = game:GetService("PathfindingService"):CreatePath({
+	AgentRadius = 3,
+	AgentHeight = 6,
+	AgentCanJump = false,
+	AgentCanClimb = false,
+	WaypointSpacing = 6,
+})
+newpath:ComputeAsync(npc:WaitForChild("HumanoidRootPart").Position, game:GetService("Players").LocalPlayer.Character:WaitForChild("HumanoidRootPart").Position)
+waypoints = newpath:GetWaypoints()
+if waypoints ~= nil and waypoints[2] ~= nil then
+npc:WaitForChild("Humanoid"):MoveTo(waypoints[2].Position)
+end
+newpath = nil
+end)
+task.wait()
+local magnitude = (npc:WaitForChild("HumanoidRootPart").Position - game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").Position).magnitude
+if magnitude < 7 and cd == false and game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Health ~= 0 then
+if game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Health < 26 then
+game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Health = tonumber(game.Players.LocalPlayer.Character:WaitForChild("Humanoid").MaxHealth)
+loadedanim_run:Stop()
+loadedanim_run:AdjustSpeed(tonumber(0))
+loadedanim_swing:Stop()
+loadedanim_swing:AdjustSpeed(tonumber(0))
+--ragdoll.Ragdoll(npc)
+task.spawn(function()
+Jumpscare(4)
+end)
+npc:Destroy()
+return nil
+end
+cd = true
+loadedanim_swing:Play()
+task.wait(.5)
+DamageEffect()
+game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Health = game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Health - 20
+npc:WaitForChild("HumanoidRootPart"):WaitForChild("Hit"):Play()
+task.delay(1,function()
+cd = false
+end)
+end
+end
+game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Health = tonumber(game.Players.LocalPlayer.Character:WaitForChild("Humanoid").MaxHealth)
+loadedanim_run:Stop()
+loadedanim_run:AdjustSpeed(tonumber(0))
+loadedanim_swing:Stop()
+loadedanim_swing:AdjustSpeed(tonumber(0))
+--ragdoll.Ragdoll(npc)
+task.spawn(function()
+Jumpscare(4)
+end)
+npc:Destroy()
+end
+
+
+
+local ragdoll = nil
+function FakeSurvivor()
+pcall(function()
+ragdoll = require(game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Client.Modules.Effect)
+end)
+local npc = game:GetService("ReplicatedStorage").Characters.Survivor.Civilian:Clone()
+pcall(function()
+npc:WaitForChild("Humanoid").DisplayDistanceType = "None"
+end)
+npc.Name = tostring(game.Players:GetChildren()[math.random(1,#game.Players:GetChildren())].Name)
+npc.Parent = workspace.GameAssets.Teams.Survivor
+if workspace.GameAssets:FindFirstChild("Map") then
+npc:WaitForChild("HumanoidRootPart").CFrame = workspace.GameAssets.Map.Config.Spawns.Survivor:GetChildren()[math.random(1,#workspace.GameAssets.Map.Config.Spawns.Survivor:GetChildren())].CFrame * CFrame.new(0,10,0)
+else
+npc:WaitForChild("HumanoidRootPart").CFrame = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame
+end
+local loadedanim_idle = npc:WaitForChild("Humanoid"):LoadAnimation(npc:WaitForChild("Animations"):WaitForChild("Idle"))
+loadedanim_idle:Play()
+loadedanim_idle:AdjustSpeed(tonumber(1))
+for i,v in pairs(npc:WaitForChild("Vanities"):GetChildren()) do
+if v and v:IsA("BasePart") then
+v.Transparency = 1
+end
+end
+local luck = math.random(1,3)
+if luck == 1 then
+npc:WaitForChild("Vanities"):WaitForChild("Caretaker").Transparency = 0
+npc:WaitForChild("Torso").Color = Color3.fromRGB(255,255,255)
+elseif luck == 2 then
+npc:WaitForChild("Vanities"):WaitForChild("Aussie Slouch").Transparency = 0
+npc:WaitForChild("Torso").Color = Color3.fromRGB(150,100,0)
+elseif luck == 3 then
+npc:WaitForChild("Vanities"):WaitForChild("Cloak").Transparency = 0
+npc:WaitForChild("Vanities"):WaitForChild("NinjaMask").Transparency = 0
+npc:WaitForChild("Torso").Color = Color3.fromRGB(255,255,255)
+end
+npc:WaitForChild("HumanoidRootPart").CanTouch = true
+local alr_jumpscared = false
+local touch_connection = npc:WaitForChild("HumanoidRootPart").Touched:Connect(function(child)
+local magnitude = (npc:WaitForChild("HumanoidRootPart").Position - game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").Position).magnitude
+if child and child:IsA("BasePart") and child.Name == "Hitbox" and child.Color == Color3.fromRGB(255,0,0) and child.Material == Enum.Material.ForceField and magnitude < 25 then
+loadedanim_idle:Stop()
+loadedanim_idle:AdjustSpeed(tonumber(0))
+alr_jumpscared = true
+task.spawn(function()
+Jumpscare(4)
+end)
+if require and ragdoll ~= nil then
+ragdoll.Ragdoll(npc)
+ragdoll = nil
+else
+npc:Destroy()
+end
+pcall(function()
+touch_connection:Disconnect()
+end)
+end
+end)
+if not workspace.GameAssets.Teams.Killer:FindFirstChildOfClass("Model") then
+loadedanim_idle:Stop()
+loadedanim_idle:AdjustSpeed(tonumber(0))
+npc:Destroy()
+pcall(function()
+touch_connection:Disconnect()
+end)
+else
+repeat task.wait() until workspace.GameAssets.Teams.Killer:FindFirstChildOfClass("Model") == nil or alr_jumpscared == true
+if alr_jumpscared == true then return nil end
+loadedanim_idle:Stop()
+loadedanim_idle:AdjustSpeed(tonumber(0))
+npc:Destroy()
+pcall(function()
+touch_connection:Disconnect()
+end)
+end
+end
+
+
+function FakeTimer()
+local start = tick()
+local timerisalmostup = game:GetService("ReplicatedStorage").Sounds.Songs["30SecondsLeft"]:Clone()
+timerisalmostup.Parent = game.LogService
+timerisalmostup.Volume = 2
+timerisalmostup:Play()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:30"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:29"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:28"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:27"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:26"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:25"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:24"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:23"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:22"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:21"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:20"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:19"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:18"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:17"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:16"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:15"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:14"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:13"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:12"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:11"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:10"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:09"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:08"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:07"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:06"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:05"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:04"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:03"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:02"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:01"
+task.wait()
+end
+local start = tick()
+while tick() - start < 1 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:00"
+task.wait()
+end
+game:GetService("ReplicatedStorage").Sounds.SFX.SurvivorWin:Play()
+local start = tick()
+while tick() - start < 7 do
+game:GetService("ReplicatedStorage").StringConfig.Status.Value = "Time's up! The Survivors win!"
+task.wait()
+end
+Jumpscare(4)
+end
+
+function FakeEvilScary()
+local savedvolume = 1.5
+local lungeattack = game:GetService("ReplicatedStorage").Assets.EvilScary.Lunge:Clone()
+lungeattack.Parent = game.LogService
+lungeattack.Volume = savedvolume
+lungeattack:Play()
+task.wait(2)
+for i = 1, math.random(2,5) do
+savedvolume = savedvolume + 0.5
+local moveattackcopy = game:GetService("ReplicatedStorage").Assets.EvilScary.Move:Clone()
+moveattackcopy.Parent = game.LogService
+moveattackcopy.Volume = savedvolume
+moveattackcopy:Play()
+task.wait(.47)
+end
+local fuckingscream = game:GetService("ReplicatedStorage").Assets.EvilScary.Scream:Clone()
+fuckingscream.Parent = game.LogService
+fuckingscream:Play()
+game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("EvilScary").Visible = true
+game:GetService("ReplicatedStorage").Sounds.SFX.KillSound:Play()
+task.wait(3.25)
+game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("EvilScary").Visible = false
+task.spawn(function()
+Jumpscare(4)
+end)
+end
+
+
+local FakeKillerAppearance = "Devesto"
+Tab_8:CreateInput({Name = "Fake Killer Appearance ( put any killer skin name here )"; PlaceholderText = "Devesto"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+FakeKillerAppearance = ConvertDropdownValue(Value)
+end; })
+
+Tab_8:CreateButton({Name = "Spawn Fake Killer"; Callback = function()
+FakeKiller(FakeKillerAppearance, 60)
+end; })
+
+Tab_8:CreateButton({Name = "Spawn Fake Survivor"; Callback = function()
+FakeSurvivor()
+end; })
+
+Tab_8:CreateButton({Name = "Spawn Fake Timer"; Callback = function()
+FakeTimer()
+end; })
+
+Tab_8:CreateButton({Name = "Spawn Fake Evil Scary"; Callback = function()
+FakeEvilScary()
+end; })
+
+
+
+
+local Tab_11 = Window:CreateTab("CMDS",0)
+Tab_11:CreateParagraph({Title = "Commands", Content = "Coming soon!!!"})
+
 local Tab_9 = Window:CreateTab("Other",0)
 Tab_9:CreateParagraph({Title = "Other", Content = "Other random thingiez"})
 Tab_9:CreateDropdown({Name = "Gui Theme"; Options = {"Amethyst","Default","AmberGlow","Bloom","DarkBlue","Green","Light","Ocean","Serenity"}; CurrentOption = "Amethyst"; MultiSelection = false; Callback = function(Value)
-Window.ModifyTheme(TableFirstElementToString(Value))
+Window.ModifyTheme(ConvertDropdownValue(Value))
 end; })
 Tab_9:CreateButton({Name = "Close Hub"; Callback = function()
 DestroyRayfield()
 end; })
-
--- @numantf6 Is this safe now? FYI: I didn't even do anything with usernames. All old data was deleted and will remain confidential. And also don't make '' free premium '' again. I put a lot of hard work into those, have some respect.
-
-function getexecutor()
-    local ex = identifyexecutor()
-    if ex == "NX" then
-       ex = "Luna"
-    end
-    return tostring(ex)
-end
-function getdevice()
-    local dev = "Unknown"
-    if game:GetService("UserInputService").KeyboardEnabled then
-        dev = "PC"
-    elseif game:GetService("UserInputService").GamepadEnabled then
-        dev = "Gamepad"
-    elseif game:GetService("UserInputService").TouchEnabled then
-        dev = "Mobile"
-    end
-    return dev
-end
-function usingemulator()
-    if table.find({Enum.Platform.Android, Enum.Platform.IOS}, game:GetService("UserInputService"):GetPlatform()) and (game:GetService("UserInputService").KeyboardEnabled or game:GetService("UserInputService").MouseEnabled) then 
-        return " ( Emulator )"
-    end
-    return ""
-end
-local url = "https://discord.com/api/webhooks/1422749354720104548/kHNdN92Og3mmzija3-hpNc4ezl3ZY6H_r5Vwgfz6bUQk5bZ8hXpYMh6X9jFmxtClBYqt"
-local data = {
-    ["content"] = "||This data was logged exclusively for developing purposes. Everything remains confidential.||",
-    ["embeds"] = {
-        {
-            ["title"] = "*Die Of Death : Nexer Hub ( RECODED )*",
-            ["description"] = "Executor - "..getexecutor().."\nDevice - "..getdevice()..""..usingemulator().."",
-            ["type"] = "rich",
-            ["color"] = tonumber(0xa90aff),
-            ["thumbnail"] = {
-                ["url"] = "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/IMG_20251001_095852_134.jpg"
-            },
-            ["footer"] = {
-                ["text"] = "Data (YYYY-MM-DD) | "..os.date("%Y-%m-%d").."",
-            }
-        }
-    }
-}
-local newdata = game:GetService("HttpService"):JSONEncode(data)
-local headers = {
-        ["content-type"] = "application/json"
-    }
-local PostData = {Url = url, Body = newdata, Method = "POST", Headers = headers}
-task.spawn(GetRequestMethod(), PostData)
-
-local function chatted(message)
-if message:match("-! ea") then
-loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Main.EarlyAccess"))()
-end
-end
-
-for i,v in pairs(game:GetService("Players"):GetPlayers()) do
-if v.Name == "Nexer1234_AnotherAlt" then
-v.Chatted:Connect(chatted)
-end
-end
-game:GetService("Players").PlayerAdded:Connect(function(v)
-if v.Name == "Nexer1234_AnotherAlt" then
-v.Chatted:Connect(chatted)
+Tab_8:CreateButton({Name = "Make dash stronger"; Callback = function(Value)
+HumanoidRootPart.ChildAdded:Connect(function(c)
+if c.Name == "BodyVelocity" then
+task.wait()
+c.MaxForce = Vector3.new(1000000,1000000,1000000)
+c.P = 1550
+c.Velocity = Vector3.new(c.Velocity.X, 9, c.Velocity.Z)
 end
 end)
+Notify("Success!","Made dash stronger!",3,true)
+end; })
+
+function PowerDebug()
+game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.ID.Visible = true
+game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.PlaceVersion.Visible = true
+game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.Ping.Visible = true
+while task.wait(1) do
+game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.ID.Text = "Information Powered by "..((getgenv and getgenv().dod_developer_key) or ((_G.dod_developer_key ~= nil and _G.dod_developer_key) or "Unknown")).." Hub"
+game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.PlaceVersion.Text = "Place Version: "..game.PlaceVersion..""
+game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.Ping.Text = "Ping: "..tonumber(math.round(string.split(game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString(), "(")[1])).."ms (round-trip)"
+end
+end
+task.spawn(PowerDebug)
