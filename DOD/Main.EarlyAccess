@@ -2418,7 +2418,7 @@ if charpart and (humanoid.RigType.Name == "R6" or charpart:IsA("BasePart")) then
         motor.C0 = CFrame.new()
         motor.C1 = CFrame.new()
         motor.Parent = charpart
-        partsToHide[charpart] = true
+        partstohide[charpart] = true
 else
         part:Destroy()
 end
