@@ -275,6 +275,8 @@ Announcements:CreateButton({Name = "Copy Discord Server Link"; Callback = functi
 setclipboard(tostring("https://discord.gg/7u5GRNw3xn"))
 Notify("Success!", "Copied Link!", 3, true)
 end; })
+Announcements:CreateSection("")
+Announcements:CreateParagraph({Title = "Warning!", Content = "Recently there were multiple skidded scripts of mine hub. The great example of this are oshub, nyxer hub and others. Those "hubs" are full copy pastes of mine script that also logs your data... stay safe!"})
 end)
 
 
