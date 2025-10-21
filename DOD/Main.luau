@@ -270,13 +270,13 @@ local Window = Rayfield:CreateWindow({
 
 pcall(function()
 local Announcements = Window:CreateTab("Announce",0)
+Announcements:CreateParagraph({Title = "Warning!", Content = "Recently there were multiple skidded scripts of mine hub. The great example of this are oshub, nyxer hub and others. Those so called ''hubs'' are full copy pastes of mine script that also logs your data... stay safe!"})
+Announcements:CreateSection("")
 Announcements:CreateParagraph({Title = "Hi there!", Content = "Script Version: 2.2 ( WORK IN PROGRESS, EXCEPT A LOT OF BUGS )\n\nThis script was fully recoded and fixed. Thank you for using my script. ❤️\n\nAlso join our discord server for early updates, free premium access and many other things..."})
 Announcements:CreateButton({Name = "Copy Discord Server Link"; Callback = function()
 setclipboard(tostring("https://discord.gg/7u5GRNw3xn"))
 Notify("Success!", "Copied Link!", 3, true)
 end; })
-Announcements:CreateSection("")
-Announcements:CreateParagraph({Title = "Warning!", Content = "Recently there were multiple skidded scripts of mine hub. The great example of this are oshub, nyxer hub and others. Those so called ''hubs'' are full copy pastes of mine script that also logs your data... stay safe!"})
 end)
 
 
