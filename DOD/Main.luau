@@ -1575,7 +1575,7 @@ else
 end
 end; })
 
-Tab_7:CreateLabel("or join our discord server to unlock premium features!")
+Tab_7:CreateLabel("or join our discord server to unlock premium features! ( key from premium is in my discord server )")
 
 Tab_7:CreateButton({Name = "Copy Discord Server Link"; Callback = function()
 setclipboard(tostring("https://discord.gg/7u5GRNw3xn"))
