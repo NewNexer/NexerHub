@@ -196,11 +196,13 @@ temp_msg:Destroy()
 
 function Notify(title, content, time, mode)
 time = time or 4
-mode = mode or false
+mode = mode or false or warn
 if mode == true then
 img = 136186846844342
 elseif mode == false then
 img = 71508738660632
+elseif mode == warn then
+img = 9441432403
 end
 Rayfield:Notify({
 	Title = title,
@@ -272,7 +274,7 @@ pcall(function()
 local Announcements = Window:CreateTab("Announce",0)
 Announcements:CreateParagraph({Title = "Warning!", Content = "Recently there were multiple skidded scripts of mine hub. The great example of this are oshub, nyxer hub and others. Those so called ''hubs'' are full copy pastes of mine script that also logs your data... stay safe!"})
 Announcements:CreateSection("")
-Announcements:CreateParagraph({Title = "Hi there!", Content = "Script Version: 2.2 ( WORK IN PROGRESS, EXCEPT A LOT OF BUGS )\n\nThis script was fully recoded and fixed. Thank you for using my script. ❤️\n\nAlso join our discord server for early updates, free premium access and many other things..."})
+Announcements:CreateParagraph({Title = "Hi there!", Content = "Script Version: 2.3 ( WORK IN PROGRESS, EXCEPT A LOT OF BUGS )\n\nThis script was fully recoded and fixed. Thank you for using my script. ❤️\n\nAlso join our discord server for early updates, free premium access and many other things..."})
 Announcements:CreateButton({Name = "Copy Discord Server Link"; Callback = function()
 setclipboard(tostring("https://discord.gg/7u5GRNw3xn"))
 Notify("Success!", "Copied Link!", 3, true)
@@ -491,7 +493,7 @@ Tab_2:CreateButton({Name = "Use Tornado"; Callback = function()
 game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("Emote"):FireServer("Tornado")
 end; })
 
-Tab_2:CreateButton({Name = "Use Rainbow Waves ( NO VFX / SFX )"; Callback = function()
+Tab_2:CreateButton({Name = "Use Rainbow Waves (CLIENT VFX)"; Callback = function()
 local anim = Instance.new("Animation")
 anim.AnimationId = "rbxassetid://75513960644342"
 local planim = Humanoid:LoadAnimation(anim)
@@ -502,6 +504,92 @@ song.Looped = true
 song.SoundId = "rbxassetid://137048834753046"
 song.Parent = HumanoidRootPart
 song:Play()
+local PE1 = Instance.new("ParticleEmitter")
+PE1.Texture = "rbxassetid://13425686092"
+PE1.Rate = 50
+PE1.Lifetime = NumberRange.new(1, 1)
+PE1.Speed = NumberRange.new(5, 15)
+PE1.Size = NumberSequence.new(0.4)
+PE1.LightEmission = 1
+PE1.LightInfluence = 1
+
+PE1.Color = ColorSequence.new({
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+	ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 128, 0)),
+	ColorSequenceKeypoint.new(0.33, Color3.fromRGB(255, 255, 0)),
+	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 0)),
+	ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
+	ColorSequenceKeypoint.new(0.83, Color3.fromRGB(128, 0, 255)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 255))
+})
+
+PE1.Transparency = NumberSequence.new({
+	NumberSequenceKeypoint.new(0, 0),
+	NumberSequenceKeypoint.new(0, 0.613),
+	NumberSequenceKeypoint.new(0, 1),
+	NumberSequenceKeypoint.new(1, 0)
+})
+
+PE1.Shape = Enum.ParticleEmitterShape.Box
+PE1.ShapeStyle = Enum.ParticleEmitterShapeStyle.Volume
+PE1.ShapeInOut = Enum.ParticleEmitterShapeInOut.Outward
+PE1.ShapePartial = 1
+
+PE1.SpreadAngle = Vector2.new(360, 360)
+PE1.EmissionDirection = Enum.NormalId.Top
+
+PE1.Parent = HumanoidRootPart
+
+PE1.Orientation = Enum.ParticleOrientation.VelocityParallel
+PE1.Acceleration = Vector3.new(-15, -15, -15)
+
+PE1.Squash = NumberSequence.new({
+	NumberSequenceKeypoint.new(0, 0),
+	NumberSequenceKeypoint.new(0.5, 1),
+	NumberSequenceKeypoint.new(1, 0)
+})
+
+
+local PE2 = Instance.new("ParticleEmitter")
+PE2.Texture = "rbxassetid://1057939773"
+PE2.Rate = 5
+PE2.Lifetime = NumberRange.new(0.5, 0.5)
+PE2.Speed = NumberRange.new(0.01, 0.01)
+PE2.Size = NumberSequence.new({
+	NumberSequenceKeypoint.new(0, 0.5),
+	NumberSequenceKeypoint.new(1, 10),
+	NumberSequenceKeypoint.new(1, 1)
+})
+PE2.LightEmission = 1
+PE2.LightInfluence = 1
+PE2.Color = ColorSequence.new({
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+	ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 128, 0)),
+	ColorSequenceKeypoint.new(0.33, Color3.fromRGB(255, 255, 0)),
+	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 0)),
+	ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
+	ColorSequenceKeypoint.new(0.83, Color3.fromRGB(128, 0, 255)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 255))
+})
+PE2.Transparency = NumberSequence.new({
+	NumberSequenceKeypoint.new(0, 0),
+	NumberSequenceKeypoint.new(0.5, 0.613),
+	NumberSequenceKeypoint.new(1, 1)
+})
+PE2.Shape = Enum.ParticleEmitterShape.Box
+PE2.ShapeStyle = Enum.ParticleEmitterShapeStyle.Volume
+PE2.ShapeInOut = Enum.ParticleEmitterShapeInOut.Outward
+PE2.ShapePartial = 1
+PE2.SpreadAngle = Vector2.new(0, 0)
+PE2.EmissionDirection = Enum.NormalId.Top
+PE2.Orientation = Enum.ParticleOrientation.VelocityPerpendicular
+PE2.Acceleration = Vector3.new(0, 0, 0)
+PE2.Squash = NumberSequence.new({
+	NumberSequenceKeypoint.new(0, 0),
+	NumberSequenceKeypoint.new(1, 0),
+	NumberSequenceKeypoint.new(1, 0)
+})
+PE2.Parent = HumanoidRootPart
 local TooLate = false
 LocalPlayer.CharacterAdded:Once(function()
 	if TooLate then return end
@@ -509,6 +597,8 @@ LocalPlayer.CharacterAdded:Once(function()
 	song:Destroy()
 planim:Stop()
 	anim:Destroy()
+	PE1:Destroy()
+	PE2:Destroy()
 end)
 Humanoid.Running:Once(function()
 	if TooLate then return end
@@ -516,6 +606,8 @@ Humanoid.Running:Once(function()
 	song:Destroy()
 planim:Stop()
 	anim:Destroy()
+	PE1:Destroy()
+	PE2:Destroy()
 end)
 end; })
 
@@ -986,6 +1078,134 @@ end; })
 local Tab_5 = Window:CreateTab("Anti / Immunities",0)
 Tab_5:CreateParagraph({Title = "Anti / Immunities", Content = "You can get immunities to multiple things yeah."})
 Tab_5:CreateSection("Server")
+
+
+local path = {"GameAssets", "Map", "Config", "KillerOnly"}
+
+local function getFolder()
+	local f = workspace
+	for _, v in ipairs(path) do
+		if not f then return nil end
+		f = f:FindFirstChild(v)
+		if not f then return nil end
+	end
+	return f
+end
+
+local ogState = {}
+local conns = {}
+
+local function setNoCollide(v, state)
+	if not v or not v:IsA("BasePart") then return end
+	if state then
+		if ogState[v] == nil then
+			ogState[v] = v.CanCollide
+		end
+		v.CanCollide = false
+	else
+		if ogState[v] ~= nil then
+			if v.Parent then
+				v.CanCollide = ogState[v]
+			end
+			ogState[v] = nil
+		end
+	end
+end
+
+local function enable()
+	local gameAssets = workspace:FindFirstChild("GameAssets")
+	local map = gameAssets and gameAssets:FindFirstChild("Map")
+
+	if not map then
+		Notify("Error!", "Round Haven't Started Yet!", 5, false)
+		return
+	end
+
+	local f = getFolder()
+	if not f then
+		Notify("Error!", "Map Doesn't Support Killer Door!", 5, warn)
+		return
+	end
+
+	local hasPart = false
+	for _, v in ipairs(f:GetDescendants()) do
+		if v:IsA("BasePart") then
+			hasPart = true
+			setNoCollide(v, true)
+		end
+	end
+
+	if not hasPart then
+		Notify("Error!", "Map Doesn't Have Any Killer Door!", 5, warn)
+		return
+	end
+
+	local c = f.DescendantAdded:Connect(function(v)
+		setNoCollide(v, true)
+	end)
+	table.insert(conns, c)
+
+	Notify("Success!", "You can now enter through Killer Door!", 3, true)
+end
+
+local function disable()
+	for v in pairs(ogState) do
+		setNoCollide(v, false)
+	end
+	table.clear(ogState)
+
+	for _, c in ipairs(conns) do
+		if c.Connected then
+			c:Disconnect()
+		end
+	end
+	table.clear(conns)
+end
+
+Tab_5:CreateToggle({Name = "Enter Through Killer Door"; CurrentValue = false; Callback = function(Value)
+if Value then
+enable()
+else
+disable()
+end
+end; })
+
+
+
+
+
+
+
+
+--[[ 
+
+
+
+
+
+
+
+                                         
+
+
+
+
+
+
+
+
+]]--
+
+
+
+
+
+
+
+
+
+
+
 
 local AntiWalls
 AntiWalls = false
@@ -1559,7 +1779,7 @@ Tab_7:CreateLabel("Buy the gamepass to unlock premium features! [ Cost "..tostri
 Tab_7:CreateButton({Name = "Open Gamepass Link"; Callback = function()
 if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(LocalPlayer.UserId, 1264479709) then
     HavePremium = true
-    Notify("Error!", "Arleady have gamepass!", 2)
+    Notify("Error!", "Already have gamepass!", 3, warn)
 else
     OpenLink("https://www.roblox.com/game-pass/1264479709")
 end
@@ -1568,7 +1788,7 @@ end; })
 Tab_7:CreateButton({Name = "Copy Gamepass Link"; Callback = function()
 if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(LocalPlayer.UserId, 1264479709) then
     HavePremium = true
-    Notify("Error!", "Arleady have gamepass!", 2)
+    Notify("Error!", "Already have gamepass!", 3, warn)
 else
     setclipboard(tostring("https://www.roblox.com/game-pass/1264479709"))
     Notify("Success!", "Copied Link!", 3, true)
@@ -1597,17 +1817,72 @@ Tab_7:CreateSection("Aimbot")
 Tab_7:CreateLabel("coming soon")
 
 Tab_7:CreateSection("Advanced Anti / Immunities")
-Tab_7:CreateToggle({Name = "Anti-Stun"; CurrentValue = false; Callback = function(Value)
-if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
-AntiStun = Value
-if AntiStun == true then
+
+
+local antiStun = false
+local AntiSlowDown = nil
+local character = nil
+
+local function antinegativewalkspeedmodifier()
+if not antiStun then return end
+if not character then return end
+local value = character:GetAttribute("WalkSpeedModifier")
+if typeof(value) == "number" and value < 0 then
+character:SetAttribute("WalkSpeedModifier", 0)
+end
+end
+
+local function setupCharacter(char)
+if not char then return end
+character = char
+if character:GetAttribute("WalkSpeedModifier") == nil then
+character:SetAttribute("WalkSpeedModifier", 0)
+end
+if AntiSlowDown then
+AntiSlowDown:Disconnect()
+AntiSlowDown = nil
+end
+AntiSlowDown = character:GetAttributeChangedSignal("WalkSpeedModifier"):Connect(function()
+antinegativewalkspeedmodifier()
+end)
+task.spawn(antinegativewalkspeedmodifier)
+end
+
+local currentChar = LP.Character or LP.CharacterAdded:Wait()
+setupCharacter(currentChar)
+
+LP.CharacterAdded:Connect(function(newChar)
+wait(0.1)
+setupCharacter(newChar)
+end)
+
+Tab_7:CreateToggle({
+Name = "Anti-Stun (rewrited)",
+CurrentValue = false,
+Callback = function(Value)
+antiStun = Value
+if antiStun then
+local char = LP.Character or LP.CharacterAdded:Wait()
+setupCharacter(char)
 Notify("Success!", "Anti-Stun is now enabled!", 2, true)
-repeat task.wait(.003)
-Character:SetAttribute("WalkSpeedModifier", 0)
-Character:SetAttribute("StaminaModifier", 0)
-until AntiStun == false
+else
+if AntiSlowDown then
+AntiSlowDown:Disconnect()
+AntiSlowDown = nil
+end
 end
 end; })
+
+
+
+
+
+----------------------------
+
+
+
+
+
 
 local noclip_connection = nil
 local camera_connection = nil
@@ -1661,7 +1936,7 @@ end
 
 Tab_7:CreateSection("Invisibility")
 Tab_7:CreateToggle({Name = "Turn On/Off Invisibility"; CurrentValue = false; Callback = function(Value)
-if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4,warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
 if Value == false then
 ApplyInvisibility(Value)
 Notify("Success!", "Disabled invisibility!", 2, true)
@@ -1672,7 +1947,7 @@ end
 end; })
 
 Tab_7:CreateToggle({Name = "Infinity Cloak"; CurrentValue = false; Callback = function(Value)
-if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4,warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
 InfinityCloak = Value
 end; })
 
@@ -1726,7 +2001,7 @@ end
 Tab_7:CreateSection("Hitbox Extender")
 Tab_7:CreateLabel("ONLY WORKS FOR KILLER! EXTENDS SLIGHTLY!")
 Tab_7:CreateToggle({Name = "Extend Hitbox"; CurrentValue = false; Callback = function(Value)
-if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
 ExtendHitbox = Value
 if ExtendHitbox == true then
 local distance = StudsIntoPower(2)
@@ -1775,7 +2050,7 @@ Tab_7:CreateSection("FE Hitbox Breaker")
 
 Tab_7:CreateLabel("Invincibility / God Mode only can be applied only during dienation gamemode, and you must be killdroid!")
 Tab_7:CreateButton({Name = "FE Invincibility / God Mode"; Callback = function()
-if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
 if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChild(LocalPlayer.Name) then Notify("Error!", "You must be killer!", 4, false) return end
 Notify("Applying Invincibility...", "Please wait!", 7, true)
 --If you're not a skid, you can easily de-obfuscate that.
@@ -1788,8 +2063,8 @@ Tab_7:CreateSection("FE Server Glitcher / Softlock Utility")
 Tab_7:CreateLabel("Only Harken, Badware and Killdroid can be softlocked. Harken will softlock if she uses Immolate or Tangle. Badware will softlock if he uses Rift. All Killdroid Deploys will get softlocked.")
 Tab_7:CreateLabel("WARNING! You will play as ghost after activating this feature.")
 Tab_7:CreateButton({Name = "FE Softlock Killers"; Callback = function()
-if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
-if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChildWhichIsA("Model") then Notify("Error!", "No Killers!", 3, false) return end
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
+if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChildWhichIsA("Model") then Notify("Error!", "No Killers!", 3, warn) return end
 Notify("Enabling Auto-Softlock...", "Please wait!", 7, true)
 --If you're not a skid, you can easily de-obfuscate that.
 Encryptor.load("\48\48\49\49\48\48\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\49\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\48\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\49\48\49\48\48\48\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\49\48\48\48\49\48\48\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\49\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\48\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\49\48\48\48\49\49\48\49\49\49\48\49\48\48\48\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\48\48\48\49\48\48\48\49\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\49\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\49\49\48\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\48\49\48\49\48\48\48\48\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\48\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\48\48\49\48\48\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\48\48\49\48\48\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\48\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\48\48\48\49\49\49\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\48\49")
@@ -1811,7 +2086,7 @@ end; })
 local AutoBlock = false
 local UnHookAttributes = nil
 Tab_7:CreateToggle({Name = "Auto Block"; CurrentValue = false; Callback = function(Value)
-if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, false) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
 AutoBlock = Value
 task.wait()
 if Value == true then
@@ -2090,7 +2365,7 @@ ChoosenKillerTarget = ConvertDropdownValue(Value)
 end; })
 Tab_12:CreateButton({Name = "Teleport to Killer"; Callback = function()
 if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChildOfClass("Model") then
-Notify("Error!", "There are no killers!", 3, false)
+Notify("Error!", "There are no killers!", 3, warn)
 return nil
 end
 if ChoosenKillerTarget == nil or ChoosenKillerTarget == "" or not ChoosenKillerTarget then
@@ -2119,7 +2394,7 @@ Notify("Error!", "There are no survivors!", 3, false)
 return nil
 end
 if ChoosenSurvivorTarget == nil or ChoosenSurvivorTarget == "" or not ChoosenSurvivorTarget then
-Notify("Error!", "Choose your target!", 3, false)
+Notify("Error!", "Choose your target!", 3, warn)
 return nil
 end
 SafeTeleport(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor"):FindFirstChild(ChoosenSurvivorTarget):WaitForChild("HumanoidRootPart"))
@@ -2140,7 +2415,7 @@ ChoosenGhostTarget = ConvertDropdownValue(Value)
 end; })
 Tab_12:CreateButton({Name = "Teleport to Ghost"; Callback = function()
 if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost"):FindFirstChildOfClass("Model") then
-Notify("Error!", "There are no ghosts!", 3, false)
+Notify("Error!", "There are no ghosts!", 3, warn)
 return nil
 end
 if ChoosenGhostTarget == nil or ChoosenGhostTarget == "" or not ChoosenGhostTarget then
@@ -2164,7 +2439,7 @@ Tab_12:CreateSection("Specific Teleports")
 
 Tab_12:CreateButton({Name = "Teleport to Survivor with caretaker"; Callback = function()
 if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor"):FindFirstChildOfClass("Model") then
-Notify("Error!", "There are no caretakers!", 3, false)
+Notify("Error!", "There are no caretakers!", 3, warn)
 return nil
 end
 local plrwithcaretaker = nil
@@ -2176,7 +2451,7 @@ end
 if plrwithcaretaker then
 SafeTeleport(plrwithcaretaker:WaitForChild("HumanoidRootPart"))
 else
-Notify("Error!", "There are no caretakers!", 3, false)
+Notify("Error!", "There are no caretakers!", 3, warn)
 end
 end; })
 
@@ -2190,24 +2465,39 @@ end
 if injuredplr then
 SafeTeleport(injuredplr:WaitForChild("HumanoidRootPart"))
 else
-Notify("Error!", "There are no injured players!", 3, false)
+Notify("Error!", "There are no injured players!", 3, warn)
 end
 end; })
 
 Tab_12:CreateButton({Name = "Teleport to Bonus Pad"; Callback = function()
 if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable"):FindFirstChild("BonusPad") then
-Notify("Error!", "There are no bonus pads!", 3, false)
+Notify("Error!", "There are no bonus pads!", 3, warn)
 return nil
 end
 SafeTeleport(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable"):WaitForChild("BonusPad"):WaitForChild("Pad"))
 end; })
 
 
+local survivorFolder = workspace:FindFirstChild("GameAssets") and workspace.GameAssets.Teams:FindFirstChild("Survivor")
 
+local function tpCarePad()
+if not hrp then return end
+for _, v in pairs(survivorFolder:GetChildren()) do
+if v:IsA("Model") and v:FindFirstChild("HumanoidRootPart") then
+	local a1 = v:GetAttribute("Ability1")
+	local a2 = v:GetAttribute("Ability2")
+	if (a1 == "Caretaker" and a2 == "BonusPad") or (a1 == "BonusPad" and a2 == "Caretaker") then
+		if v == Character then return end -- this ignore if you have CarePad so yeah
+		SafeTeleport(v.HumanoidRootPart)
+		return
+	end
+end
+end
+end
 
-
-
-
+Tab_12:CreateButton({Name = "Teleport to CarePad Survivor"; Callback = function()
+tpCarePad()
+end; })
 
 local Tab_10 = Window:CreateTab("Audio",0)
 if HaveWorkspaceAccess() ~= true then
@@ -2231,7 +2521,7 @@ Notify("Success!","Reloading LMS Audios...",3,true)
 end; })
 Tab_10:CreateButton({Name = "Set Custom LMS"; Callback = function()
 if (choosen_lms == nil or choosen_lms == "") then
-Notify("Error!","Choose Audio!",3,false)
+Notify("Error!","Choose Audio!",3,warn)
 return
 end
 local temp_table = loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))()
@@ -2276,7 +2566,7 @@ return
 end
 local temp_table = loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))()
 if table.find(temp_table, lms_file_name) then
-Notify("Error!","This file is already added!",3,false)
+Notify("Error!","This file is already added!", 3, warn)
 return
 end
 InsertElement("NexerHub/DieOfDeath/Assets/LMS/data.luau", lms_file_name)
@@ -2306,7 +2596,7 @@ Notify("Success!","Reloading Chase Themes...",3,true)
 end; })
 Tab_10:CreateButton({Name = "Set Custom Chase Theme"; Callback = function()
 if (choosen_chase == nil or choosen_chase == "") then
-Notify("Error!","Choose Audio!",3,false)
+Notify("Error!","Choose Audio!",3,warn)
 return
 end
 local temp_table = loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))()
@@ -2343,7 +2633,7 @@ return
 end
 local temp_table = loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))()
 if table.find(temp_table, chase_file_name) then
-Notify("Error!","This file is already added!",3,false)
+Notify("Error!","This file is already added!",3,warn)
 return
 end
 InsertElement("NexerHub/DieOfDeath/Assets/Chases/data.luau", chase_file_name)
@@ -2667,14 +2957,14 @@ KillerAppearance = ConvertDropdownValue(Value)
 end; })
 Tab_8:CreateButton({Name = "Change your appearance"; Callback = function()
 if GetKillerModelByName(KillerAppearance) == nil then
-Notify("Error!","Incorrect killer name.",3,false)
+Notify("Error!","Incorrect killer name.",3,warn)
 return
 end
 ReplaceModel(workspace.GameAssets.Teams.Killer:FindFirstChildOfClass("Model"), GetKillerModelByName(KillerAppearance))
 end; })
 Tab_8:CreateButton({Name = "Change current killer(s) appearance"; Callback = function()
 if GetKillerModelByName(KillerAppearance) == nil then
-Notify("Error!","Incorrect killer name.",3,false)
+Notify("Error!","Incorrect killer name.",3,warn)
 return
 end
 for i,v in next, workspace.GameAssets.Teams.Killer:GetChildren() do
@@ -3133,7 +3423,6 @@ end; })
 Tab_8:CreateButton({Name = "Spawn Fake Evil Scary"; Callback = function()
 FakeEvilScary()
 end; })
-
 
 
 
