@@ -140,14 +140,7 @@ end)
 if Success then
 return result
 elseif not Success then
-if decompile then
-pcall(function()
-result = loadstring(decompile(module))()
-return result
-end)
-else
-return {}
-end
+return nil
 end
 end
 
@@ -635,7 +628,7 @@ end; })
 
 
 
-local AbilityNames = {"Cloak","Punch","Taunt","BonusPad","Block","Caretaker","Dash","Hotdog","Revolver","Adrenaline","Banana"}
+local AbilityNames = {"Cloak","Punch","Taunt","BonusPad","Block","Caretaker","Dash","Hotdog","Revolver","Adrenaline","Banana","Nothing"}
 
 local AbilityDatas = {
     ["Adrenaline"] = {Name = "Adrenaline",InputShown = "",Tip = "Get a temporary speed boost for 6 seconds, highlighting you to your teamates and slowing you down after it\'s over.",Cooldown = 35,Icon = "rbxassetid://116399911657417",DisplayName = "Adrenaline"};
@@ -653,6 +646,148 @@ local AbilityDatas = {
 
 pcall(function()
 AbilityModule = RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("Ability"))
+if AbilityModule == nil or not AbilityModule then
+local temp_module = [[
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local Debris = game:GetService("Debris")
+local UserInputService = game:GetService("UserInputService")
+
+local Events = ReplicatedStorage:WaitForChild("Events")
+local ClientModules = ReplicatedStorage:WaitForChild("ClientModules")
+local AbilityConfig = require(ClientModules.AbilityConfig)
+
+local LocalPlayer = Players.LocalPlayer
+local script = LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("Ability")
+local PlayerGui = LocalPlayer.PlayerGui
+
+local RoundUI = PlayerGui.MainGui.RoundUI
+local AbilitiesFolder = PlayerGui.MainGui.Abilities.Folder
+
+local AbilitySystem = {
+    Input1 = "Q",
+    Input2 = "E", 
+    Input3 = "R",
+    Input4 = "T",
+    Input5 = "M1",
+    PreferredInput = UserInputService.PreferredInput
+}
+
+function AbilitySystem.CreateAbility(AbilityData, IsExtraAbility)
+    if AbilitiesFolder:FindFirstChild(AbilityData.Name) then return end
+    
+    local AbilityButton = script.AbilityTemplate:Clone()
+    
+    if AbilitySystem.PreferredInput == Enum.PreferredInput.Gamepad then
+        AbilitySystem.Input1 = "X"
+        AbilitySystem.Input2 = "Y" 
+        AbilitySystem.Input3 = "B"
+        AbilitySystem.Input4 = "A"
+        AbilitySystem.Input5 = "R2"
+    end
+    
+    local InputKey = AbilitySystem.Input1
+    if IsExtraAbility then
+        local AbilityCount = #AbilitiesFolder:GetChildren()
+        if AbilityCount <= 1 then
+            InputKey = AbilitySystem.Input1
+        elseif AbilityCount == 2 then
+            InputKey = AbilitySystem.Input2
+        elseif AbilityCount == 3 then
+            InputKey = AbilitySystem.Input3
+        else
+            InputKey = AbilitySystem.Input4
+        end
+    else
+        InputKey = AbilitySystem[AbilityData.InputShown] or AbilityData.InputShown
+    end
+    
+    AbilityButton.Parent = AbilitiesFolder
+    AbilityButton.Name = AbilityData.Name
+    AbilityButton.Input.Text = InputKey
+    AbilityButton.Title.Text = AbilityData.DisplayName
+    
+    AbilityButton.Cooldown.Visible = false
+    AbilityButton.CooldownLabel.Visible = false
+    PlayerGui.MainGui.Abilities.Tip.Visible = false
+    
+    AbilityButton.MouseEnter:Connect(function()
+        PlayerGui.MainGui.Abilities.Tip.Label.Text = "<font color='rgb(137, 255, 26)'>Usage:</font> <font color='rgb(255, 255, 255)'>" .. (AbilityData.Tip or "No tips for this ability.") .. "</font>"
+        PlayerGui.MainGui.Abilities.Tip.Visible = true
+    end)
+    
+    AbilityButton.MouseLeave:Connect(function()
+        PlayerGui.MainGui.Abilities.Tip.Visible = false
+    end)
+    
+    if AbilityData.Icon then
+        AbilityButton.Icon.Image = AbilityData.Icon
+    end
+    
+    AbilityButton.Activated:Connect(function()
+        AbilitySystem.UseAbility(AbilityData, AbilityButton)
+    end)
+end
+
+function AbilitySystem.AbilityTween(AbilityButton)
+    TweenService:Create(AbilityButton, TweenInfo.new(0.2), {Size = UDim2.new(0.9, 0, 0.9, 0)}):Play()
+    
+    if AbilityButton:FindFirstChild("UseEffect") then
+        AbilityButton.UseEffect.Visible = true
+        AbilityButton.UseEffect.BackgroundTransparency = 0.5
+        TweenService:Create(AbilityButton.UseEffect, TweenInfo.new(0.4), {BackgroundTransparency = 1}):Play()
+    end
+    
+    task.wait(0.2)
+    TweenService:Create(AbilityButton, TweenInfo.new(0.5, Enum.EasingStyle.Back), {Size = UDim2.new(1, 0, 1, 0)}):Play()
+end
+
+function AbilitySystem.PutOnCooldown(AbilityButton, CooldownTime)
+    if AbilityButton.Cooldown.Visible then return end
+    
+    AbilityButton.Input.Visible = false
+    AbilityButton.InputImage.Visible = false
+    AbilityButton.Cooldown.Visible = true
+    AbilityButton.CooldownLabel.Visible = true
+    AbilityButton.Icon.ImageColor3 = Color3.fromRGB(90, 90, 90)
+    
+    local TotalSteps = CooldownTime * 10
+    
+    for Step = math.round(TotalSteps), 0, -1 do
+        if not AbilityButton.Parent then break end
+        
+        AbilityButton.Cooldown.Size = UDim2.new(1, 0, Step / math.round(TotalSteps), 0)
+        AbilityButton.CooldownLabel.Text = math.round(CooldownTime) .. "s"
+        
+        task.wait(0.1)
+        CooldownTime = string.format("%.1f", CooldownTime - 0.1)
+    end
+    
+    if AbilityButton.Parent then
+        AbilitySystem.AbilityTween(AbilityButton)
+        AbilityButton.Input.Visible = true
+        AbilityButton.InputImage.Visible = true
+        AbilityButton.Cooldown.Visible = false
+        AbilityButton.CooldownLabel.Visible = false
+        AbilityButton.Icon.ImageColor3 = Color3.fromRGB(255, 255, 255)
+    end
+end
+
+function AbilitySystem.UseAbility(AbilityData, AbilityButton)
+    if AbilityButton.Cooldown.Visible then return end
+    local Success, Cooldown = Events.RemoteFunctions.UseAbility:InvokeServer(AbilityData.Name)
+    if Success then
+        AbilitySystem.AbilityTween(AbilityButton)
+        if Success ~= "MultipleUse" then
+            AbilitySystem.PutOnCooldown(AbilityButton, Cooldown or AbilityData.Cooldown)
+        end
+    end
+end
+
+return AbilitySystem]]
+AbilityModule = loadstring(temp_module)()
+end
 end)
 pcall(function()
 UIModule = RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("UI"))
@@ -661,21 +796,31 @@ end)
 local Tab_3 = Window:CreateTab("Abilities",0)
 Tab_3:CreateParagraph({Title = "Abilities", Content = "You can give yourself abilities or cards with abilities."})
 Tab_3:CreateSection("Get Ability")
-
+local InputBind = "None"
+Tab_3:CreateKeybind({
+   Name = "Ability Keybind",
+   CurrentKeybind = "None",
+   HoldToInteract = false,
+   Callback = function(Value)
+InputBind = Value
+   end,
+})
 local ChoosenAbility = "Block"
 Tab_3:CreateDropdown({Name = "Choose Ability"; Options = AbilityNames; CurrentOption = "Block"; MultiSelection = false; Callback = function(Value)
 ChoosenAbility = ConvertDropdownValue(Value)
 end; })
 Tab_3:CreateButton({Name = "Get Choosen Ability"; Callback = function()
-game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(ChoosenAbility)
-AbilityModule.CreateAbility(AbilityDatas[ChoosenAbility])
+local temp_table = table.clone(AbilityDatas[ChoosenAbility])
+temp_table.InputShown = (InputBind ~= "None" and InputBind) or ""
+AbilityModule.CreateAbility(temp_table)
 end; })
 
 Tab_3:CreateButton({Name = "Get All Abilities"; Callback = function()
 game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(unpack({{tostring(AbilityNames[math.random(1, 11)]);tostring(AbilityNames[math.random(1, 11)]);}}))
 for _,ability in pairs(AbilityNames) do
-game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(unpack({{tostring(ability);}}))
-AbilityModule.CreateAbility(AbilityDatas[tostring(ability)])
+local temp_table = table.clone(AbilityDatas[ability])
+temp_table.InputShown = (InputBind ~= "None" and InputBind) or ""
+AbilityModule.CreateAbility(temp_table)
 end
 end; })
 
@@ -742,8 +887,11 @@ Tab_3:CreateToggle({Name = "Auto Inject"; CurrentValue = false; Callback = funct
 AutoInjectAbility = Value
 end; })
 
-Tab_3:CreateDropdown({Name = "Abilities"; Options = AbilityNames; CurrentOption = ""; MultiSelection = true; Callback = function(Value)
-AI_Abilities = Value
+Tab_3:CreateDropdown({Name = "First Ability"; Options = AbilityNames; CurrentOption = ""; MultiSelection = false; Callback = function(Value)
+AI_Abilities1 = ConvertDropdownValue(Value)
+end; })
+Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOption = ""; MultiSelection = false; Callback = function(Value)
+AI_Abilities2 = ConvertDropdownValue(Value)
 end; })
 
 game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams").DescendantAdded:Connect(function(descendant)
@@ -751,10 +899,8 @@ task.wait()
 if descendant.Name == ""..LP.Name.."" and descendant.Parent.Name == "Survivor" and AutoInjectAbility == true then
 task.wait(8)
 pcall(function()
-game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(AI_Abilities)
-for _,ability in pairs(AI_Abilities) do
-AbilityModule.CreateAbility(AbilityDatas[tostring(ability)])
-end
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer({""..tostring(AI_Abilities1)..""})
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer({""..tostring(AI_Abilities2)..""})
 end)
 end
 end)
@@ -1812,12 +1958,7 @@ end; })
 
 Tab_7:CreateSection("")
 
-Tab_7:CreateSection("Aimbot")
-
-Tab_7:CreateLabel("coming soon")
-
 Tab_7:CreateSection("Advanced Anti / Immunities")
-
 
 local antiStun = false
 local AntiSlowDown = nil
@@ -1857,7 +1998,7 @@ setupCharacter(newChar)
 end)
 
 Tab_7:CreateToggle({
-Name = "Anti-Stun (rewrited)",
+Name = "Anti-Stun",
 CurrentValue = false,
 Callback = function(Value)
 antiStun = Value
@@ -1995,16 +2136,97 @@ end)
 end
 end)
 
-function StudsIntoPower(studs)
-return (studs * 5)
+
+
+local HitboxAutoTracer, Range, ClosestHRP = false, 9e9, nil
+local AutoAim, AimTarget, Freeze_XAxis, Freeze_YAxis, Freeze_ZAxis = false, false, true, false, false
+
+function EnableAutoTracer()
+local suc, err = pcall(function()
+while game:GetService("RunService").Heartbeat:Wait() do 
+if HitboxAutoTracer == true then
+while not (game:GetService("Players").LocalPlayer.Character and game:GetService("Players").LocalPlayer.Character.Parent and game:GetService("Players").LocalPlayer.Character.HumanoidRootPart and game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Parent) do
+task.wait(.5)
 end
-Tab_7:CreateSection("Hitbox Extender")
-Tab_7:CreateLabel("ONLY WORKS FOR KILLER! EXTENDS SLIGHTLY!")
+local mag = (ClosestHRP.Position - HumanoidRootPart.Position).Magnitude
+local vel = HumanoidRootPart.Velocity
+if mag > Range then
+HumanoidRootPart.Velocity = vel
+elseif mag < 32 then
+HumanoidRootPart.Velocity = (((ClosestHRP.Position - HumanoidRootPart.Position).Unit) * (mag * 10))
+else
+--if mag < 140 then
+HumanoidRootPart.Velocity = (((ClosestHRP.Position - HumanoidRootPart.Position).Unit) * (mag * 13))
+end
+game:GetService("RunService").RenderStepped:Wait()
+if (game:GetService("Players").LocalPlayer.Character and game:GetService("Players").LocalPlayer.Character.Parent and game:GetService("Players").LocalPlayer.Character.HumanoidRootPart and game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Parent) then
+HumanoidRootPart.Velocity = vel
+end
+end
+end
+end)
+if not suc then
+task.spawn(function() EnableAutoTracer() end)
+end
+end
+task.spawn(EnableAutoTracer)
+
+function IsNormalC(v)
+if v and v:FindFirstChild("Head") and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChildOfClass("Humanoid") then
+return true
+end
+return false
+end
+
+game:GetService("RunService").Heartbeat:Connect(function()
+pcall(function()
+local ClosestDistance = math.huge
+local NewClosest = nil
+if not IsNormalC(Character) then
+ClosestHRP = nil
+return
+end
+for i,v in pairs(game.Players:GetPlayers()) do
+if not IsNormalC(v.Character) then continue end
+if AimTarget == "Killers" and v.Character.Parent.Name ~= "Killer" then continue end
+if AimTarget == "Civilians" and v.Character.Parent.Name ~= "Survivor" then continue end
+if v and v.Name ~= game:GetService("Players").LocalPlayer.Name then
+local Distance = (HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).Magnitude
+if Distance < ClosestDistance then
+ClosestDistance = Distance
+NewClosest = v.Character.HumanoidRootPart
+end
+end
+end
+if AutoAim == true and ClosestDistance < Range then
+local LookingPosition = CFrame.lookAt(HumanoidRootPart.Position, NewClosest.Position)
+if Freeze_XAxis or Freeze_YAxis or Freeze_ZAxis then
+local x_1, y_1, z_1 = LookingPosition:ToOrientation()
+local x_2, y_2, z_2 = HumanoidRootPart.CFrame:ToOrientation()
+HumanoidRootPart.CFrame = CFrame.new(HumanoidRootPart.Position) * CFrame.Angles(((Freeze_XAxis and x_2) or x_1), ((Freeze_YAxis and y_2) or y_1), ((Freeze_ZAxis and z_2) or z_1))
+else
+HumanoidRootPart.CFrame = LookingPosition
+end
+end
+ClosestHRP = NewClosest
+end)
+end)
+
+Tab_7:CreateSection("Hitbox Manipulation ( ONLY FOR KILLERS! )")
+
+Tab_7:CreateLabel("Basically Extender but with auto-tracer and without fling")
+
+Tab_7:CreateToggle({Name = "Auto-Trace Hitbox"; CurrentValue = false; Callback = function(Value)
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
+HitboxAutoTracer = Value
+end; })
+
+Tab_7:CreateLabel("Default Extender, might fling when touching people")
 Tab_7:CreateToggle({Name = "Extend Hitbox"; CurrentValue = false; Callback = function(Value)
 if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
 ExtendHitbox = Value
 if ExtendHitbox == true then
-local distance = StudsIntoPower(2)
+local distance = 10
 repeat game:GetService("RunService").Heartbeat:Wait()
 local vel, movel = nil, 0.1
 while not (game:GetService("Players").LocalPlayer.Character and game:GetService("Players").LocalPlayer.Character.Parent and game:GetService("Players").LocalPlayer.Character.HumanoidRootPart and game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Parent) do
@@ -2019,6 +2241,34 @@ end
 until ExtendHitbox == false
 end
 end; })
+
+
+Tab_7:CreateSection("Aimbot")
+
+Tab_7:CreateDropdown({Name = "Aim Target"; Options = {"Everyone","Civilians","Killers"}; CurrentOption = "Everyone"; MultiSelection = false; Callback = function(Value)
+AimTarget = ConvertDropdownValue(Value)
+end; })
+
+Tab_7:CreateLabel("Aims Character to a closest player")
+Tab_7:CreateToggle({Name = "Humanoid Auto Aim"; CurrentValue = false; Callback = function(Value)
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
+AutoAim = Value
+end; })
+
+Tab_7:CreateLabel("Don't edit if you don't know what is this")
+Tab_7:CreateToggle({Name = "Freeze X Axis"; CurrentValue = true; Callback = function(Value)
+Freeze_XAxis = Value
+end; })
+
+Tab_7:CreateToggle({Name = "Freeze Y Axis"; CurrentValue = false; Callback = function(Value)
+Freeze_YAxis = Value
+end; })
+
+Tab_7:CreateToggle({Name = "Freeze Z Axis"; CurrentValue = false; Callback = function(Value)
+Freeze_ZAxis = Value
+end; })
+
+
 
 function MorphIntoGhost()
     local a = game:GetService("ReplicatedStorage").Characters.Other.Ghost:Clone()
@@ -2543,10 +2793,14 @@ end
 game.CoreGui.DOD_Assets.LMSSongs:Clone().Parent = game:GetService("ReplicatedStorage").Sounds.Songs
 Notify("Success!","Restored!",3,true)
 end; })
-Tab_10:CreateSlider({Name = "LMS Volume"; Range = {0, 10}; Increment = .5; Suffix = ""; CurrentValue = 1; Callback = function(Value)
+Tab_10:CreateSlider({Name = "LMS Volume ( Restore Normal LMS to Reset )"; Range = {0, 10}; Increment = .5; Suffix = ""; CurrentValue = 1; Callback = function(Value)
 for i,v in next, game:GetService("ReplicatedStorage").Sounds.Songs.LMSSongs:GetChildren() do
 if v and v:IsA("Sound") then
-v.Volume = tonumber(Value)
+local temp_volume = tonumber(Value)
+v:GetAttributeChangedSignal("Volume"):Connect(function()
+v.Volume = temp_volume
+end)
+v.Volume = temp_volume
 end
 end
 end; })
@@ -2614,7 +2868,11 @@ end; })
 Tab_10:CreateSlider({Name = "Chase Themes Volume"; Range = {0, 10}; Increment = .5; Suffix = ""; CurrentValue = 1; Callback = function(Value)
 for i,v in next, workspace:WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):GetDescendants() do
 if v and v:IsA("Sound") and v.Name == "ChaseTheme" then
-v.Volume = tonumber(Value)
+local temp_volume = tonumber(Value)
+v:GetAttributeChangedSignal("Volume"):Connect(function()
+v.Volume = temp_volume
+end)
+v.Volume = temp_volume
 end
 end
 end; })
