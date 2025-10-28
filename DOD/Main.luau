@@ -799,7 +799,7 @@ Tab_3:CreateSection("Get Ability")
 local InputBind = "None"
 Tab_3:CreateKeybind({
    Name = "Ability Keybind",
-   CurrentKeybind = "None",
+   CurrentKeybind = "E",
    HoldToInteract = false,
    Callback = function(Value)
 InputBind = Value
@@ -811,7 +811,7 @@ ChoosenAbility = ConvertDropdownValue(Value)
 end; })
 Tab_3:CreateButton({Name = "Get Choosen Ability"; Callback = function()
 local temp_table = table.clone(AbilityDatas[ChoosenAbility])
-temp_table.InputShown = (InputBind ~= "None" and InputBind) or ""
+temp_table.InputShown = (InputBind ~= "None" and InputBind.Name) or ""
 AbilityModule.CreateAbility(temp_table)
 end; })
 
