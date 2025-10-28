@@ -819,7 +819,7 @@ Tab_3:CreateButton({Name = "Get All Abilities"; Callback = function()
 game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(unpack({{tostring(AbilityNames[math.random(1, 11)]);tostring(AbilityNames[math.random(1, 11)]);}}))
 for _,ability in pairs(AbilityNames) do
 local temp_table = table.clone(AbilityDatas[ability])
-temp_table.InputShown = (InputBind ~= "None" and InputBind) or ""
+temp_table.InputShown = (InputBind ~= "None" and InputBind.Name) or ""
 AbilityModule.CreateAbility(temp_table)
 end
 end; })
