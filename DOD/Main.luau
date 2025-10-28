@@ -811,7 +811,12 @@ ChoosenAbility = ConvertDropdownValue(Value)
 end; })
 Tab_3:CreateButton({Name = "Get Choosen Ability"; Callback = function()
 local temp_table = table.clone(AbilityDatas[ChoosenAbility])
+pcall(function()
 temp_table.InputShown = (InputBind ~= "None" and InputBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (InputBind ~= "None" and InputBind) or ""
+end)
 AbilityModule.CreateAbility(temp_table)
 end; })
 
@@ -819,7 +824,12 @@ Tab_3:CreateButton({Name = "Get All Abilities"; Callback = function()
 game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(unpack({{tostring(AbilityNames[math.random(1, 11)]);tostring(AbilityNames[math.random(1, 11)]);}}))
 for _,ability in pairs(AbilityNames) do
 local temp_table = table.clone(AbilityDatas[ability])
+pcall(function()
 temp_table.InputShown = (InputBind ~= "None" and InputBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (InputBind ~= "None" and InputBind) or ""
+end)
 AbilityModule.CreateAbility(temp_table)
 end
 end; })
