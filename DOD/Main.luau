@@ -2138,8 +2138,8 @@ end)
 
 
 
-local HitboxAutoTracer, Range, ClosestHRP = false, 9e9, nil
-local AutoAim, AimTarget, Freeze_XAxis, Freeze_YAxis, Freeze_ZAxis = false, false, true, false, false
+local HitboxAutoTracer, ClosestHRP = false, nil
+local AimRange, AutoAim, AimTarget, Freeze_XAxis, Freeze_YAxis, Freeze_ZAxis = 9e9, false, false, true, false, false
 
 function EnableAutoTracer()
 local suc, err = pcall(function()
@@ -2150,9 +2150,7 @@ task.wait(.5)
 end
 local mag = (ClosestHRP.Position - HumanoidRootPart.Position).Magnitude
 local vel = HumanoidRootPart.Velocity
-if mag > Range then
-HumanoidRootPart.Velocity = vel
-elseif mag < 32 then
+if mag < 32 then
 HumanoidRootPart.Velocity = (((ClosestHRP.Position - HumanoidRootPart.Position).Unit) * (mag * 10))
 else
 --if mag < 140 then
@@ -2198,7 +2196,7 @@ NewClosest = v.Character.HumanoidRootPart
 end
 end
 end
-if AutoAim == true and ClosestDistance < Range then
+if AutoAim == true and ClosestDistance < AimRange then
 local LookingPosition = CFrame.lookAt(HumanoidRootPart.Position, NewClosest.Position)
 if Freeze_XAxis or Freeze_YAxis or Freeze_ZAxis then
 local x_1, y_1, z_1 = LookingPosition:ToOrientation()
@@ -2244,6 +2242,10 @@ end; })
 
 
 Tab_7:CreateSection("Aimbot")
+
+Tab_7:CreateInput({Name = "Aim Range"; PlaceholderText = "inf"; NumbersOnly = true; OnEnter = false; RemoveTextAfterFocusLost = false; Callback = function(Value)
+AimRange = Value
+end; })
 
 Tab_7:CreateDropdown({Name = "Aim Target"; Options = {"Everyone","Civilians","Killers"}; CurrentOption = "Everyone"; MultiSelection = false; Callback = function(Value)
 AimTarget = ConvertDropdownValue(Value)
