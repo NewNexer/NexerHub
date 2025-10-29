@@ -124,13 +124,15 @@ return tostring(tbl)
 end
 end
 
-temp_msg.Text = "Loading Modules... (0/3)"
+local WebHandler = {}
+function WebHandler:OpenRBX(url)
+game:GetService("GuiService"):BroadcastNotification(game:GetService("HttpService"):JSONEncode({["title"] = "Roblox", ["presentationStyle"] = 2, ["visible"] = true, ["url"] = tostring(url)}), 20)
+end
+temp_msg.Text = "Loading Modules... (0/2)"
 local Encryptor = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/Encryption-Center/refs/heads/main/Main.luau"))()
-temp_msg.Text = "Loading Modules... (1/3)"
-local WebHandler = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/Web-Module.luau"))()
-temp_msg.Text = "Loading Modules... (2/3)"
+temp_msg.Text = "Loading Modules... (1/2)"
 local MainModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Module.luau"))()
-temp_msg.Text = "Loading Modules... (3/3)"
+temp_msg.Text = "Loading Modules... (2/2)"
 
 function RequestModule(module)
 local result = nil
@@ -265,7 +267,7 @@ local Window = Rayfield:CreateWindow({
 
 pcall(function()
 local Announcements = Window:CreateTab("Announce",0)
-Announcements:CreateParagraph({Title = "Warning!", Content = "Recently there were multiple skidded scripts of mine hub. The great example of this are oshub, nyxer hub and others. Those so called ''hubs'' are full copy pastes of mine script that also logs your data... stay safe!"})
+Announcements:CreateParagraph({Title = "Warning!", Content = "Recently there were multiple skidded scripts of mine hub. The great example of this are oshub, nyxer hub and others. Those so called ''hubs'' are full copy pastes of mine script. They can't deny it."})
 Announcements:CreateSection("")
 Announcements:CreateParagraph({Title = "Hi there!", Content = "Script Version: 2.3 ( WORK IN PROGRESS, EXCEPT A LOT OF BUGS )\n\nThis script was fully recoded and fixed. Thank you for using my script. ❤️\n\nAlso join our discord server for early updates, free premium access and many other things..."})
 Announcements:CreateButton({Name = "Copy Discord Server Link"; Callback = function()
