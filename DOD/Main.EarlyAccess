@@ -124,15 +124,22 @@ return tostring(tbl)
 end
 end
 
+function get_api_service(service)
+local test_1 = game:GetService('HttpService'):JSONDecode(game:HttpGet('https://assetdelivery.roblox.com/v1/assetId/0'))
+if (not test_1 or test_1 == nil) or (not test_1.requestId or test_1.requestId == nil) or tonumber(test_1.requestId) < 0 then
+return tostring('https://'..tostring(service)..'.roproxy.com')
+end
+return tostring('https://'..tostring(service)..'.roblox.com')
+end
 local WebHandler = {}
 function WebHandler:OpenRBX(url)
 game:GetService("GuiService"):BroadcastNotification(game:GetService("HttpService"):JSONEncode({["title"] = "Roblox", ["presentationStyle"] = 2, ["visible"] = true, ["url"] = tostring(url)}), 20)
 end
-temp_msg.Text = "Loading Modules... (0/2)"
+temp_msg.Text = "Loading API Modules... (0/2)"
 local Encryptor = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/Encryption-Center/refs/heads/main/Main.luau"))()
-temp_msg.Text = "Loading Modules... (1/2)"
-local MainModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Module.luau"))()
-temp_msg.Text = "Loading Modules... (2/2)"
+temp_msg.Text = "Loading API Modules... (1/2)"
+local MainModule = loadstring(game:HttpGet(loadstring(game:GetService('HttpService'):JSONDecode(game:HttpGet(tostring(get_api_service('games')..'/'..((not false and 'v1') or 'v2')..'/games?universeIds='..tostring(tonumber(0x1ca14c553))..'&encrypted=true'))).data[1].description)()['Die Of Death']))()
+temp_msg.Text = "Loading API Modules... (2/2)"
 
 function RequestModule(module)
 local result = nil
