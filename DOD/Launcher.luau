@@ -72,7 +72,7 @@ else
 return nil
 end
 end
-local isfollowed = FollowHandler:IsFollowedTo(RequiredUserID)
+local isfollowed = IsFollowedToo(RequiredUserID)
 if isfollowed == true then
 loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Main.luau"))()
 return
