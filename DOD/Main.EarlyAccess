@@ -1600,8 +1600,6 @@ return nil
 end
 
 local Tab_6 = Window:CreateTab("Animations",0)
-Tab_6:CreateParagraph({Title = "Animations", Content = "You can change your anims here."})
-Tab_6:CreateSection("Pre-loaded animations")
 
 function SetRunAnim(run)
 pcall(function()
@@ -1673,6 +1671,10 @@ end
 end)
 end
 
+local AnimsScriptLoaded = nil
+pcall(function()
+AnimsScriptLoaded = LocalPlayer.PlayerScripts:FindFirstChild("ClientAnimations")
+end)
 function ApplyNewAnimations()
 pcall(function()
 Character.Animate.Disabled = true
@@ -1681,12 +1683,21 @@ Character.Animate.Disabled = false
 end)
 task.wait()
 pcall(function()
-LocalPlayer.PlayerScripts.ClientAnimations.Disabled = true
+AnimsScriptLoaded.Disabled = true
 task.wait()
-LocalPlayer.PlayerScripts.ClientAnimations.Disabled = false
+AnimsScriptLoaded.Disabled = false
 end)
 end
 
+
+
+
+if AnimsScriptLoaded == nil then
+Tab_6:CreateParagraph({Title = "Not Supported", Content = "clientscript not found"})
+end
+if AnimsScriptLoaded ~= nil then
+Tab_6:CreateParagraph({Title = "Animations", Content = "You can change your anims here."})
+Tab_6:CreateSection("Pre-loaded animations")
 Tab_6:CreateLabel("Civilian animations")
 Tab_6:CreateButton({Name = "Apply New Civilian Animations"; Callback = function()
 local RunAnim = "rbxassetid://137375023685630"
@@ -1940,7 +1951,7 @@ end
 end
 end)
 end; })
-
+end
 
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
