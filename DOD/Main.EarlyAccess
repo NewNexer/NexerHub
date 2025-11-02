@@ -695,8 +695,7 @@ local AbilityDatas = {
 }
 
 pcall(function()
-AbilityModule = RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("Ability"))
-if AbilityModule == nil or not AbilityModule then
+if IsRequireSupported == false then
 local temp_module = [[
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
@@ -837,10 +836,19 @@ end
 
 return AbilitySystem]]
 AbilityModule = loadstring(temp_module)()
+elseif IsRequireSupported == true then
+AbilityModule = RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("Ability"))
 end
 end)
 pcall(function()
+if IsRequireSupported == false then
+UIModule = {}
+UIModule.AbilitySelection = function(v841) Notify("Error!", "Couldn't use function ''AbilitySelection'', missing function ''require'' or ''decompile''!", 5, true) return end
+UIModule.OpenShop = function(v841) Notify("Error!", "Couldn't use function ''OpenShop'', missing function ''require'' or ''decompile''!", 5, true) return end
+UIModule.TeamateDeathEffect = function(v841) Notify("Error!", "Couldn't use function ''TeamateDeathEffect'', missing function ''require'' or ''decompile''!", 5, true) return end
+elseif IsRequireSupported == true then
 UIModule = RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("UI"))
+end
 end)
 
 local Tab_3 = Window:CreateTab("Abilities",0)
