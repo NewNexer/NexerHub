@@ -350,9 +350,15 @@ Humanoid, Hum = Character.Humanoid, Character.Humanoid
 end)
 end)
 
-pcall(function()
+local IsRequireSupported, ReturnedValue = pcall(function()
 StaminaModule = RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("Movement"))
 end)
+if IsRequireSupported ~= true then
+IsRequireSupported = false
+end
+if ReturnedValue ~= nil and ReturnedValue == "Requested module experienced an error while loading" then
+IsRequireSupported = false
+end
 
 function SetStaminaProperty(property, value)
 if property == "MaxStamina" then
@@ -362,7 +368,7 @@ if StaminaModule then
 StaminaModule["Stamina"] = value
 end
 elseif property == "Fatigue" then
-Char:SetAttribute("Fatigue", value)
+Char:SetAttribute("Fatigue", ((value==true and 1) or 0))
 elseif property == "WalkSpeed" then
 Hum.WalkSpeed = value
 elseif property == "SprintSpeed" then
@@ -841,14 +847,9 @@ local Tab_3 = Window:CreateTab("Abilities",0)
 Tab_3:CreateParagraph({Title = "Abilities", Content = "You can give yourself abilities or cards with abilities."})
 Tab_3:CreateSection("Get Ability")
 local InputBind = "None"
-Tab_3:CreateKeybind({
-   Name = "Ability Keybind",
-   CurrentKeybind = "E",
-   HoldToInteract = false,
-   Callback = function(Value)
-InputBind = Value
-   end,
-})
+Tab_3:CreateInput({Name = "Ability Keybind"; PlaceholderText = "None"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+InputBind = tostring(Value)
+end; })
 local ChoosenAbility = "Block"
 Tab_3:CreateDropdown({Name = "Choose Ability"; Options = AbilityNames; CurrentOption = "Block"; MultiSelection = false; Callback = function(Value)
 ChoosenAbility = ConvertDropdownValue(Value)
