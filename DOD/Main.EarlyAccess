@@ -350,22 +350,21 @@ Humanoid, Hum = Character.Humanoid, Character.Humanoid
 end)
 end)
 
-local IsRequireSupported, ReturnedValue = pcall(function()
+pcall(function()
+if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) then
+StaminaModule = {}
+StaminaModule.Stamina = 100
+else
 StaminaModule = RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("Movement"))
+end
 end)
-if IsRequireSupported ~= true then
-IsRequireSupported = false
-end
-if ReturnedValue ~= nil and ReturnedValue == "Requested module experienced an error while loading" then
-IsRequireSupported = false
-end
 
 function SetStaminaProperty(property, value)
 if property == "MaxStamina" then
 Char:SetAttribute("MaxStamina", value)
 elseif property == "Stamina" then
 if StaminaModule then
-StaminaModule["Stamina"] = value
+StaminaModule.Stamina = value
 end
 elseif property == "Fatigue" then
 Char:SetAttribute("Fatigue", ((value==true and 1) or 0))
@@ -695,7 +694,6 @@ local AbilityDatas = {
 }
 
 pcall(function()
-if IsRequireSupported == false then
 local temp_module = [[
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
@@ -836,17 +834,14 @@ end
 
 return AbilitySystem]]
 AbilityModule = loadstring(temp_module)()
-elseif IsRequireSupported == true then
-AbilityModule = RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("Ability"))
-end
 end)
 pcall(function()
-if IsRequireSupported == false then
+if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) then
 UIModule = {}
 UIModule.AbilitySelection = function(v841) Notify("Error!", "Couldn't use function ''AbilitySelection'', missing function ''require'' or ''decompile''!", 5, true) return end
 UIModule.OpenShop = function(v841) Notify("Error!", "Couldn't use function ''OpenShop'', missing function ''require'' or ''decompile''!", 5, true) return end
 UIModule.TeamateDeathEffect = function(v841) Notify("Error!", "Couldn't use function ''TeamateDeathEffect'', missing function ''require'' or ''decompile''!", 5, true) return end
-elseif IsRequireSupported == true then
+else
 UIModule = RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("UI"))
 end
 end)
@@ -1979,10 +1974,9 @@ return (MarketplaceService:GetProductInfo(Id,Enum.InfoType.Asset).PriceInRobux)
 end)
 end
 local PremiumPrice = GetAssetPrice(1264479709) or 39
--- WAIT PLEASE LISTEN
 -- YOU CAN GET PREMIUM FOR FREE BY ENTERING A KEY
--- KEY IS IN MY DISCORD SERVER 😭🙏
--- AAAAAAH!!!!!!!!!!!!
+-- KEY IS IN MY DISCORD SERVER!!
+-- THINK ABOUT IT, IS IT REALLY WORTH IT?
 local HavePremium = false
 if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(LocalPlayer.UserId, 1264479709) then
 HavePremium = true
