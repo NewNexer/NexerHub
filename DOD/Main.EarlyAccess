@@ -441,7 +441,7 @@ if lastusedmethod == "require" then
 NoStaminaLoss = false
 lastusedmethod = ""
 return
-else
+elseif lastusedmethod == "scriptbreak" then
 SetStaminaProperty("Fatigue", 0)
 lastusedmethod = ""
 return
@@ -457,7 +457,7 @@ SetStaminaProperty("Stamina", Character:GetAttribute("MaxStamina"))
 end
 until NoStaminaLoss == false
 end)
-else
+elseif ChoosenNoStamLossMethod == "scriptbreak" then
 lastusedmethod = "scriptbreak"
 game:GetService("VirtualInputManager"):SendKeyEvent(true,"W",false,game:GetService("VirtualInputManager"))
 task.wait(.2)
