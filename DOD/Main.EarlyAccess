@@ -75,7 +75,7 @@ local music_assets = {
 ["A Retro Soul"] = "https://files.catbox.moe/u375iy.mp3";
 }
 local download_failed = false
-local catboxstatus = loadstring(game:HttpGet("https://files.catbox.moe/ygoei4.luau"))()
+local catboxstatus = "working"
 if catboxstatus == "working" then
 if HaveWorkspaceAccess() and not IsFile("NexerHub/DieOfDeath/Assets/LMS/data.luau") then CreateFile("NexerHub/DieOfDeath/Assets/LMS/data.luau", [[return {
     "One Bounce";
