@@ -118,7 +118,7 @@ temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/24)"
 end
 end
 end
-if catboxstatus == "working" and download_failed ~= true then
+if catboxstatus == "working" then
 if HaveWorkspaceAccess() and not IsFile("NexerHub/DieOfDeath/Assets/Chases/data.luau") then CreateFile("NexerHub/DieOfDeath/Assets/Chases/data.luau", [[return {
     "A God with No Time";
     "Derptastic";
@@ -141,6 +141,7 @@ local temp_table = {
     "Screw Time";
     "Middle Big Brother";
 }
+if download_failed ~= true then
 for i,v in pairs(temp_table) do
 local music_data = nil
 pcall(function()
@@ -156,6 +157,7 @@ end
 CreateFile("NexerHub/DieOfDeath/Assets/Chases/"..v..".mp3",music_data)
 asset_counter += 1
 temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/24)"
+end
 end
 end
 end
@@ -2343,43 +2345,17 @@ Tab_7:CreateToggle({Name = "Freeze Z Axis"; CurrentValue = false; Callback = fun
 Freeze_ZAxis = Value
 end; })
 
-
-
-function MorphIntoGhost()
-    local a = game:GetService("ReplicatedStorage").Characters.Other.Ghost:Clone()
-    a.Name = LocalPlayer.Name
-    a.Parent = game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost")
-    pcall(function()
-    a:WaitForChild("Humanoid").DisplayDistanceType = "None"
-    end)
-    a:WaitForChild("HumanoidRootPart").CFrame = (game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChildOfClass("Model") and game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChildOfClass("Model"):WaitForChild("HumanoidRootPart").CFrame) or CFrame.new(0,0,0)
-    pcall(function()
-    for i,v in pairs(a:GetDescendants()) do
-    if (v:IsA("BasePart") or v:IsA("Decal")) and (v.Name ~= "HumanoidRootPart" and (not v:FindFirstChild("Face") and v.Name ~= "Hurtbox")) then
-	v.Transparency = 0.5
-	end
-    end
-    end)
-    LocalPlayer.Character = a
-    task.wait(.5)
-    LocalPlayer.CharacterAdded:Once(function()
-    a:Destroy()
-    end)
-end
-
 Tab_7:CreateSection("FE Game Manipulation")
 
 Tab_7:CreateLabel("You can end round only if you are last survivor ( LMS ) or you are the only killer!")
 Tab_7:CreateButton({Name = "FE End Round"; Callback = function()
 if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
---If you're not a skid, you can easily de-obfuscate that.
 MainModule:InitiateRoundEnd()
 end; })
 
 Tab_7:CreateLabel("You can start LMS only if there are two survivors! ( You and someone else )")
 Tab_7:CreateButton({Name = "FE Two Players LMS"; Callback = function()
 if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
---If you're not a skid, you can easily de-obfuscate that.
 MainModule:InitiateTwoPlayersLMS()
 end; })
 
@@ -2401,7 +2377,6 @@ Tab_7:CreateButton({Name = "FE Invincibility / God Mode"; Callback = function()
 if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
 if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChild(LocalPlayer.Name) then Notify("Error!", "You must be killer!", 4, false) return end
 Notify("Applying Invincibility...", "Please wait!", 7, true)
---If you're not a skid, you can easily de-obfuscate that.
 MainModule:StartGodMode()
 Notify("Applied Invincibility!", "Now no one can damage you.", 3, true)
 end; })
@@ -2412,7 +2387,6 @@ Tab_7:CreateButton({Name = "FE Softlock Killers"; Callback = function()
 if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
 if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChildWhichIsA("Model") then Notify("Error!", "No Killers!", 3, warn) return end
 Notify("Enabling Auto-Softlock...", "Please wait!", 7, true)
---If you're not a skid, you can easily de-obfuscate that.
 MainModule:StartSoftlock()
 Notify("Auto-Softlock Enabled!", "Check the label above to see when will specific killers get softlocked.", 5, true)
 end; })
