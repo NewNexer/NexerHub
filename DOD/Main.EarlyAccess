@@ -163,6 +163,21 @@ end
 end
 
 Instance.new("Folder",game:GetService("CoreGui")).Name = "DOD_Assets"
+function XenoClear()
+local a = game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Leaderstats
+a:GetPropertyChangedSignal("Visible"):Connect(function()
+a.Visible = true
+end)
+a.Visible = true
+local b = game:GetService("Players").LocalPlayer.PlayerGui.MainGui.KillerIntro
+b:GetPropertyChangedSignal("Visible"):Connect(function()
+b.Visible = false
+end)
+b.Visible = false
+end
+if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) then
+task.spawn(XenoClear)
+end
 
 function ConvertDropdownValue(tbl)
 if type(tbl) == "table" then
