@@ -2269,7 +2269,7 @@ NewClosest = v.Character.HumanoidRootPart
 end
 end
 end
-if AutoAim == true and ClosestDistance < AimRange then
+if AutoAim == true and ClosestDistance < tonumber(AimRange) then
 local LookingPosition = CFrame.lookAt(HumanoidRootPart.Position, NewClosest.Position)
 if Freeze_XAxis or Freeze_YAxis or Freeze_ZAxis then
 local x_1, y_1, z_1 = LookingPosition:ToOrientation()
@@ -2316,7 +2316,7 @@ end; })
 
 Tab_7:CreateSection("Aimbot")
 
-Tab_7:CreateInput({Name = "Aim Range"; PlaceholderText = "inf"; NumbersOnly = true; OnEnter = false; RemoveTextAfterFocusLost = false; Callback = function(Value)
+Tab_7:CreateInput({Name = "Aim Range"; PlaceholderText = "9000000000"; NumbersOnly = true; OnEnter = false; RemoveTextAfterFocusLost = false; Callback = function(Value)
 AimRange = Value
 end; })
 
@@ -2367,13 +2367,36 @@ function MorphIntoGhost()
     end)
 end
 
-Tab_7:CreateSection("FE Hitbox Breaker")
+Tab_7:CreateSection("FE Game Manipulation")
+
+Tab_7:CreateLabel("You can end round only if you are last survivor ( LMS ) or you are the only killer!")
+Tab_7:CreateButton({Name = "FE End Round"; Callback = function()
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
+--If you're not a skid, you can easily de-obfuscate that.
+MainModule:InitiateRoundEnd()
+end; })
+
+Tab_7:CreateLabel("You can start LMS only if there are two survivors! ( You and someone else )")
+Tab_7:CreateButton({Name = "FE Two Players LMS"; Callback = function()
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
+--If you're not a skid, you can easily de-obfuscate that.
+MainModule:InitiateTwoPlayersLMS()
+end; })
+
+Tab_7:CreateLabel("No evilness limit will make you earn evilness but never make you killer, must enable in lobby! ( After turning on, don't change anything in DOD settings )")
+Tab_7:CreateToggle({Name = "No Evilness Limit"; CurrentValue = false; Callback = function(Value)
+MainModule:SetNoEvilnessLimit(Value)
+end; })
+MainModule:InitiateNoEvilnessLimit()
+
+
+Tab_7:CreateSection("FE Game Breaks")
 
 
 -- Code is obfuscated to prevent those methods to get patched
 
 
-Tab_7:CreateLabel("Invincibility / God Mode only can be applied only during dienation gamemode, and you must be killdroid!")
+Tab_7:CreateLabel("Invincibility / God Mode only can be applied only during dienation gamemode!")
 Tab_7:CreateButton({Name = "FE Invincibility / God Mode"; Callback = function()
 if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
 if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChild(LocalPlayer.Name) then Notify("Error!", "You must be killer!", 4, false) return end
