@@ -194,6 +194,9 @@ elseif not Success then
 return nil
 end
 end
+if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) then
+game.Players.LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("UI").Name = "UI_r"
+end
 
 local GetRequestMethod = function()
 local iqnd = request or http_request or HttpPost or (syn and syn.request) or (http and http.request) or (fluxus and fluxus.request) or (KRNL and KRNL.request) or (Xeno and Xeno.request) or (game and game.HttpPost)
@@ -849,7 +852,9 @@ UIModule.AbilitySelection = function(v841) Notify("Error!", "Couldn't use functi
 UIModule.OpenShop = function(v841) Notify("Error!", "Couldn't use function ''OpenShop'', missing function ''require'' or ''decompile''!", 5, false) return end
 UIModule.TeamateDeathEffect = function(v841) Notify("Error!", "Couldn't use function ''TeamateDeathEffect'', missing function ''require'' or ''decompile''!", 5, false) return end
 else
-UIModule = ((string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) and "empty") or RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("UI"))
+if LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):FindFirstChild("UI") then
+UIModule = RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("UI"))
+end
 end
 end)
 
