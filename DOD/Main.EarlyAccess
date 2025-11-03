@@ -447,7 +447,7 @@ lastusedmethod = ""
 return
 end
 if Value == true then
-if ChoosenNoStamLossMethod then
+if ChoosenNoStamLossMethod == "require" then
 NoStaminaLoss = true
 lastusedmethod = "require"
 task.spawn(function()
