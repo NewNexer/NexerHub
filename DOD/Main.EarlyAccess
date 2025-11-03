@@ -429,26 +429,45 @@ SetStaminaProperty("CanJump", false)
 end
 end; })
 
-Tab_1:CreateToggle({Name = "No Stamina Loss ( ''require'' method )"; CurrentValue = false; Callback = function(Value)
-NoStaminaLoss = Value
-if NoStaminaLoss == true then
+local ChoosenNoStamLossMethod = "require"
+local lastusedmethod = ""
+Tab_1:CreateDropdown({Name = "Choosen No Stamina Loss Method"; Options = {"require","scriptbreak"}; CurrentOption = "require"; MultiSelection = false; Callback = function(Value)
+ChoosenNoStamLossMethod = ConvertDropdownValue(Value)
+end; })
+
+local NoStaminaLoss = false
+Tab_1:CreateToggle({Name = "No Stamina Loss"; CurrentValue = false; Callback = function(Value)
+if lastusedmethod == "require" then
+NoStaminaLoss = false
+lastusedmethod = ""
+return
+else
+SetStaminaProperty("Fatigue", 0)
+lastusedmethod = ""
+return
+end
+if Value == true then
+if ChoosenNoStamLossMethod then
+NoStaminaLoss = true
+lastusedmethod = "require"
+task.spawn(function()
 repeat task.wait(0.003)
 if Character and Character:GetAttribute("MaxStamina") then
 SetStaminaProperty("Stamina", Character:GetAttribute("MaxStamina"))
 end
 until NoStaminaLoss == false
-end
-end; })
-
-Tab_1:CreateToggle({Name = "No Stamina Loss ( fatigue method )"; CurrentValue = false; Callback = function(Value)
-if Value == true then
-game:GetService("VirtualInputManager"):SendKeyEvent(true,"LeftShift",false,game:GetService("VirtualInputManager"))
-task.wait(.3)
-SetStaminaProperty("Fatigue", true)
-task.wait(.3)
-game:GetService("VirtualInputManager"):SendKeyEvent(false,"LeftShift",false,game:GetService("VirtualInputManager"))
+end)
 else
-SetStaminaProperty("Fatigue", 0)
+lastusedmethod = "scriptbreak"
+game:GetService("VirtualInputManager"):SendKeyEvent(true,"W",false,game:GetService("VirtualInputManager"))
+task.wait(.2)
+game:GetService("VirtualInputManager"):SendKeyEvent(true,"LeftShift",false,game:GetService("VirtualInputManager"))
+task.wait(.2)
+SetStaminaProperty("Fatigue", true)
+task.wait(.05)
+game:GetService("VirtualInputManager"):SendKeyEvent(false,"LeftShift",false,game:GetService("VirtualInputManager"))
+game:GetService("VirtualInputManager"):SendKeyEvent(false,"W",false,game:GetService("VirtualInputManager"))
+end
 end
 end; })
 
