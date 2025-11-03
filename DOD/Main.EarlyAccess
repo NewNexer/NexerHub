@@ -108,7 +108,8 @@ if (not music_data or music_data == nil) or (music_data and music_data["errors"]
 download_failed = true
 end
 if download_failed == true then
-temp_msg.Text = "Failed Loading Core Assets."
+temp_msg.Text = "Failed Loading Core Assets. (Timeout)"
+task.wait(3)
 break
 end
 CreateFile("NexerHub/DieOfDeath/Assets/LMS/"..v..".mp3",music_data)
@@ -117,7 +118,7 @@ temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/24)"
 end
 end
 end
-if catboxstatus == "working" then
+if catboxstatus == "working" and download_failed ~= true then
 if HaveWorkspaceAccess() and not IsFile("NexerHub/DieOfDeath/Assets/Chases/data.luau") then CreateFile("NexerHub/DieOfDeath/Assets/Chases/data.luau", [[return {
     "A God with No Time";
     "Derptastic";
@@ -175,13 +176,12 @@ local WebHandler = {}
 function WebHandler:OpenRBX(url)
 game:GetService("GuiService"):BroadcastNotification(game:GetService("HttpService"):JSONEncode({["title"] = "Roblox", ["presentationStyle"] = 2, ["visible"] = true, ["url"] = tostring(url)}), 20)
 end
-temp_msg.Text = "Loading API Modules... (0/2)"
-local Encryptor = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/Encryption-Center/refs/heads/main/Main.luau"))()
-temp_msg.Text = "Loading API Modules... (1/2)"
+temp_msg.Text = "Loading API Modules... (0/1)"
 local MainModule = loadstring(game:HttpGet("https://pastebin.com/raw/G17DaBUh"))()
-temp_msg.Text = "Loading API Modules... (2/2)"
+temp_msg.Text = "Loading API Modules... (1/1)"
 
 function RequestModule(module)
+if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) then return nil end
 local result = nil
 local Success, Error = pcall(function()
 result = require(module)
@@ -843,9 +843,9 @@ end)
 pcall(function()
 if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) then
 UIModule = {}
-UIModule.AbilitySelection = function(v841) Notify("Error!", "Couldn't use function ''AbilitySelection'', missing function ''require'' or ''decompile''!", 5, true) return end
-UIModule.OpenShop = function(v841) Notify("Error!", "Couldn't use function ''OpenShop'', missing function ''require'' or ''decompile''!", 5, true) return end
-UIModule.TeamateDeathEffect = function(v841) Notify("Error!", "Couldn't use function ''TeamateDeathEffect'', missing function ''require'' or ''decompile''!", 5, true) return end
+UIModule.AbilitySelection = function(v841) Notify("Error!", "Couldn't use function ''AbilitySelection'', missing function ''require'' or ''decompile''!", 5, false) return end
+UIModule.OpenShop = function(v841) Notify("Error!", "Couldn't use function ''OpenShop'', missing function ''require'' or ''decompile''!", 5, false) return end
+UIModule.TeamateDeathEffect = function(v841) Notify("Error!", "Couldn't use function ''TeamateDeathEffect'', missing function ''require'' or ''decompile''!", 5, false) return end
 else
 UIModule = RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("UI"))
 end
@@ -2907,7 +2907,7 @@ end; })
 Tab_10:CreateSection("Custom LMS ( settings )")
 local lms_file_name = "Type Here!"
 Tab_10:CreateParagraph({Title = "How to add your own music?", Content = "Find your executor's folder in your phone's explorer, then find the ''workspace'' folder, and inside it you must find ''NexerHub'' folder, now go inside it, then click ''Assets'' and ''LMS''. And now, in this folder, input your mp3 music."})
-Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here!"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here! ( ONLY NAME, WITHOUT ''.mp3'' )"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 lms_file_name = ConvertDropdownValue(Value)
 end; })
 Tab_10:CreateButton({Name = "Add File"; Callback = function()
@@ -2978,7 +2978,7 @@ end; })
 Tab_10:CreateSection("Custom Chase Themes ( settings )")
 local chase_file_name = "Type Here!"
 Tab_10:CreateParagraph({Title = "How to add your own music?", Content = "Find your executor's folder in your phone's explorer, then find the ''workspace'' folder, and inside it you must find ''NexerHub'' folder, now go inside it, then click ''Assets'' and ''Chases''. And now, in this folder, input your mp3 music."})
-Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here!"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here! ( ONLY NAME, WITHOUT ''.mp3'' )"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 chase_file_name = ConvertDropdownValue(Value)
 end; })
 Tab_10:CreateButton({Name = "Add File"; Callback = function()
