@@ -431,8 +431,8 @@ end; })
 
 local ChoosenNoStamLossMethod = "require"
 local lastusedmethod = ""
-Tab_1:CreateDropdown({Name = "Choosen No Stamina Loss Method"; Options = {"require","scriptbreak"}; CurrentOption = "require"; MultiSelection = false; Callback = function(Value)
-ChoosenNoStamLossMethod = ConvertDropdownValue(Value)
+Tab_1:CreateDropdown({Name = "Choosen No Stamina Loss Method"; Options = {"require","scriptbreak (toggle while running)"}; CurrentOption = "require"; MultiSelection = false; Callback = function(Value)
+ChoosenNoStamLossMethod = ((ConvertDropdownValue(Value)=="scriptbreak (toggle while running)" and "scriptbreak") or "require")
 end; })
 
 local NoStaminaLoss = false
