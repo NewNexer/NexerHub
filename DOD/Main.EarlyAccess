@@ -2406,8 +2406,6 @@ MainModule:StartGodMode()
 Notify("Applied Invincibility!", "Now no one can damage you.", 3, true)
 end; })
 
-
-Tab_7:CreateSection("FE Server Glitcher / Softlock Utility")
 Tab_7:CreateLabel("Only Harken, Badware and Killdroid can be softlocked. Harken will softlock if she uses Immolate or Tangle. Badware will softlock if he uses Rift. All Killdroid Deploys will get softlocked.")
 Tab_7:CreateLabel("WARNING! You will play as ghost after activating this feature.")
 Tab_7:CreateButton({Name = "FE Softlock Killers"; Callback = function()
