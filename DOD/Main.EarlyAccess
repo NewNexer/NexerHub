@@ -2848,6 +2848,10 @@ if not table.find(temp_table, choosen_lms) then
 Notify("Error!","File isn't added! ( Please reload lms audios and choose again. )",3,false)
 return
 end
+if not IsFile("NexerHub/DieOfDeath/Assets/Chases/"..choosen_chase..".mp3") then
+Notify("Error!","File not found! ( Please check ''Chases'' folder and make sure it is here. )",3,false)
+return
+end
 for i,v in next, game:GetService("ReplicatedStorage").Sounds.Songs.LMSSongs:GetChildren() do
 if v and v:IsA("Sound") then
 v.SoundId = GetFile("NexerHub/DieOfDeath/Assets/LMS/"..choosen_lms..".mp3","gca")
@@ -2884,7 +2888,7 @@ lms_file_name = ConvertDropdownValue(Value)
 end; })
 Tab_10:CreateButton({Name = "Add File"; Callback = function()
 if not IsFile("NexerHub/DieOfDeath/Assets/LMS/"..lms_file_name..".mp3") then
-Notify("Error!","File not found! ( Did you entered name correctly? Make sure it is mp3. )",3,false)
+Notify("Error!","File not found! ( Did you entered name correctly? Make sure it is mp3. Don't write ''.mp3'' at the end, only the name of the file. )",5,false)
 return
 end
 local temp_table = loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))()
@@ -2927,6 +2931,10 @@ if not table.find(temp_table, choosen_chase) then
 Notify("Error!","File isn't added! ( Please reload chase themes and choose again. )",3,false)
 return
 end
+if not IsFile("NexerHub/DieOfDeath/Assets/Chases/"..choosen_chase..".mp3") then
+Notify("Error!","File not found! ( Please check ''Chases'' folder and make sure it is here. )",3,false)
+return
+end
 for i,v in next, workspace:WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):GetDescendants() do
 if v and v:IsA("Sound") and v.Name == "ChaseTheme" then
 v.SoundId = GetFile("NexerHub/DieOfDeath/Assets/Chases/"..choosen_chase..".mp3","gca")
@@ -2955,7 +2963,7 @@ chase_file_name = ConvertDropdownValue(Value)
 end; })
 Tab_10:CreateButton({Name = "Add File"; Callback = function()
 if not IsFile("NexerHub/DieOfDeath/Assets/Chases/"..chase_file_name..".mp3") then
-Notify("Error!","File not found! ( Did you entered name correctly? Make sure it is mp3. )",3,false)
+Notify("Error!","File not found! ( Did you entered name correctly? Make sure it is mp3. Don't write ''.mp3'' at the end, only the name of the file. )",5,false)
 return
 end
 local temp_table = loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))()
