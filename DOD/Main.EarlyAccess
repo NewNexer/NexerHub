@@ -75,6 +75,8 @@ local music_assets = {
 ["A Retro Soul"] = "https://files.catbox.moe/u375iy.mp3";
 }
 local download_failed = false
+local catboxstatus = loadstring(game:HttpGet("https://files.catbox.moe/ygoei4.luau"))()
+if catboxstatus == "working" then
 if HaveWorkspaceAccess() and not IsFile("NexerHub/DieOfDeath/Assets/LMS/data.luau") then CreateFile("NexerHub/DieOfDeath/Assets/LMS/data.luau", [[return {
     "One Bounce";
     "Showtime";
@@ -114,6 +116,8 @@ asset_counter += 1
 temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/24)"
 end
 end
+end
+if catboxstatus == "working" then
 if HaveWorkspaceAccess() and not IsFile("NexerHub/DieOfDeath/Assets/Chases/data.luau") then CreateFile("NexerHub/DieOfDeath/Assets/Chases/data.luau", [[return {
     "A God with No Time";
     "Derptastic";
@@ -151,6 +155,7 @@ end
 CreateFile("NexerHub/DieOfDeath/Assets/Chases/"..v..".mp3",music_data)
 asset_counter += 1
 temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/24)"
+end
 end
 end
 
