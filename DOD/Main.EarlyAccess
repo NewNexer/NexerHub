@@ -459,14 +459,7 @@ until NoStaminaLoss == false
 end)
 elseif ChoosenNoStamLossMethod == "scriptbreak" then
 lastusedmethod = "scriptbreak"
-game:GetService("VirtualInputManager"):SendKeyEvent(true,"W",false,game:GetService("VirtualInputManager"))
-task.wait(.2)
-game:GetService("VirtualInputManager"):SendKeyEvent(true,"LeftShift",false,game:GetService("VirtualInputManager"))
-task.wait(.2)
 SetStaminaProperty("Fatigue", true)
-task.wait(.05)
-game:GetService("VirtualInputManager"):SendKeyEvent(false,"LeftShift",false,game:GetService("VirtualInputManager"))
-game:GetService("VirtualInputManager"):SendKeyEvent(false,"W",false,game:GetService("VirtualInputManager"))
 end
 end
 end; })
