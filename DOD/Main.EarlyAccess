@@ -193,9 +193,15 @@ local WebHandler = {}
 function WebHandler:OpenRBX(url)
 game:GetService("GuiService"):BroadcastNotification(game:GetService("HttpService"):JSONEncode({["title"] = "Roblox", ["presentationStyle"] = 2, ["visible"] = true, ["url"] = tostring(url)}), 20)
 end
-temp_msg.Text = "Loading API Modules... (0/1)"
+temp_msg.Text = "Loading API Module... (0/1)"
 local MainModule = loadstring(game:HttpGet("https://pastebin.com/raw/G17DaBUh"))()
-temp_msg.Text = "Loading API Modules... (1/1)"
+if MainModule.IsWorking ~= nil then
+temp_msg.Text = "Loading API Module... (1/1)"
+task.wait(1)
+else
+temp_msg.Text = "Failed loading API Module, most of the premium features might not work."
+task.wait(3)
+end
 
 function RequestModule(module)
 if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) then return nil end
@@ -2446,6 +2452,47 @@ if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Tea
 Notify("Enabling Auto-Softlock...", "Please wait!", 7, true)
 MainModule:StartSoftlock()
 Notify("Auto-Softlock Enabled!", "Check the label above to see when will specific killers get softlocked.", 5, true)
+end; })
+
+Tab_7:CreateLabel("To use model breaker, you must play as badware during round! You'll have to inject first, and only then destroy models. You can search models using explorer scripts. DO NOT SPAM CLICK OR IT'LL BREAK!")
+
+local modeldservice, modeldname = "Workspace", "Type Here!"
+Tab_7:CreateDropdown({Name = "Model Service"; Options = {"Workspace","ReplicatedStorage"}; CurrentOption = "Workspace"; MultiSelection = false; Callback = function(Value)
+modeldservice = ConvertDropdownValue(Value)
+end; })
+
+Tab_7:CreateInput({Name = "Model Name"; PlaceholderText = "Type Here!"; NumbersOnly = false; OnEnter = false; RemoveTextAfterFocusLost = false; Callback = function(Value)
+modeldname = Value
+end; })
+
+Tab_7:CreateButton({Name = "Inject Model Destroyer"; Callback = function()
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
+MainModule:InjectDestroyer()
+end; })
+
+--credits to infinite yield i guess
+function getstring(begin)
+local start = begin-1
+local AA = '' for i,v in pairs(cargs) do
+if i > start then
+if AA ~= '' then
+AA = AA .. ' ' .. v
+else
+AA = AA .. v
+end
+end
+end
+return AA
+end
+Tab_7:CreateButton({Name = "Destroy Model"; Callback = function()
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
+for i,v in pairs(game:GetService(modeldservice):GetDescendants()) do
+if v.Name:lower() == getstring(1):lower() and v:IsA("BasePart") then
+MainModule:DestroyDataModel(v)
+return
+end
+end
+Notify("Error!", "Model not found.", 2, false)
 end; })
 
 Tab_7:CreateSection("Auto Block")
