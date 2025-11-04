@@ -2486,7 +2486,7 @@ return AA
 end
 Tab_7:CreateButton({Name = "Destroy Model"; Callback = function()
 if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
-for i,v in pairs(game:GetService(modeldservice):GetDescendants()) do
+for i,v in pairs(game:GetService(tostring(modeldservice)):GetDescendants()) do
 if v.Name:lower() == getstring(1):lower() and v:IsA("BasePart") then
 MainModule:DestroyDataModel(v)
 return
