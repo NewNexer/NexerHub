@@ -444,6 +444,8 @@ if tostring(track.Animation.AnimationId) == a then
 track.TimePosition = b
 end
 end
+end
+end)
 
 end)
 
@@ -498,9 +500,8 @@ if tostring(track.Animation.AnimationId) == a then
 track.TimePosition = b
 end
 end
-
-end)
 end
+end)
 
 end)
 end)
