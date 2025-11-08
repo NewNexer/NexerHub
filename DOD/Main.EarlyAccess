@@ -424,7 +424,6 @@ task.wait()
 repeat task.wait() until Character:FindFirstChild("Humanoid")
 Humanoid, Hum = Character.Humanoid, Character.Humanoid
 
-if EmoteSync == true then
 if HeadSync ~= nil then
 HeadSync:Disconnect()
 HeadSync = nil
@@ -435,7 +434,7 @@ HumanoidRootPartSync = nil
 end
 repeat task.wait() until Character:FindFirstChild("Head")
 HeadSync = Character:FindFirstChild("Head").ChildAdded:Connect(function(c)
-if c.Name=="EmoteSong" then
+if c.Name=="EmoteSong" and EmoteSync == true then
 local strinid = tostring(c.SoundId)
 local a,b,v = pcall(SyncEmoteWithClosestPlayer, strinid)
 c.TimePosition = v
@@ -449,7 +448,7 @@ end
 end
 end)
 HumanoidRootPartSync = HumanoidRootPart.ChildAdded:Connect(function(c)
-if c.Name=="EmoteSong" then
+if c.Name=="EmoteSong" and EmoteSync == true then
 local strinid = tostring(c.SoundId)
 local a,b,v = pcall(SyncEmoteWithClosestPlayer, strinid)
 c.TimePosition = v
@@ -460,7 +459,7 @@ if tostring(track.Animation.AnimationId) == a then
 track.TimePosition = b
 end
 end
-end
+
 end)
 end
 
@@ -665,7 +664,12 @@ end)
 local Tab_2 = Window:CreateTab("Emotes",0)
 Tab_2:CreateParagraph({Title = "Emotes", Content = "Functions that are related to emotes."})
 
+local canuseemotesync = false
+game.Players.LocalPlayer.CharacterAdded:Once(function()
+canuseemotesync = true
+end)
 Tab_2:CreateToggle({Name = "Auto Emote Sync"; CurrentValue = false; Callback = function(Value)
+if canuseemotesync ~= true then Notify("Error!", "Can't sync, please try again after you respawn.", 5, false) return end
 EmoteSync = Value
 end; })
 
@@ -694,7 +698,7 @@ Tab_2:CreateButton({Name = "Use Tornado"; Callback = function()
 game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("Emote"):FireServer("Tornado")
 end; })
 
-Tab_2:CreateButton({Name = "Use Rainbow Waves (CLIENT VFX)"; Callback = function()
+Tab_2:CreateButton({Name = "Use Rainbow Waves (CLIENT VFX/SFX)"; Callback = function()
 local anim = Instance.new("Animation")
 anim.AnimationId = "rbxassetid://75513960644342"
 local planim = Humanoid:LoadAnimation(anim)
