@@ -114,7 +114,7 @@ return
 end
 end
 
-temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/24)"
+temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/25)"
 if HaveWorkspaceAccess() then
 if not isfolder("NexerHub") then
 makefolder("NexerHub")
@@ -145,8 +145,11 @@ if isfolder("NexerHub") and isfolder("NexerHub/DieOfDeath") and isfolder("NexerH
 makefolder("NexerHub/DieOfDeath/Assets/Chases")
 end
 end
-asset_counter = 5
-temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/24)"
+if not isfolder("NexerHub/Core") then
+makefolder("NexerHub/Core")
+end
+asset_counter = 6
+temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/25)"
 end
 
 local music_assets = {
@@ -210,7 +213,7 @@ break
 end
 CreateFile("NexerHub/DieOfDeath/Assets/LMS/"..v..".mp3",music_data)
 asset_counter += 1
-temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/24)"
+temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/25)"
 end
 end
 end
@@ -252,7 +255,7 @@ break
 end
 CreateFile("NexerHub/DieOfDeath/Assets/Chases/"..v..".mp3",music_data)
 asset_counter += 1
-temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/24)"
+temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/25)"
 end
 end
 end
@@ -3998,6 +4001,168 @@ end
 end)
 Notify("Success!","Made dash stronger!",3,true)
 end; })
+
+
+
+-- i am sorry this was made by ai because i dont know accessory things
+function weldAttachments(attach1, attach2)
+  local weld = Instance.new("Weld")
+  weld.Part0 = attach1.Parent
+  weld.Part1 = attach2.Parent
+  weld.C0 = attach1.CFrame
+  weld.C1 = attach2.CFrame
+  weld.Parent = attach1.Parent
+  return weld
+end
+local function buildWeld(weldName, parent, part0, part1, c0, c1)
+  local weld = Instance.new("Weld")
+  weld.Name = weldName
+  weld.Part0 = part0
+  weld.Part1 = part1
+  weld.C0 = c0
+  weld.C1 = c1
+  weld.Parent = parent
+  return weld
+end
+local function findFirstMatchingAttachment(model, name)
+  for _, child in pairs(model:GetChildren()) do
+    if child:IsA("Attachment") and child.Name == name then
+      return child
+    elseif not child:IsA("Accoutrement") and not child:IsA("Tool") then
+      local foundAttachment = findFirstMatchingAttachment(child, name)
+      if foundAttachment then
+        return foundAttachment
+      end
+    end
+  end
+end
+function AddAccessory(character, accoutrement, bodyPartName)
+  accoutrement.Parent = character
+  local handle = accoutrement:FindFirstChild("Handle")
+  if not handle then
+    return
+  end
+  local bodyPart = character:FindFirstChild(bodyPartName or "Head")
+  if not bodyPart then
+    return
+  end
+  local accAttachment = handle:FindFirstChildOfClass("Attachment")
+  if accAttachment then
+    local bodyAttachment = bodyPart:FindFirstChild(accAttachment.Name)
+    if not bodyAttachment then
+      bodyAttachment = Instance.new("Attachment")
+      bodyAttachment.Name = accAttachment.Name
+      bodyAttachment.Parent = bodyPart
+      if bodyPartName == "Head" then
+        bodyAttachment.Position = Vector3.new(0, 0.5, 0)
+      elseif bodyPartName == "Torso" then
+        bodyAttachment.Position = Vector3.new(0, 1, 0)
+      elseif bodyPartName == "Right Arm" then
+        bodyAttachment.Position = Vector3.new(1, 0.5, 0)
+      elseif bodyPartName == "Left Arm" then
+        bodyAttachment.Position = Vector3.new(-1, 0.5, 0)
+      elseif bodyPartName == "Right Leg" then
+        bodyAttachment.Position = Vector3.new(0.5, 1, 0)
+      elseif bodyPartName == "Left Leg" then
+        bodyAttachment.Position = Vector3.new(-0.5, 1, 0)
+      else
+        bodyAttachment.Position = Vector3.new(0, 0, 0)
+      end
+    end
+    weldAttachments(bodyAttachment, accAttachment)
+  else
+    local weld = Instance.new("Weld")
+    weld.Name = bodyPartName .. "Weld"
+    weld.Part0 = bodyPart
+    weld.Part1 = handle
+    weld.Parent = bodyPart
+    if bodyPartName == "Head" then
+      weld.C0 = CFrame.new(0, 0.5, 0)
+      weld.C1 = CFrame.new(0, 0, 0)
+    elseif bodyPartName == "Torso" then
+      weld.C0 = CFrame.new(0, 1.5, 0)
+      weld.C1 = CFrame.new(0, 0, 0)
+    elseif bodyPartName == "Right Arm" then
+      weld.C0 = CFrame.new(1.5, 0.5, 0)
+      weld.C1 = CFrame.new(0, 0, 0)
+    elseif bodyPartName == "Left Arm" then
+      weld.C0 = CFrame.new(-1.5, 0.5, 0)
+      weld.C1 = CFrame.new(0, 0, 0)
+    elseif bodyPartName == "Right Leg" then
+      weld.C0 = CFrame.new(0.5, 2, 0)
+      weld.C1 = CFrame.new(0, 0, 0)
+    elseif bodyPartName == "Left Leg" then
+      weld.C0 = CFrame.new(-0.5, 2, 0)
+      weld.C1 = CFrame.new(0, 0, 0)
+    else
+      weld.C0 = CFrame.new(0, 0, 0)
+      weld.C1 = CFrame.new(0, 0, 0)
+    end
+  end
+  return accoutrement
+end
+function EditHumanoidChild(char, part, value)
+if part == "Pants" then
+char:FindFirstChildOfClass("Pants").PantsTemplate = value
+elseif part == "Shirt" then
+char:FindFirstChildOfClass("Shirt").ShirtTemplate = value
+elseif part == "TShirt" then
+char:FindFirstChildOfClass("ShirtGraphic").Graphic = value
+else
+char:FindFirstChild(part).Value = value
+end
+end
+
+local function ArtfulSetUp(c)
+--head
+local head_asset = game:GetObjects("rbxassetid://"..tostring(114257201579610))[1]
+repeat task.wait(.05) until head_asset ~= nil and head_asset:FindFirstChild("Handle") and head_asset.Handle:FindFirstChild("SpecialMesh")
+local head = AddAccessory(c, head_asset, "Head")
+task.wait(.05)
+head:WaitForChild("Handle").CanCollide = false
+-- right sleeve
+local rs_asset = game:GetObjects("rbxassetid://"..tostring(83730135593176))[1]
+repeat task.wait(.05) until rs_asset ~= nil and rs_asset:FindFirstChild("Handle") and rs_asset.Handle:FindFirstChild("SpecialMesh")
+local rs = AddAccessory(c, rs_asset, "Right Arm")
+task.wait(.05)
+rs:WaitForChild("Handle").CanCollide = false
+rs:WaitForChild("Handle"):WaitForChild("SpecialMesh").Offset = Vector3.new(-1,0.5,0)
+-- left sleeve
+local ls_asset = game:GetObjects("rbxassetid://"..tostring(82696867944296))[1]
+repeat task.wait(.05) until ls_asset ~= nil and ls_asset:FindFirstChild("Handle") and ls_asset.Handle:FindFirstChild("SpecialMesh")
+local ls = AddAccessory(c, ls_asset, "Left Arm")
+task.wait(.05)
+ls:WaitForChild("Handle").CanCollide = false
+ls:WaitForChild("Handle"):WaitForChild("SpecialMesh").Offset = Vector3.new(1,0.5,0)
+-- torso
+local torso_asset = game:GetObjects("rbxassetid://"..tostring(127089746240385))[1]
+repeat task.wait(.05) until torso_asset ~= nil and torso_asset:FindFirstChild("Handle") and torso_asset.Handle:FindFirstChild("SpecialMesh")
+local torso = AddAccessory(c, torso_asset, "Torso")
+task.wait(.05)
+torso:WaitForChild("Handle").CanCollide = false
+torso:WaitForChild("Handle"):WaitForChild("SpecialMesh").Offset = Vector3.new(0,-1,-0.5)
+-- making body parts visible
+repeat task.wait(.05) until c:FindFirstChild("Left Leg") and c:FindFirstChild("Left Arm")
+c["Left Arm"].Transparency = 0
+c["Left Leg"].Transparency = 0
+end
+
+local mp3_conversion_module = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/Encryption-Center/refs/heads/main/mp3_conversion.lua"))()
+if not isfile("NexerHub/Core/Artful.mp3") then
+writefile("NexerHub/Core/Artful.mp3", mp3_conversion_module:ConvertMP3Data(mp3_conversion_module["Artful?"]))
+repeat task.wait(.1) until isfile("Artful.mp3")
+end
+local temp_table = {
+	["Name"] = "Artful?";
+	["Bio"] = "''I sure do wonder why am i here.''";
+	["Icon"] = "rbxassetid://134690353237803";
+	["ClearMainAccessories"] = true;
+	["ChaseTheme"] = ((getcustomasset and getcustomasset("Artful.mp3")) or tostring(game.ReplicatedStorage.Characters.Killer.Artful.Cementful.Animations.ChaseTheme.SoundId));
+	["CharacterAdded"] = function(c) task.spawn(ArtfulSetUp, c) end
+}
+pcall(function()
+MainModule:ModifySkin("Cementful", temp_table)
+end)
 
 function PowerDebug()
 game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.ID.Visible = true
