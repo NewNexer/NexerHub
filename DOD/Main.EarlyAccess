@@ -407,51 +407,8 @@ end)
 pcall(function()
 Humanoid, Hum = Character.Humanoid, Character.Humanoid
 end)
-pcall(function()
-
-if HeadSync ~= nil then
-HeadSync:Disconnect()
-HeadSync = nil
-end
-if HumanoidRootPartSync ~= nil then
-HumanoidRootPartSync:Disconnect()
-HumanoidRootPartSync = nil
-end
-repeat task.wait() until Character:FindFirstChild("Head")
-HeadSync = Character:FindFirstChild("Head").ChildAdded:Connect(function(c)
-if c.Name=="EmoteSong" and EmoteSync == true then
-local strinid = tostring(c.SoundId)
-local a,b,v = pcall(SyncEmoteWithClosestPlayer, strinid)
-c.TimePosition = v
-local hoh = (game.Players.LocalPlayer.Character.Humanoid:FindFirstChild("Animator")~=nil and game.Players.LocalPlayer.Character.Humanoid.Animator) or game.Players.LocalPlayer.Character.Humanoid
-local hah = hoh:GetPlayingAnimationTracks()
-for _,track in pairs(hah) do
-if tostring(track.Animation.AnimationId) == a then
-track.TimePosition = b
-end
-end
-end
-end)
-HumanoidRootPartSync = HumanoidRootPart.ChildAdded:Connect(function(c)
-if c.Name=="EmoteSong" and EmoteSync == true then
-local strinid = tostring(c.SoundId)
-local a,b,v = pcall(SyncEmoteWithClosestPlayer, strinid)
-c.TimePosition = v
-local hoh = (game.Players.LocalPlayer.Character.Humanoid:FindFirstChild("Animator")~=nil and game.Players.LocalPlayer.Character.Humanoid.Animator) or game.Players.LocalPlayer.Character.Humanoid
-local hah = hoh:GetPlayingAnimationTracks()
-for _,track in pairs(hah) do
-if tostring(track.Animation.AnimationId) == a then
-track.TimePosition = b
-end
-end
-end
-end)
-
-end)
-
 LocalPlayer.CharacterAdded:Connect(function()
 pcall(function()
-
 Character, Char = nil, nil
 HumanoidRootPart, HRP = nil, nil
 Humanoid, Hum = nil, nil
@@ -464,45 +421,6 @@ HumanoidRootPart, HRP = Character.HumanoidRootPart, Character.HumanoidRootPart
 task.wait()
 repeat task.wait() until Character:FindFirstChild("Humanoid")
 Humanoid, Hum = Character.Humanoid, Character.Humanoid
-
-if HeadSync ~= nil then
-HeadSync:Disconnect()
-HeadSync = nil
-end
-if HumanoidRootPartSync ~= nil then
-HumanoidRootPartSync:Disconnect()
-HumanoidRootPartSync = nil
-end
-repeat task.wait() until Character:FindFirstChild("Head")
-HeadSync = Character:FindFirstChild("Head").ChildAdded:Connect(function(c)
-if c.Name=="EmoteSong" and EmoteSync == true then
-local strinid = tostring(c.SoundId)
-local a,b,v = pcall(SyncEmoteWithClosestPlayer, strinid)
-c.TimePosition = v
-local hoh = (game.Players.LocalPlayer.Character.Humanoid:FindFirstChild("Animator")~=nil and game.Players.LocalPlayer.Character.Humanoid.Animator) or game.Players.LocalPlayer.Character.Humanoid
-local hah = hoh:GetPlayingAnimationTracks()
-for _,track in pairs(hah) do
-if tostring(track.Animation.AnimationId) == a then
-track.TimePosition = b
-end
-end
-end
-end)
-HumanoidRootPartSync = HumanoidRootPart.ChildAdded:Connect(function(c)
-if c.Name=="EmoteSong" and EmoteSync == true then
-local strinid = tostring(c.SoundId)
-local a,b,v = pcall(SyncEmoteWithClosestPlayer, strinid)
-c.TimePosition = v
-local hoh = (game.Players.LocalPlayer.Character.Humanoid:FindFirstChild("Animator")~=nil and game.Players.LocalPlayer.Character.Humanoid.Animator) or game.Players.LocalPlayer.Character.Humanoid
-local hah = hoh:GetPlayingAnimationTracks()
-for _,track in pairs(hah) do
-if tostring(track.Animation.AnimationId) == a then
-track.TimePosition = b
-end
-end
-end
-end)
-
 end)
 end)
 
@@ -3105,7 +3023,7 @@ if not table.find(temp_table, choosen_lms) then
 Notify("Error!","File isn't added! ( Please reload lms audios and choose again. )",3,false)
 return
 end
-if not IsFile("NexerHub/DieOfDeath/Assets/Chases/"..choosen_chase..".mp3") then
+if not IsFile("NexerHub/DieOfDeath/Assets/Chases/"..choosen_lms..".mp3") then
 Notify("Error!","File not found! ( Please check ''Chases'' folder and make sure it is here. )",3,false)
 return
 end
