@@ -2152,6 +2152,7 @@ otherTeam.ChildRemoved:Connect(function(npc)
 	AnimationController:CleanupCharacter(npc)
 end)
 
+
 -- Periodic cleanup of invalid characters
 game:GetService("RunService").Heartbeat:Connect(function()
 	for character, _ in pairs(AnimationController.CharacterAnimators) do
@@ -3762,15 +3763,9 @@ for i,v in pairs(Model1:GetChildren()) do
 end
 local function setnewchanges()
 pcall(function()
-game.Players:GetPlayerFromCharacter(Model1).Character.Animate.Disabled = true
+workspace:SetAttribute("AnimationsEnabled", false)
 task.wait()
-game.Players:GetPlayerFromCharacter(Model1).Character.Animate.Disabled = false
-end)
-task.wait()
-pcall(function()
-game.Players:GetPlayerFromCharacter(Model1).PlayerScripts.ClientAnimations.Disabled = true
-task.wait()
-game.Players:GetPlayerFromCharacter(Model1).PlayerScripts.ClientAnimations.Disabled = false
+workspace:SetAttribute("AnimationsEnabled", true)
 end)
 pcall(function()
 for i,v in next, game.Players:GetPlayerFromCharacter(Model1).Character.Humanoid:GetPlayingAnimationTracks() do
