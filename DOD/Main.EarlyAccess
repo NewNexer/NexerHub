@@ -585,7 +585,7 @@ local Songs = {
 	["rbxassetid://76016409017292"] = "rbxassetid://125027188864914";
 	["rbxassetid://33810432"] = "rbxassetid://81883187469620";
 }
-function SyncEmoteWithClosestPlayer(e)
+local function SyncEmoteWithClosestPlayer(e)
     local NewClosest = nil
     local ClosestDistance = math.huge
     local timeposem = 0
@@ -646,8 +646,8 @@ end
 end
 end
 end)
-end)
 Notify("Success!", "Enabled sync!", 2, true)
+end)
 end; })
 
 Tab_2:CreateButton({Name = "Open Emote Selection"; Callback = function()
