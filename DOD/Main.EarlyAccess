@@ -348,52 +348,7 @@ end; })
 end)
 
 
-local Songs = {
-	["rbxassetid://95332984406426"] = "rbxassetid://73591689210949";
-	["rbxassetid://91496313320059"] = "rbxassetid://117826199625726";
-	["rbxassetid://72840218506214"] = "rbxassetid://87502844893473";
-	["rbxassetid://76016409017292"] = "rbxassetid://125027188864914";
-	["rbxassetid://33810432"] = "rbxassetid://81883187469620";
-}
-function SyncEmoteWithClosestPlayer(e)
-    local NewClosest = nil
-    local ClosestDistance = math.huge
-    local timeposem = 0
-    local animtrackpos = nil
-    local idklol = nil
-    for i, v in pairs(game.Players:GetPlayers()) do
-        if v and v.Name ~= game.Players.LocalPlayer.Name and v.Character and v.Character:FindFirstChild("Head") and v.Character:FindFirstChild("HumanoidRootPart") then
-            local emote = (v.Character.Head:FindFirstChild("EmoteSong") or v.Character.HumanoidRootPart:FindFirstChild("EmoteSong"))
-            if not emote or tostring(emote.SoundId) ~= e then
-                continue
-            end
-            local Distance = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).Magnitude
-            if Distance < ClosestDistance then
-                ClosestDistance = Distance
-                NewClosest = (v.Character.Humanoid:FindFirstChild("Animator") ~= nil and v.Character.Humanoid.Animator) or v.Character.Humanoid
-                timeposem = emote.TimePosition
-                local hah = NewClosest:GetPlayingAnimationTracks()
-                for _, track in pairs(hah) do
-                    if track.Animation and Songs[e] == tostring(track.Animation.AnimationId) then
-                        idklol = tostring(track.Animation.AnimationId)
-                        animtrackpos = track.TimePosition
-                        break
-                    end
-                end
-            end
-        end
-    end
-    if NewClosest == nil or ClosestDistance > 20 then
-        return nil, nil, nil
-    end
-    return idklol, animtrackpos, timeposem
-end
 
-
-
-local EmoteSync = false
-local HeadSync = nil
-local HumanoidRootPartSync = nil
 local LocalPlayer, LP = game.Players.LocalPlayer, game.Players.LocalPlayer
 local Character, Char
 local HumanoidRootPart, HRP
@@ -622,8 +577,78 @@ end)
 local Tab_2 = Window:CreateTab("Emotes",0)
 Tab_2:CreateParagraph({Title = "Emotes", Content = "Functions that are related to emotes."})
 
-Tab_2:CreateToggle({Name = "Auto Emote Sync"; CurrentValue = false; Callback = function(Value)
-EmoteSync = Value
+Tab_2:CreateButton({Name = "Sync Emotes"; Callback = function()
+task.spawn(function()
+local Songs = {
+	["rbxassetid://95332984406426"] = "rbxassetid://73591689210949";
+	["rbxassetid://91496313320059"] = "rbxassetid://117826199625726";
+	["rbxassetid://72840218506214"] = "rbxassetid://87502844893473";
+	["rbxassetid://76016409017292"] = "rbxassetid://125027188864914";
+	["rbxassetid://33810432"] = "rbxassetid://81883187469620";
+}
+function SyncEmoteWithClosestPlayer(e)
+    local NewClosest = nil
+    local ClosestDistance = math.huge
+    local timeposem = 0
+    local animtrackpos = nil
+    local idklol = nil
+    for i, v in pairs(game.Players:GetPlayers()) do
+        if v and v.Name ~= game.Players.LocalPlayer.Name and v.Character and v.Character:FindFirstChild("Head") and v.Character:FindFirstChild("HumanoidRootPart") then
+            local emote = (v.Character.Head:FindFirstChild("EmoteSong") or v.Character.HumanoidRootPart:FindFirstChild("EmoteSong"))
+            if not emote or tostring(emote.SoundId) ~= e then
+                continue
+            end
+            local Distance = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).Magnitude
+            if Distance < ClosestDistance then
+                ClosestDistance = Distance
+                NewClosest = (v.Character.Humanoid:FindFirstChild("Animator") ~= nil and v.Character.Humanoid.Animator) or v.Character.Humanoid
+                timeposem = emote.TimePosition
+                local hah = NewClosest:GetPlayingAnimationTracks()
+                for _, track in pairs(hah) do
+                    if track.Animation and Songs[e] == tostring(track.Animation.AnimationId) then
+                        idklol = tostring(track.Animation.AnimationId)
+                        animtrackpos = track.TimePosition
+                        break
+                    end
+                end
+            end
+        end
+    end
+    if NewClosest == nil or ClosestDistance > 20 then
+        return nil, nil, nil
+    end
+    return idklol, animtrackpos, timeposem
+end
+game.Players.LocalPlayer.Character.Head.ChildAdded:Connect(function(c)
+if c.Name=="EmoteSong" then
+local a,b,v = SyncEmoteWithClosestPlayer(tostring(c.SoundId))
+print(a,b,v)
+c.TimePosition = v
+local hoh = (game.Players.LocalPlayer.Character.Humanoid:FindFirstChild("Animator")~=nil and game.Players.LocalPlayer.Character.Humanoid.Animator) or game.Players.LocalPlayer.Character.Humanoid
+local hah = hoh:GetPlayingAnimationTracks()
+for _,track in pairs(hah) do
+if tostring(track.Animation.AnimationId) == a then
+track.TimePosition = b
+end
+end
+end
+end)
+game.Players.LocalPlayer.Character.HumanoidRootPart.ChildAdded:Connect(function(c)
+if c.Name=="EmoteSong" then
+local a,b,v = FindClosestPlayerWithEmote(tostring(c.SoundId))
+print(a,b,v)
+c.TimePosition = v
+local hoh = (game.Players.LocalPlayer.Character.Humanoid:FindFirstChild("Animator")~=nil and game.Players.LocalPlayer.Character.Humanoid.Animator) or game.Players.LocalPlayer.Character.Humanoid
+local hah = hoh:GetPlayingAnimationTracks()
+for _,track in pairs(hah) do
+if tostring(track.Animation.AnimationId) == a then
+track.TimePosition = b
+end
+end
+end
+end)
+end)
+Notify("Success!", "Enabled sync!", 2, true)
 end; })
 
 Tab_2:CreateButton({Name = "Open Emote Selection"; Callback = function()
@@ -964,7 +989,7 @@ end
 end
 end)
 
-local Tab_3 = Window:CreateTab("Abilities",0)
+local Tab_3 = Window:CreateTab("Civilian",0)
 Tab_3:CreateParagraph({Title = "Abilities", Content = "You can give yourself abilities or cards with abilities."})
 Tab_3:CreateSection("Get Ability")
 local InputBind = "None"
@@ -1053,34 +1078,6 @@ end)
 until AutoSpamAbility == false
 end
 end; })
-
-Tab_3:CreateSection("Auto Ability Injection")
-local AI_Abilities, AutoInjectAbility
-
-Tab_3:CreateLabel("Ability will automatically get equipped ( along side with their accessories ) 8 seconds after the round starts.")
-
-Tab_3:CreateToggle({Name = "Auto Inject"; CurrentValue = false; Callback = function(Value)
-AutoInjectAbility = Value
-end; })
-
-Tab_3:CreateDropdown({Name = "First Ability"; Options = AbilityNames; CurrentOption = ""; MultiSelection = false; Callback = function(Value)
-AI_Abilities1 = ConvertDropdownValue(Value)
-end; })
-Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOption = ""; MultiSelection = false; Callback = function(Value)
-AI_Abilities2 = ConvertDropdownValue(Value)
-end; })
-
-game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams").DescendantAdded:Connect(function(descendant)
-task.wait()
-if descendant.Name == ""..LP.Name.."" and descendant.Parent.Name == "Survivor" and AutoInjectAbility == true then
-task.wait(8)
-pcall(function()
-game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer({""..tostring(AI_Abilities1)..""})
-game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer({""..tostring(AI_Abilities2)..""})
-end)
-end
-end)
-
 
 
 
@@ -1491,43 +1488,6 @@ else
 disable()
 end
 end; })
-
-
-
-
-
-
-
-
---[[ 
-
-
-
-
-
-
-
-                                         
-
-
-
-
-
-
-
-
-]]--
-
-
-
-
-
-
-
-
-
-
-
 
 local AntiWalls
 AntiWalls = false
