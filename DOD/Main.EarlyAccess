@@ -1739,7 +1739,7 @@ if workspace:GetAttribute("AnimDesyncEnabled") == nil then
 	workspace:SetAttribute("AnimDesyncEnabled", false)
 end
 if workspace:GetAttribute("AnimDesync") == nil then
-	workspace:SetAttribute("AnimDesync", 3)
+	workspace:SetAttribute("AnimDesync", 1)
 end
 
 
