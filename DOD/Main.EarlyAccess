@@ -1708,8 +1708,503 @@ end)
 
 
 
+local AnimationsModule = [[task.spawn(function()
+pcall(function()
+local stopper = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") or game.Players.LocalPlayer.Character:FindFirstChildOfClass("AnimationController")
+for i,v in next, stopper:GetPlayingAnimationTracks() do
+v:Stop()
+end
+end)
+end)
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Events = ReplicatedStorage:WaitForChild("Events")
+local RunService = game:GetService("RunService")
+
+-- Animation control system
+local AnimationController = {}
+AnimationController.Enabled = true
+AnimationController.ActiveAnimations = {}
+AnimationController.CharacterConnections = {}
+AnimationController.CharacterAnimators = {}
+AnimationController.LoadedTracks = {}
+
+-- Initialize workspace attribute if not exists
+if workspace:GetAttribute("AnimationsEnabled") == nil then
+	workspace:SetAttribute("AnimationsEnabled", true)
+end
+-- and also init this anim desync lolz
+if workspace:GetAttribute("AnimDesyncEnabled") == nil then
+	workspace:SetAttribute("AnimDesyncEnabled", false)
+end
+if workspace:GetAttribute("AnimDesync") == nil then
+	workspace:SetAttribute("AnimDesync", 3)
+end
 
 
+-- Listen for attribute changes
+workspace:GetAttributeChangedSignal("AnimationsEnabled"):Connect(function()
+	AnimationController.Enabled = workspace:GetAttribute("AnimationsEnabled")
+	if not AnimationController.Enabled then
+		AnimationController:UnloadAllAnimations()
+	else
+		-- Reload animations for all valid characters
+		for character, _ in pairs(AnimationController.CharacterAnimators) do
+			if character and character.Parent and character:IsDescendantOf(workspace) then
+				if character:FindFirstChild("Humanoid") and character:FindFirstChild("Animations") then
+					task.spawn(function()
+						AnimationController:LoadCharacterAnimations(character)
+					end)
+				end
+			else
+				-- Clean up invalid characters
+				AnimationController.CharacterAnimators[character] = nil
+			end
+		end
+	end
+end)
+
+function AnimationController:UnloadAllAnimations()
+	-- Stop and remove all animation tracks
+	for character, tracks in pairs(self.LoadedTracks) do
+		for trackName, track in pairs(tracks) do
+			if track and track.IsPlaying then
+				track:Stop()
+			end
+		end
+	end
+	self.LoadedTracks = {}
+	
+	-- Stop active animations
+	self:StopAllAnimations()
+end
+
+function AnimationController:StopAllAnimations()
+	for character, animations in pairs(self.ActiveAnimations) do
+		for animName, track in pairs(animations) do
+			if track and track.IsPlaying then
+				track:Stop()
+			end
+		end
+	end
+	self.ActiveAnimations = {}
+end
+
+function AnimationController:CleanupCharacter(character)
+	-- Clean up loaded tracks
+	if self.LoadedTracks[character] then
+		for trackName, track in pairs(self.LoadedTracks[character]) do
+			if track and track.IsPlaying then
+				track:Stop()
+			end
+		end
+		self.LoadedTracks[character] = nil
+	end
+	
+	-- Clean up active animations
+	if self.ActiveAnimations[character] then
+		for animName, track in pairs(self.ActiveAnimations[character]) do
+			if track and track.IsPlaying then
+				track:Stop()
+			end
+		end
+		self.ActiveAnimations[character] = nil
+	end
+
+	-- Clean up connections
+	if self.CharacterConnections[character] then
+		for _, connection in ipairs(self.CharacterConnections[character]) do
+			connection:Disconnect()
+		end
+		self.CharacterConnections[character] = nil
+	end
+
+	self.CharacterAnimators[character] = nil
+end
+
+function AnimationController:LoadAnimationTrack(character, animationName, animationId)
+	if not self.Enabled then return nil end
+	if not character or not character.Parent then return nil end
+	
+	local humanoid, renderHumanoid = self:GetHumanoid(character)
+	local actualHumanoid = renderHumanoid or humanoid
+	if not actualHumanoid then return nil end
+
+	local animator = actualHumanoid:FindFirstChildOfClass("Animator")
+	if not animator then
+		animator = Instance.new("Animator")
+		animator.Parent = actualHumanoid
+	end
+
+	-- Create animation instance
+	local animation = Instance.new("Animation")
+	animation.AnimationId = animationId
+	
+	-- Load animation track
+	local track = animator:LoadAnimation(animation)
+	
+	-- Store in loaded tracks
+	if not self.LoadedTracks[character] then
+		self.LoadedTracks[character] = {}
+	end
+	self.LoadedTracks[character][animationName] = track
+	
+	return track
+end
+
+function AnimationController:GetHumanoid(character)
+	if not self.Enabled then return nil end
+
+	local humanoid = character:FindFirstChildWhichIsA("Humanoid")
+	local renderHumanoid = nil
+	if character:GetAttribute("MROB") and RunService:IsClient() then
+		pcall(function()
+			local renderUI = character:FindFirstChild("RenderUIPath")
+			if renderUI and renderUI.Value then
+				local viewport = renderUI.Value
+				if viewport then
+					renderHumanoid = viewport.ViewportFrame.WorldModel.RenderModel:FindFirstChildWhichIsA("Humanoid")
+				end
+			end
+		end)
+	end
+	return humanoid, renderHumanoid
+end
+
+function AnimationController:LoadCharacterAnimations(character)
+	if not self.Enabled then return end
+	if not character or not character.Parent then return end
+	if not character:FindFirstChild("Humanoid") then return end
+	if not character:FindFirstChild("Animations") then return end
+
+	local animationsFolder = character:FindFirstChild("Animations")
+	if not animationsFolder then return end
+
+	-- Clean up existing animations for this character
+	self:CleanupCharacter(character)
+
+	-- Load all animations from the folder
+	local loadedTracks = {}
+	
+	for _, animationObject in ipairs(animationsFolder:GetChildren()) do
+		if animationObject:IsA("Animation") then
+			local track = self:LoadAnimationTrack(character, animationObject.Name, animationObject.AnimationId)
+			if track then
+				loadedTracks[animationObject.Name] = track
+			end
+		end
+	end
+
+	-- Store animator reference
+	local humanoid, renderHumanoid = self:GetHumanoid(character)
+	local actualHumanoid = renderHumanoid or humanoid
+	if actualHumanoid then
+		local animator = actualHumanoid:FindFirstChildOfClass("Animator")
+		if animator then
+			self.CharacterAnimators[character] = animator
+		end
+	end
+
+	-- Start animation system if we have the required animations
+	if loadedTracks["Idle"] then
+		self:StartCharacterAnimationSystem(character, loadedTracks)
+	end
+end
+
+function AnimationController:StartCharacterAnimationSystem(character, loadedTracks)
+	if not self.Enabled then return end
+	if not character or not character.Parent then return end
+	if not character:FindFirstChild("HumanoidRootPart") then return end
+
+	local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+	local humanoid, renderHumanoid = self:GetHumanoid(character)
+	local actualHumanoid = renderHumanoid or humanoid
+	if not actualHumanoid then return end
+
+	local animations = character:FindFirstChild("Animations")
+	if not animations then return end
+
+	local player = Players:GetPlayerFromCharacter(character)
+	if player and player ~= Players.LocalPlayer then return end
+
+	local transitionSpeed = animations:GetAttribute("TransitionSpeed") or 0.25
+
+	-- Start with idle animation
+	if loadedTracks["Idle"] then
+		loadedTracks["Idle"]:Play()
+		self:AddActiveAnimation(character, "Idle", loadedTracks["Idle"])
+	end
+
+	-- Play passive animation if exists
+	if loadedTracks["PassiveAnimation"] then
+		loadedTracks["PassiveAnimation"]:Play()
+		self:AddActiveAnimation(character, "PassiveAnimation", loadedTracks["PassiveAnimation"])
+	end
+
+	-- Jump animation handling
+	if loadedTracks["Jump"] then
+		local stateConnection = actualHumanoid.StateChanged:Connect(function(oldState, newState)
+			if not self.Enabled then return end
+			if not character or not character.Parent then return end
+			
+			-- Jump and fall handling
+			if newState == Enum.HumanoidStateType.Jumping or newState == Enum.HumanoidStateType.Freefall then
+				loadedTracks["Jump"]:Play(0)
+				self:AddActiveAnimation(character, "Jump", loadedTracks["Jump"])
+				if ReplicatedStorage:FindFirstChild("Sounds") and ReplicatedStorage.Sounds:FindFirstChild("SFX") then if character.PrimaryPart:FindFirstChild("Jump") then return end local jumpSound = ReplicatedStorage.Sounds.SFX.Jump:Clone() jumpSound.Parent = character.PrimaryPart jumpSound:Play() jumpSound.Ended:Once(function() jumpSound:Destroy() end) end
+			else
+				loadedTracks["Jump"]:Stop(0.2)
+				self:RemoveActiveAnimation(character, "Jump")
+			end
+		end)
+		
+		-- Store connection for cleanup
+		if not self.CharacterConnections[character] then
+			self.CharacterConnections[character] = {}
+		end
+		table.insert(self.CharacterConnections[character], stateConnection)
+	end
+
+	-- Movement animations with speed attributes (from original script)
+	if loadedTracks["Walk"] then
+		local walkAnim = loadedTracks["Walk"]
+		local sprintAnim = loadedTracks["Sprint"]
+		
+		if loadedTracks["Idle"] then
+			loadedTracks["Idle"].Priority = Enum.AnimationPriority.Core
+		end
+		walkAnim.Priority = Enum.AnimationPriority.Idle
+		if sprintAnim then
+			sprintAnim.Priority = Enum.AnimationPriority.Movement
+		end
+
+		-- Get speed attributes from character (like original script)
+		local baseWalkSpeed = (character:GetAttribute("WalkSpeed") or 6) + (character:GetAttribute("WalkSpeedModifier") or 0)
+		local baseSprintSpeed = (character:GetAttribute("SprintSpeed") or 23) + (character:GetAttribute("WalkSpeedModifier") or 0)
+		
+		-- Adjust animation speeds based on current walk speed (like original script)
+		local function adjustAnimationSpeeds()
+			if not self.Enabled then return end
+			if not character or not character.Parent then return end
+			
+			local currentWalkSpeed = actualHumanoid.WalkSpeed
+			local walkSpeedRatio = currentWalkSpeed / (character:GetAttribute("WalkSpeed") or 6)
+			local sprintSpeedRatio = currentWalkSpeed / (character:GetAttribute("SprintSpeed") or 23)
+			
+			walkAnim:AdjustSpeed(walkSpeedRatio < 0 and 0.1 or walkSpeedRatio)
+			if sprintAnim then
+				sprintAnim:AdjustSpeed(sprintSpeedRatio < 0 and 0.1 or sprintSpeedRatio)
+			end
+		end
+
+		-- Connect to WalkSpeed changes (like original script)
+		local speedConnection = actualHumanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(adjustAnimationSpeeds)
+		if not self.CharacterConnections[character] then
+			self.CharacterConnections[character] = {}
+		end
+		table.insert(self.CharacterConnections[character], speedConnection)
+
+		-- Initial speed adjustment
+		adjustAnimationSpeeds()
+
+		local function updateMovement(speed)
+			if not self.Enabled then return end
+			if not character or not character.Parent then return end
+			if not humanoidRootPart or not actualHumanoid then return end
+
+			if speed >= 0.25 and not humanoidRootPart.Anchored then
+				-- Use speed thresholds from attributes (like original script)
+				if sprintAnim and speed >= (baseSprintSpeed - baseWalkSpeed) then
+					if not sprintAnim.IsPlaying then 
+						sprintAnim:Play(transitionSpeed) 
+						self:AddActiveAnimation(character, "Sprint", sprintAnim)
+					end
+					walkAnim:Stop(transitionSpeed)
+					self:RemoveActiveAnimation(character, "Walk")
+					if loadedTracks["Idle"] then
+						loadedTracks["Idle"]:Stop(transitionSpeed)
+					end
+				else
+					if not walkAnim.IsPlaying then 
+						walkAnim:Play(transitionSpeed) 
+						self:AddActiveAnimation(character, "Walk", walkAnim)
+					end
+					if sprintAnim then 
+						sprintAnim:Stop(transitionSpeed) 
+						self:RemoveActiveAnimation(character, "Sprint")
+					end
+					if loadedTracks["Idle"] then
+						loadedTracks["Idle"]:Stop(transitionSpeed)
+					end
+				end
+			else
+				if loadedTracks["Idle"] and not loadedTracks["Idle"].IsPlaying then 
+					loadedTracks["Idle"]:Play(transitionSpeed) 
+					self:AddActiveAnimation(character, "Idle", loadedTracks["Idle"])
+				end
+				walkAnim:Stop(transitionSpeed)
+				self:RemoveActiveAnimation(character, "Walk")
+				if sprintAnim then 
+					sprintAnim:Stop(transitionSpeed) 
+					self:RemoveActiveAnimation(character, "Sprint")
+				end
+			end
+		end
+
+		local runningConnection = actualHumanoid.Running:Connect(updateMovement)
+		
+		-- Store connection for cleanup
+		if not self.CharacterConnections[character] then
+			self.CharacterConnections[character] = {}
+		end
+		table.insert(self.CharacterConnections[character], runningConnection)
+	end
+end
+
+function AnimationController:AddActiveAnimation(character, animationName, track)
+	if not self.ActiveAnimations[character] then
+		self.ActiveAnimations[character] = {}
+	end
+	self.ActiveAnimations[character][animationName] = track
+end
+
+function AnimationController:RemoveActiveAnimation(character, animationName)
+	if self.ActiveAnimations[character] then
+		self.ActiveAnimations[character][animationName] = nil
+	end
+end
+
+-- Remote event handlers
+Events.RemoteEvents.PlayAnimation.OnClientEvent:Connect(function(animation, character, delay)
+	if not AnimationController.Enabled then return end
+	if not character or not character.Parent then return end
+	if workspace:GetAttribute("AnimDesyncEnabled") == true then task.wait(workspace:GetAttribute("AnimDesync")) end
+
+	if character and (not Players:GetPlayerFromCharacter(character) or Players:GetPlayerFromCharacter(character) == Players.LocalPlayer) then
+		local humanoid = AnimationController:GetHumanoid(character)
+		if not humanoid then return end
+
+		local animator = humanoid:FindFirstChildOfClass("Animator") or Instance.new("Animator", humanoid)
+		for _, track in animator:GetPlayingAnimationTracks() do
+			if track.Name == animation.Name then
+				track:Play()
+				return
+			end
+		end
+		animator:LoadAnimation(animation):Play(delay or 0.1)
+	end
+end)
+
+Events.RemoteEvents.StopAnimation.OnClientEvent:Connect(function(animation, character)
+	if not character or not character.Parent then return end
+	if workspace:GetAttribute("AnimDesyncEnabled") == true then task.wait(workspace:GetAttribute("AnimDesync")) end
+
+	local humanoid = AnimationController:GetHumanoid(character)
+	if not humanoid then return end
+
+	local animator = humanoid:FindFirstChildOfClass("Animator") or Instance.new("Animator", humanoid)
+	for _, track in animator:GetPlayingAnimationTracks() do
+		if track.Name == animation.Name then
+			track:Stop()
+			return
+		end
+	end
+end)
+
+function AnimationController:SetupDefaultCharacter(character)
+	if not self.Enabled then return end
+	if not character or not character.Parent then return end
+	if not character:FindFirstChild("Humanoid") then return end
+
+	local civilian = ReplicatedStorage:FindFirstChild("Characters") and 
+					ReplicatedStorage.Characters.Survivor:FindFirstChild("Civilian")
+	local defaultAnimations = civilian and civilian:FindFirstChild("Animations")
+
+	if defaultAnimations then
+		-- Remove existing animations folder
+		local existingAnimations = character:FindFirstChild("Animations")
+		if existingAnimations then
+			existingAnimations:Destroy()
+		end
+
+		-- Clone new animations
+		local newAnimations = defaultAnimations:Clone()
+		newAnimations.Parent = character
+
+		if character:FindFirstChild("HumanoidRootPart") then
+			character.PrimaryPart = character:WaitForChild("HumanoidRootPart")
+		end
+
+		-- Load animations from the new folder
+		self:LoadCharacterAnimations(character)
+		character:SetAttribute("WalkSpeed", 10)
+		character:SetAttribute("SprintSpeed", 26)
+	end
+end
+
+-- Update initial state
+AnimationController.Enabled = workspace:GetAttribute("AnimationsEnabled")
+
+-- Player character handling
+local localPlayer = Players.LocalPlayer
+
+localPlayer.CharacterAdded:Connect(function(character)
+	task.wait(1)
+	if AnimationController.Enabled then
+		if character:FindFirstChild("Animations") then
+			AnimationController:LoadCharacterAnimations(character)
+		else
+			AnimationController:SetupDefaultCharacter(character)
+		end
+	end
+end)
+
+localPlayer.CharacterRemoving:Connect(function(character)
+	AnimationController:CleanupCharacter(character)
+end)
+
+task.spawn(function()
+	if AnimationController.Enabled and localPlayer.Character then
+		AnimationController:SetupDefaultCharacter(localPlayer.Character)
+	end
+end)
+
+-- NPC handling
+local teamsFolder = workspace:WaitForChild("GameAssets"):WaitForChild("Teams")
+local otherTeam = teamsFolder:WaitForChild("Other")
+
+otherTeam.ChildAdded:Connect(function(npc)
+	if not AnimationController.Enabled then return end
+	if not npc:FindFirstChild("Humanoid") then return end
+	if not npc:FindFirstChild("Animations") then return end
+
+	local humanoid = npc:FindFirstChild("Humanoid")
+	if humanoid then
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics, false)
+		AnimationController:LoadCharacterAnimations(npc)
+	end
+end)
+
+-- Clean up when NPCs are removed
+otherTeam.ChildRemoved:Connect(function(npc)
+	AnimationController:CleanupCharacter(npc)
+end)
+
+-- Periodic cleanup of invalid characters
+game:GetService("RunService").Heartbeat:Connect(function()
+	for character, _ in pairs(AnimationController.CharacterAnimators) do
+		if not character or not character.Parent or not character:IsDescendantOf(workspace) then
+			AnimationController:CleanupCharacter(character)
+		end
+	end
+end)]]
+if workspace:GetAttribute("AnimationsEnabled") == nil and game:GetService("Players").LocalPlayer.PlayerScripts:FindFirstChild("ClientAnimations") then
+game:GetService("Players").LocalPlayer.PlayerScripts.ClientAnimations:Destroy()
+task.wait()
+loadstring(AnimationsModule)()
+end
 
 
 
@@ -1793,31 +2288,21 @@ end
 end)
 end
 
-local AnimsScriptLoaded = nil
-pcall(function()
-AnimsScriptLoaded = LocalPlayer.PlayerScripts:FindFirstChild("ClientAnimations")
-end)
 function ApplyNewAnimations()
 pcall(function()
-Character.Animate.Disabled = true
+workspace:SetAttribute("AnimationsEnabled", false)
 task.wait()
-Character.Animate.Disabled = false
-end)
-task.wait()
-pcall(function()
-AnimsScriptLoaded.Disabled = true
-task.wait()
-AnimsScriptLoaded.Disabled = false
+workspace:SetAttribute("AnimationsEnabled", true)
 end)
 end
 
 
 
-
-if AnimsScriptLoaded == nil then
+task.wait()
+if workspace:GetAttribute("AnimationsEnabled") == nil then
 Tab_6:CreateParagraph({Title = "Not Supported", Content = "clientscript not found"})
 end
-if AnimsScriptLoaded ~= nil then
+if workspace:GetAttribute("AnimationsEnabled") ~= nil then
 Tab_6:CreateParagraph({Title = "Animations", Content = "You can change your anims here."})
 Tab_6:CreateSection("Pre-loaded animations")
 Tab_6:CreateLabel("Civilian animations")
@@ -2056,10 +2541,17 @@ end; })
 
 Tab_6:CreateSection("Miscellaneous")
 
+Tab_6:CreateInput({Name = "Desync in seconds"; PlaceholderText = "1"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+workspace:SetAttribute("AnimDesync", tonumber(Value))
+end; })
+
+Tab_6:CreateToggle({Name = "Animations Desync"; CurrentValue = false; Callback = function(Value)
+workspace:SetAttribute("AnimDesyncEnabled", Value)
+end; })
 
 Tab_6:CreateButton({Name = "No animations [ Apply any animation to revert! ]"; Callback = function()
 pcall(function()
-LocalPlayer.PlayerScripts.ClientAnimations.Disabled = true
+workspace:SetAttribute("AnimationsEnabled", false)
 end)
 end; })
 
@@ -2074,6 +2566,7 @@ end
 end)
 end; })
 end
+
 
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
@@ -2094,7 +2587,6 @@ end
 local PremiumPrice = GetAssetPrice(1264479709) or 39
 -- YOU CAN GET PREMIUM FOR FREE BY ENTERING A KEY
 -- KEY IS IN MY DISCORD SERVER!!
--- THINK ABOUT IT, IS IT REALLY WORTH IT?
 local HavePremium = false
 if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(LocalPlayer.UserId, 1264479709) then
 HavePremium = true
@@ -2134,9 +2626,9 @@ setclipboard(tostring("https://discord.gg/7u5GRNw3xn"))
 Notify("Success!", "Copied Link!", 3, true)
 end; })
 
-Tab_7:CreateInput({Name = "Input Key"; PlaceholderText = "Type Here!"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = true; Callback = function(Value)
+Tab_7:CreateInput({Name = "Input Key"; PlaceholderText = "Type Here!"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 local key = MainModule:GetKey()
-if tostring(Value) == tostring(key) then
+if string.lower(string.gsub(tostring(Value), "^%s*(.-)%s*$", "%1")) == tostring(key) then
 HavePremium = true
 Notify("Success!", "Redeemed key, enjoy your premium!", 5, true)
 end
@@ -2182,24 +2674,6 @@ LP.CharacterAdded:Connect(function(newChar)
 wait(0.1)
 setupCharacter(newChar)
 end)
-
-Tab_7:CreateToggle({
-Name = "Anti-Stun",
-CurrentValue = false,
-Callback = function(Value)
-antiStun = Value
-if antiStun then
-local char = LP.Character or LP.CharacterAdded:Wait()
-setupCharacter(char)
-Notify("Success!", "Anti-Stun is now enabled!", 2, true)
-else
-if AntiSlowDown then
-AntiSlowDown:Disconnect()
-AntiSlowDown = nil
-end
-end
-end; })
-
 
 
 
