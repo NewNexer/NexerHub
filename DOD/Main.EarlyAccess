@@ -7,7 +7,6 @@ end
 local asset_counter = 0
 local temp_msg = Instance.new("Message",game.CoreGui)
 
--- Functions were created fully by me. No AI contributions.
 local Execute = function(f, ...) return function(f, ...) return task.spawn(f, ...) end end
 local HaveWorkspaceAccess = function() if isfile and writefile and readfile and isfolder and makefolder and (getcustomasset or get_custom_asset) then return true end return false end
 local CreateFile = function(f,c) writefile(f,c) end
