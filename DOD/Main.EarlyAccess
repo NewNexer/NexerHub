@@ -17,6 +17,34 @@ local InsertElement = function(tf, element) local temp_table = loadstring(tostri
 local RemoveElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); for i,v in pairs(temp_table) do if v == element then temp_table[i]=nil end end; CreateFile(tf, TableToLuauString(temp_table,false)) end
 --local InsertElement_test = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); temp_table[element] = value; CreateFile(tf, TableToLuauString(temp_table,false)) end
 
+if not isfolder("NexerHub") then
+makefolder("NexerHub")
+repeat task.wait() until isfolder("NexerHub")
+end
+if not isfolder("NexerHub/Core") then
+makefolder("NexerHub/Core")
+repeat task.wait() until isfolder("NexerHub/Core")
+end
+if not isfile("NexerHub/Core/DOD_config.luau") then
+writefile("NexerHub/Core/DOD_config.luau", [[return {
+	["Tab_1"] = {["Bind"]="None";};
+	["Tab_2"] = {};
+	["Tab_3"] = {};
+	["Tab_4"] = {};
+	["Tab_5"] = {};
+	["Tab_6"] = {};
+	["Tab_7"] = {};
+	["Tab_8"] = {};
+	["Tab_9"] = {};
+	["Tab_10"] = {};
+	["Tab_11"] = {};
+	["Tab_12"] = {};
+}]])
+repeat task.wait() until isfile("NexerHub/Core/DOD_config.luau")
+end
+local SaveConfig = function(tab,value,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/DOD_config.luau","rf")))(); if not element_2 then temp_table[tab][element_1] = value elseif not element_3 then temp_table[tab][element_1][element_2] = value else temp_table[tab][element_1][element_2][element_3] = value end CreateFile("NexerHub/Core/DOD_config.luau", TableToLuauString(temp_table,true)) end
+
+
 Instance.new("Folder",game:GetService("CoreGui")).Name = "DOD_Assets"
 function XenoClear()
 local a = game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Leaderstats
@@ -143,9 +171,6 @@ end
 if isfolder("NexerHub") and isfolder("NexerHub/DieOfDeath") and isfolder("NexerHub/DieOfDeath/Assets") and not isfolder("NexerHub/DieOfDeath/Assets/Chases") then
 makefolder("NexerHub/DieOfDeath/Assets/Chases")
 end
-end
-if not isfolder("NexerHub/Core") then
-makefolder("NexerHub/Core")
 end
 asset_counter = 6
 temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/25)"
@@ -521,7 +546,7 @@ AutoInjectStamina = Value
 end; })
 
 Tab_1:CreateInput({Name = "Max Stamina"; PlaceholderText = "Type Here!"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-AI_MaxStamina = Value
+AI_MaxStamina = tonumber(Value)
 end; })
 
 Tab_1:CreateInput({Name = "Walk Speed"; PlaceholderText = "Type Here!"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
@@ -990,11 +1015,28 @@ end)
 
 local Tab_3 = Window:CreateTab("Civilian",0)
 Tab_3:CreateParagraph({Title = "Abilities", Content = "You can give yourself abilities or cards with abilities."})
-Tab_3:CreateSection("Get Ability")
+Tab_3:CreateSection("Fast Functions")
+Tab_3:CreateButton({Name = "Get All Abilities"; Callback = function()
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(unpack({{tostring(AbilityNames[math.random(1, 11)]);tostring(AbilityNames[math.random(1, 11)]);}}))
+for _,ability in pairs(AbilityNames) do
+local temp_table = table.clone(AbilityDatas[ability])
+pcall(function()
+temp_table.InputShown = (InputBind ~= "None" and InputBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (InputBind ~= "None" and InputBind) or ""
+end)
+AbilityModule.CreateAbility(temp_table)
+end
+end; })
+
+Tab_3:CreateSection("Main Configuration")
 local InputBind = "None"
 Tab_3:CreateInput({Name = "Ability Keybind"; PlaceholderText = "None"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 InputBind = tostring(Value)
 end; })
+
+Tab_3:CreateSection("Abilities")
 local ChoosenAbility = "Block"
 Tab_3:CreateDropdown({Name = "Choose Ability"; Options = AbilityNames; CurrentOption = "Block"; MultiSelection = false; Callback = function(Value)
 ChoosenAbility = ConvertDropdownValue(Value)
@@ -1008,20 +1050,6 @@ pcall(function()
 temp_table.InputShown = (InputBind ~= "None" and InputBind) or ""
 end)
 AbilityModule.CreateAbility(temp_table)
-end; })
-
-Tab_3:CreateButton({Name = "Get All Abilities"; Callback = function()
-game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(unpack({{tostring(AbilityNames[math.random(1, 11)]);tostring(AbilityNames[math.random(1, 11)]);}}))
-for _,ability in pairs(AbilityNames) do
-local temp_table = table.clone(AbilityDatas[ability])
-pcall(function()
-temp_table.InputShown = (InputBind ~= "None" and InputBind.Name) or ""
-end)
-pcall(function()
-temp_table.InputShown = (InputBind ~= "None" and InputBind) or ""
-end)
-AbilityModule.CreateAbility(temp_table)
-end
 end; })
 
 Tab_3:CreateSection("Get Cards")
