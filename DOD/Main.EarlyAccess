@@ -2635,7 +2635,22 @@ wait(0.1)
 setupCharacter(newChar)
 end)
 
-
+Tab_7:CreateToggle({
+Name = "Anti-Stun",
+CurrentValue = false,
+Callback = function(Value)
+antiStun = Value
+if antiStun then
+local char = LP.Character or LP.CharacterAdded:Wait()
+setupCharacter(char)
+Notify("Success!", "Anti-Stun is now enabled!", 2, true)
+else
+if AntiSlowDown then
+AntiSlowDown:Disconnect()
+AntiSlowDown = nil
+end
+end
+end; })
 
 
 ----------------------------
