@@ -17,6 +17,7 @@ local InsertElement = function(tf, element) local temp_table = loadstring(tostri
 local RemoveElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); for i,v in pairs(temp_table) do if v == element then temp_table[i]=nil end end; CreateFile(tf, TableToLuauString(temp_table,false)) end
 --local InsertElement_test = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); temp_table[element] = value; CreateFile(tf, TableToLuauString(temp_table,false)) end
 
+local config_save = "DOD_config_ea.luau"
 if not isfolder("NexerHub") then
 makefolder("NexerHub")
 repeat task.wait() until isfolder("NexerHub")
@@ -25,24 +26,84 @@ if not isfolder("NexerHub/Core") then
 makefolder("NexerHub/Core")
 repeat task.wait() until isfolder("NexerHub/Core")
 end
-if not isfile("NexerHub/Core/DOD_config.luau") then
-writefile("NexerHub/Core/DOD_config.luau", [[return {
-	["Tab_1"] = {["Bind"]="None";};
-	["Tab_2"] = {};
-	["Tab_3"] = {};
-	["Tab_4"] = {};
-	["Tab_5"] = {};
-	["Tab_6"] = {};
-	["Tab_7"] = {};
-	["Tab_8"] = {};
-	["Tab_9"] = {};
-	["Tab_10"] = {};
-	["Tab_11"] = {};
-	["Tab_12"] = {};
+if not isfile("NexerHub/Core/"..config_save.."") then
+writefile("NexerHub/Core/"..config_save.."", [[return {
+    ["Tab_1"] = {
+        ["AutoInjection"] = {
+            ["MaxStamina"] = "Type Here!",
+            ["WalkSpeed"] = "Type Here!",
+            ["SprintSpeed"] = "Type Here!"
+        }
+    },
+    ["Tab_2"] = {},
+    ["Tab_3"] = {
+        ["Bind"] = "None",
+        ["FastFunctions"] = {
+            ["ChoosenAbility"] = "Cloak"
+        },
+        ["CloakConfig"] = {
+            ["Bind"] = "None",
+            ["ClientCooldown"] = 40
+        },
+        ["PunchConfig"] = {
+            ["Bind"] = "None",
+            ["ClientCooldown"] = 40
+        },
+        ["TauntConfig"] = {
+            ["Bind"] = "None",
+            ["ClientCooldown"] = 25
+        },
+        ["BonusPadConfig"] = {
+            ["Bind"] = "None",
+            ["ClientCooldown"] = 60
+        },
+        ["BlockConfig"] = {
+            ["Bind"] = "None",
+            ["ClientCooldown"] = 40
+        },
+        ["CaretakerConfig"] = {
+            ["Bind"] = "None",
+            ["ClientCooldown"] = 30
+        },
+        ["DashConfig"] = {
+            ["Bind"] = "None",
+            ["ClientCooldown"] = 20,
+            ["Power"] = 1250,
+            ["MaxForce"] = 30000,
+            ["Duration"] = 0.3
+        },
+        ["HotdogConfig"] = {
+            ["Bind"] = "None",
+            ["ClientCooldown"] = 25,
+            ["StaminaLoss"] = 5
+        },
+        ["RevolverConfig"] = {
+            ["Bind"] = "None",
+            ["ClientCooldown"] = 15
+        },
+        ["AdrenalineConfig"] = {
+            ["Bind"] = "None",
+            ["ClientCooldown"] = 35
+        },
+        ["BananaConfig"] = {
+            ["Bind"] = "None",
+            ["ClientCooldown"] = 20
+        }
+    },
+    ["Tab_4"] = {},
+    ["Tab_5"] = {},
+    ["Tab_6"] = {},
+    ["Tab_7"] = {},
+    ["Tab_8"] = {},
+    ["Tab_9"] = {},
+    ["Tab_10"] = {},
+    ["Tab_11"] = {},
+    ["Tab_12"] = {}
 }]])
-repeat task.wait() until isfile("NexerHub/Core/DOD_config.luau")
+repeat task.wait() until isfile("NexerHub/Core/"..config_save.."")
 end
-local SaveConfig = function(tab,value,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/DOD_config.luau","rf")))(); if not element_2 then temp_table[tab][element_1] = value elseif not element_3 then temp_table[tab][element_1][element_2] = value else temp_table[tab][element_1][element_2][element_3] = value end CreateFile("NexerHub/Core/DOD_config.luau", TableToLuauString(temp_table,true)) end
+local SaveConfig = function(tab,value,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); if not element_2 then temp_table[tab][element_1] = value elseif not element_3 then temp_table[tab][element_1][element_2] = value else temp_table[tab][element_1][element_2][element_3] = value end CreateFile("NexerHub/Core/"..config_save.."", TableToLuauString(temp_table,true)) end
+local LoadConfig = function(tab,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); if not element_2 then return temp_table[tab][element_1] elseif not element_3 then return temp_table[tab][element_1][element_2] else return temp_table[tab][element_1][element_2][element_3] end end
 
 
 Instance.new("Folder",game:GetService("CoreGui")).Name = "DOD_Assets"
@@ -842,20 +903,20 @@ end; })
 
 
 
-local AbilityNames = {"Cloak","Punch","Taunt","BonusPad","Block","Caretaker","Dash","Hotdog","Revolver","Adrenaline","Banana","Nothing"}
+local AbilityNames = {"Cloak","Punch","Taunt","BonusPad","Block","Caretaker","Dash","Hotdog","Revolver","Adrenaline","Banana"}
 
 local AbilityDatas = {
-    ["Adrenaline"] = {Name = "Adrenaline",InputShown = "",Tip = "Get a temporary speed boost for 6 seconds, highlighting you to your teamates and slowing you down after it\'s over.",Cooldown = 35,Icon = "rbxassetid://116399911657417",DisplayName = "Adrenaline"};
-    ["Punch"] = {Name = "Punch",InputShown = "",Tip = "Swing foward stunning any killers hit for 3 seconds, if missed you\'ll get severe endlag.",Cooldown = 40,Icon = "rbxassetid://97428323453639",DisplayName = "Punch"};
-    ["Caretaker"] = {Name = "Caretaker",InputShown = "",Tip = "Splash a potion infront of you, any survivors hit will heal 20 HP in total. Having this ability makes you lose 75 max health though!",Cooldown = 30,Icon = "rbxassetid://90712805517714",DisplayName = "Caretaker"};
-    ["Cloak"] = {Name = "Cloak",InputShown = "",Tip = "Becoming heavily slowed but invisible for a short amount of time, Killers can still hit you though!",Cooldown = 50,Icon = "rbxassetid://90476367580326",DisplayName = "Cloak"};
-    ["Block"] = {Name = "Block",InputShown = "",Tip = "Try blocking any form of damage, if successful heal 10 HP, get a speed boost and negate all the damage.",Cooldown = 40,Icon = "rbxassetid://120929805037270",DisplayName = "Block"};
-    ["Dash"] = {Name = "Dash",InputShown = "",Tip = "Dash foward, after you will get fatigue for 2 seconds which slows stamina regeneration and makes it drain faster.",Cooldown = 20,Icon = "rbxassetid://73777691791017",DisplayName = "Dash"};
-    ["BonusPad"] = {Name = "BonusPad",InputShown = "",Tip = "Build a temporary speed pad that speeds up any survivor who steps on it. Having this ability makes you lose 10 max health though!",Cooldown = 70,Icon = "rbxassetid://86775625332300",DisplayName = "BonusPad"};
-    ["Hotdog"] = {Name = "Hotdog",InputShown = "",Tip = "Eat a hotdog, healing 15 HP at the cost of 10 stamina.",Cooldown = 15,Icon = "rbxassetid://134322360499381",DisplayName = "Hotdog"};
-    ["Revolver"] = {Name = "Revolver",InputShown = "",Tip = "Shoot with your revolver stunning any killers hit for 2 seconds, you\'ll have to reload after. Having this ability makes you lose 20 max stamina though!",Cooldown = 15,Icon = "rbxassetid://107624957891469",DisplayName = "Revolver"};
-    ["Taunt"] = {Name = "Taunt",InputShown = "",Tip = "Taunt the killer gaining a forcefield, highlighting the killer, and slowing them down for 5 seconds or until you\'re hit for the duration of the effect (1.25x damage).",Cooldown = 25,Icon = "rbxassetid://85436299122876",DisplayName = "Taunt"};
-    ["Banana"] = {Name = "Banana",InputShown = "",Tip = "Toss a banana onto the floor, if the killer or the civilian who made it touch the banana, they will slip and be briefly stunned, the banana will naturally decay over time.",Cooldown = 20,Icon = "rbxassetid://96202444819611",DisplayName = "Banana Peel"};
+    ["Adrenaline"] = {Name = "Adrenaline",InputShown = "",Tip = "Get a massive speed boost for 6 seconds, once the 6 seconds are over you will be given Exhaust and stunned briefly while also revealing your location to teammates for the duration.",Cooldown = 35,Icon = "rbxassetid://116399911657417",DisplayName = "Adrenaline",Noise = "Causes 3 noise upon the first use, and 2 noise once the ability ends."};
+    ["Punch"] = {Name = "Punch",InputShown = "",Tip = "Take a moment to swing forward and stun the killer for 3 seconds if landed, dealing 25 damage. Missing will result with heavy end-lag.",Cooldown = 40,Icon = "rbxassetid://97428323453639",DisplayName = "Punch",Noise = "Causes 2 noise upon use, and 3 noise if landed."};
+    ["Caretaker"] = {Name = "Caretaker",InputShown = "",Tip = "Splash a potion in front of you and heal anyone for 10 HP instantly, and another 10 overtime. This ability lowers Max HP by 25.",Cooldown = 30,Icon = "rbxassetid://90712805517714",DisplayName = "Caretaker",Noise = "Causes 1 noise upon use."};
+    ["Cloak"] = {Name = "Cloak",InputShown = "",Tip = "Go invisible over the span of 1.5 seconds and stay invisible for 10 seconds, being given Exhaust for its duration. At the end of the invisibility, take another second to fully turn visible again. Being hit while invisible forces you to turn visible again.",Cooldown = 40,Icon = "rbxassetid://90476367580326",DisplayName = "Cloak",Noise = "Causes no noise upon use."};
+    ["Block"] = {Name = "Block",InputShown = "",Tip = "Raise your arm up and get in a blocking stance for 2 seconds, getting hit by (mostly) anything will grant a speed boost and regen 10 HP, also locking killer abilities for a second.",Cooldown = 40,Icon = "rbxassetid://120929805037270",DisplayName = "Block",Noise = "Causes 1 noise upon use, and 5 noise if landed."};
+    ["Dash"] = {Name = "Dash",InputShown = "",Tip = "Dash a great distance forward and drain 35 SP. Can be used even below 35 SP.",Cooldown = 20,Icon = "rbxassetid://73777691791017",DisplayName = "Dash",Noise = "Causes 1 noise upon use."};
+    ["BonusPad"] = {Name = "BonusPad",InputShown = "",Tip = "Build a pad on the floor over the span of 5 seconds, stepping on the pad will grant a speed boost for 2 seconds. After 50 seconds, the pad will disappear. This ability lowers your Max HP by 10.",Cooldown = 60,Icon = "rbxassetid://86775625332300",DisplayName = "BonusPad",Noise = "Causes 6 noise upon use. Additionally causes 1 noise every time someone steps on a pad."};
+    ["Hotdog"] = {Name = "Hotdog",InputShown = "",Tip = "Take out a delicious hotdog and eat it over the span of 3 seconds and be given an additional 5 max HP and 15 HP, at the cost of -5 SP. The max HP bonus caps at 125.",Cooldown = 25,Icon = "rbxassetid://134322360499381",DisplayName = "Hotdog",Noise = "Causes 5 noise upon use."};
+    ["Revolver"] = {Name = "Revolver",InputShown = "",Tip = "Stand still and fire your revolver forwards, shoot out a projectile with an explosive AOE, stunning for 2 seconds and dealing 50 damage. After firing you need to reload your revolver in order to shoot it again. This ability lowers SP by 10.",Cooldown = 15,Icon = "rbxassetid://107624957891469",DisplayName = "Revolver",Noise = "Causes 4 noise upon use, 5 noise if landed. And 2 noise on reload."};
+    ["Taunt"] = {Name = "Taunt",InputShown = "",Tip = "Taunt the killer at close range with a hitbox that slowly gets larger. Successfully taunting the killer will highlight them to everyone and cover their screen, and also give you damage immunity for a bit. Missing embarrasses you to everyone.",Cooldown = 25,Icon = "rbxassetid://85436299122876",DisplayName = "Taunt",Noise = "Causes 6 noise upon use, and 2 noise if landed. 2 noise is also done on miss."};
+    ["Banana"] = {Name = "Banana",InputShown = "",Tip = "Shoot a banana peel onto the floor, if the civilian who placed it or the killer steps on it, they'll be ragdolled for 2 seconds. The banana will decay over the span of 25 seconds.",Cooldown = 20,Icon = "rbxassetid://96202444819611",DisplayName = "Banana Peel",Noise = "Causes 2 noise upon use, and 2 noise if someone slips on the banana peel."};
 }
 
 pcall(function()
@@ -886,34 +947,12 @@ local AbilitySystem = {
     PreferredInput = UserInputService.PreferredInput
 }
 
-function AbilitySystem.CreateAbility(AbilityData, IsExtraAbility)
+function AbilitySystem.CreateAbility(AbilityData)
     if AbilitiesFolder:FindFirstChild(AbilityData.Name) then return end
     
     local AbilityButton = script.AbilityTemplate:Clone()
-    
-    if AbilitySystem.PreferredInput == Enum.PreferredInput.Gamepad then
-        AbilitySystem.Input1 = "X"
-        AbilitySystem.Input2 = "Y" 
-        AbilitySystem.Input3 = "B"
-        AbilitySystem.Input4 = "A"
-        AbilitySystem.Input5 = "R2"
-    end
-    
-    local InputKey = AbilitySystem.Input1
-    if IsExtraAbility then
-        local AbilityCount = #AbilitiesFolder:GetChildren()
-        if AbilityCount <= 1 then
-            InputKey = AbilitySystem.Input1
-        elseif AbilityCount == 2 then
-            InputKey = AbilitySystem.Input2
-        elseif AbilityCount == 3 then
-            InputKey = AbilitySystem.Input3
-        else
-            InputKey = AbilitySystem.Input4
-        end
-    else
-        InputKey = AbilitySystem[AbilityData.InputShown] or AbilityData.InputShown
-    end
+
+    local InputKey = AbilitySystem[AbilityData.InputShown] or AbilityData.InputShown
     
     AbilityButton.Parent = AbilitiesFolder
     AbilityButton.Name = AbilityData.Name
@@ -992,7 +1031,7 @@ function AbilitySystem.UseAbility(AbilityData, AbilityButton)
     if Success then
         AbilitySystem.AbilityTween(AbilityButton)
         if Success ~= "MultipleUse" then
-            AbilitySystem.PutOnCooldown(AbilityButton, Cooldown or AbilityData.Cooldown)
+            AbilitySystem.PutOnCooldown(AbilityButton, AbilityData.Cooldown or Cooldown)
         end
     end
 end
@@ -1015,7 +1054,26 @@ end)
 
 local Tab_3 = Window:CreateTab("Civilian",0)
 Tab_3:CreateParagraph({Title = "Abilities", Content = "You can give yourself abilities or cards with abilities."})
+
 Tab_3:CreateSection("Fast Functions")
+local InputBind = LoadConfig("Tab_3", "Bind")
+Tab_3:CreateInput({Name = "Ability Keybind"; PlaceholderText = InputBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+InputBind = tostring(Value)
+end; })
+local ChoosenAbility = LoadConfig("Tab_3", "FastFunctions", "ChoosenAbility")
+Tab_3:CreateDropdown({Name = "Choose Ability"; Options = AbilityNames; CurrentOption = ChoosenAbility; MultiSelection = false; Callback = function(Value)
+ChoosenAbility = ConvertDropdownValue(Value)
+end; })
+Tab_3:CreateButton({Name = "Get Choosen Ability"; Callback = function()
+local temp_table = table.clone(AbilityDatas[ChoosenAbility])
+pcall(function()
+temp_table.InputShown = (InputBind ~= "None" and InputBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (InputBind ~= "None" and InputBind) or ""
+end)
+AbilityModule.CreateAbility(temp_table)
+end; })
 Tab_3:CreateButton({Name = "Get All Abilities"; Callback = function()
 game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(unpack({{tostring(AbilityNames[math.random(1, 11)]);tostring(AbilityNames[math.random(1, 11)]);}}))
 for _,ability in pairs(AbilityNames) do
@@ -1030,27 +1088,355 @@ AbilityModule.CreateAbility(temp_table)
 end
 end; })
 
-Tab_3:CreateSection("Main Configuration")
-local InputBind = "None"
-Tab_3:CreateInput({Name = "Ability Keybind"; PlaceholderText = "None"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-InputBind = tostring(Value)
-end; })
-
 Tab_3:CreateSection("Abilities")
-local ChoosenAbility = "Block"
-Tab_3:CreateDropdown({Name = "Choose Ability"; Options = AbilityNames; CurrentOption = "Block"; MultiSelection = false; Callback = function(Value)
-ChoosenAbility = ConvertDropdownValue(Value)
+
+--[[
+Taunt
+]]--
+local TauntConfig = LoadConfig("Tab_3", "TauntConfig")
+Tab_3:CreateLabel("Taunt Ability")
+local TauntBind = TauntConfig.Bind
+Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = TauntBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+TauntBind = tostring(Value)
 end; })
-Tab_3:CreateButton({Name = "Get Choosen Ability"; Callback = function()
-local temp_table = table.clone(AbilityDatas[ChoosenAbility])
+local TauntCooldown = TauntConfig.ClientCooldown
+Tab_3:CreateInput({Name = "Client Cooldown"; PlaceholderText = TauntCooldown; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+TauntCooldown = tonumber(Value)
+end; })
+Tab_3:CreateButton({Name = "Get Taunt"; Callback = function()
+local temp_table = table.clone(AbilityDatas["Taunt"])
+temp_table.Cooldown = TauntCooldown
 pcall(function()
-temp_table.InputShown = (InputBind ~= "None" and InputBind.Name) or ""
+temp_table.InputShown = (TauntBind ~= "None" and TauntBind.Name) or ""
 end)
 pcall(function()
-temp_table.InputShown = (InputBind ~= "None" and InputBind) or ""
+temp_table.InputShown = (TauntBind ~= "None" and TauntBind) or ""
 end)
 AbilityModule.CreateAbility(temp_table)
 end; })
+
+--[[
+Punch
+]]--
+local PunchConfig = LoadConfig("Tab_3", "PunchConfig")
+Tab_3:CreateLabel("Punch Ability")
+local PunchBind = PunchConfig.Bind
+Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = PunchBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+PunchBind = tostring(Value)
+end; })
+local PunchCooldown = PunchConfig.ClientCooldown
+Tab_3:CreateInput({Name = "Client Cooldown"; PlaceholderText = PunchCooldown; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+PunchCooldown = tonumber(Value)
+end; })
+Tab_3:CreateButton({Name = "Get Punch"; Callback = function()
+local temp_table = table.clone(AbilityDatas["Punch"])
+temp_table.Cooldown = PunchCooldown
+pcall(function()
+temp_table.InputShown = (PunchBind ~= "None" and PunchBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (PunchBind ~= "None" and PunchBind) or ""
+end)
+AbilityModule.CreateAbility(temp_table)
+end; })
+
+--[[
+Revolver
+]]--
+local RevolverConfig = LoadConfig("Tab_3", "RevolverConfig")
+Tab_3:CreateLabel("Revolver Ability")
+local RevolverBind = RevolverConfig.Bind
+Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = RevolverBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+RevolverBind = tostring(Value)
+end; })
+local RevolverCooldown = RevolverConfig.ClientCooldown
+Tab_3:CreateInput({Name = "Client Cooldown"; PlaceholderText = RevolverCooldown; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+RevolverCooldown = tonumber(Value)
+end; })
+Tab_3:CreateButton({Name = "Get Revolver"; Callback = function()
+local temp_table = table.clone(AbilityDatas["Revolver"])
+temp_table.Cooldown = RevolverCooldown
+pcall(function()
+temp_table.InputShown = (RevolverBind ~= "None" and RevolverBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (RevolverBind ~= "None" and RevolverBind) or ""
+end)
+AbilityModule.CreateAbility(temp_table)
+end; })
+
+--[[
+Caretaker
+]]--
+local CaretakerConfig = LoadConfig("Tab_3", "CaretakerConfig")
+Tab_3:CreateLabel("Caretaker Ability")
+local CaretakerBind = CaretakerConfig.Bind
+Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = CaretakerBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+CaretakerBind = tostring(Value)
+end; })
+local CaretakerCooldown = CaretakerConfig.ClientCooldown
+Tab_3:CreateInput({Name = "Client Cooldown"; PlaceholderText = CaretakerCooldown; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+CaretakerCooldown = tonumber(Value)
+end; })
+Tab_3:CreateButton({Name = "Get Caretaker"; Callback = function()
+local temp_table = table.clone(AbilityDatas["Caretaker"])
+temp_table.Cooldown = CaretakerCooldown
+pcall(function()
+temp_table.InputShown = (CaretakerBind ~= "None" and CaretakerBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (CaretakerBind ~= "None" and CaretakerBind) or ""
+end)
+AbilityModule.CreateAbility(temp_table)
+end; })
+
+--[[
+Banana
+]]--
+local BananaConfig = LoadConfig("Tab_3", "BananaConfig")
+Tab_3:CreateLabel("Banana Ability")
+local BananaBind = BananaConfig.Bind
+Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = BananaBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+BananaBind = tostring(Value)
+end; })
+local BananaCooldown = BananaConfig.ClientCooldown
+Tab_3:CreateInput({Name = "Client Cooldown"; PlaceholderText = BananaCooldown; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+BananaCooldown = tonumber(Value)
+end; })
+Tab_3:CreateButton({Name = "Get Banana"; Callback = function()
+local temp_table = table.clone(AbilityDatas["Banana"])
+temp_table.Cooldown = BananaCooldown
+pcall(function()
+temp_table.InputShown = (BananaBind ~= "None" and BananaBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (BananaBind ~= "None" and BananaBind) or ""
+end)
+AbilityModule.CreateAbility(temp_table)
+end; })
+
+--[[
+Dash
+]]--
+local DashConfig = LoadConfig("Tab_3", "DashConfig")
+Tab_3:CreateLabel("Dash Ability")
+local DashBind = DashConfig.Bind
+Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = DashBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+DashBind = tostring(Value)
+end; })
+local DashCooldown = DashConfig.ClientCooldown
+Tab_3:CreateInput({Name = "Client Cooldown"; PlaceholderText = DashCooldown; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+DashCooldown = tonumber(Value)
+end; })
+local DashPower = DashConfig.Power
+Tab_3:CreateInput({Name = "Power"; PlaceholderText = DashPower; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+DashPower = tonumber(Value)
+end; })
+local DashMaxForce = DashConfig.MaxForce
+Tab_3:CreateInput({Name = "Max Force"; PlaceholderText = DashMaxForce; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+DashMaxForce = tonumber(Value)
+end; })
+local DashDuration = DashConfig.Duration
+Tab_3:CreateInput({Name = "Duration"; PlaceholderText = DashDuration; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+DashDuration = tonumber(Value)
+end; })
+--------------------------------------------------------------------------------------
+local DashConfigEffects = nil
+function ApplyDashConfigurations()
+if not HumanoidRootPart then return end
+if DashConfigEffects then
+DashConfigEffects:Disconnect()
+DashConfigEffects = nil
+end
+if not (DashDuration > 0.3) then
+DashConfigEffects = HumanoidRootPart.ChildAdded:Connect(function(c)
+if c.Name == "BodyVelocity" then
+c.MaxForce = Vector3.new(DashMaxForce,(DashMaxForce*0.1),DashMaxForce)
+c.P = DashPower
+game.Debris:AddItem(c, DashDuration)
+end
+end)
+elseif DashDuration > 0.3 then
+DashConfigEffects = HumanoidRootPart.ChildAdded:Connect(function(c)
+if c.Name == "BodyVelocity" then
+c:Destroy()
+local BodyVelocity = Instance.new("BodyVelocity")
+BodyVelocity.MaxForce = Vector3.new(DashMaxForce,(DashMaxForce*0.1),DashMaxForce)
+BodyVelocity.P = DashPower
+BodyVelocity.Velocity = HumanoidRootPart.CFrame.LookVector * 80
+BodyVelocity.Parent = HumanoidRootPart
+game.Debris:AddItem(BodyVelocity, DashDuration)
+end
+end)
+end
+end
+--------------------------------------------------------------------------------------
+Tab_3:CreateButton({Name = "Get Dash"; Callback = function()
+local temp_table = table.clone(AbilityDatas["Dash"])
+temp_table.Cooldown = DashCooldown
+pcall(function()
+temp_table.InputShown = (DashBind ~= "None" and DashBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (DashBind ~= "None" and DashBind) or ""
+end)
+AbilityModule.CreateAbility(temp_table)
+ApplyDashConfigurations()
+end; })
+
+--[[
+Hotdog
+]]--
+local HotdogConfig = LoadConfig("Tab_3", "HotdogConfig")
+Tab_3:CreateLabel("Hotdog Ability")
+local HotdogBind = HotdogConfig.Bind
+Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = HotdogBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+HotdogBind = tostring(Value)
+end; })
+local HotdogCooldown = HotdogConfig.ClientCooldown
+Tab_3:CreateInput({Name = "Client Cooldown"; PlaceholderText = HotdogCooldown; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+HotdogCooldown = tonumber(Value)
+end; })
+local HotdogStaminaLoss = HotdogConfig.StaminaLoss
+Tab_3:CreateInput({Name = "Stamina Loss per Hotdog"; PlaceholderText = HotdogStaminaLoss; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+HotdogStaminaLoss = tonumber(Value)
+end; })
+--------------------------------------------------------------------------------------
+local HotdogConfigEffects = nil
+function ApplyHotdogConfigurations()
+if not HumanoidRootPart then return end
+if HotdogStaminaLoss == 5 then return end
+if HotdogConfigEffects then
+HotdogConfigEffects:Disconnect()
+HotdogConfigEffects = nil
+end
+HotdogConfigEffects = HumanoidRootPart.Hotdog:GetPropertyChangedSignal("Playing"):Connect(function(c)
+if HumanoidRootPart.Hotdog.Playing == true then
+local OldMaxStamina = tonumber(Character:GetAttribute("MaxStamina"))
+if not OldMaxStamina then return end
+Character:GetAttributeChangedSignal("MaxStamina"):Once(function()
+Character:SetAttribute("MaxStamina", tonumber(OldMaxStamina-HotdogStaminaLoss))
+end)
+end
+end)
+end
+--------------------------------------------------------------------------------------
+Tab_3:CreateButton({Name = "Get Hotdog"; Callback = function()
+local temp_table = table.clone(AbilityDatas["Hotdog"])
+temp_table.Cooldown = HotdogCooldown
+pcall(function()
+temp_table.InputShown = (HotdogBind ~= "None" and HotdogBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (HotdogBind ~= "None" and HotdogBind) or ""
+end)
+AbilityModule.CreateAbility(temp_table)
+ApplyHotdogConfigurations()
+end; })
+
+--[[
+Block
+]]--
+local BlockConfig = LoadConfig("Tab_3", "BlockConfig")
+Tab_3:CreateLabel("Block Ability")
+local BlockBind = BlockConfig.Bind
+Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = BlockBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+BlockBind = tostring(Value)
+end; })
+local BlockCooldown = BlockConfig.ClientCooldown
+Tab_3:CreateInput({Name = "Client Cooldown"; PlaceholderText = BlockCooldown; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+BlockCooldown = tonumber(Value)
+end; })
+Tab_3:CreateButton({Name = "Get Block"; Callback = function()
+local temp_table = table.clone(AbilityDatas["Block"])
+temp_table.Cooldown = BlockCooldown
+pcall(function()
+temp_table.InputShown = (BlockBind ~= "None" and BlockBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (BlockBind ~= "None" and BlockBind) or ""
+end)
+AbilityModule.CreateAbility(temp_table)
+end; })
+
+--[[
+Adrenaline
+]]--
+local AdrenalineConfig = LoadConfig("Tab_3", "AdrenalineConfig")
+Tab_3:CreateLabel("Adrenaline Ability")
+local AdrenalineBind = AdrenalineConfig.Bind
+Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = AdrenalineBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+AdrenalineBind = tostring(Value)
+end; })
+local AdrenalineCooldown = AdrenalineConfig.ClientCooldown
+Tab_3:CreateInput({Name = "Client Cooldown"; PlaceholderText = AdrenalineCooldown; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+AdrenalineCooldown = tonumber(Value)
+end; })
+Tab_3:CreateButton({Name = "Get Adrenaline"; Callback = function()
+local temp_table = table.clone(AbilityDatas["Adrenaline"])
+temp_table.Cooldown = AdrenalineCooldown
+pcall(function()
+temp_table.InputShown = (AdrenalineBind ~= "None" and AdrenalineBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (AdrenalineBind ~= "None" and AdrenalineBind) or ""
+end)
+AbilityModule.CreateAbility(temp_table)
+end; })
+
+--[[
+BonusPad
+]]--
+local BonusPadConfig = LoadConfig("Tab_3", "BonusPadConfig")
+Tab_3:CreateLabel("BonusPad Ability")
+local BonusPadBind = BonusPadConfig.Bind
+Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = BonusPadBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+BonusPadBind = tostring(Value)
+end; })
+local BonusPadCooldown = BonusPadConfig.ClientCooldown
+Tab_3:CreateInput({Name = "Client Cooldown"; PlaceholderText = BonusPadCooldown; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+BonusPadCooldown = tonumber(Value)
+end; })
+Tab_3:CreateButton({Name = "Get BonusPad"; Callback = function()
+local temp_table = table.clone(AbilityDatas["BonusPad"])
+temp_table.Cooldown = BonusPadCooldown
+pcall(function()
+temp_table.InputShown = (BonusPadBind ~= "None" and BonusPadBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (BonusPadBind ~= "None" and BonusPadBind) or ""
+end)
+AbilityModule.CreateAbility(temp_table)
+end; })
+
+
+
+--[[
+Cloak
+]]--
+local CloakConfig = LoadConfig("Tab_3", "CloakConfig")
+Tab_3:CreateLabel("Cloak Ability")
+local CloakBind = CloakConfig.Bind
+Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = CloakBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+CloakBind = tostring(Value)
+end; })
+local CloakCooldown = CloakConfig.ClientCooldown
+Tab_3:CreateInput({Name = "Client Cooldown"; PlaceholderText = CloakCooldown; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+CloakCooldown = tonumber(Value)
+end; })
+Tab_3:CreateButton({Name = "Get Cloak"; Callback = function()
+local temp_table = table.clone(AbilityDatas["Cloak"])
+temp_table.Cooldown = CloakCooldown
+pcall(function()
+temp_table.InputShown = (CloakBind ~= "None" and CloakBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (CloakBind ~= "None" and CloakBind) or ""
+end)
+AbilityModule.CreateAbility(temp_table)
+end; })
+
+
 
 Tab_3:CreateSection("Get Cards")
 
