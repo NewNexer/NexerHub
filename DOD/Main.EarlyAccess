@@ -948,7 +948,7 @@ local AbilitySystem = {
 }
 
 function AbilitySystem.CreateAbility(AbilityData)
-    if AbilitiesFolder:FindFirstChild(AbilityData.Name) then return end
+    if AbilitiesFolder:FindFirstChild(AbilityData.Name) then AbilitiesFolder:FindFirstChild(AbilityData.Name):Destroy() task.wait() end
     
     local AbilityButton = script.AbilityTemplate:Clone()
 
@@ -1053,7 +1053,7 @@ end
 end)
 
 local Tab_3 = Window:CreateTab("Civilian",0)
-Tab_3:CreateParagraph({Title = "Abilities", Content = "You can give yourself abilities or cards with abilities."})
+Tab_3:CreateParagraph({Title = "Abilities", Content = "You can give yourself abilities or cards with abilities. If you gave yourself an ability you already had, the old ability will be replaced with new settings."})
 
 Tab_3:CreateSection("Fast Functions")
 local InputBind = LoadConfig("Tab_3", "Bind")
@@ -3865,6 +3865,11 @@ if HaveWorkspaceAccess() then
 local LMSes_Backup = game:GetService("ReplicatedStorage").Sounds.Songs.LMSSongs:Clone()
 LMSes_Backup.Name = "LMSSongs"
 LMSes_Backup.Parent = game.CoreGui.DOD_Assets
+for i,v in next, LMSes_Backup:GetDescendants() do
+if v and v:IsA("Sound") and v.Playing == true then
+v.Playing = false
+end
+end
 
 Tab_10:CreateParagraph({Title = "Audio", Content = "Audio Management ( Mostly LMS and chases )"})
 Tab_10:CreateSection("Custom LMS")
@@ -3908,7 +3913,7 @@ Tab_10:CreateSlider({Name = "LMS Volume ( Restore Normal LMS to Reset )"; Range 
 for i,v in next, game:GetService("ReplicatedStorage").Sounds.Songs.LMSSongs:GetChildren() do
 if v and v:IsA("Sound") then
 local temp_volume = tonumber(Value)
-v:GetAttributeChangedSignal("Volume"):Connect(function()
+v:GetPropertyChangedSignal("Volume"):Connect(function()
 v.Volume = temp_volume
 end)
 v.Volume = temp_volume
@@ -3984,7 +3989,7 @@ Tab_10:CreateSlider({Name = "Chase Themes Volume"; Range = {0, 10}; Increment = 
 for i,v in next, workspace:WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):GetDescendants() do
 if v and v:IsA("Sound") and v.Name == "ChaseTheme" then
 local temp_volume = tonumber(Value)
-v:GetAttributeChangedSignal("Volume"):Connect(function()
+v:GetPropertyChangedSignal("Volume"):Connect(function()
 v.Volume = temp_volume
 end)
 v.Volume = temp_volume
