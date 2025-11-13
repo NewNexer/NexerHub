@@ -26,7 +26,7 @@ if not isfolder("NexerHub/Core") then
 makefolder("NexerHub/Core")
 repeat task.wait() until isfolder("NexerHub/Core")
 end
-if not isfile("NexerHub/Core/"..config_save.."") then
+--if not isfile("NexerHub/Core/"..config_save.."") then
 writefile("NexerHub/Core/"..config_save.."", [[return {
     ["Tab_1"] = {
         ["AutoInjection"] = {
@@ -42,52 +42,42 @@ writefile("NexerHub/Core/"..config_save.."", [[return {
             ["ChoosenAbility"] = "Cloak"
         },
         ["CloakConfig"] = {
-            ["Bind"] = "None",
-            ["ClientCooldown"] = 40
+            ["Bind"] = "None"
         },
         ["PunchConfig"] = {
-            ["Bind"] = "None",
-            ["ClientCooldown"] = 40
+            ["Bind"] = "None"
         },
         ["TauntConfig"] = {
-            ["Bind"] = "None",
-            ["ClientCooldown"] = 25
+            ["Bind"] = "None"
         },
         ["BonusPadConfig"] = {
             ["Bind"] = "None",
-            ["ClientCooldown"] = 60
+            ["SpeedModifier"] = 7
         },
         ["BlockConfig"] = {
-            ["Bind"] = "None",
-            ["ClientCooldown"] = 40
+            ["Bind"] = "None"
         },
         ["CaretakerConfig"] = {
-            ["Bind"] = "None",
-            ["ClientCooldown"] = 30
+            ["Bind"] = "None"
         },
         ["DashConfig"] = {
             ["Bind"] = "None",
-            ["ClientCooldown"] = 20,
             ["Power"] = 1250,
             ["MaxForce"] = 30000,
             ["Duration"] = 0.3
         },
         ["HotdogConfig"] = {
             ["Bind"] = "None",
-            ["ClientCooldown"] = 25,
             ["StaminaLoss"] = 5
         },
         ["RevolverConfig"] = {
-            ["Bind"] = "None",
-            ["ClientCooldown"] = 15
+            ["Bind"] = "None"
         },
         ["AdrenalineConfig"] = {
-            ["Bind"] = "None",
-            ["ClientCooldown"] = 35
+            ["Bind"] = "None"
         },
         ["BananaConfig"] = {
-            ["Bind"] = "None",
-            ["ClientCooldown"] = 20
+            ["Bind"] = "None"
         }
     },
     ["Tab_4"] = {},
@@ -101,7 +91,7 @@ writefile("NexerHub/Core/"..config_save.."", [[return {
     ["Tab_12"] = {}
 }]])
 repeat task.wait() until isfile("NexerHub/Core/"..config_save.."")
-end
+--end
 local SaveConfig = function(tab,value,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); if not element_2 then temp_table[tab][element_1] = value elseif not element_3 then temp_table[tab][element_1][element_2] = value else temp_table[tab][element_1][element_2][element_3] = value end CreateFile("NexerHub/Core/"..config_save.."", TableToLuauString(temp_table,true)) end
 local LoadConfig = function(tab,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); if not element_2 then return temp_table[tab][element_1] elseif not element_3 then return temp_table[tab][element_1][element_2] else return temp_table[tab][element_1][element_2][element_3] end end
 
@@ -1031,7 +1021,7 @@ function AbilitySystem.UseAbility(AbilityData, AbilityButton)
     if Success then
         AbilitySystem.AbilityTween(AbilityButton)
         if Success ~= "MultipleUse" then
-            AbilitySystem.PutOnCooldown(AbilityButton, AbilityData.Cooldown or Cooldown)
+            AbilitySystem.PutOnCooldown(AbilityButton, Cooldown or AbilityData.Cooldown)
         end
     end
 end
@@ -1099,13 +1089,8 @@ local TauntBind = TauntConfig.Bind
 Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = TauntBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 TauntBind = tostring(Value)
 end; })
-local TauntCooldown = TauntConfig.ClientCooldown
-Tab_3:CreateInput({Name = "Client Cooldown"; PlaceholderText = TauntCooldown; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-TauntCooldown = tonumber(Value)
-end; })
 Tab_3:CreateButton({Name = "Get Taunt"; Callback = function()
 local temp_table = table.clone(AbilityDatas["Taunt"])
-temp_table.Cooldown = TauntCooldown
 pcall(function()
 temp_table.InputShown = (TauntBind ~= "None" and TauntBind.Name) or ""
 end)
@@ -1124,13 +1109,8 @@ local PunchBind = PunchConfig.Bind
 Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = PunchBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 PunchBind = tostring(Value)
 end; })
-local PunchCooldown = PunchConfig.ClientCooldown
-Tab_3:CreateInput({Name = "Client Cooldown"; PlaceholderText = PunchCooldown; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-PunchCooldown = tonumber(Value)
-end; })
 Tab_3:CreateButton({Name = "Get Punch"; Callback = function()
 local temp_table = table.clone(AbilityDatas["Punch"])
-temp_table.Cooldown = PunchCooldown
 pcall(function()
 temp_table.InputShown = (PunchBind ~= "None" and PunchBind.Name) or ""
 end)
@@ -1149,13 +1129,8 @@ local RevolverBind = RevolverConfig.Bind
 Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = RevolverBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 RevolverBind = tostring(Value)
 end; })
-local RevolverCooldown = RevolverConfig.ClientCooldown
-Tab_3:CreateInput({Name = "Client Cooldown"; PlaceholderText = RevolverCooldown; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-RevolverCooldown = tonumber(Value)
-end; })
 Tab_3:CreateButton({Name = "Get Revolver"; Callback = function()
 local temp_table = table.clone(AbilityDatas["Revolver"])
-temp_table.Cooldown = RevolverCooldown
 pcall(function()
 temp_table.InputShown = (RevolverBind ~= "None" and RevolverBind.Name) or ""
 end)
@@ -1174,13 +1149,8 @@ local CaretakerBind = CaretakerConfig.Bind
 Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = CaretakerBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 CaretakerBind = tostring(Value)
 end; })
-local CaretakerCooldown = CaretakerConfig.ClientCooldown
-Tab_3:CreateInput({Name = "Client Cooldown"; PlaceholderText = CaretakerCooldown; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-CaretakerCooldown = tonumber(Value)
-end; })
 Tab_3:CreateButton({Name = "Get Caretaker"; Callback = function()
 local temp_table = table.clone(AbilityDatas["Caretaker"])
-temp_table.Cooldown = CaretakerCooldown
 pcall(function()
 temp_table.InputShown = (CaretakerBind ~= "None" and CaretakerBind.Name) or ""
 end)
@@ -1199,13 +1169,8 @@ local BananaBind = BananaConfig.Bind
 Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = BananaBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 BananaBind = tostring(Value)
 end; })
-local BananaCooldown = BananaConfig.ClientCooldown
-Tab_3:CreateInput({Name = "Client Cooldown"; PlaceholderText = BananaCooldown; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-BananaCooldown = tonumber(Value)
-end; })
 Tab_3:CreateButton({Name = "Get Banana"; Callback = function()
 local temp_table = table.clone(AbilityDatas["Banana"])
-temp_table.Cooldown = BananaCooldown
 pcall(function()
 temp_table.InputShown = (BananaBind ~= "None" and BananaBind.Name) or ""
 end)
@@ -1224,10 +1189,6 @@ local DashBind = DashConfig.Bind
 Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = DashBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 DashBind = tostring(Value)
 end; })
-local DashCooldown = DashConfig.ClientCooldown
-Tab_3:CreateInput({Name = "Client Cooldown"; PlaceholderText = DashCooldown; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-DashCooldown = tonumber(Value)
-end; })
 local DashPower = DashConfig.Power
 Tab_3:CreateInput({Name = "Power"; PlaceholderText = DashPower; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 DashPower = tonumber(Value)
@@ -1243,11 +1204,11 @@ end; })
 --------------------------------------------------------------------------------------
 local DashConfigEffects = nil
 function ApplyDashConfigurations()
-if not HumanoidRootPart then return end
 if DashConfigEffects then
 DashConfigEffects:Disconnect()
 DashConfigEffects = nil
 end
+if not HumanoidRootPart then return end
 if not (DashDuration > 0.3) then
 DashConfigEffects = HumanoidRootPart.ChildAdded:Connect(function(c)
 if c.Name == "BodyVelocity" then
@@ -1273,7 +1234,6 @@ end
 --------------------------------------------------------------------------------------
 Tab_3:CreateButton({Name = "Get Dash"; Callback = function()
 local temp_table = table.clone(AbilityDatas["Dash"])
-temp_table.Cooldown = DashCooldown
 pcall(function()
 temp_table.InputShown = (DashBind ~= "None" and DashBind.Name) or ""
 end)
@@ -1293,10 +1253,6 @@ local HotdogBind = HotdogConfig.Bind
 Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = HotdogBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 HotdogBind = tostring(Value)
 end; })
-local HotdogCooldown = HotdogConfig.ClientCooldown
-Tab_3:CreateInput({Name = "Client Cooldown"; PlaceholderText = HotdogCooldown; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-HotdogCooldown = tonumber(Value)
-end; })
 local HotdogStaminaLoss = HotdogConfig.StaminaLoss
 Tab_3:CreateInput({Name = "Stamina Loss per Hotdog"; PlaceholderText = HotdogStaminaLoss; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 HotdogStaminaLoss = tonumber(Value)
@@ -1304,12 +1260,12 @@ end; })
 --------------------------------------------------------------------------------------
 local HotdogConfigEffects = nil
 function ApplyHotdogConfigurations()
-if not HumanoidRootPart then return end
-if HotdogStaminaLoss == 5 then return end
 if HotdogConfigEffects then
 HotdogConfigEffects:Disconnect()
 HotdogConfigEffects = nil
 end
+if not HumanoidRootPart then return end
+if HotdogStaminaLoss == 5 then return end
 HotdogConfigEffects = HumanoidRootPart.Hotdog:GetPropertyChangedSignal("Playing"):Connect(function(c)
 if HumanoidRootPart.Hotdog.Playing == true then
 local OldMaxStamina = tonumber(Character:GetAttribute("MaxStamina"))
@@ -1323,7 +1279,6 @@ end
 --------------------------------------------------------------------------------------
 Tab_3:CreateButton({Name = "Get Hotdog"; Callback = function()
 local temp_table = table.clone(AbilityDatas["Hotdog"])
-temp_table.Cooldown = HotdogCooldown
 pcall(function()
 temp_table.InputShown = (HotdogBind ~= "None" and HotdogBind.Name) or ""
 end)
@@ -1343,13 +1298,8 @@ local BlockBind = BlockConfig.Bind
 Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = BlockBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 BlockBind = tostring(Value)
 end; })
-local BlockCooldown = BlockConfig.ClientCooldown
-Tab_3:CreateInput({Name = "Client Cooldown"; PlaceholderText = BlockCooldown; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-BlockCooldown = tonumber(Value)
-end; })
 Tab_3:CreateButton({Name = "Get Block"; Callback = function()
 local temp_table = table.clone(AbilityDatas["Block"])
-temp_table.Cooldown = BlockCooldown
 pcall(function()
 temp_table.InputShown = (BlockBind ~= "None" and BlockBind.Name) or ""
 end)
@@ -1368,13 +1318,8 @@ local AdrenalineBind = AdrenalineConfig.Bind
 Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = AdrenalineBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 AdrenalineBind = tostring(Value)
 end; })
-local AdrenalineCooldown = AdrenalineConfig.ClientCooldown
-Tab_3:CreateInput({Name = "Client Cooldown"; PlaceholderText = AdrenalineCooldown; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-AdrenalineCooldown = tonumber(Value)
-end; })
 Tab_3:CreateButton({Name = "Get Adrenaline"; Callback = function()
 local temp_table = table.clone(AbilityDatas["Adrenaline"])
-temp_table.Cooldown = AdrenalineCooldown
 pcall(function()
 temp_table.InputShown = (AdrenalineBind ~= "None" and AdrenalineBind.Name) or ""
 end)
@@ -1393,13 +1338,33 @@ local BonusPadBind = BonusPadConfig.Bind
 Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = BonusPadBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 BonusPadBind = tostring(Value)
 end; })
-local BonusPadCooldown = BonusPadConfig.ClientCooldown
-Tab_3:CreateInput({Name = "Client Cooldown"; PlaceholderText = BonusPadCooldown; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-BonusPadCooldown = tonumber(Value)
+local BonusPadSpeedModifier = BonusPadConfig.SpeedModifier
+Tab_3:CreateInput({Name = "Speed Modifier"; PlaceholderText = BonusPadSpeedModifier; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+BonusPadSpeedModifier = tonumber(Value)
 end; })
+--------------------------------------------------------------------------------------
+local BonusPadConfigEffects = nil
+function ApplyBonusPadConfigurations()
+if BonusPadConfigEffects then
+BonusPadConfigEffects:Disconnect()
+BonusPadConfigEffects = nil
+end
+if not HumanoidRootPart then return end
+if BonusPadSpeedModifier == 7 then return end
+BonusPadConfigEffects = Character.ChildAdded:Connect(function(c)
+if c:IsA("Highlight") and c.Name == "CoolHighlight" then
+task.wait()
+local OldWalkSpeedModifier = tonumber(Character:GetAttribute("WalkSpeedModifier"))
+if not OldWalkSpeedModifier then return end
+if OldWalkSpeedModifier > 6 then
+Character:SetAttribute("WalkSpeedModifier", tonumber((OldWalkSpeedModifier-7)+BonusPadSpeedModifier))
+end
+end
+end)
+end
+--------------------------------------------------------------------------------------
 Tab_3:CreateButton({Name = "Get BonusPad"; Callback = function()
 local temp_table = table.clone(AbilityDatas["BonusPad"])
-temp_table.Cooldown = BonusPadCooldown
 pcall(function()
 temp_table.InputShown = (BonusPadBind ~= "None" and BonusPadBind.Name) or ""
 end)
@@ -1407,6 +1372,7 @@ pcall(function()
 temp_table.InputShown = (BonusPadBind ~= "None" and BonusPadBind) or ""
 end)
 AbilityModule.CreateAbility(temp_table)
+ApplyBonusPadConfigurations()
 end; })
 
 
@@ -1420,13 +1386,8 @@ local CloakBind = CloakConfig.Bind
 Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = CloakBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 CloakBind = tostring(Value)
 end; })
-local CloakCooldown = CloakConfig.ClientCooldown
-Tab_3:CreateInput({Name = "Client Cooldown"; PlaceholderText = CloakCooldown; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-CloakCooldown = tonumber(Value)
-end; })
 Tab_3:CreateButton({Name = "Get Cloak"; Callback = function()
 local temp_table = table.clone(AbilityDatas["Cloak"])
-temp_table.Cooldown = CloakCooldown
 pcall(function()
 temp_table.InputShown = (CloakBind ~= "None" and CloakBind.Name) or ""
 end)
