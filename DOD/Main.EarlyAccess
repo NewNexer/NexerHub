@@ -1887,28 +1887,25 @@ end)
 
 local AntiComputer
 AntiComputer = false
-Tab_5:CreateToggle({Name = "Anti Cooldown in Badware Computer Prompts"; CurrentValue = false; Callback = function(Value)
+Tab_5:CreateToggle({Name = "Insta-Destroy Badware Computer"; CurrentValue = false; Callback = function(Value)
 AntiComputer = Value
-if AntiComputer == true then
-for _,descendant in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Other"):GetDescendants()) do
-if descendant and descendant:IsA("ProximityPrompt") and AntiComputer == true then
-pcall(function()
-descendant.HoldDuration = 0
-descendant.RequiresLineOfSight = false
-descendant.Enabled = true
-end)
-end
-end
-end
 end; })
-game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Other").DescendantAdded:Connect(function(descendant)
-if descendant and descendant:IsA("ProximityPrompt") and AntiComputer == true then
-pcall(function()
-descendant.HoldDuration = 0
-descendant.RequiresLineOfSight = false
-descendant.Enabled = true
-end)
+game:GetService("ProximityPromptService").PromptShown:Connect(function(a,b)
+if AntiComputer == true and a.HoldDuration ~= 0 then
+a.HoldDuration = 0
 end
+end)
+local alreadydestroyingpc = false
+game:GetService("ProximityPromptService").PromptTriggered:Connect(function(a,b)
+if alreadydestroyingpc or AntiComputer ~= true then return end
+alreadydestroyingpc = true
+a.HoldDuration = 0
+a.RequiresLineOfSight = false
+a.Enabled = true
+for i = 1,40 do
+pcall(fireproximityprompt, a)
+end
+alreadydestroyingpc = false
 end)
 
 local AntiEvilScary
