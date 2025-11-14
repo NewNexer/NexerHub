@@ -26,7 +26,7 @@ if not isfolder("NexerHub/Core") then
 makefolder("NexerHub/Core")
 repeat task.wait() until isfolder("NexerHub/Core")
 end
---if not isfile("NexerHub/Core/"..config_save.."") then
+if not isfile("NexerHub/Core/"..config_save.."") then
 writefile("NexerHub/Core/"..config_save.."", [[return {
     ["Tab_1"] = {
         ["AutoInjection"] = {
@@ -42,7 +42,8 @@ writefile("NexerHub/Core/"..config_save.."", [[return {
             ["ChoosenAbility"] = "Cloak"
         },
         ["CloakConfig"] = {
-            ["Bind"] = "None"
+            ["Bind"] = "None",
+            ["InvisibilityTime"] = 5
         },
         ["PunchConfig"] = {
             ["Bind"] = "None"
@@ -78,6 +79,26 @@ writefile("NexerHub/Core/"..config_save.."", [[return {
         },
         ["BananaConfig"] = {
             ["Bind"] = "None"
+        },
+        ["Cards"] = {
+            ["FirstCard"] = {
+                [1] = "Revolver",
+                [2] = "Caretaker"
+            },
+            ["SecondCard"] = {
+                [1] = "BonusPad",
+                [2] = "Caretaker"
+            },
+            ["ThirdCard"] = {
+                [1] = "Revolver",
+                [2] = "Punch"
+            }
+        },
+        ["IB"] = {
+            ["InstaDestroyComputer"] = false,
+            ["AntiWalls"] = false,
+            ["AntiEvilScary"] = false,
+            ["AntiFallRagdoll"] = false
         }
     },
     ["Tab_4"] = {},
@@ -91,7 +112,7 @@ writefile("NexerHub/Core/"..config_save.."", [[return {
     ["Tab_12"] = {}
 }]])
 repeat task.wait() until isfile("NexerHub/Core/"..config_save.."")
---end
+end
 local SaveConfig = function(tab,value,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); if not element_2 then temp_table[tab][element_1] = value elseif not element_3 then temp_table[tab][element_1][element_2] = value else temp_table[tab][element_1][element_2][element_3] = value end CreateFile("NexerHub/Core/"..config_save.."", TableToLuauString(temp_table,true)) end
 local LoadConfig = function(tab,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); if not element_2 then return temp_table[tab][element_1] elseif not element_3 then return temp_table[tab][element_1][element_2] else return temp_table[tab][element_1][element_2][element_3] end end
 
@@ -1049,10 +1070,12 @@ Tab_3:CreateSection("Fast Functions")
 local InputBind = LoadConfig("Tab_3", "Bind")
 Tab_3:CreateInput({Name = "Ability Keybind"; PlaceholderText = InputBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 InputBind = tostring(Value)
+SaveConfig("Tab_3", InputBind, "Bind")
 end; })
 local ChoosenAbility = LoadConfig("Tab_3", "FastFunctions", "ChoosenAbility")
 Tab_3:CreateDropdown({Name = "Choose Ability"; Options = AbilityNames; CurrentOption = ChoosenAbility; MultiSelection = false; Callback = function(Value)
 ChoosenAbility = ConvertDropdownValue(Value)
+SaveConfig("Tab_3", ChoosenAbility, "FastFunctions", "ChoosenAbility")
 end; })
 Tab_3:CreateButton({Name = "Get Choosen Ability"; Callback = function()
 local temp_table = table.clone(AbilityDatas[ChoosenAbility])
@@ -1088,6 +1111,7 @@ Tab_3:CreateLabel("Taunt Ability")
 local TauntBind = TauntConfig.Bind
 Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = TauntBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 TauntBind = tostring(Value)
+SaveConfig("Tab_3", TauntBind, "TauntConfig", "Bind")
 end; })
 Tab_3:CreateButton({Name = "Get Taunt"; Callback = function()
 local temp_table = table.clone(AbilityDatas["Taunt"])
@@ -1108,6 +1132,7 @@ Tab_3:CreateLabel("Punch Ability")
 local PunchBind = PunchConfig.Bind
 Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = PunchBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 PunchBind = tostring(Value)
+SaveConfig("Tab_3", PunchBind, "PunchConfig", "Bind")
 end; })
 Tab_3:CreateButton({Name = "Get Punch"; Callback = function()
 local temp_table = table.clone(AbilityDatas["Punch"])
@@ -1128,6 +1153,7 @@ Tab_3:CreateLabel("Revolver Ability")
 local RevolverBind = RevolverConfig.Bind
 Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = RevolverBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 RevolverBind = tostring(Value)
+SaveConfig("Tab_3", RevolverBind, "RevolverConfig", "Bind")
 end; })
 Tab_3:CreateButton({Name = "Get Revolver"; Callback = function()
 local temp_table = table.clone(AbilityDatas["Revolver"])
@@ -1148,6 +1174,7 @@ Tab_3:CreateLabel("Caretaker Ability")
 local CaretakerBind = CaretakerConfig.Bind
 Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = CaretakerBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 CaretakerBind = tostring(Value)
+SaveConfig("Tab_3", CaretakerBind, "CaretakerConfig", "Bind")
 end; })
 Tab_3:CreateButton({Name = "Get Caretaker"; Callback = function()
 local temp_table = table.clone(AbilityDatas["Caretaker"])
@@ -1168,6 +1195,7 @@ Tab_3:CreateLabel("Banana Ability")
 local BananaBind = BananaConfig.Bind
 Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = BananaBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 BananaBind = tostring(Value)
+SaveConfig("Tab_3", BananaBind, "BananaConfig", "Bind")
 end; })
 Tab_3:CreateButton({Name = "Get Banana"; Callback = function()
 local temp_table = table.clone(AbilityDatas["Banana"])
@@ -1188,18 +1216,22 @@ Tab_3:CreateLabel("Dash Ability")
 local DashBind = DashConfig.Bind
 Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = DashBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 DashBind = tostring(Value)
+SaveConfig("Tab_3", DashBind, "DashConfig", "Bind")
 end; })
 local DashPower = DashConfig.Power
 Tab_3:CreateInput({Name = "Power"; PlaceholderText = DashPower; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 DashPower = tonumber(Value)
+SaveConfig("Tab_3", DashPower, "DashConfig", "Power")
 end; })
 local DashMaxForce = DashConfig.MaxForce
 Tab_3:CreateInput({Name = "Max Force"; PlaceholderText = DashMaxForce; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 DashMaxForce = tonumber(Value)
+SaveConfig("Tab_3", DashMaxForce, "DashConfig", "MaxForce")
 end; })
 local DashDuration = DashConfig.Duration
 Tab_3:CreateInput({Name = "Duration"; PlaceholderText = DashDuration; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 DashDuration = tonumber(Value)
+SaveConfig("Tab_3", DashDuration, "DashConfig", "Duration")
 end; })
 --------------------------------------------------------------------------------------
 local DashConfigEffects = nil
@@ -1252,10 +1284,12 @@ Tab_3:CreateLabel("Hotdog Ability")
 local HotdogBind = HotdogConfig.Bind
 Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = HotdogBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 HotdogBind = tostring(Value)
+SaveConfig("Tab_3", HotdogBind, "HotdogConfig", "Bind")
 end; })
 local HotdogStaminaLoss = HotdogConfig.StaminaLoss
 Tab_3:CreateInput({Name = "Stamina Loss per Hotdog"; PlaceholderText = HotdogStaminaLoss; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 HotdogStaminaLoss = tonumber(Value)
+SaveConfig("Tab_3", HotdogStaminaLoss, "HotdogConfig", "StaminaLoss")
 end; })
 --------------------------------------------------------------------------------------
 local HotdogConfigEffects = nil
@@ -1297,6 +1331,7 @@ Tab_3:CreateLabel("Block Ability")
 local BlockBind = BlockConfig.Bind
 Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = BlockBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 BlockBind = tostring(Value)
+SaveConfig("Tab_3", BlockBind, "BlockConfig", "Bind")
 end; })
 Tab_3:CreateButton({Name = "Get Block"; Callback = function()
 local temp_table = table.clone(AbilityDatas["Block"])
@@ -1317,6 +1352,7 @@ Tab_3:CreateLabel("Adrenaline Ability")
 local AdrenalineBind = AdrenalineConfig.Bind
 Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = AdrenalineBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 AdrenalineBind = tostring(Value)
+SaveConfig("Tab_3", AdrenalineBind, "AdrenalineConfig", "Bind")
 end; })
 Tab_3:CreateButton({Name = "Get Adrenaline"; Callback = function()
 local temp_table = table.clone(AbilityDatas["Adrenaline"])
@@ -1337,10 +1373,12 @@ Tab_3:CreateLabel("BonusPad Ability")
 local BonusPadBind = BonusPadConfig.Bind
 Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = BonusPadBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 BonusPadBind = tostring(Value)
+SaveConfig("Tab_3", BonusPadBind, "BonusPadConfig", "Bind")
 end; })
 local BonusPadSpeedModifier = BonusPadConfig.SpeedModifier
 Tab_3:CreateInput({Name = "Speed Modifier"; PlaceholderText = BonusPadSpeedModifier; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 BonusPadSpeedModifier = tonumber(Value)
+SaveConfig("Tab_3", BonusPadSpeedModifier, "BonusPadConfig", "SpeedModifier")
 end; })
 --------------------------------------------------------------------------------------
 local BonusPadConfigEffects = nil
@@ -1385,6 +1423,7 @@ Tab_3:CreateLabel("Cloak Ability")
 local CloakBind = CloakConfig.Bind
 Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = CloakBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 CloakBind = tostring(Value)
+SaveConfig("Tab_3", CloakBind, "CloakConfig", "Bind")
 end; })
 Tab_3:CreateButton({Name = "Get Cloak"; Callback = function()
 local temp_table = table.clone(AbilityDatas["Cloak"])
@@ -1402,56 +1441,213 @@ end; })
 Tab_3:CreateSection("Get Cards")
 
 local CardSettings = {
-    [1] = {[1]="Revolver",[2]="Caretaker"},
-    [2] = {[1]="BonusPad",[2]="Caretaker"},
-    [3] = {[1]="Revolver",[2]="Punch"}
+    [1] = LoadConfig("Tab_3", "Cards", "FirstCard"),
+    [2] = LoadConfig("Tab_3", "Cards", "SecondCard"),
+    [3] = LoadConfig("Tab_3", "Cards", "ThirdCard")
 }
 Tab_3:CreateLabel("First Card Settings")
-Tab_3:CreateDropdown({Name = "First Ability"; Options = AbilityNames; CurrentOption = "Revolver"; MultiSelection = false; Callback = function(Value)
+Tab_3:CreateDropdown({Name = "First Ability"; Options = AbilityNames; CurrentOption = CardSettings[1][1]; MultiSelection = false; Callback = function(Value)
 CardSettings[1][1] = ConvertDropdownValue(Value)
+SaveConfig("Tab_3", CardSettings[1][1], "Cards", "FirstCard", 1)
 end; })
-Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOption = "Caretaker"; MultiSelection = false; Callback = function(Value)
+Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOption = CardSettings[1][2]; MultiSelection = false; Callback = function(Value)
 CardSettings[1][2] = ConvertDropdownValue(Value)
+SaveConfig("Tab_3", CardSettings[1][2], "Cards", "FirstCard", 2)
 end; })
 
 Tab_3:CreateLabel("Second Card Settings")
-Tab_3:CreateDropdown({Name = "First Ability"; Options = AbilityNames; CurrentOption = "BonusPad"; MultiSelection = false; Callback = function(Value)
+Tab_3:CreateDropdown({Name = "First Ability"; Options = AbilityNames; CurrentOption = CardSettings[2][1]; MultiSelection = false; Callback = function(Value)
 CardSettings[2][1] = ConvertDropdownValue(Value)
+SaveConfig("Tab_3", CardSettings[2][1], "Cards", "SecondCard", 1)
 end; })
-Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOption = "Caretaker"; MultiSelection = false; Callback = function(Value)
+Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOption = CardSettings[2][2]; MultiSelection = false; Callback = function(Value)
 CardSettings[2][2] = ConvertDropdownValue(Value)
+SaveConfig("Tab_3", CardSettings[2][2], "Cards", "SecondCard", 2)
 end; })
 
 Tab_3:CreateLabel("Third Card Settings")
-Tab_3:CreateDropdown({Name = "First Ability"; Options = AbilityNames; CurrentOption = "Revolver"; MultiSelection = false; Callback = function(Value)
+Tab_3:CreateDropdown({Name = "First Ability"; Options = AbilityNames; CurrentOption = CardSettings[3][1]; MultiSelection = false; Callback = function(Value)
 CardSettings[3][1] = ConvertDropdownValue(Value)
+SaveConfig("Tab_3", CardSettings[3][1], "Cards", "ThirdCard", 1)
 end; })
-Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOption = "Punch"; MultiSelection = false; Callback = function(Value)
+Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOption = CardSettings[3][2]; MultiSelection = false; Callback = function(Value)
 CardSettings[3][2] = ConvertDropdownValue(Value)
+SaveConfig("Tab_3", CardSettings[3][2], "Cards", "ThirdCard", 2)
 end; })
 
 Tab_3:CreateButton({Name = "Summon Chosen Cards"; Callback = function()
 UIModule.AbilitySelection(unpack(CardSettings))
 end; })
 
+Tab_3:CreateSection("")
 
-Tab_3:CreateSection("Spam Ability")
+Tab_3:CreateParagraph({Title = "Immunities / Buffs", Content = "Immunities and buffs for workspace side"})
 
-local SpamAbility = "Hotdog"
-Tab_3:CreateDropdown({Name = "Ability to Spam"; Options = AbilityNames; CurrentOption = "Hotdog"; MultiSelection = false; Callback = function(Value)
-SpamAbility = ConvertDropdownValue(Value)
+Tab_3:CreateSection("Workspace Side")
+
+local InstaDestroyComputer = LoadConfig("Tab_3", "IB", "InstaDestroyComputer")
+Tab_3:CreateToggle({Name = "Insta-Destroy Badware Computer"; CurrentValue = InstaDestroyComputer; Callback = function(Value)
+InstaDestroyComputer = Value
+SaveConfig("Tab_3", InstaDestroyComputer, "IB", "InstaDestroyComputer")
 end; })
-
-Tab_3:CreateToggle({Name = "Spam Ability"; CurrentValue = false; Callback = function(Value)
-AutoSpamAbility = Value
-if AutoSpamAbility == true then
-repeat task.wait(0.1)
-pcall(function()
-game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteFunctions"):WaitForChild("UseAbility"):InvokeServer(unpack({tostring(SpamAbility)}))
-end)
-until AutoSpamAbility == false
+game:GetService("ProximityPromptService").PromptShown:Connect(function(a,b)
+if InstaDestroyComputer == true and a.HoldDuration ~= 0 then
+a.HoldDuration = 0
 end
+end)
+local alreadydestroyingpc = false
+game:GetService("ProximityPromptService").PromptTriggered:Connect(function(a,b)
+if alreadydestroyingpc or InstaDestroyComputer ~= true then return end
+alreadydestroyingpc = true
+a.HoldDuration = 0
+a.RequiresLineOfSight = false
+a.Enabled = true
+for i = 1,40 do
+pcall(fireproximityprompt, a)
+end
+alreadydestroyingpc = false
+end)
+
+local AntiWalls = LoadConfig("Tab_3", "IB", "AntiWalls")
+Tab_5:CreateToggle({Name = "Anti-Artful Walls"; CurrentValue = AntiWalls; Callback = function(Value)
+AntiWalls = Value
+task.spawn(ClearWalls)
+SaveConfig("Tab_3", AntiWalls, "IB", "AntiWalls")
 end; })
+function ClearWalls()
+for _,d in next, game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Other"):GetDescendants() do
+if AntiWalls ~= true then return end
+if d and d.Name == "HumanoidRootPart" and d.Anchored == true then
+d.CanCollide = false
+d.CanTouch = false
+d.Transparency = 0.5
+end
+end
+end
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Other").DescendantAdded:Connect(function(d)
+if AntiWalls ~= true then return end
+if d and d.Name == "HumanoidRootPart" and d.Anchored == true then
+d.CanCollide = false
+d.CanTouch = false
+d.Transparency = 0.5
+end
+end)
+
+local AntiEvilScary1 = LoadConfig("Tab_3", "IB", "AntiEvilScary")
+Tab_5:CreateToggle({Name = "Anti Evil Scary"; CurrentValue = AntiEvilScary1; Callback = function(Value)
+AntiEvilScary1 = Value
+if AntiEvilScary1 == true then
+for i,v in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable"):GetChildren()) do
+if v and v.Name == "EvilScary" then
+for _,trans in pairs(v:GetChildren()) do
+if trans and trans:IsA("TouchTransmitter") then
+trans:Destroy()
+end
+end
+for _,part in pairs(v:GetChildren()) do
+if part and part:IsA("BasePart") then
+part.CanCollide = false
+part.CanTouch = false
+pcall(function()
+part.CanQuery = false
+end)
+end
+end
+v.CanCollide = false
+v.CanTouch = false
+pcall(function()
+v.CanQuery = false
+end)
+end
+end
+end
+SaveConfig("Tab_3", AntiEvilScary1, "IB", "AntiEvilScary")
+end; })
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable").ChildAdded:Connect(function(child)
+if child and child.Name == "EvilScary" and AntiEvilScary1 == true then
+for _,trans in pairs(child:GetChildren()) do
+if trans and trans:IsA("TouchTransmitter") then
+trans:Destroy()
+end
+end
+for _,part in pairs(child:GetChildren()) do
+if part and part:IsA("BasePart") then
+part.CanCollide = false
+part.CanTouch = false
+pcall(function()
+part.CanQuery = false
+end)
+end
+end
+child.CanCollide = false
+child.CanTouch = false
+pcall(function()
+child.CanQuery = false
+end)
+end
+end)
+
+
+local AntiBarriers1 = false
+local AntiBarriers1_con = nil
+local AntiBarriers1_toggle = nil
+AntiBarriers1_toggle = Tab_5:CreateToggle({Name = "Anti Barriers"; CurrentValue = AntiBarriers1; Callback = function(Value)
+AntiBarriers1 = Value
+pcall(function()
+if AntiBarriers1 == true then
+if workspace.GameAssets:FindFirstChild("Map") == nil then
+AntiBarriers1_toggle:Set(false)
+return
+end
+workspace.GameAssets.Map.Config.Barriers.Parent = game:GetService("LogService")
+AntiBarriers1_con = workspace.GameAssets.ChildRemoved:Once(function(c)
+if c.Name == "Map" and AntiBarriers == true then
+game:GetService("LogService").Barriers:Destroy()
+end
+end)
+else
+if AntiBarriers1_con then
+AntiBarriers1_con:Disconnect()
+AntiBarriers1_con = nil
+end
+game:GetService("LogService").Barriers.Parent = workspace.GameAssets.Map.Config
+end
+end)
+end; })
+workspace.GameAssets.ChildRemoved:Connect(function(c)
+if c.Name == "Map" and AntiBarriers1 == true then
+AntiBarriers_toggle:Set(false)
+end
+end)
+
+
+local AntiFallRagdoll = LoadConfig("Tab_3", "IB", "AntiFallRagdoll")
+Tab_5:CreateToggle({Name = "Anti Fall Ragdoll"; CurrentValue = AntiFallRagdoll; Callback = function(Value)
+AntiFallRagdoll = Value
+for i,v in next, workspace.GameAssets:GetDescendants() do
+if v.Name == "FallDamage" and v:IsA("BasePart") then
+child.CanCollide = not AntiFallRagdoll
+child.CanTouch = not AntiFallRagdoll
+pcall(function()
+child.CanQuery = not AntiFallRagdoll
+end)
+end
+end
+SaveConfig("Tab_3", AntiFallRagdoll, "IB", "AntiFallRagdoll")
+end; })
+workspace.GameAssets.DescendantAdded:Connect(function(child)
+if AntiFallRagdoll ~= true then return end
+if child.Name == "FallDamage" and child:IsA("BasePart") then
+child.CanCollide = false
+child.CanTouch = false
+pcall(function()
+child.CanQuery = false
+end)
+end
+end)
+
+
+
 
 
 
@@ -1768,262 +1964,17 @@ end; })
 
 
 
-local Tab_5 = Window:CreateTab("Anti / Immunities",0)
-Tab_5:CreateParagraph({Title = "Anti / Immunities", Content = "You can get immunities to multiple things yeah."})
-Tab_5:CreateSection("Server")
+local Tab_5 = Window:CreateTab("A",0)
+Tab_5:CreateParagraph({Title = "A", Content = ""})
 
 
-local path = {"GameAssets", "Map", "Config", "KillerOnly"}
 
-local function getFolder()
-	local f = workspace
-	for _, v in ipairs(path) do
-		if not f then return nil end
-		f = f:FindFirstChild(v)
-		if not f then return nil end
-	end
-	return f
-end
 
-local ogState = {}
-local conns = {}
 
-local function setNoCollide(v, state)
-	if not v or not v:IsA("BasePart") then return end
-	if state then
-		if ogState[v] == nil then
-			ogState[v] = v.CanCollide
-		end
-		v.CanCollide = false
-	else
-		if ogState[v] ~= nil then
-			if v.Parent then
-				v.CanCollide = ogState[v]
-			end
-			ogState[v] = nil
-		end
-	end
-end
 
-local function enable()
-	local gameAssets = workspace:FindFirstChild("GameAssets")
-	local map = gameAssets and gameAssets:FindFirstChild("Map")
 
-	if not map then
-		Notify("Error!", "Round Haven't Started Yet!", 5, false)
-		return
-	end
 
-	local f = getFolder()
-	if not f then
-		Notify("Error!", "Map Doesn't Support Killer Door!", 5, warn)
-		return
-	end
 
-	local hasPart = false
-	for _, v in ipairs(f:GetDescendants()) do
-		if v:IsA("BasePart") then
-			hasPart = true
-			setNoCollide(v, true)
-		end
-	end
-
-	if not hasPart then
-		Notify("Error!", "Map Doesn't Have Any Killer Door!", 5, warn)
-		return
-	end
-
-	local c = f.DescendantAdded:Connect(function(v)
-		setNoCollide(v, true)
-	end)
-	table.insert(conns, c)
-
-	Notify("Success!", "You can now enter through Killer Door!", 3, true)
-end
-
-local function disable()
-	for v in pairs(ogState) do
-		setNoCollide(v, false)
-	end
-	table.clear(ogState)
-
-	for _, c in ipairs(conns) do
-		if c.Connected then
-			c:Disconnect()
-		end
-	end
-	table.clear(conns)
-end
-
-Tab_5:CreateToggle({Name = "Enter Through Killer Door"; CurrentValue = false; Callback = function(Value)
-if Value then
-enable()
-else
-disable()
-end
-end; })
-
-local AntiWalls
-AntiWalls = false
-Tab_5:CreateToggle({Name = "Anti-Artful Walls"; CurrentValue = false; Callback = function(Value)
-AntiWalls = Value
-if AntiWalls == true then
-for i,v in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Other"):GetDescendants()) do
-if v and v.Name == "HumanoidRootPart" and v.Anchored == true then
-v.CanCollide = false
-v.CanTouch = false
-v.Transparency = 0.5
-end
-end
-end
-end; })
-game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Other").DescendantAdded:Connect(function(descendant)
-if descendant and descendant.Name == "HumanoidRootPart" and descendant.Anchored == true and AntiWalls == true then
-descendant.CanCollide = false
-descendant.CanTouch = false
-descendant.Transparency = 0.5
-end
-end)
-
-local AntiComputer
-AntiComputer = false
-Tab_5:CreateToggle({Name = "Insta-Destroy Badware Computer"; CurrentValue = false; Callback = function(Value)
-AntiComputer = Value
-end; })
-game:GetService("ProximityPromptService").PromptShown:Connect(function(a,b)
-if AntiComputer == true and a.HoldDuration ~= 0 then
-a.HoldDuration = 0
-end
-end)
-local alreadydestroyingpc = false
-game:GetService("ProximityPromptService").PromptTriggered:Connect(function(a,b)
-if alreadydestroyingpc or AntiComputer ~= true then return end
-alreadydestroyingpc = true
-a.HoldDuration = 0
-a.RequiresLineOfSight = false
-a.Enabled = true
-for i = 1,40 do
-pcall(fireproximityprompt, a)
-end
-alreadydestroyingpc = false
-end)
-
-local AntiEvilScary
-AntiEvilScary = false
-Tab_5:CreateToggle({Name = "Anti Evil Scary"; CurrentValue = false; Callback = function(Value)
-AntiEvilScary = Value
-if AntiEvilScary == true then
-for i,v in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable"):GetChildren()) do
-if v and v.Name == "EvilScary" then
-for _,trans in pairs(v:GetChildren()) do
-if trans and trans:IsA("TouchTransmitter") then
-trans:Destroy()
-end
-end
-for _,part in pairs(v:GetChildren()) do
-if part and part:IsA("BasePart") then
-part.CanCollide = false
-part.CanTouch = false
-pcall(function()
-part.CanQuery = false
-end)
-part:Destroy()
-end
-end
-v.CanCollide = false
-v.CanTouch = false
-pcall(function()
-v.CanQuery = false
-end)
-v:Destroy()
-end
-end
-end
-end; })
-game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable").ChildAdded:Connect(function(child)
-if child and child.Name == "EvilScary" and AntiEvilScary == true then
-for _,trans in pairs(child:GetChildren()) do
-if trans and trans:IsA("TouchTransmitter") then
-trans:Destroy()
-end
-end
-for _,part in pairs(child:GetChildren()) do
-if part and part:IsA("BasePart") then
-part.CanCollide = false
-part.CanTouch = false
-pcall(function()
-part.CanQuery = false
-end)
-part:Destroy()
-end
-end
-child.CanCollide = false
-child.CanTouch = false
-pcall(function()
-child.CanQuery = false
-end)
-child:Destroy()
-end
-end)
-
-local BackupEffect = game:GetService("ReplicatedStorage").Events.RemoteEvents.TauntEffect:Clone()
-BackupEffect.Parent = game.LogService
-local AntiTaunt = false
-Tab_5:CreateToggle({Name = "Anti Taunt"; CurrentValue = false; Callback = function(Value)
-AntiTaunt = Value
-if AntiTaunt == true then
-LocalPlayer.PlayerGui.MainGui.RoundUI.TauntTemplate:Destroy()
-else
-if LocalPlayer.PlayerGui.MainGui.RoundUI:FindFirstChild("TauntTemplate") == nil then
-local a = BackupEffect:Clone()
-a.Parent = LocalPlayer.PlayerGui.MainGui.RoundUI
-end
-end
-end; })
-
-LocalPlayer.PlayerGui.MainGui.RoundUI.ChildAdded:Connect(function(child)
-if child.Name == "TauntTemplate" and AntiTaunt == true then
-child:Destroy()
-Character:SetAttribute("WalkSpeedModifier", 0)
-end
-end)
-
-local AntiFallDamage = false
-Tab_5:CreateToggle({Name = "Anti Fall Damage"; CurrentValue = false; Callback = function(Value)
-AntiFallDamage = Value
-for i,v in next, workspace.GameAssets:GetDescendants() do
-if v.Name == "FallDamage" and v:IsA("BasePart") and AntiFallDamage == true then
-v:Destroy()
-end
-end
-end; })
-workspace.GameAssets.DescendantAdded:Connect(function(child)
-if child.Name == "FallDamage" and child:IsA("BasePart") and AntiFallDamage == true then
-child:Destroy()
-end
-end)
-
-local AutoRemoveBarriers = false
-Tab_5:CreateToggle({Name = "Anti Barriers"; CurrentValue = false; Callback = function(Value)
-AutoRemoveBarriers = Value
-pcall(function()
-if Value == true then
-workspace.GameAssets.Map.Config.Barriers:Destroy()
-end
-end)
-end; })
-
-game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams").DescendantAdded:Connect(function(d)
-task.wait()
-if d.Name == LocalPlayer.Name then
-task.wait(1)
-pcall(function()
-if AutoRemoveBarriers == true then
-workspace.GameAssets.Map.Config.Barriers:Destroy()
-end
-end)
-end
-end)
 
 
 
