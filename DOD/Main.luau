@@ -236,6 +236,7 @@ local Window = Rayfield:CreateWindow({
    Icon = 0,    
    LoadingTitle = "NH:DOD",
    LoadingSubtitle = "by nexer",
+   ShowText = "Nexer Hub",
    Theme = "Amethyst",
    DisableRayfieldPrompts = true,
    DisableBuildWarnings = true,
@@ -269,7 +270,7 @@ pcall(function()
 local Announcements = Window:CreateTab("Announce",0)
 Announcements:CreateParagraph({Title = "Warning!", Content = "Recently there were multiple skidded scripts of mine hub. The great example of this are oshub, nyxer hub and others. Those so called ''hubs'' are full copy pastes of mine script. They can't deny it."})
 Announcements:CreateSection("")
-Announcements:CreateParagraph({Title = "Hi there!", Content = "Script Version: 2.3 ( WORK IN PROGRESS, EXCEPT A LOT OF BUGS )\n\nThis script was fully recoded and fixed. Thank you for using my script. ❤️\n\nAlso join our discord server for early updates, free premium access and many other things..."})
+Announcements:CreateParagraph({Title = "Hi there!", Content = "Script Version: 2.35 ( WORK IN PROGRESS, EXCEPT A LOT OF BUGS )\n\nThis script was fully recoded and fixed. Thank you for using my script. ❤️\n\nAlso join our discord server for early updates, free premium access and many other things..."})
 Announcements:CreateButton({Name = "Copy Discord Server Link"; Callback = function()
 setclipboard(tostring("https://discord.gg/7u5GRNw3xn"))
 Notify("Success!", "Copied Link!", 3, true)
@@ -1188,7 +1189,7 @@ Tab_4:CreateLabel("soon...")
 Tab_4:CreateSection("Intro / Special Round Starter")
 
 killerintro = "Pursuer"
-Tab_4:CreateDropdown({Name = "Killer Intro"; Options = {"Pursuer","Artful","Badware","Killdroid","Harken"}; CurrentOption = "Pursuer"; MultiSelection = false; Callback = function(Value)
+Tab_4:CreateDropdown({Name = "Killer Intro"; Options = {"Pursuer","Artful","Badware","Killdroid","Harken","Paranoy","MR.O.B."}; CurrentOption = "Pursuer"; MultiSelection = false; Callback = function(Value)
 killerintro = ConvertDropdownValue(Value)
 end; })
 
@@ -1199,7 +1200,7 @@ end; })
 
 
 specialroundevent = "Double Trouble"
-Tab_4:CreateDropdown({Name = "Special Round Event"; Options = {"Double Trouble","Evil Scary","One Bounce","Gunslinger","Dienation"}; CurrentOption = "Double Trouble"; MultiSelection = false; Callback = function(Value)
+Tab_4:CreateDropdown({Name = "Special Round Event"; Options = {"Double Trouble","Evil Scary","One Bounce","Gunslinger","Dienation","Mini Brawl"}; CurrentOption = "Double Trouble"; MultiSelection = false; Callback = function(Value)
 specialroundevent = ConvertDropdownValue(Value)
 end; })
 
@@ -1241,33 +1242,33 @@ Tab_5:CreateSection("Server")
 local path = {"GameAssets", "Map", "Config", "KillerOnly"}
 
 local function getFolder()
-	local f = workspace
-	for _, v in ipairs(path) do
-		if not f then return nil end
-		f = f:FindFirstChild(v)
-		if not f then return nil end
-	end
-	return f
+local f = workspace
+for _, v in ipairs(path) do
+	if not f then return nil end
+	f = f:FindFirstChild(v)
+	if not f then return nil end
+end
+return f
 end
 
 local ogState = {}
 local conns = {}
 
 local function setNoCollide(v, state)
-	if not v or not v:IsA("BasePart") then return end
-	if state then
-		if ogState[v] == nil then
-			ogState[v] = v.CanCollide
-		end
-		v.CanCollide = false
-	else
-		if ogState[v] ~= nil then
-			if v.Parent then
-				v.CanCollide = ogState[v]
-			end
-			ogState[v] = nil
-		end
+if not v or not v:IsA("BasePart") then return end
+if state then
+	if ogState[v] == nil then
+		ogState[v] = v.CanCollide
 	end
+	v.CanCollide = false
+else
+	if ogState[v] ~= nil then
+		if v.Parent then
+			v.CanCollide = ogState[v]
+		end
+		ogState[v] = nil
+	end
+end
 end
 
 local function enable()
@@ -1364,7 +1365,7 @@ end; })
 
 
 
-
+Tab_5:CreateSection("Anti")
 local AntiWalls
 AntiWalls = false
 Tab_5:CreateToggle({Name = "Anti-Artful Walls"; CurrentValue = false; Callback = function(Value)
@@ -1386,6 +1387,7 @@ descendant.CanTouch = false
 descendant.Transparency = 0.5
 end
 end)
+
 
 local AntiComputer
 AntiComputer = false
@@ -1507,6 +1509,18 @@ if child.Name == "FallDamage" and child:IsA("BasePart") and AntiFallDamage == tr
 child:Destroy()
 end
 end)
+
+
+local AutoRemoveDestroyableObject = false
+Tab_5:CreateToggle({Name = "Anti Destroyable Object"; CurrentValue = false; Callback = function(Value)
+AutoRemoveDestroyableObject = Value
+pcall(function()
+if Value == true then
+workspace.GameAssets.Map.Build.Destroyable:Destroy()
+end
+end)
+end; })
+
 
 local AutoRemoveBarriers = false
 Tab_5:CreateToggle({Name = "Anti Barriers"; CurrentValue = false; Callback = function(Value)
@@ -1877,6 +1891,40 @@ ApplyNewAnimations()
 end)
 Notify("Success!", "Applying replacion, it may take up to 10 seconds.", 3, true)
 end; })
+
+
+
+
+Tab_6:CreateSection("Custom Ability Animation Changer")
+Tab_6:CreateSection("DONT REQUIRE rbxassetid ONLY NUMBER REQUIRED")
+
+
+local abilityList = {}
+for name,_ in pairs(AbilityAnimData) do
+	table.insert(abilityList,name)
+end
+
+local SelectedAbility = abilityList[1]
+Tab_6:CreateDropdown({Name = "Select Ability"; Options = abilityList; CurrentOption = abilityList[1]; MultiSelection = false; Callback = function(v)
+	SelectedAbility = ConvertDropdownValue(v)
+end
+});
+
+local CustomAnimID = ""
+Tab_6:CreateInput({Name = "Animation ID"; PlaceholderText = "Enter ID only"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(v)
+	CustomAnimID = v
+end
+});
+
+Tab_6:CreateButton({Name = "Apply"; Callback = function()
+if CustomAnimID ~= "" then
+	AbilityAnimData[SelectedAbility] = "rbxassetid://" .. CustomAnimID
+	Character.Animations.Abilities[SelectedAbility].AnimationId = AbilityAnimData[SelectedAbility]
+	ApplyNewAnimations()
+	Notify("Success!", "Custom Ability animation changed", 1, true)
+end
+end
+});
 
 
 Tab_6:CreateSection("Miscellaneous")
