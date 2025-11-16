@@ -57,14 +57,14 @@ local function SerializeType(Value, Class)
 		return tostring(Value)
 	end
 end
-function TableToLuauString(Table)
-	IgnoredTables = {}
+function TableToLuauString(Table, IgnoredTables, DepthData, Path)
+	IgnoredTables = IgnoredTables or {}
 	local CyclicData = IgnoredTables[Table]
 	if CyclicData then
 		return ((CyclicData[1] == DepthData[1] - 1 and '\'[Cyclic Parent ' or '\'[Cyclic ') .. tostring(Table) .. ', path: ' .. CyclicData[2] .. ']\'')
 	end
-	Path = 'ROOT'
-	DepthData = {0, Path}
+	Path = Path or 'ROOT'
+	DepthData = DepthData or {0, Path}
 	local Depth = DepthData[1] + 1
 	DepthData[1] = Depth
 	DepthData[2] = Path
@@ -98,12 +98,12 @@ function TableToLuauString(Table)
 		Value = ValueClass == 'table' and TableToLuauString(Value, IgnoredTables, {Depth + 1, Path}, Path .. (HasBrackets and '' or '.') .. Key) or SerializeType(Value, ValueClass)
 		Result = Result .. LineTab .. (HasOrder and Value or Key .. ' = ' .. Value) .. ','
 	end
-	local donetable = (IsEmpty and Result .. '}' or string.sub(Result,  1, -2) .. '\n' .. TrailingTab .. '}')
+	local donetable = IsEmpty and Result .. '}' or string.sub(Result,  1, -2) .. '\n' .. TrailingTab .. '}'
 	return 'return '..donetable..''
 end
-local InsertElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); table.insert(temp_table,element); CreateFile(tf, TableToLuauString(temp_table,false)) end
-local RemoveElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); for i,v in pairs(temp_table) do if v == element then temp_table[i]=nil end end; CreateFile(tf, TableToLuauString(temp_table,false)) end
---local InsertElement_test = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); temp_table[element] = value; CreateFile(tf, TableToLuauString(temp_table,false)) end
+local InsertElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); table.insert(temp_table,element); CreateFile(tf, TableToLuauString(temp_table)) end
+local RemoveElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); for i,v in pairs(temp_table) do if v == element then temp_table[i]=nil end end; CreateFile(tf, TableToLuauString(temp_table)) end
+--local InsertElement_test = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); temp_table[element] = value; CreateFile(tf, TableToLuauString(temp_table)) end
 
 local config_save = "DOD_config_ea.luau"
 if not isfolder("NexerHub") then
@@ -201,7 +201,7 @@ writefile("NexerHub/Core/"..config_save.."", [[return {
 }]])
 repeat task.wait() until isfile("NexerHub/Core/"..config_save.."")
 end
-local SaveConfig = function(tab,value,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); if not element_2 then temp_table[tab][element_1] = value elseif not element_3 then temp_table[tab][element_1][element_2] = value else temp_table[tab][element_1][element_2][element_3] = value end CreateFile("NexerHub/Core/"..config_save.."", TableToLuauString(temp_table,true)) end
+local SaveConfig = function(tab,value,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); if not element_2 then temp_table[tab][element_1] = value elseif not element_3 then temp_table[tab][element_1][element_2] = value else temp_table[tab][element_1][element_2][element_3] = value end CreateFile("NexerHub/Core/"..config_save.."", TableToLuauString(temp_table)) end
 local LoadConfig = function(tab,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); if not element_2 then return temp_table[tab][element_1] elseif not element_3 then return temp_table[tab][element_1][element_2] else return temp_table[tab][element_1][element_2][element_3] end end
 
 
