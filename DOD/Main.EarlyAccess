@@ -167,14 +167,17 @@ if not isfolder("NexerHub/Core") then
 makefolder("NexerHub/Core")
 repeat task.wait() until isfolder("NexerHub/Core")
 end
-if not isfile("NexerHub/Core/"..config_save.."") then
+--if not isfile("NexerHub/Core/"..config_save.."") then
 writefile("NexerHub/Core/"..config_save.."", [[return {
     ["Tab_1"] = {
         ["AutoInjection"] = {
             ["MaxStamina"] = "Type Here!",
             ["WalkSpeed"] = "Type Here!",
             ["SprintSpeed"] = "Type Here!"
-        }
+        },
+        ["NoStaminaLossMethod"] = "require",
+        ["NoStaminaLoss"] = false,
+        ["NoFatigue"] = false
     },
     ["Tab_2"] = {},
     ["Tab_3"] = {
@@ -242,8 +245,24 @@ writefile("NexerHub/Core/"..config_save.."", [[return {
             ["AntiFallRagdoll"] = false
         }
     },
-    ["Tab_4"] = {},
-    ["Tab_5"] = {},
+    ["Tab_4"] = {
+        ["ESP"] = {
+            ["Enabled"] = false,
+            ["Transparency"] = 0.3,
+            ["ShowUsernames"] = true,
+            ["ShowHealth"] = true
+        },
+        ["Money"] = {
+            ["Amount"] = "10",
+            ["Reason"] = "for surviving for atleast 60 seconds."
+        }
+    },
+    ["Tab_5"] = {
+        ["IB"] = {
+            ["AntiEvilScary"] = false,
+            ["AntiTaunt"] = false
+        }
+    },
     ["Tab_6"] = {},
     ["Tab_7"] = {},
     ["Tab_8"] = {},
@@ -253,7 +272,7 @@ writefile("NexerHub/Core/"..config_save.."", [[return {
     ["Tab_12"] = {}
 }]])
 repeat task.wait() until isfile("NexerHub/Core/"..config_save.."")
-end
+--end
 local SaveConfig = function(tab,value,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); if not element_2 then temp_table[tab][element_1] = value elseif not element_3 then temp_table[tab][element_1][element_2] = value else temp_table[tab][element_1][element_2][element_3] = value end CreateFile("NexerHub/Core/"..config_save.."", 'return '..TableToLuauString(temp_table)..'') end
 local LoadConfig = function(tab,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); if not element_2 then return temp_table[tab][element_1] elseif not element_3 then return temp_table[tab][element_1][element_2] else return temp_table[tab][element_1][element_2][element_3] end end
 
