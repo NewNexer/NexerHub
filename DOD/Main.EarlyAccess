@@ -673,13 +673,14 @@ SetStaminaProperty("CanJump", false)
 end
 end; })
 
-local ChoosenNoStamLossMethod = "require"
+local ChoosenNoStamLossMethod = LoadConfig("Tab_1", "NoStaminaLossMethod")
 local lastusedmethod = ""
-Tab_1:CreateDropdown({Name = "Choosen No Stamina Loss Method"; Options = {"require","scriptbreak (toggle while running)"}; CurrentOption = "require"; MultiSelection = false; Callback = function(Value)
+Tab_1:CreateDropdown({Name = "Choosen No Stamina Loss Method"; Options = {"require","scriptbreak (toggle while running)"}; CurrentOption = ChoosenNoStamLossMethod; MultiSelection = false; Callback = function(Value)
 ChoosenNoStamLossMethod = ((ConvertDropdownValue(Value)=="scriptbreak (toggle while running)" and "scriptbreak") or "require")
+SaveConfig("Tab_1", ChoosenNoStamLossMethod, "NoStaminaLossMethod")
 end; })
 
-local NoStaminaLoss = false
+local NoStaminaLoss = LoadConfig("Tab_1", "NoStaminaLoss")
 Tab_1:CreateToggle({Name = "No Stamina Loss"; CurrentValue = false; Callback = function(Value)
 if lastusedmethod == "require" then
 NoStaminaLoss = false
@@ -690,6 +691,7 @@ SetStaminaProperty("Fatigue", 0)
 lastusedmethod = ""
 return
 end
+SaveConfig("Tab_1", Value, "NoStaminaLoss")
 if Value == true then
 if ChoosenNoStamLossMethod == "require" then
 NoStaminaLoss = true
@@ -708,8 +710,10 @@ end
 end
 end; })
 
-Tab_1:CreateToggle({Name = "No Fatigue"; CurrentValue = false; Callback = function(Value)
+local NoFatigue = LoadConfig("Tab_1", "NoFatigue")
+Tab_1:CreateToggle({Name = "No Fatigue"; CurrentValue = NoFatigue; Callback = function(Value)
 NoFatigue = Value
+SaveConfig("Tab_1", Value, "NoFatigue")
 if NoFatigue == true then
 repeat task.wait(0.003)
 if Character and Character:GetAttribute("Fatigue") and Character:GetAttribute("Fatigue") == 1 then
@@ -1129,6 +1133,7 @@ function AbilitySystem.CreateAbility(AbilityData)
     end
     
     AbilityButton.Activated:Connect(function()
+		if AbilityData.Client ~= nil and AbilityData.Client == true then return end
         AbilitySystem.UseAbility(AbilityData, AbilityButton)
     end)
 end
@@ -1186,6 +1191,7 @@ function AbilitySystem.UseAbility(AbilityData, AbilityButton)
             AbilitySystem.PutOnCooldown(AbilityButton, Cooldown or AbilityData.Cooldown)
         end
     end
+	return Success
 end
 
 return AbilitySystem]]
@@ -1813,10 +1819,10 @@ if not game:GetService("CoreGui"):FindFirstChild("DOD_ESP_HANDLER") then
 Instance.new("Folder", game:GetService("CoreGui")).Name = "DOD_ESP_HANDLER"
 end
 
-_G.ESPenabledHandler = false
-_G.ESPtransHandler = 0.3
-_G.ESPshowusers = true
-_G.ESPshowhealth = true
+_G.ESPenabledHandler = LoadConfig("Tab_4", "ESP", "Enabled")
+_G.ESPtransHandler = LoadConfig("Tab_4", "ESP", "Transparency")
+_G.ESPshowusers = LoadConfig("Tab_4", "ESP", "ShowUsernames")
+_G.ESPshowhealth = LoadConfig("Tab_4", "ESP", "ShowHealth")
 
 
 function CreateHighlight(plr)
@@ -1922,17 +1928,20 @@ local Tab_4 = Window:CreateTab("Visual",0)
 Tab_4:CreateParagraph({Title = "Visual", Content = "You can change some of the visual parts of the game here."})
 Tab_4:CreateSection("ESP")
 
-Tab_4:CreateSlider({Name = "ESP Transparency (in %)"; Range = {0, 100}; Increment = 5; Suffix = "%"; CurrentValue = 30; Callback = function(Value)
+Tab_4:CreateSlider({Name = "ESP Transparency (in %)"; Range = {0, 100}; Increment = 5; Suffix = "%"; CurrentValue = (_G.ESPtransHandler*100); Callback = function(Value)
 _G.ESPtransHandler = (tonumber(Value) / 100)
 ChangeTransparency(tonumber(_G.ESPtransHandler))
+SaveConfig("Tab_4", _G.ESPtransHandler, "ESP", "Transparency")
 end; })
 
 Tab_4:CreateToggle({Name = "Show Username"; CurrentValue = true; Callback = function(Value)
 _G.ESPshowusers = Value
+SaveConfig("Tab_4", _G.ESPshowusers, "ESP", "ShowUsernames")
 end; })
 
 Tab_4:CreateToggle({Name = "Show Health"; CurrentValue = true; Callback = function(Value)
 _G.ESPshowhealth = Value
+SaveConfig("Tab_4", _G.ESPshowhealth, "ESP", "ShowHealth")
 end; })
 
 plradded_esp = nil
@@ -1964,6 +1973,7 @@ plrremoved_esp:Disconnect()
 plrremoved_esp = nil
 end
 end
+SaveConfig("Tab_4", _G.ESPenabledHandler, "ESP", "Enabled")
 end; })
 
 Tab_4:CreateSection("Gui Management ε=( o｀ω′)ノ")
@@ -2036,17 +2046,19 @@ function AwardPoints(points, reason)
 		end
 	end)
 end
-MoneyToGet = 10
-ReasonForMoney = "for surviving for atleast 60 seconds."
+MoneyToGet = LoadConfig("Tab_4", "Money", "Amount")
+ReasonForMoney = LoadConfig("Tab_4", "Money", "Reason")
 
 Tab_4:CreateSection("Money Giver ( Visual )")
 
-Tab_4:CreateInput({Name = "Money amount"; PlaceholderText = "10"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-MoneyToGet = tonumber(Value)
+Tab_4:CreateInput({Name = "Money amount"; PlaceholderText = MoneyToGet; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+MoneyToGet = Value
+SaveConfig("Tab_4", MoneyToGet, "Money", "Amount")
 end; })
 
-Tab_4:CreateInput({Name = "Reason for getting money"; PlaceholderText = "for surviving for atleast 60 seconds."; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+Tab_4:CreateInput({Name = "Reason for getting money"; PlaceholderText = ReasonForMoney; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 ReasonForMoney = tostring(Value)
+SaveConfig("Tab_4", ReasonForMoney, "Money", "Reason")
 end; })
 
 Tab_4:CreateButton({Name = "Give money"; Callback = function()
@@ -2106,13 +2118,61 @@ end; })
 
 
 local Tab_5 = Window:CreateTab("Killer",0)
-Tab_5:CreateParagraph({Title = "Abilities Editor", Content = "Ability Editor"})
+Tab_5:CreateParagraph({Title = "Abilities Editor", Content = "Ability Editor and giver"})
 
+Tab_5:CreateSection("Universal")
+Tab_5:CreateButton({Name = "Get Faster Swing"; Callback = function(Value)
+local a = game.ReplicatedStorage:FindFirstChild("UseAbility",true)
+AbilityModule.CreateAbility({Client = true,Name = "Whack_NH",InputShown = "M2",Tip = "Swing but faster.",Cooldown = 0, Icon = "rbxassetid://13771861804",DisplayName = "Whack"})
+repeat task.wait() until game.Players.LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Whack_NH")
+game.Players.LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Whack_NH").MouseButton1Down:Connect(function()
+a:InvokeServer("Swing")
+AbilityModule.AbilityTween(game.Players.LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Whack_NH"))
+end)
+end; })
+Tab_5:CreateSection("Pursuer")
+Tab_5:CreateSection("Badware")
+Tab_5:CreateSection("Artful")
+Tab_5:CreateSection("Harken")
+Tab_5:CreateSection("Killdroid")
 
 
 Tab_5:CreateParagraph({Title = "Immunities / Buffs", Content = "Immunities and buffs for workspace side"})
 
 Tab_5:CreateSection("Workspace Side")
+
+local BackupEffect = game:GetService("ReplicatedStorage").Events.RemoteEvents.TauntEffect:Clone()
+BackupEffect.Parent = game.LogService
+local AntiTaunt = LoadConfig("Tab_5", "IB", "AntiTaunt")
+Tab_5:CreateToggle({Name = "Anti Taunt"; CurrentValue = AntiTaunt; Callback = function(Value)
+AntiTaunt = Value
+if AntiTaunt == true then
+LocalPlayer.PlayerGui.MainGui.RoundUI.TauntTemplate:Destroy()
+else
+if LocalPlayer.PlayerGui.MainGui.RoundUI:FindFirstChild("TauntTemplate") == nil then
+local a = BackupEffect:Clone()
+a.Parent = LocalPlayer.PlayerGui.MainGui.RoundUI
+end
+end
+SaveConfig("Tab_5", AntiTaunt, "IB", "AntiTaunt")
+end; })
+LocalPlayer.PlayerGui.MainGui.RoundUI.ChildAdded:Connect(function(child)
+if child.Name == "TauntTemplate" and AntiTaunt == true then
+child:Destroy()
+if Character:GetAttribute("WalkSpeedModifier") ~= nil and Character:GetAttribute("WalkSpeedModifier") < 0 then
+Character:SetAttribute("WalkSpeedModifier", 0)
+else
+task.wait(.05)
+Character:SetAttribute("WalkSpeedModifier", 0)
+end
+end
+end)
+
+Tab_5:CreateButton({Name = "Remove Destroyable Objects"; Callback = function(Value)
+pcall(function()
+workspace.GameAssets.Map.Build.Destroyable:Destroy()
+end)
+end; })
 
 local AntiEvilScary2 = LoadConfig("Tab_5", "IB", "AntiEvilScary")
 Tab_5:CreateToggle({Name = "Anti Evil Scary"; CurrentValue = AntiEvilScary2; Callback = function(Value)
@@ -2200,9 +2260,6 @@ if c.Name == "Map" and AntiBarriers2 == true then
 AntiBarriers2_toggle:Set(false)
 end
 end)
-
-
-
 
 
 
@@ -4470,7 +4527,7 @@ if GetKillerModelByName(KillerAppearance) == nil then
 Notify("Error!","Incorrect killer name.",3,warn)
 return
 end
-ReplaceModel(workspace.GameAssets.Teams.Killer:FindFirstChildOfClass("Model"), GetKillerModelByName(KillerAppearance))
+ReplaceModel(workspace.GameAssets.Teams:FindFirstChild(game.Players.LocalPlayer.Name, true), GetKillerModelByName(KillerAppearance))
 end; })
 Tab_8:CreateButton({Name = "Change current killer(s) appearance"; Callback = function()
 if GetKillerModelByName(KillerAppearance) == nil then
