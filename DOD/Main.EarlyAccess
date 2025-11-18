@@ -2150,10 +2150,88 @@ AbilityModule.AbilityTween(game.Players.LocalPlayer.PlayerGui.MainGui.Abilities.
 end)
 end; })
 Tab_5:CreateSection("Pursuer")
+Tab_5:CreateLabel("Nothing Yet...")
 Tab_5:CreateSection("Badware")
+local HotdogConfig = LoadConfig("Tab_5", "HotdogConfig")
+Tab_3:CreateLabel("Hotdog Ability")
+local HotdogBind = HotdogConfig.Bind
+Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = HotdogBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+HotdogBind = tostring(Value)
+SaveConfig("Tab_3", HotdogBind, "HotdogConfig", "Bind")
+end; })
+--------------------------------------------------------------------------------------
+local HotdogConfigEffects = nil
+function ApplyHotdogConfigurations()
+if HotdogConfigEffects then
+HotdogConfigEffects:Disconnect()
+HotdogConfigEffects = nil
+end
+if not HumanoidRootPart then return end
+if HotdogStaminaLoss == 5 then return end
+HotdogConfigEffects = HumanoidRootPart.Hotdog:GetPropertyChangedSignal("Playing"):Connect(function(c)
+if HumanoidRootPart.Hotdog.Playing == true then
+local OldMaxStamina = tonumber(Character:GetAttribute("MaxStamina"))
+if not OldMaxStamina then return end
+Character:GetAttributeChangedSignal("MaxStamina"):Once(function()
+Character:SetAttribute("MaxStamina", tonumber(OldMaxStamina-HotdogStaminaLoss))
+end)
+end
+end)
+end
+--------------------------------------------------------------------------------------
+Tab_5:CreateButton({Name = "Apply Pursuer Configurations"; Callback = function(Value)
+
+end; })
 Tab_5:CreateSection("Artful")
+--------------------------------------------------------------------------------------
+local HotdogConfigEffects = nil
+function ApplyHotdogConfigurations()
+if HotdogConfigEffects then
+HotdogConfigEffects:Disconnect()
+HotdogConfigEffects = nil
+end
+if not HumanoidRootPart then return end
+if HotdogStaminaLoss == 5 then return end
+HotdogConfigEffects = HumanoidRootPart.Hotdog:GetPropertyChangedSignal("Playing"):Connect(function(c)
+if HumanoidRootPart.Hotdog.Playing == true then
+local OldMaxStamina = tonumber(Character:GetAttribute("MaxStamina"))
+if not OldMaxStamina then return end
+Character:GetAttributeChangedSignal("MaxStamina"):Once(function()
+Character:SetAttribute("MaxStamina", tonumber(OldMaxStamina-HotdogStaminaLoss))
+end)
+end
+end)
+end
+--------------------------------------------------------------------------------------
+Tab_5:CreateButton({Name = "Apply Pursuer Configurations"; Callback = function(Value)
+
+end; })
 Tab_5:CreateSection("Harken")
+Tab_5:CreateLabel("Nothing Yet...")
 Tab_5:CreateSection("Killdroid")
+--------------------------------------------------------------------------------------
+local HotdogConfigEffects = nil
+function ApplyHotdogConfigurations()
+if HotdogConfigEffects then
+HotdogConfigEffects:Disconnect()
+HotdogConfigEffects = nil
+end
+if not HumanoidRootPart then return end
+if HotdogStaminaLoss == 5 then return end
+HotdogConfigEffects = HumanoidRootPart.Hotdog:GetPropertyChangedSignal("Playing"):Connect(function(c)
+if HumanoidRootPart.Hotdog.Playing == true then
+local OldMaxStamina = tonumber(Character:GetAttribute("MaxStamina"))
+if not OldMaxStamina then return end
+Character:GetAttributeChangedSignal("MaxStamina"):Once(function()
+Character:SetAttribute("MaxStamina", tonumber(OldMaxStamina-HotdogStaminaLoss))
+end)
+end
+end)
+end
+--------------------------------------------------------------------------------------
+Tab_5:CreateButton({Name = "Apply Pursuer Configurations"; Callback = function(Value)
+
+end; })
 
 
 Tab_5:CreateParagraph({Title = "Immunities / Buffs", Content = "Immunities and buffs for workspace side"})
