@@ -261,6 +261,21 @@ writefile("NexerHub/Core/"..config_save.."", [[return {
         ["IB"] = {
             ["AntiEvilScary"] = false,
             ["AntiTaunt"] = false
+        },
+        ["PursuerConfig"] = {
+            ["CleaveBoost"] = 6
+        },
+        ["BadwareConfig"] = {
+            ["HipHeight"] = 5
+        },
+        ["ArtfulConfig"] = {
+            ["HipHeight"] = 5
+        },
+        ["HarkenConfig"] = {},
+        ["KilldroidConfig"] = {
+            ["Power"] = 1250,
+            ["MaxForce"] = 1000000,
+            ["Don'tDescendDuringTheFlight"] = false
         }
     },
     ["Tab_6"] = {},
@@ -2149,88 +2164,145 @@ a:InvokeServer("Swing")
 AbilityModule.AbilityTween(game.Players.LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Whack_NH"))
 end)
 end; })
+
+
 Tab_5:CreateSection("Pursuer")
-Tab_5:CreateLabel("Nothing Yet...")
+local PursuerConfig = LoadConfig("Tab_5", "PursuerConfig")
+local PursuerCleaveBoost = PursuerConfig.CleaveBoost
+Tab_5:CreateInput({Name = "Cleave Boost"; PlaceholderText = PursuerCleaveBoost; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+PursuerCleaveBoost = Value
+SaveConfig("Tab_5", PursuerCleaveBoost, "PursuerConfig", "CleaveBoost")
+end; })
+--------------------------------------------------------------------------------------
+local PursuerConfigEffects = nil
+function ApplyPursuerConfigurations()
+if PursuerConfigEffects then
+PursuerConfigEffects:Disconnect()
+PursuerConfigEffects = nil
+end
+if not Character then return end
+if PursuerCleaveBoost == 6 then return end
+PursuerConfigEffects = Character:GetAttributeChangedSignal("WalkSpeedModifier"):Connect(function()
+local OldWalkSpeedModifier = Character:GetAttribute("WalkSpeedModifier")
+if not OldWalkSpeedModifier then return end
+if OldWalkSpeedModifier == 6 then
+Character:SetAttribute("WalkSpeedModifier", PursuerCleaveBoost)
+end
+end)
+end
+--------------------------------------------------------------------------------------
+Tab_5:CreateButton({Name = "Apply Pursuer Configurations"; Callback = function()
+ApplyPursuerConfigurations()
+Notify("Success!", "Applied configurations.", 3, false)
+end; })
+
 Tab_5:CreateSection("Badware")
-local HotdogConfig = LoadConfig("Tab_5", "HotdogConfig")
-Tab_3:CreateLabel("Hotdog Ability")
-local HotdogBind = HotdogConfig.Bind
-Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = HotdogBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-HotdogBind = tostring(Value)
-SaveConfig("Tab_3", HotdogBind, "HotdogConfig", "Bind")
+local BadwareConfig = LoadConfig("Tab_5", "BadwareConfig")
+local BadwareHipHeight = BadwareConfig.HipHeight
+Tab_5:CreateInput({Name = "Hip Height when placing computers"; PlaceholderText = BadwareHipHeight; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+BadwareHipHeight = Value
+SaveConfig("Tab_5", BadwareHipHeight, "BadwareConfig", "HipHeight")
 end; })
 --------------------------------------------------------------------------------------
-local HotdogConfigEffects = nil
-function ApplyHotdogConfigurations()
-if HotdogConfigEffects then
-HotdogConfigEffects:Disconnect()
-HotdogConfigEffects = nil
+local BadwareConfigEffects = nil
+function ApplyBadwareConfigurations()
+if BadwareConfigEffects then
+BadwareConfigEffects:Disconnect()
+BadwareConfigEffects = nil
 end
 if not HumanoidRootPart then return end
-if HotdogStaminaLoss == 5 then return end
-HotdogConfigEffects = HumanoidRootPart.Hotdog:GetPropertyChangedSignal("Playing"):Connect(function(c)
-if HumanoidRootPart.Hotdog.Playing == true then
-local OldMaxStamina = tonumber(Character:GetAttribute("MaxStamina"))
-if not OldMaxStamina then return end
-Character:GetAttributeChangedSignal("MaxStamina"):Once(function()
-Character:SetAttribute("MaxStamina", tonumber(OldMaxStamina-HotdogStaminaLoss))
-end)
-end
+if not Humanoid then return end
+if BadwareHipHeight == 0 then return end
+BadwareConfigEffects = HumanoidRootPart.FirewallBypass:GetPropertyChangedSignal("Playing"):Connect(function(c)
+if HumanoidRootPart.FirewallBypass.Playing ~= true then return end
+Humanoid.HipHeight = tonumber(BadwareHipHeight)
+task.wait(2)
+Humanoid.HipHeight = 0
 end)
 end
 --------------------------------------------------------------------------------------
-Tab_5:CreateButton({Name = "Apply Pursuer Configurations"; Callback = function(Value)
-
+Tab_5:CreateButton({Name = "Apply Badware Configurations"; Callback = function()
+ApplyBadwareConfigurations()
+Notify("Success!", "Applied configurations.", 3, false)
 end; })
+
 Tab_5:CreateSection("Artful")
+local ArtfulConfig = LoadConfig("Tab_5", "ArtfulConfig")
+local ArtfulHipHeight = ArtfulConfig.HipHeight
+Tab_5:CreateInput({Name = "Hip Height when placing walls/music box"; PlaceholderText = ArtfulHipHeight; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+ArtfulHipHeight = Value
+SaveConfig("Tab_5", ArtfulHipHeight, "ArtfulConfig", "HipHeight")
+end; })
 --------------------------------------------------------------------------------------
-local HotdogConfigEffects = nil
-function ApplyHotdogConfigurations()
-if HotdogConfigEffects then
-HotdogConfigEffects:Disconnect()
-HotdogConfigEffects = nil
+local ArtfulConfigEffects = nil
+function ApplyArtfulConfigurations()
+if ArtfulConfigEffects then
+ArtfulConfigEffects:Disconnect()
+ArtfulConfigEffects = nil
 end
 if not HumanoidRootPart then return end
-if HotdogStaminaLoss == 5 then return end
-HotdogConfigEffects = HumanoidRootPart.Hotdog:GetPropertyChangedSignal("Playing"):Connect(function(c)
-if HumanoidRootPart.Hotdog.Playing == true then
-local OldMaxStamina = tonumber(Character:GetAttribute("MaxStamina"))
-if not OldMaxStamina then return end
-Character:GetAttributeChangedSignal("MaxStamina"):Once(function()
-Character:SetAttribute("MaxStamina", tonumber(OldMaxStamina-HotdogStaminaLoss))
-end)
-end
+if not Humanoid then return end
+if ArtfulHipHeight == 0 then return end
+ArtfulConfigEffects = HumanoidRootPart["CopyThrice2"]:GetPropertyChangedSignal("Playing"):Connect(function(c)
+if HumanoidRootPart["CopyThrice2"].Playing ~= true then return end
+Humanoid.HipHeight = tonumber(ArtfulHipHeight)
+task.wait(2)
+Humanoid.HipHeight = 0
 end)
 end
 --------------------------------------------------------------------------------------
-Tab_5:CreateButton({Name = "Apply Pursuer Configurations"; Callback = function(Value)
-
+Tab_5:CreateButton({Name = "Apply Artful Configurations"; Callback = function()
+ApplyArtfulConfigurations()
+Notify("Success!", "Applied configurations.", 3, false)
 end; })
+
 Tab_5:CreateSection("Harken")
 Tab_5:CreateLabel("Nothing Yet...")
+
 Tab_5:CreateSection("Killdroid")
+local KilldroidConfig = LoadConfig("Tab_5", "KilldroidConfig")
+local KilldroidPower = KilldroidConfig.Power
+Tab_5:CreateInput({Name = "Power"; PlaceholderText = KilldroidPower; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+KilldroidPower = tonumber(Value)
+SaveConfig("Tab_5", KilldroidPower, "KilldroidConfig", "Power")
+end; })
+local KilldroidMaxForce = KilldroidConfig.MaxForce
+Tab_5:CreateInput({Name = "Max Force"; PlaceholderText = KilldroidMaxForce; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+KilldroidMaxForce = tonumber(Value)
+SaveConfig("Tab_5", KilldroidMaxForce, "KilldroidConfig", "MaxForce")
+end; })
+local KilldroidDD = KilldroidConfig["Don'tDescendDuringTheFlight"]
+Tab_5:CreateToggle({Name = "Dont Descend During the Flight"; CurrentValue = KilldroidDD; Callback = function(Value)
+KilldroidDD = Value
+SaveConfig("Tab_5", KilldroidDD, "KilldroidConfig", "Don'tDescendDuringTheFlight")
+end; })
 --------------------------------------------------------------------------------------
-local HotdogConfigEffects = nil
-function ApplyHotdogConfigurations()
-if HotdogConfigEffects then
-HotdogConfigEffects:Disconnect()
-HotdogConfigEffects = nil
+local KilldroidConfigEffects = nil
+function ApplyKilldroidConfigurations()
+if KilldroidConfigEffects then
+KilldroidConfigEffects:Disconnect()
+KilldroidConfigEffects = nil
 end
 if not HumanoidRootPart then return end
-if HotdogStaminaLoss == 5 then return end
-HotdogConfigEffects = HumanoidRootPart.Hotdog:GetPropertyChangedSignal("Playing"):Connect(function(c)
-if HumanoidRootPart.Hotdog.Playing == true then
-local OldMaxStamina = tonumber(Character:GetAttribute("MaxStamina"))
-if not OldMaxStamina then return end
-Character:GetAttributeChangedSignal("MaxStamina"):Once(function()
-Character:SetAttribute("MaxStamina", tonumber(OldMaxStamina-HotdogStaminaLoss))
+KilldroidConfigEffects = HumanoidRootPart.ChildAdded:Connect(function(c)
+if c.Name == "BodyVelocity" then
+c.MaxForce = Vector3.new(KilldroidMaxForce,KilldroidMaxForce,KilldroidMaxForce)
+c.P = KilldroidPower
+if KilldroidDD ~= true then return end
+task.spawn(function()
+pcall(function()
+while task.wait() do
+c.Velocity = Vector3.new(c.Velocity.X, 0, c.Velocity.Z)
+end
+end)
 end)
 end
 end)
 end
 --------------------------------------------------------------------------------------
-Tab_5:CreateButton({Name = "Apply Pursuer Configurations"; Callback = function(Value)
-
+Tab_5:CreateButton({Name = "Apply Killdroid Configurations"; Callback = function(Value)
+ApplyKilldroidConfigurations()
+Notify("Success!", "Applied configurations.", 3, false)
 end; })
 
 
