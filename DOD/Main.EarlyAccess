@@ -288,6 +288,14 @@ writefile("NexerHub/Core/"..config_save.."", [[return {
 }]])
 repeat task.wait() until isfile("NexerHub/Core/"..config_save.."")
 --end
+if not isfile("NexerHub/Core/PreloadData.luau") then
+writefile("NexerHub/Core/PreloadData.luau", [[return {
+    ["LoadConfig"] = true,
+    ["GUID"] = ]]..tostring(game:GetService("HttpService"):GenerateGUID())..[[,
+    ["CoreVersion"] = 1
+}]])
+repeat task.wait() until isfile("NexerHub/Core/"..config_save.."")
+end
 local SaveConfig = function(tab,value,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); if not element_2 then temp_table[tab][element_1] = value elseif not element_3 then temp_table[tab][element_1][element_2] = value else temp_table[tab][element_1][element_2][element_3] = value end CreateFile("NexerHub/Core/"..config_save.."", 'return '..TableToLuauString(temp_table)..'') end
 local LoadConfig = function(tab,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); if not element_2 then return temp_table[tab][element_1] elseif not element_3 then return temp_table[tab][element_1][element_2] else return temp_table[tab][element_1][element_2][element_3] end end
 
@@ -484,7 +492,7 @@ break
 end
 CreateFile("NexerHub/DieOfDeath/Assets/LMS/"..v..".mp3",music_data)
 asset_counter += 1
-temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/25)"
+temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/25, will be cancelled if doesn't load )"
 end
 end
 end
@@ -526,7 +534,7 @@ break
 end
 CreateFile("NexerHub/DieOfDeath/Assets/Chases/"..v..".mp3",music_data)
 asset_counter += 1
-temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/25)"
+temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/25, will be cancelled if doesn't load)"
 end
 end
 end
@@ -1833,6 +1841,301 @@ end)
 
 
 
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+local Tab_5 = Window:CreateTab("Killer",0)
+Tab_5:CreateParagraph({Title = "Abilities Editor", Content = "Ability Editor and giver"})
+
+Tab_5:CreateSection("Universal")
+Tab_5:CreateButton({Name = "Get Faster Swing"; Callback = function(Value)
+local a = game.ReplicatedStorage:FindFirstChild("UseAbility",true)
+AbilityModule.CreateAbility({Client = true,Name = "Whack_NH",InputShown = "M2",Tip = "Swing but faster.",Cooldown = 0, Icon = "rbxassetid://13771861804",DisplayName = "Whack"})
+repeat task.wait() until game.Players.LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Whack_NH")
+game.Players.LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Whack_NH").MouseButton1Down:Connect(function()
+a:InvokeServer("Swing")
+AbilityModule.AbilityTween(game.Players.LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Whack_NH"))
+end)
+end; })
+
+
+Tab_5:CreateSection("Pursuer")
+local PursuerConfig = LoadConfig("Tab_5", "PursuerConfig")
+local PursuerCleaveBoost = PursuerConfig.CleaveBoost
+Tab_5:CreateInput({Name = "Cleave Boost"; PlaceholderText = PursuerCleaveBoost; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+PursuerCleaveBoost = Value
+SaveConfig("Tab_5", PursuerCleaveBoost, "PursuerConfig", "CleaveBoost")
+end; })
+--------------------------------------------------------------------------------------
+local PursuerConfigEffects = nil
+function ApplyPursuerConfigurations()
+if PursuerConfigEffects then
+PursuerConfigEffects:Disconnect()
+PursuerConfigEffects = nil
+end
+if not Character then return end
+if PursuerCleaveBoost == 6 then return end
+PursuerConfigEffects = Character:GetAttributeChangedSignal("WalkSpeedModifier"):Connect(function()
+local OldWalkSpeedModifier = Character:GetAttribute("WalkSpeedModifier")
+if not OldWalkSpeedModifier then return end
+if OldWalkSpeedModifier == 6 then
+Character:SetAttribute("WalkSpeedModifier", PursuerCleaveBoost)
+end
+end)
+end
+--------------------------------------------------------------------------------------
+Tab_5:CreateButton({Name = "Apply Pursuer Configurations"; Callback = function()
+ApplyPursuerConfigurations()
+Notify("Success!", "Applied configurations.", 3, false)
+end; })
+
+Tab_5:CreateSection("Badware")
+local BadwareConfig = LoadConfig("Tab_5", "BadwareConfig")
+local BadwareHipHeight = BadwareConfig.HipHeight
+Tab_5:CreateInput({Name = "Hip Height when placing computers"; PlaceholderText = BadwareHipHeight; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+BadwareHipHeight = Value
+SaveConfig("Tab_5", BadwareHipHeight, "BadwareConfig", "HipHeight")
+end; })
+--------------------------------------------------------------------------------------
+local BadwareConfigEffects = nil
+function ApplyBadwareConfigurations()
+if BadwareConfigEffects then
+BadwareConfigEffects:Disconnect()
+BadwareConfigEffects = nil
+end
+if not HumanoidRootPart then return end
+if not Humanoid then return end
+if BadwareHipHeight == 0 then return end
+BadwareConfigEffects = HumanoidRootPart.FirewallBypass:GetPropertyChangedSignal("Playing"):Connect(function(c)
+if HumanoidRootPart.FirewallBypass.Playing ~= true then return end
+Humanoid.HipHeight = tonumber(BadwareHipHeight)
+task.wait(2)
+Humanoid.HipHeight = 0
+end)
+end
+--------------------------------------------------------------------------------------
+Tab_5:CreateButton({Name = "Apply Badware Configurations"; Callback = function()
+ApplyBadwareConfigurations()
+Notify("Success!", "Applied configurations.", 3, false)
+end; })
+
+Tab_5:CreateSection("Artful")
+local ArtfulConfig = LoadConfig("Tab_5", "ArtfulConfig")
+local ArtfulHipHeight = ArtfulConfig.HipHeight
+Tab_5:CreateInput({Name = "Hip Height when placing walls/music box"; PlaceholderText = ArtfulHipHeight; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+ArtfulHipHeight = Value
+SaveConfig("Tab_5", ArtfulHipHeight, "ArtfulConfig", "HipHeight")
+end; })
+--------------------------------------------------------------------------------------
+local ArtfulConfigEffects = nil
+function ApplyArtfulConfigurations()
+if ArtfulConfigEffects then
+ArtfulConfigEffects:Disconnect()
+ArtfulConfigEffects = nil
+end
+if not HumanoidRootPart then return end
+if not Humanoid then return end
+if ArtfulHipHeight == 0 then return end
+ArtfulConfigEffects = HumanoidRootPart["CopyThrice2"]:GetPropertyChangedSignal("Playing"):Connect(function(c)
+if HumanoidRootPart["CopyThrice2"].Playing ~= true then return end
+Humanoid.HipHeight = tonumber(ArtfulHipHeight)
+task.wait(2)
+Humanoid.HipHeight = 0
+end)
+end
+--------------------------------------------------------------------------------------
+Tab_5:CreateButton({Name = "Apply Artful Configurations"; Callback = function()
+ApplyArtfulConfigurations()
+Notify("Success!", "Applied configurations.", 3, false)
+end; })
+
+Tab_5:CreateSection("Harken")
+Tab_5:CreateLabel("Nothing Yet...")
+
+Tab_5:CreateSection("Killdroid")
+local KilldroidConfig = LoadConfig("Tab_5", "KilldroidConfig")
+local KilldroidPower = KilldroidConfig.Power
+Tab_5:CreateInput({Name = "Power"; PlaceholderText = KilldroidPower; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+KilldroidPower = tonumber(Value)
+SaveConfig("Tab_5", KilldroidPower, "KilldroidConfig", "Power")
+end; })
+local KilldroidMaxForce = KilldroidConfig.MaxForce
+Tab_5:CreateInput({Name = "Max Force"; PlaceholderText = KilldroidMaxForce; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+KilldroidMaxForce = tonumber(Value)
+SaveConfig("Tab_5", KilldroidMaxForce, "KilldroidConfig", "MaxForce")
+end; })
+local KilldroidDD = KilldroidConfig["Don'tDescendDuringTheFlight"]
+Tab_5:CreateToggle({Name = "Dont Descend During the Flight"; CurrentValue = KilldroidDD; Callback = function(Value)
+KilldroidDD = Value
+SaveConfig("Tab_5", KilldroidDD, "KilldroidConfig", "Don'tDescendDuringTheFlight")
+end; })
+--------------------------------------------------------------------------------------
+local KilldroidConfigEffects = nil
+function ApplyKilldroidConfigurations()
+if KilldroidConfigEffects then
+KilldroidConfigEffects:Disconnect()
+KilldroidConfigEffects = nil
+end
+if not HumanoidRootPart then return end
+KilldroidConfigEffects = HumanoidRootPart.ChildAdded:Connect(function(c)
+if c.Name == "BodyVelocity" then
+c.MaxForce = Vector3.new(KilldroidMaxForce,KilldroidMaxForce,KilldroidMaxForce)
+c.P = KilldroidPower
+if KilldroidDD ~= true then return end
+task.spawn(function()
+pcall(function()
+while task.wait() do
+c.Velocity = Vector3.new(c.Velocity.X, 0, c.Velocity.Z)
+end
+end)
+end)
+end
+end)
+end
+--------------------------------------------------------------------------------------
+Tab_5:CreateButton({Name = "Apply Killdroid Configurations"; Callback = function(Value)
+ApplyKilldroidConfigurations()
+Notify("Success!", "Applied configurations.", 3, false)
+end; })
+
+
+Tab_5:CreateParagraph({Title = "Immunities / Buffs", Content = "Immunities and buffs for workspace side"})
+
+Tab_5:CreateSection("Workspace Side")
+
+local BackupEffect = game:GetService("ReplicatedStorage").Events.RemoteEvents.TauntEffect:Clone()
+BackupEffect.Parent = game.LogService
+local AntiTaunt = LoadConfig("Tab_5", "IB", "AntiTaunt")
+Tab_5:CreateToggle({Name = "Anti Taunt"; CurrentValue = AntiTaunt; Callback = function(Value)
+AntiTaunt = Value
+if AntiTaunt == true then
+LocalPlayer.PlayerGui.MainGui.RoundUI.TauntTemplate:Destroy()
+else
+if LocalPlayer.PlayerGui.MainGui.RoundUI:FindFirstChild("TauntTemplate") == nil then
+local a = BackupEffect:Clone()
+a.Parent = LocalPlayer.PlayerGui.MainGui.RoundUI
+end
+end
+SaveConfig("Tab_5", AntiTaunt, "IB", "AntiTaunt")
+end; })
+LocalPlayer.PlayerGui.MainGui.RoundUI.ChildAdded:Connect(function(child)
+if child.Name == "TauntTemplate" and AntiTaunt == true then
+child:Destroy()
+if Character:GetAttribute("WalkSpeedModifier") ~= nil and Character:GetAttribute("WalkSpeedModifier") < 0 then
+Character:SetAttribute("WalkSpeedModifier", 0)
+else
+task.wait(.05)
+Character:SetAttribute("WalkSpeedModifier", 0)
+end
+end
+end)
+
+Tab_5:CreateButton({Name = "Remove Destroyable Objects"; Callback = function(Value)
+pcall(function()
+workspace.GameAssets.Map.Build.Destroyable:Destroy()
+end)
+end; })
+
+local AntiEvilScary2 = LoadConfig("Tab_5", "IB", "AntiEvilScary")
+Tab_5:CreateToggle({Name = "Anti Evil Scary"; CurrentValue = AntiEvilScary2; Callback = function(Value)
+AntiEvilScary2 = Value
+if AntiEvilScary2 == true then
+for i,v in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable"):GetChildren()) do
+if v and v.Name == "EvilScary" then
+for _,trans in pairs(v:GetChildren()) do
+if trans and trans:IsA("TouchTransmitter") then
+trans:Destroy()
+end
+end
+for _,part in pairs(v:GetChildren()) do
+if part and part:IsA("BasePart") then
+part.CanCollide = false
+part.CanTouch = false
+pcall(function()
+part.CanQuery = false
+end)
+end
+end
+v.CanCollide = false
+v.CanTouch = false
+pcall(function()
+v.CanQuery = false
+end)
+end
+end
+end
+SaveConfig("Tab_5", AntiEvilScary2, "IB", "AntiEvilScary")
+end; })
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable").ChildAdded:Connect(function(child)
+if child and child.Name == "EvilScary" and AntiEvilScary2 == true then
+for _,trans in pairs(child:GetChildren()) do
+if trans and trans:IsA("TouchTransmitter") then
+trans:Destroy()
+end
+end
+for _,part in pairs(child:GetChildren()) do
+if part and part:IsA("BasePart") then
+part.CanCollide = false
+part.CanTouch = false
+pcall(function()
+part.CanQuery = false
+end)
+end
+end
+child.CanCollide = false
+child.CanTouch = false
+pcall(function()
+child.CanQuery = false
+end)
+end
+end)
+
+
+local AntiBarriers2 = false
+local AntiBarriers2_con = nil
+local AntiBarriers2_toggle = nil
+AntiBarriers2_toggle = Tab_5:CreateToggle({Name = "Anti Barriers"; CurrentValue = AntiBarriers2; Callback = function(Value)
+AntiBarriers2 = Value
+pcall(function()
+if AntiBarriers2 == true then
+if workspace.GameAssets:FindFirstChild("Map") == nil then
+AntiBarriers2_toggle:Set(false)
+return
+end
+workspace.GameAssets.Map.Config.Barriers.Parent = game:GetService("LogService")
+AntiBarriers2_con = workspace.GameAssets.ChildRemoved:Once(function(c)
+if c.Name == "Map" and AntiBarriers == true then
+game:GetService("LogService").Barriers:Destroy()
+end
+end)
+else
+if AntiBarriers2_con then
+AntiBarriers2_con:Disconnect()
+AntiBarriers2_con = nil
+end
+game:GetService("LogService").Barriers.Parent = workspace.GameAssets.Map.Config
+end
+end)
+end; })
+workspace.GameAssets.ChildRemoved:Connect(function(c)
+if c.Name == "Map" and AntiBarriers2 == true then
+AntiBarriers2_toggle:Set(false)
+end
+end)
+
+
 
 
 ----------------------------------------------------------------------------------------------
@@ -2131,304 +2434,6 @@ end; })
 
 
 
-
-
-
-
-
-----------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-local Tab_5 = Window:CreateTab("Killer",0)
-Tab_5:CreateParagraph({Title = "Abilities Editor", Content = "Ability Editor and giver"})
-
-Tab_5:CreateSection("Universal")
-Tab_5:CreateButton({Name = "Get Faster Swing"; Callback = function(Value)
-local a = game.ReplicatedStorage:FindFirstChild("UseAbility",true)
-AbilityModule.CreateAbility({Client = true,Name = "Whack_NH",InputShown = "M2",Tip = "Swing but faster.",Cooldown = 0, Icon = "rbxassetid://13771861804",DisplayName = "Whack"})
-repeat task.wait() until game.Players.LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Whack_NH")
-game.Players.LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Whack_NH").MouseButton1Down:Connect(function()
-a:InvokeServer("Swing")
-AbilityModule.AbilityTween(game.Players.LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Whack_NH"))
-end)
-end; })
-
-
-Tab_5:CreateSection("Pursuer")
-local PursuerConfig = LoadConfig("Tab_5", "PursuerConfig")
-local PursuerCleaveBoost = PursuerConfig.CleaveBoost
-Tab_5:CreateInput({Name = "Cleave Boost"; PlaceholderText = PursuerCleaveBoost; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-PursuerCleaveBoost = Value
-SaveConfig("Tab_5", PursuerCleaveBoost, "PursuerConfig", "CleaveBoost")
-end; })
---------------------------------------------------------------------------------------
-local PursuerConfigEffects = nil
-function ApplyPursuerConfigurations()
-if PursuerConfigEffects then
-PursuerConfigEffects:Disconnect()
-PursuerConfigEffects = nil
-end
-if not Character then return end
-if PursuerCleaveBoost == 6 then return end
-PursuerConfigEffects = Character:GetAttributeChangedSignal("WalkSpeedModifier"):Connect(function()
-local OldWalkSpeedModifier = Character:GetAttribute("WalkSpeedModifier")
-if not OldWalkSpeedModifier then return end
-if OldWalkSpeedModifier == 6 then
-Character:SetAttribute("WalkSpeedModifier", PursuerCleaveBoost)
-end
-end)
-end
---------------------------------------------------------------------------------------
-Tab_5:CreateButton({Name = "Apply Pursuer Configurations"; Callback = function()
-ApplyPursuerConfigurations()
-Notify("Success!", "Applied configurations.", 3, false)
-end; })
-
-Tab_5:CreateSection("Badware")
-local BadwareConfig = LoadConfig("Tab_5", "BadwareConfig")
-local BadwareHipHeight = BadwareConfig.HipHeight
-Tab_5:CreateInput({Name = "Hip Height when placing computers"; PlaceholderText = BadwareHipHeight; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-BadwareHipHeight = Value
-SaveConfig("Tab_5", BadwareHipHeight, "BadwareConfig", "HipHeight")
-end; })
---------------------------------------------------------------------------------------
-local BadwareConfigEffects = nil
-function ApplyBadwareConfigurations()
-if BadwareConfigEffects then
-BadwareConfigEffects:Disconnect()
-BadwareConfigEffects = nil
-end
-if not HumanoidRootPart then return end
-if not Humanoid then return end
-if BadwareHipHeight == 0 then return end
-BadwareConfigEffects = HumanoidRootPart.FirewallBypass:GetPropertyChangedSignal("Playing"):Connect(function(c)
-if HumanoidRootPart.FirewallBypass.Playing ~= true then return end
-Humanoid.HipHeight = tonumber(BadwareHipHeight)
-task.wait(2)
-Humanoid.HipHeight = 0
-end)
-end
---------------------------------------------------------------------------------------
-Tab_5:CreateButton({Name = "Apply Badware Configurations"; Callback = function()
-ApplyBadwareConfigurations()
-Notify("Success!", "Applied configurations.", 3, false)
-end; })
-
-Tab_5:CreateSection("Artful")
-local ArtfulConfig = LoadConfig("Tab_5", "ArtfulConfig")
-local ArtfulHipHeight = ArtfulConfig.HipHeight
-Tab_5:CreateInput({Name = "Hip Height when placing walls/music box"; PlaceholderText = ArtfulHipHeight; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-ArtfulHipHeight = Value
-SaveConfig("Tab_5", ArtfulHipHeight, "ArtfulConfig", "HipHeight")
-end; })
---------------------------------------------------------------------------------------
-local ArtfulConfigEffects = nil
-function ApplyArtfulConfigurations()
-if ArtfulConfigEffects then
-ArtfulConfigEffects:Disconnect()
-ArtfulConfigEffects = nil
-end
-if not HumanoidRootPart then return end
-if not Humanoid then return end
-if ArtfulHipHeight == 0 then return end
-ArtfulConfigEffects = HumanoidRootPart["CopyThrice2"]:GetPropertyChangedSignal("Playing"):Connect(function(c)
-if HumanoidRootPart["CopyThrice2"].Playing ~= true then return end
-Humanoid.HipHeight = tonumber(ArtfulHipHeight)
-task.wait(2)
-Humanoid.HipHeight = 0
-end)
-end
---------------------------------------------------------------------------------------
-Tab_5:CreateButton({Name = "Apply Artful Configurations"; Callback = function()
-ApplyArtfulConfigurations()
-Notify("Success!", "Applied configurations.", 3, false)
-end; })
-
-Tab_5:CreateSection("Harken")
-Tab_5:CreateLabel("Nothing Yet...")
-
-Tab_5:CreateSection("Killdroid")
-local KilldroidConfig = LoadConfig("Tab_5", "KilldroidConfig")
-local KilldroidPower = KilldroidConfig.Power
-Tab_5:CreateInput({Name = "Power"; PlaceholderText = KilldroidPower; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-KilldroidPower = tonumber(Value)
-SaveConfig("Tab_5", KilldroidPower, "KilldroidConfig", "Power")
-end; })
-local KilldroidMaxForce = KilldroidConfig.MaxForce
-Tab_5:CreateInput({Name = "Max Force"; PlaceholderText = KilldroidMaxForce; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-KilldroidMaxForce = tonumber(Value)
-SaveConfig("Tab_5", KilldroidMaxForce, "KilldroidConfig", "MaxForce")
-end; })
-local KilldroidDD = KilldroidConfig["Don'tDescendDuringTheFlight"]
-Tab_5:CreateToggle({Name = "Dont Descend During the Flight"; CurrentValue = KilldroidDD; Callback = function(Value)
-KilldroidDD = Value
-SaveConfig("Tab_5", KilldroidDD, "KilldroidConfig", "Don'tDescendDuringTheFlight")
-end; })
---------------------------------------------------------------------------------------
-local KilldroidConfigEffects = nil
-function ApplyKilldroidConfigurations()
-if KilldroidConfigEffects then
-KilldroidConfigEffects:Disconnect()
-KilldroidConfigEffects = nil
-end
-if not HumanoidRootPart then return end
-KilldroidConfigEffects = HumanoidRootPart.ChildAdded:Connect(function(c)
-if c.Name == "BodyVelocity" then
-c.MaxForce = Vector3.new(KilldroidMaxForce,KilldroidMaxForce,KilldroidMaxForce)
-c.P = KilldroidPower
-if KilldroidDD ~= true then return end
-task.spawn(function()
-pcall(function()
-while task.wait() do
-c.Velocity = Vector3.new(c.Velocity.X, 0, c.Velocity.Z)
-end
-end)
-end)
-end
-end)
-end
---------------------------------------------------------------------------------------
-Tab_5:CreateButton({Name = "Apply Killdroid Configurations"; Callback = function(Value)
-ApplyKilldroidConfigurations()
-Notify("Success!", "Applied configurations.", 3, false)
-end; })
-
-
-Tab_5:CreateParagraph({Title = "Immunities / Buffs", Content = "Immunities and buffs for workspace side"})
-
-Tab_5:CreateSection("Workspace Side")
-
-local BackupEffect = game:GetService("ReplicatedStorage").Events.RemoteEvents.TauntEffect:Clone()
-BackupEffect.Parent = game.LogService
-local AntiTaunt = LoadConfig("Tab_5", "IB", "AntiTaunt")
-Tab_5:CreateToggle({Name = "Anti Taunt"; CurrentValue = AntiTaunt; Callback = function(Value)
-AntiTaunt = Value
-if AntiTaunt == true then
-LocalPlayer.PlayerGui.MainGui.RoundUI.TauntTemplate:Destroy()
-else
-if LocalPlayer.PlayerGui.MainGui.RoundUI:FindFirstChild("TauntTemplate") == nil then
-local a = BackupEffect:Clone()
-a.Parent = LocalPlayer.PlayerGui.MainGui.RoundUI
-end
-end
-SaveConfig("Tab_5", AntiTaunt, "IB", "AntiTaunt")
-end; })
-LocalPlayer.PlayerGui.MainGui.RoundUI.ChildAdded:Connect(function(child)
-if child.Name == "TauntTemplate" and AntiTaunt == true then
-child:Destroy()
-if Character:GetAttribute("WalkSpeedModifier") ~= nil and Character:GetAttribute("WalkSpeedModifier") < 0 then
-Character:SetAttribute("WalkSpeedModifier", 0)
-else
-task.wait(.05)
-Character:SetAttribute("WalkSpeedModifier", 0)
-end
-end
-end)
-
-Tab_5:CreateButton({Name = "Remove Destroyable Objects"; Callback = function(Value)
-pcall(function()
-workspace.GameAssets.Map.Build.Destroyable:Destroy()
-end)
-end; })
-
-local AntiEvilScary2 = LoadConfig("Tab_5", "IB", "AntiEvilScary")
-Tab_5:CreateToggle({Name = "Anti Evil Scary"; CurrentValue = AntiEvilScary2; Callback = function(Value)
-AntiEvilScary2 = Value
-if AntiEvilScary2 == true then
-for i,v in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable"):GetChildren()) do
-if v and v.Name == "EvilScary" then
-for _,trans in pairs(v:GetChildren()) do
-if trans and trans:IsA("TouchTransmitter") then
-trans:Destroy()
-end
-end
-for _,part in pairs(v:GetChildren()) do
-if part and part:IsA("BasePart") then
-part.CanCollide = false
-part.CanTouch = false
-pcall(function()
-part.CanQuery = false
-end)
-end
-end
-v.CanCollide = false
-v.CanTouch = false
-pcall(function()
-v.CanQuery = false
-end)
-end
-end
-end
-SaveConfig("Tab_5", AntiEvilScary2, "IB", "AntiEvilScary")
-end; })
-game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable").ChildAdded:Connect(function(child)
-if child and child.Name == "EvilScary" and AntiEvilScary2 == true then
-for _,trans in pairs(child:GetChildren()) do
-if trans and trans:IsA("TouchTransmitter") then
-trans:Destroy()
-end
-end
-for _,part in pairs(child:GetChildren()) do
-if part and part:IsA("BasePart") then
-part.CanCollide = false
-part.CanTouch = false
-pcall(function()
-part.CanQuery = false
-end)
-end
-end
-child.CanCollide = false
-child.CanTouch = false
-pcall(function()
-child.CanQuery = false
-end)
-end
-end)
-
-
-local AntiBarriers2 = false
-local AntiBarriers2_con = nil
-local AntiBarriers2_toggle = nil
-AntiBarriers2_toggle = Tab_5:CreateToggle({Name = "Anti Barriers"; CurrentValue = AntiBarriers2; Callback = function(Value)
-AntiBarriers2 = Value
-pcall(function()
-if AntiBarriers2 == true then
-if workspace.GameAssets:FindFirstChild("Map") == nil then
-AntiBarriers2_toggle:Set(false)
-return
-end
-workspace.GameAssets.Map.Config.Barriers.Parent = game:GetService("LogService")
-AntiBarriers2_con = workspace.GameAssets.ChildRemoved:Once(function(c)
-if c.Name == "Map" and AntiBarriers == true then
-game:GetService("LogService").Barriers:Destroy()
-end
-end)
-else
-if AntiBarriers2_con then
-AntiBarriers2_con:Disconnect()
-AntiBarriers2_con = nil
-end
-game:GetService("LogService").Barriers.Parent = workspace.GameAssets.Map.Config
-end
-end)
-end; })
-workspace.GameAssets.ChildRemoved:Connect(function(c)
-if c.Name == "Map" and AntiBarriers2 == true then
-AntiBarriers2_toggle:Set(false)
-end
-end)
 
 
 
