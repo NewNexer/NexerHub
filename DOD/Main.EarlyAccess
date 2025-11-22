@@ -332,12 +332,17 @@ function WebHandler:OpenRBX(url)
 game:GetService("GuiService"):BroadcastNotification(game:GetService("HttpService"):JSONEncode({["title"] = "Roblox", ["presentationStyle"] = 2, ["visible"] = true, ["url"] = tostring(url)}), 20)
 end
 temp_msg.Text = "Loading API Module... (0/1)"
-local MainModule = loadstring(game:HttpGet("https://pastebin.com/raw/G17DaBUh"))()
-if MainModule.IsWorking ~= nil then
+local lodsuc, loderr = pcall(function()
+MainModule = loadstring(game:HttpGet("https://pastebin.com/raw/G17DaBUh"))()
+end)
+if not lodsuc then
+temp_msg.Text = "Failed loading API Module, most of the features might not work."
+task.wait(3)
+elseif lodsuc and MainModule.IsWorking ~= nil then
 temp_msg.Text = "Loading API Module... (1/1)"
 task.wait(1)
 else
-temp_msg.Text = "Failed loading API Module, most of the premium features might not work."
+temp_msg.Text = "Failed loading API Module, most of the features might not work."
 task.wait(3)
 end
 
