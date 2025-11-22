@@ -167,7 +167,7 @@ if not isfolder("NexerHub/Core") then
 makefolder("NexerHub/Core")
 repeat task.wait() until isfolder("NexerHub/Core")
 end
---if not isfile("NexerHub/Core/"..config_save.."") then
+if not isfile("NexerHub/Core/"..config_save.."") then
 writefile("NexerHub/Core/"..config_save.."", [[return {
     ["Tab_1"] = {
         ["AutoInjection"] = {
@@ -287,7 +287,7 @@ writefile("NexerHub/Core/"..config_save.."", [[return {
     ["Tab_12"] = {}
 }]])
 repeat task.wait() until isfile("NexerHub/Core/"..config_save.."")
---end
+end
 if not isfile("NexerHub/Core/PreloadData.luau") then
 writefile("NexerHub/Core/PreloadData.luau", [[return {
     ["LoadConfig"] = true,
@@ -1900,17 +1900,60 @@ end)
 local Tab_5 = Window:CreateTab("Killer",0)
 Tab_5:CreateParagraph({Title = "Abilities Editor", Content = "Ability Editor and giver"})
 
-Tab_5:CreateSection("Universal")
+Tab_5:CreateSection("Universal ( except for killdroid ☹ )")
 Tab_5:CreateButton({Name = "Get Faster Swing"; Callback = function(Value)
-local a = game.ReplicatedStorage:FindFirstChild("UseAbility",true)
-AbilityModule.CreateAbility({Client = true,Name = "Whack_NH",InputShown = "M2",Tip = "Swing but faster.",Cooldown = 0, Icon = "rbxassetid://13771861804",DisplayName = "Whack"})
-repeat task.wait() until game.Players.LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Whack_NH")
-game.Players.LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Whack_NH").MouseButton1Down:Connect(function()
-a:InvokeServer("Swing")
-AbilityModule.AbilityTween(game.Players.LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Whack_NH"))
-end)
+AbilityModule.CreateAbility({Client = true,ClientFunction = function() game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Swing") end,Name = "Whack_NH",InputShown = "M2",Tip = "Swing but faster.",Cooldown = 0.01, Icon = "rbxassetid://13771861804",DisplayName = "Whack"})
 end; })
-
+Tab_5:CreateButton({Name = "Get Lunge Attack"; Callback = function(Value)
+local function Ability()
+local a = Humanoid:LoadAnimation(game:GetService("ReplicatedStorage").Characters.Killer.Harken.Default.Animations.Throw)
+repeat task.wait() until a.Length > 0
+task.spawn(function()
+local a = nil
+for i = 1,10 do
+if a == true then return end
+a = game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Swing")
+end
+end)
+local function onswing()
+a:Play()
+repeat task.wait() until a.IsPlaying
+a.TimePosition = .6
+local BodyVelocity = Instance.new("BodyVelocity")
+BodyVelocity.MaxForce = Vector3.new(1000000,1000,1000000)
+BodyVelocity.P = 1250
+BodyVelocity.Velocity = HumanoidRootPart.CFrame.LookVector * 80
+BodyVelocity.Parent = HumanoidRootPart
+game.Debris:AddItem(BodyVelocity, .25)
+task.wait(.15)
+Character:SetAttribute("SprintSpeed", (Character:GetAttribute("SprintSpeed")*2))
+Character:SetAttribute("WalkSpeed", (Character:GetAttribute("WalkSpeed")*2))
+end
+local c = nil
+local d = nil
+c = Humanoid.AnimationPlayed:Connect(function(track)
+if track.Animation.AnimationId == "rbxassetid://80787680522855" then
+c:Disconnect()
+track:Stop()
+task.spawn(onswing)
+end
+end)
+end
+local lunge_abil = function()
+local a = Humanoid:LoadAnimation(game:GetService("ReplicatedStorage").Characters.Killer.Harken.Default.Animations.Throw)
+repeat task.wait() until a.Length > 0
+a:Play()
+repeat task.wait() until a.IsPlaying
+a.TimePosition = 0.6
+a:AdjustSpeed(0)
+Character:SetAttribute("SprintSpeed", (Character:GetAttribute("SprintSpeed")/2))
+Character:SetAttribute("WalkSpeed", (Character:GetAttribute("WalkSpeed")/2))
+task.spawn(Ability)
+repeat task.wait() until Character:GetAttribute("SprintSpeed") > 13
+a:Stop()
+end
+AbilityModule.CreateAbility({Client = true,ClientFunction = lunge_abil,Name = "Lunge_NH",InputShown = "E",Tip = "Lunge forwards to deal damage.",Cooldown = 3,Icon = "rbxassetid://105910997361738",DisplayName = "Lunge"})
+end; })
 
 Tab_5:CreateSection("Pursuer")
 local PursuerConfig = LoadConfig("Tab_5", "PursuerConfig")
@@ -1939,7 +1982,7 @@ end
 --------------------------------------------------------------------------------------
 Tab_5:CreateButton({Name = "Apply Pursuer Configurations"; Callback = function()
 ApplyPursuerConfigurations()
-Notify("Success!", "Applied configurations.", 3, false)
+Notify("Success!", "Applied configurations.", 3, true)
 end; })
 
 Tab_5:CreateSection("Badware")
@@ -1969,7 +2012,7 @@ end
 --------------------------------------------------------------------------------------
 Tab_5:CreateButton({Name = "Apply Badware Configurations"; Callback = function()
 ApplyBadwareConfigurations()
-Notify("Success!", "Applied configurations.", 3, false)
+Notify("Success!", "Applied configurations.", 3, true)
 end; })
 
 Tab_5:CreateSection("Artful")
@@ -1999,7 +2042,7 @@ end
 --------------------------------------------------------------------------------------
 Tab_5:CreateButton({Name = "Apply Artful Configurations"; Callback = function()
 ApplyArtfulConfigurations()
-Notify("Success!", "Applied configurations.", 3, false)
+Notify("Success!", "Applied configurations.", 3, true)
 end; })
 
 Tab_5:CreateSection("Harken")
@@ -2038,7 +2081,9 @@ if KilldroidDD ~= true then return end
 task.spawn(function()
 pcall(function()
 while task.wait() do
-c.Velocity = Vector3.new(c.Velocity.X, 0, c.Velocity.Z)
+if c.Velocity.Y < 0 then
+c.Velocity = Vector3.new(c.Velocity.X,0,c.Velocity.Z)
+end
 end
 end)
 end)
@@ -2048,7 +2093,7 @@ end
 --------------------------------------------------------------------------------------
 Tab_5:CreateButton({Name = "Apply Killdroid Configurations"; Callback = function(Value)
 ApplyKilldroidConfigurations()
-Notify("Success!", "Applied configurations.", 3, false)
+Notify("Success!", "Applied configurations.", 3, true)
 end; })
 
 
@@ -4526,12 +4571,7 @@ stalk_loop:Stop()
 Humanoid.Parent:SetAttribute("WalkSpeed",old_ws)
 Humanoid.Parent:SetAttribute("SprintSpeed",old_ss)
 end
-AbilityModule.CreateAbility({Name = "Stalk_NH",InputShown = "",Tip = "Turn invisible and gain speed, cant use abilities and a long endlag after.",Cooldown = 15, Icon = "rbxassetid://92577246919936", DisplayName = "Stalk"})
-repeat task.wait() until LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Stalk_NH")
-LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Stalk_NH").MouseButton1Down:Connect(function()
-Stalk()
-AbilityModule.PutOnCooldown("Stalk_NH",15)
-end)
+AbilityModule.CreateAbility({Client = true, ClientFunction = Stalk, Name = "Stalk_NH",InputShown = "",Tip = "Turn invisible and gain speed, cant use abilities and a long endlag after.",Cooldown = 15, Icon = "rbxassetid://92577246919936", DisplayName = "Stalk"})
 end; })
 
 
@@ -4582,15 +4622,10 @@ BodyVelocity.MaxForce = Vector3.new(1000000,1000,1000000)
 BodyVelocity.P = 1250
 BodyVelocity.Velocity = HumanoidRootPart.CFrame.LookVector * 80
 BodyVelocity.Parent = HumanoidRootPart
-game.Debris:AddItem(BodyVelocity, .35)
+game.Debris:AddItem(BodyVelocity, .3)
 EmitDash()
 end
-AbilityModule.CreateAbility({Name = "Dash_NH",InputShown = "",Tip = "Dash foward, and gain no cooldown.",Cooldown = .2, Icon = "rbxassetid://73777691791017",DisplayName = "Dash without cooldown"})
-repeat task.wait() until LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Dash_NH")
-LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Dash_NH").MouseButton1Down:Connect(function()
-Dash()
-AbilityModule.PutOnCooldown("Dash_NH",.2)
-end)
+AbilityModule.CreateAbility({Client = true, ClientFunction = Dash, Name = "Dash_NH",InputShown = "",Tip = "Dash foward, and gain no cooldown.",Cooldown = .2, Icon = "rbxassetid://73777691791017",DisplayName = "Dash without cooldown"})
 end; })
 
 
@@ -5208,8 +5243,233 @@ end; })
 
 
 
-local Tab_11 = Window:CreateTab("CMDS",0)
-Tab_11:CreateParagraph({Title = "Commands", Content = "Coming soon!!!"})
+local Tab_11 = Window:CreateTab("Config Settings",0)
+Tab_11:CreateParagraph({Title = "Config Settings", Content = "Save and load config files. You can share your config to other people."})
+local temp_module = [[local SpecialCharacters = {['\a'] = '\\a', ['\b'] = '\\b', ['\f'] = '\\f', ['\n'] = '\\n', ['\r'] = '\\r', ['\t'] = '\\t', ['\v'] = '\\v', ['\0'] = '\\0'}
+local Keywords = { ['and'] = true, ['break'] = true, ['do'] = true, ['else'] = true, ['elseif'] = true, ['end'] = true, ['false'] = true, ['for'] = true, ['function'] = true, ['if'] = true, ['in'] = true, ['local'] = true, ['nil'] = true, ['not'] = true, ['or'] = true, ['repeat'] = true, ['return'] = true, ['then'] = true, ['true'] = true, ['until'] = true, ['while'] = true, ['continue'] = true}
+local Functions = {
+    [pairs] = "pairs",
+    [ipairs] = "ipairs", 
+    [next] = "next",
+    [type] = "type",
+    [tostring] = "tostring",
+    [tonumber] = "tonumber",
+    [print] = "print",
+    [error] = "error",
+    [assert] = "assert",
+    [pcall] = "pcall",
+    [xpcall] = "xpcall",
+    [select] = "select",
+    [rawget] = "rawget",
+    [rawset] = "rawset",
+    [rawequal] = "rawequal",
+    [getmetatable] = "getmetatable",
+    [setmetatable] = "setmetatable",
+    [require] = "require",
+}
+if loadstring then Functions[loadstring] = "loadstring" end
+if load then Functions[load] = "load" end
+local function safeTypeof(value)
+    if typeof then
+        return typeof(value)
+    else
+        return type(value)
+    end
+end
+function GetHierarchy(Object)
+    if not Object or (type(Object) ~= "table" and safeTypeof(Object) ~= "Instance") then
+        return tostring(Object)
+    end
+    local Hierarchy = {}
+    local current = Object
+    while current do
+        local name = tostring(current.Name or current.name or "Unknown")
+        name = string.gsub(name, '[%c%z]', SpecialCharacters)
+        if current == game or current == _G.game then
+            table.insert(Hierarchy, 1, "game")
+        elseif Keywords[name] or not string.match(name, '^[_%a][_%w]*$') then
+            table.insert(Hierarchy, 1, '["' .. name .. '"]')
+        else
+            table.insert(Hierarchy, 1, name)
+        end
+        current = current.Parent
+    end
+    
+    return table.concat(Hierarchy, ".")
+end
+local function SerializeType(Value, Class)
+    if Class == 'string' then
+        return string.format('"%s"', string.gsub(Value, '[%c%z]', SpecialCharacters))
+    elseif Class == 'Instance' then
+        return GetHierarchy(Value)
+    elseif Class == 'function' then
+        return Functions[Value] or "'[Function: " .. tostring(Value) .. "]'"
+    elseif Class == 'userdata' then
+        return "'[userdata: " .. tostring(Value) .. "]'"
+    elseif Class == 'thread' then
+        if coroutine and coroutine.status then
+            local status = pcall(function() return coroutine.status(Value) end)
+            return "'[thread: " .. tostring(Value) .. (status and ", status: " .. coroutine.status(Value) or "") .. "]'"
+        else
+            return "'[thread: " .. tostring(Value) .. "]'"
+        end
+    else
+        return tostring(Value)
+    end
+end
+function TableToLuauString(Table, IgnoredTables, DepthData, Path)
+    if type(Table) ~= "table" then
+        return SerializeType(Table, safeTypeof(Table))
+    end
+    IgnoredTables = IgnoredTables or {}
+    Path = Path or "ROOT"
+    if not DepthData then
+        DepthData = {0, Path}
+    end
+    local CyclicData = IgnoredTables[Table]
+    if CyclicData then
+        local currentDepth = DepthData[1] or 0
+        local cyclicDepth = CyclicData[1] or 0
+        return ((cyclicDepth == currentDepth - 1 and "'[Cyclic Parent " or "'[Cyclic ") .. tostring(Table) .. ', path: ' .. (CyclicData[2] or "unknown") .. "]'")
+    end
+    DepthData[1] = (DepthData[1] or 0) + 1
+    DepthData[2] = Path
+    IgnoredTables[Table] = {DepthData[1], DepthData[2]}
+    local currentDepth = DepthData[1] or 1
+    local Tab = string.rep('    ', currentDepth)
+    local TrailingTab = string.rep('    ', currentDepth - 1)
+    local Result = '{'
+    local LineTab = '\n' .. Tab
+    local HasOrder = true
+    local Index = 1
+    local IsEmpty = true
+    for Key, Value in pairs(Table) do
+        IsEmpty = false
+        if Index ~= Key then
+            HasOrder = false
+        else
+            Index = Index + 1
+        end
+        local KeyClass = safeTypeof(Key)
+        local ValueClass = safeTypeof(Value)
+        local HasBrackets = false
+        local KeyStr
+        if KeyClass == 'string' then
+            local cleanKey = string.gsub(Key, '[%c%z]', SpecialCharacters)
+            if Keywords[cleanKey] or not string.match(cleanKey, '^[_%a][_%w]*$') then
+                HasBrackets = true
+                KeyStr = string.format('["%s"]', cleanKey)
+            else
+                KeyStr = cleanKey
+            end
+        else
+            HasBrackets = true
+            if KeyClass == 'table' then
+                KeyStr = '[' .. TableToLuauString(Key, IgnoredTables, {currentDepth + 1, Path}) .. ']'
+            else
+                KeyStr = '[' .. SerializeType(Key, KeyClass) .. ']'
+            end
+        end
+        local ValueStr
+        if ValueClass == 'table' then
+            local newPath = Path .. (HasBrackets and '' or '.') .. KeyStr
+            ValueStr = TableToLuauString(Value, IgnoredTables, {currentDepth + 1, Path}, newPath)
+        else
+            ValueStr = SerializeType(Value, ValueClass)
+        end
+        Result = Result .. LineTab .. (HasOrder and ValueStr or KeyStr .. ' = ' .. ValueStr) .. ','
+    end
+    local donetable = IsEmpty and Result .. '}' or string.sub(Result, 1, -2) .. '\n' .. TrailingTab .. '}'
+    IgnoredTables[Table] = nil
+    return donetable
+end
+
+function minify_config(tblz)
+    if not tblz then return end
+    local tblz_loader = loadstring or load
+    local tbl = tblz_loader(tblz)()
+    local seen = {}
+    local function serialize(value)
+        local t = type(value)
+        if t == "string" then 
+            return string.format("%q", value)
+        elseif t == "number" then 
+            return tostring(value)
+        elseif t == "boolean" then 
+            return value and "true" or "false"
+        elseif t == "table" then
+            if seen[value] then return "\"<circular>\"" end
+            seen[value] = true
+            local parts = {}
+            for i = 1,#value do
+                parts[i] = serialize(value[i])
+            end
+            for k,v in pairs(value) do
+                if not (type(k) == "number" and k >= 1 and k <= #value and math.floor(k) == k) then
+                    local key = type(k) == "string" and k:match("^[%a_][%w_]*$") and k or "["..serialize(k).."]"
+                    parts[#parts + 1] = key.."="..serialize(v)
+                end
+            end
+            seen[value] = nil
+            return "{"..table.concat(parts, ",").."}"
+        else
+            return "nil"
+        end
+    end
+    return serialize(tbl)
+end
+function compile_config(txt)
+    if not txt then return "" end
+    local text = minify_config(txt)
+    local shifted = text:gsub(".", function(char)
+        local byte = string.byte(char)
+        return string.char(byte + 5)
+    end)
+    local hexed = shifted:gsub(".", function(char)
+        return string.format("%02X", string.byte(char))
+    end)
+    local separators = {"-", ":", "|", ".", "_", "~", "#", "!"}
+    local withSeparators = hexed:gsub("(%x%x)", function(hexPair)
+        return hexPair .. "-"
+    end)
+    return "[" .. withSeparators:sub(1,-2) .. "]"
+end
+function decompile_config(obfuscatedText)
+    if not obfuscatedText then return "" end
+    local content = obfuscatedText:sub(2, -2)
+    local hexOnly = content:gsub("[%-%:|%.%_%~%#%!]", "")
+    local shifted = hexOnly:gsub("(%x%x)", function(hex)
+        return string.char(tonumber(hex, 16))
+    end)
+    local original = shifted:gsub(".", function(char)
+        local byte = string.byte(char)
+        return string.char(byte - 5)
+    end)
+    local tblz_loader = loadstring or load
+    return ('return '..TableToLuauString(tblz_loader('return '..original..'')()))
+end
+
+return {["decompile_config"]=decompile_config;["compile_config"]=compile_config;}]]
+local ConfigurationModule = loadstring(temp_module)()
+
+Tab_11:CreateSection("Config Save")
+Tab_11:CreateLabel("Configurations are being auto-saved.")
+Tab_11:CreateButton({Name = "Copy Config Values"; Callback = function()
+setclipboard(tostring(ConfigurationModule.compile_config(GetFile("NexerHub/Core/"..config_save.."", "rf"))))
+Notify("Success!", "Copied Config Values!", 4, true)
+end; })
+
+Tab_11:CreateSection("Config Load")
+Tab_11:CreateLabel("You will have to re-execute script for new configurations to apply!")
+local ConfigValue = "Enter Here!"
+Tab_11:CreateInput({Name = "Enter Config Values"; PlaceholderText = ConfigValue; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+ConfigValue = Value
+end; })
+Tab_11:CreateButton({Name = "Load Config Values"; Callback = function()
+writefile("NexerHub/Core/"..config_save.."", ConfigurationModule.decompile_config(ConfigValue))
+Notify("Success!", "Applied New Config Values! You will have to re-execute script for new configurations to apply.", 10, true)
+end; })
+
 
 local Tab_9 = Window:CreateTab("Other",0)
 Tab_9:CreateParagraph({Title = "Other", Content = "Other random thingiez"})
