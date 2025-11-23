@@ -5,6 +5,14 @@ _G.dod_developer_key = "Nexer"
 end
 
 
+
+
+
+--[[
+
+Table And Configuration Things
+
+]]--
 local SpecialCharacters = {['\a'] = '\\a', ['\b'] = '\\b', ['\f'] = '\\f', ['\n'] = '\\n', ['\r'] = '\\r', ['\t'] = '\\t', ['\v'] = '\\v', ['\0'] = '\\0'}
 local Keywords = { ['and'] = true, ['break'] = true, ['do'] = true, ['else'] = true, ['elseif'] = true, ['end'] = true, ['false'] = true, ['for'] = true, ['function'] = true, ['if'] = true, ['in'] = true, ['local'] = true, ['nil'] = true, ['not'] = true, ['or'] = true, ['repeat'] = true, ['return'] = true, ['then'] = true, ['true'] = true, ['until'] = true, ['while'] = true, ['continue'] = true}
 local Functions = {
@@ -294,7 +302,7 @@ writefile("NexerHub/Core/PreloadData.luau", [[return {
     ["GUID"] = ]]..tostring(game:GetService("HttpService"):GenerateGUID())..[[,
     ["CoreVersion"] = 1
 }]])
-repeat task.wait() until isfile("NexerHub/Core/"..config_save.."")
+repeat task.wait() until isfile("NexerHub/Core/PreloadData.luau")
 end
 local SaveConfig = function(tab,value,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); if not element_2 then temp_table[tab][element_1] = value elseif not element_3 then temp_table[tab][element_1][element_2] = value else temp_table[tab][element_1][element_2][element_3] = value end CreateFile("NexerHub/Core/"..config_save.."", 'return '..TableToLuauString(temp_table)..'') end
 local LoadConfig = function(tab,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); if not element_2 then return temp_table[tab][element_1] elseif not element_3 then return temp_table[tab][element_1][element_2] else return temp_table[tab][element_1][element_2][element_3] end end
@@ -336,14 +344,18 @@ local lodsuc, loderr = pcall(function()
 MainModule = loadstring(game:HttpGet("https://pastebin.com/raw/G17DaBUh"))()
 end)
 if not lodsuc then
-temp_msg.Text = "Failed loading API Module, most of the features might not work."
-task.wait(3)
+temp_msg.Text = "Failed loading API Module, please try using VPN or another DNS server."
+task.wait(5)
+temp_msg:Destroy()
+return
 elseif lodsuc and MainModule.IsWorking ~= nil then
 temp_msg.Text = "Loading API Module... (1/1)"
 task.wait(1)
 else
-temp_msg.Text = "Failed loading API Module, most of the features might not work."
-task.wait(3)
+temp_msg.Text = "Failed loading API Module, please try using VPN or another DNS server."
+task.wait(5)
+temp_msg:Destroy()
+return
 end
 
 function RequestModule(module)
@@ -381,24 +393,30 @@ CopyLink(url)
 end
 end
 
-temp_msg.Text = "Loading Rayfield..."
-local Rayfield
+temp_msg.Text = "Loading Rayfield..."; task.wait(.2)
+local Rayfield = nil
+if not isfile("NexerHub/Core/Rayfield.luau") then
 local RAYFIELD_SUCCESS, RAYFIELD_FAIL = pcall(function()
-Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+Rayfield = game:HttpGet("https://sirius.menu/rayfield")
 end)
 if not RAYFIELD_SUCCESS then
 local RAYFIELD_SUCCESS, RAYFIELD_FAIL = pcall(function()
-Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/main/source.lua"))()
+Rayfield = game:HttpGet("https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/main/source.lua")
 end)
 if not RAYFIELD_SUCCESS then
-game:GetService("StarterGui"):SetCore("SendNotification",{
-	Title = "Failed to launch rayfield.",
-	Text = "Please check your internet connection, or try using VPN.",
-  Icon = "rbxassetid://125704683916878",
-	Duration = 10,
-})
+temp_msg.Text = "Failed loading Rayfield, please try using VPN or another DNS server."
+task.wait(5)
+temp_msg:Destroy()
 return
 end
+end
+if RAYFIELD_SUCCESS then
+writefile("NexerHub/Core/Rayfield.luau", Rayfield)
+repeat task.wait() until isfile("NexerHub/Core/Rayfield.luau")
+Rayfield = loadstring(Rayfield)()
+end
+elseif isfile("NexerHub/Core/Rayfield.luau") then
+Rayfield = loadstring(GetFile("NexerHub/Core/Rayfield.luau","rf"))()
 end
 
 temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/25)"
@@ -5651,7 +5669,7 @@ local temp_table = {
 	["Bio"] = "''I sure do wonder why am i here.''";
 	["Icon"] = "rbxassetid://134690353237803";
 	["ClearMainAccessories"] = true;
-	["ChaseTheme"] = ((getcustomasset and getcustomasset("Artful.mp3")) or tostring(game.ReplicatedStorage.Characters.Killer.Artful.Cementful.Animations.ChaseTheme.SoundId));
+	["ChaseTheme"] = ((getcustomasset and GetFile("NexerHub/Core/Artful.mp3","gca")) or tostring(game.ReplicatedStorage.Characters.Killer.Artful.Cementful.Animations.ChaseTheme.SoundId));
 	["CharacterAdded"] = function(c) task.spawn(ArtfulForsakenSetUp, c) end
 }
 pcall(function()
@@ -5790,7 +5808,7 @@ local temp_table = {
 	["Bio"] = "''Open the curtains.''";
 	["Icon"] = "rbxassetid://18662155";
 	["ClearMainAccessories"] = true;
-	["ChaseTheme"] = ((getcustomasset and getcustomasset("NexerHub/Core/LOR.mp3")) or tostring(game.ReplicatedStorage.Characters.Killer.Artful.Builder.Animations.ChaseTheme.SoundId));
+	["ChaseTheme"] = ((getcustomasset and GetFile("NexerHub/Core/LOR.mp3","gca")) or tostring(game.ReplicatedStorage.Characters.Killer.Artful.Builder.Animations.ChaseTheme.SoundId));
 	["CharacterAdded"] = function(c) task.spawn(ArtfulLORSetUp, c) end
 }
 pcall(function()
