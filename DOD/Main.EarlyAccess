@@ -1,10 +1,10 @@
-if getgenv then
-getgenv().dod_developer_key = "Nexer"
-else
-_G.dod_developer_key = "Nexer"
-end
+--[[
 
+Loading Variables
 
+]]--
+_G.dod_developer_key = "Nexer" -- my name yaa
+_G.API_last_update = "23/11/2025" -- last time update (dd/mm/yyyy)
 
 
 
@@ -335,11 +335,9 @@ return tostring(tbl)
 end
 end
 
-local WebHandler = {}
-function WebHandler:OpenRBX(url)
-game:GetService("GuiService"):BroadcastNotification(game:GetService("HttpService"):JSONEncode({["title"] = "Roblox", ["presentationStyle"] = 2, ["visible"] = true, ["url"] = tostring(url)}), 20)
-end
-temp_msg.Text = "Loading API Module... (0/1)"
+temp_msg.Text = "Loading API Module... (0/1)"; task.wait(.2)
+
+--if not isfile("NexerHub/Core/APIMODULE.luau") or (isfile("NexerHub/Core/APIMODULE.luau") and loadstring(GetFile("NexerHub/Core/APIMODULE.luau","rf"))()["last_updated"]~=_G.API_last_update) then
 local lodsuc, loderr = pcall(function()
 MainModule = loadstring(game:HttpGet("https://pastebin.com/raw/G17DaBUh"))()
 end)
@@ -357,9 +355,12 @@ task.wait(5)
 temp_msg:Destroy()
 return
 end
+--elseif isfile("NexerHub/Core/APIMODULE.luau") then
+
+--end
 
 function RequestModule(module)
-if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) then return nil end
+if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) or (string.find(identifyexecutor(), "Solara") or string.find(identifyexecutor(), "solara") or string.find(identifyexecutor(), "SOLARA")) then return nil end
 local result = nil
 local Success, Error = pcall(function()
 result = require(module)
@@ -387,7 +388,7 @@ end
 function OpenLink(link)
 local url = tostring(link)
 if WebHandler then
-local suc, err = pcall(function() WebHandler:OpenRBX(url) end) if not suc then CopyLink(url) end
+local suc, err = pcall(function() game:GetService("GuiService"):BroadcastNotification(game:GetService("HttpService"):JSONEncode({["title"] = "Roblox", ["presentationStyle"] = 2, ["visible"] = true, ["url"] = tostring(url)}), 20) end) if not suc then CopyLink(url) end
 else
 CopyLink(url)
 end
@@ -607,7 +608,7 @@ end)
 end
 
 local Window = Rayfield:CreateWindow({
-   Name = ""..((getgenv and getgenv().dod_developer_key) or ((_G.dod_developer_key ~= nil and _G.dod_developer_key) or "Unknown")).." Hub : Die Of Death",
+   Name = ""..((_G.dod_developer_key ~= nil and _G.dod_developer_key) or "Unknown")).." Hub : Die Of Death",
    Icon = 0,    
    LoadingTitle = "NH:DOD",
    LoadingSubtitle = "by nexer",
@@ -746,7 +747,7 @@ SaveConfig("Tab_1", ChoosenNoStamLossMethod, "NoStaminaLossMethod")
 end; })
 
 local NoStaminaLoss = LoadConfig("Tab_1", "NoStaminaLoss")
-Tab_1:CreateToggle({Name = "No Stamina Loss"; CurrentValue = false; Callback = function(Value)
+local NoStaminaLossToggle = Tab_1:CreateToggle({Name = "No Stamina Loss"; CurrentValue = false; Callback = function(Value)
 if lastusedmethod == "require" then
 NoStaminaLoss = false
 lastusedmethod = ""
@@ -774,19 +775,20 @@ SetStaminaProperty("Fatigue", true)
 end
 end
 end; })
+NoStaminaLossToggle:Set(NoStaminaLoss)
 
 local NoFatigue = LoadConfig("Tab_1", "NoFatigue")
-Tab_1:CreateToggle({Name = "No Fatigue"; CurrentValue = NoFatigue; Callback = function(Value)
+local NoFatigueToggle = Tab_1:CreateToggle({Name = "No Fatigue"; CurrentValue = NoFatigue; Callback = function(Value)
 NoFatigue = Value
 SaveConfig("Tab_1", Value, "NoFatigue")
-if NoFatigue == true then
+if NoFatigue ~= true then return end
 repeat task.wait(0.003)
 if Character and Character:GetAttribute("Fatigue") and Character:GetAttribute("Fatigue") == 1 then
 SetStaminaProperty("Fatigue", 0)
 end
 until NoFatigue == false
-end
 end; })
+NoFatigueToggle:Set(NoFatigue)
 
 Tab_1:CreateSection("Advanced")
 
@@ -5821,7 +5823,7 @@ game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.ID.Visible = 
 game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.PlaceVersion.Visible = true
 game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.Ping.Visible = true
 while task.wait(1) do
-game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.ID.Text = "Information Powered by "..((getgenv and getgenv().dod_developer_key) or ((_G.dod_developer_key ~= nil and _G.dod_developer_key) or "Unknown")).." Hub"
+game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.ID.Text = "Information Powered by "..((_G.dod_developer_key ~= nil and _G.dod_developer_key) or "Unknown").." Hub"
 game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.PlaceVersion.Text = "Place Version: "..game.PlaceVersion..""
 game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.Ping.Text = "Ping: "..tonumber(math.round(string.split(game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString(), "(")[1])).."ms (round-trip)"
 end
