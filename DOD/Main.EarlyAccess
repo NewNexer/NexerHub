@@ -608,7 +608,7 @@ end)
 end
 
 local Window = Rayfield:CreateWindow({
-   Name = ""..((_G.dod_developer_key ~= nil and _G.dod_developer_key) or "Unknown")).." Hub : Die Of Death",
+   Name = ""..((_G.dod_developer_key ~= nil and _G.dod_developer_key) or "Unknown").." Hub : Die Of Death",
    Icon = 0,    
    LoadingTitle = "NH:DOD",
    LoadingSubtitle = "by nexer",
