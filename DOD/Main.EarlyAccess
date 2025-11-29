@@ -286,7 +286,21 @@ writefile("NexerHub/Core/"..config_save.."", [[return {
             ["Don'tDescendDuringTheFlight"] = false
         }
     },
-    ["Tab_6"] = {},
+    ["Tab_6"] = {
+        ["CustomAnimations"] = {
+            ["Run"] = "Civilian Run",
+            ["Walk"] = "Civilian Walk",
+            ["Idle"] = "Civilian Idle"
+        },
+        ["Swap"] = {
+            ["What"] = "Punch",
+            ["WithWhat"] = "BlockStart"
+        },
+        ["Misc"] = {
+            ["Desync"] = 1,
+            ["DesyncEnabled"] = false
+        }
+    },
     ["Tab_7"] = {},
     ["Tab_8"] = {},
     ["Tab_9"] = {},
@@ -300,7 +314,8 @@ if not isfile("NexerHub/Core/PreloadData.luau") then
 writefile("NexerHub/Core/PreloadData.luau", [[return {
     ["LoadConfig"] = true,
     ["GUID"] = ]]..tostring(game:GetService("HttpService"):GenerateGUID())..[[,
-    ["CoreVersion"] = 1
+    ["CoreVersion"] = 1,
+    ["LoadAssets"] = true
 }]])
 repeat task.wait() until isfile("NexerHub/Core/PreloadData.luau")
 end
@@ -421,7 +436,7 @@ Rayfield = loadstring(GetFile("NexerHub/Core/Rayfield.luau","rf"))()
 end
 
 temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/25)"
-if HaveWorkspaceAccess() then
+if HaveWorkspaceAccess() and loadstring(GetFile("NexerHub/Core/PreloadData.luau","rf"))()["LoadAssets"] == true then
 if not isfolder("NexerHub") then
 makefolder("NexerHub")
 repeat task.wait(.1) until isfolder("NexerHub")
@@ -643,7 +658,7 @@ local Window = Rayfield:CreateWindow({
 
 pcall(function()
 local Announcements = Window:CreateTab("Announce",0)
-Announcements:CreateParagraph({Title = "Hi there!", Content = "Script Version: 2.4 ( WORK IN PROGRESS, EXCEPT A LOT OF BUGS )\n\nThis script was fully recoded and fixed. Thank you for using my script. ❤️\n\nAlso join our discord server for early updates, free premium access and many other things..."})
+Announcements:CreateParagraph({Title = "W.I.P.", Content = "A lot of stuff haven't been added yet. Work is in progress. I have a lot of studies which is why it takes a lot of time."})
 Announcements:CreateButton({Name = "Copy Discord Server Link"; Callback = function()
 setclipboard(tostring("https://discord.gg/7u5GRNw3xn"))
 Notify("Success!", "Copied Link!", 3, true)
@@ -778,7 +793,7 @@ end; })
 NoStaminaLossToggle:Set(NoStaminaLoss)
 
 local NoFatigue = LoadConfig("Tab_1", "NoFatigue")
-local NoFatigueToggle = Tab_1:CreateToggle({Name = "No Fatigue"; CurrentValue = NoFatigue; Callback = function(Value)
+local NoFatigueToggle = Tab_1:CreateToggle({Name = "No Fatigue"; CurrentValue = false; Callback = function(Value)
 NoFatigue = Value
 SaveConfig("Tab_1", Value, "NoFatigue")
 if NoFatigue ~= true then return end
@@ -1736,7 +1751,7 @@ Tab_3:CreateParagraph({Title = "Immunities / Buffs", Content = "Immunities and b
 Tab_3:CreateSection("Workspace Side")
 
 local InstaDestroyComputer = LoadConfig("Tab_3", "IB", "InstaDestroyComputer")
-Tab_3:CreateToggle({Name = "Insta-Destroy Badware Computer"; CurrentValue = InstaDestroyComputer; Callback = function(Value)
+local InstaDestroyComputerToggle = Tab_3:CreateToggle({Name = "Insta-Destroy Badware Computer"; CurrentValue = false; Callback = function(Value)
 InstaDestroyComputer = Value
 SaveConfig("Tab_3", InstaDestroyComputer, "IB", "InstaDestroyComputer")
 end; })
@@ -1757,9 +1772,10 @@ pcall(fireproximityprompt, a)
 end
 alreadydestroyingpc = false
 end)
+InstaDestroyComputerToggle:Set(InstaDestroyComputer)
 
 local AntiWalls = LoadConfig("Tab_3", "IB", "AntiWalls")
-Tab_3:CreateToggle({Name = "Anti-Artful Walls"; CurrentValue = AntiWalls; Callback = function(Value)
+local AntiWallsToggle = Tab_3:CreateToggle({Name = "Anti-Artful Walls"; CurrentValue = false; Callback = function(Value)
 AntiWalls = Value
 task.spawn(ClearWalls)
 SaveConfig("Tab_3", AntiWalls, "IB", "AntiWalls")
@@ -1782,9 +1798,10 @@ d.CanTouch = false
 d.Transparency = 0.5
 end
 end)
+AntiWallsToggle:Set(AntiWalls)
 
 local AntiEvilScary1 = LoadConfig("Tab_3", "IB", "AntiEvilScary")
-Tab_3:CreateToggle({Name = "Anti Evil Scary"; CurrentValue = AntiEvilScary1; Callback = function(Value)
+local AntiEvilScary1Toggle = Tab_3:CreateToggle({Name = "Anti Evil Scary"; CurrentValue = false; Callback = function(Value)
 AntiEvilScary1 = Value
 if AntiEvilScary1 == true then
 for i,v in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable"):GetChildren()) do
@@ -1836,6 +1853,7 @@ child.CanQuery = false
 end)
 end
 end)
+AntiEvilScary1Toggle:Set(AntiEvilScary1)
 
 
 local AntiBarriers1 = false
@@ -1872,7 +1890,7 @@ end)
 
 
 local AntiFallRagdoll = LoadConfig("Tab_3", "IB", "AntiFallRagdoll")
-Tab_3:CreateToggle({Name = "Anti Fall Ragdoll"; CurrentValue = AntiFallRagdoll; Callback = function(Value)
+local AntiFallRagdollToggle = Tab_3:CreateToggle({Name = "Anti Fall Ragdoll"; CurrentValue = false; Callback = function(Value)
 AntiFallRagdoll = Value
 for i,v in next, workspace.GameAssets:GetDescendants() do
 if v.Name == "FallDamage" and v:IsA("BasePart") then
@@ -1895,7 +1913,7 @@ child.CanQuery = false
 end)
 end
 end)
-
+AntiFallRagdollToggle:Set(AntiFallRagdoll)
 
 
 
@@ -2124,7 +2142,7 @@ Tab_5:CreateSection("Workspace Side")
 local BackupEffect = game:GetService("ReplicatedStorage").Events.RemoteEvents.TauntEffect:Clone()
 BackupEffect.Parent = game.LogService
 local AntiTaunt = LoadConfig("Tab_5", "IB", "AntiTaunt")
-Tab_5:CreateToggle({Name = "Anti Taunt"; CurrentValue = AntiTaunt; Callback = function(Value)
+local AntiTauntToggle = Tab_5:CreateToggle({Name = "Anti Taunt"; CurrentValue = false; Callback = function(Value)
 AntiTaunt = Value
 if AntiTaunt == true then
 LocalPlayer.PlayerGui.MainGui.RoundUI.TauntTemplate:Destroy()
@@ -2147,6 +2165,7 @@ Character:SetAttribute("WalkSpeedModifier", 0)
 end
 end
 end)
+AntiTauntToggle:Set(AntiTaunt)
 
 Tab_5:CreateButton({Name = "Remove Destroyable Objects"; Callback = function(Value)
 pcall(function()
@@ -2155,7 +2174,7 @@ end)
 end; })
 
 local AntiEvilScary2 = LoadConfig("Tab_5", "IB", "AntiEvilScary")
-Tab_5:CreateToggle({Name = "Anti Evil Scary"; CurrentValue = AntiEvilScary2; Callback = function(Value)
+local AntiEvilScary2Toggle = Tab_5:CreateToggle({Name = "Anti Evil Scary"; CurrentValue = false; Callback = function(Value)
 AntiEvilScary2 = Value
 if AntiEvilScary2 == true then
 for i,v in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable"):GetChildren()) do
@@ -2207,6 +2226,7 @@ child.CanQuery = false
 end)
 end
 end)
+AntiEvilScary2Toggle:Set(AntiEvilScary2)
 
 
 local AntiBarriers2 = false
@@ -2377,19 +2397,19 @@ ChangeTransparency(tonumber(_G.ESPtransHandler))
 SaveConfig("Tab_4", _G.ESPtransHandler, "ESP", "Transparency")
 end; })
 
-Tab_4:CreateToggle({Name = "Show Username"; CurrentValue = true; Callback = function(Value)
+Tab_4:CreateToggle({Name = "Show Username"; CurrentValue = _G.ESPshowusers; Callback = function(Value)
 _G.ESPshowusers = Value
 SaveConfig("Tab_4", _G.ESPshowusers, "ESP", "ShowUsernames")
 end; })
 
-Tab_4:CreateToggle({Name = "Show Health"; CurrentValue = true; Callback = function(Value)
+Tab_4:CreateToggle({Name = "Show Health"; CurrentValue = _G.ESPshowhealth; Callback = function(Value)
 _G.ESPshowhealth = Value
 SaveConfig("Tab_4", _G.ESPshowhealth, "ESP", "ShowHealth")
 end; })
 
 plradded_esp = nil
 plrremoved_esp = nil
-Tab_4:CreateToggle({Name = "Turn On/Off ESP"; CurrentValue = false; Callback = function(Value)
+local ESPenabledToggle = Tab_4:CreateToggle({Name = "Turn On/Off ESP"; CurrentValue = false; Callback = function(Value)
 _G.ESPenabledHandler = Value
 if _G.ESPenabledHandler == true then
 for i,v in pairs(game:GetService("Players"):GetPlayers()) do
@@ -2418,6 +2438,7 @@ end
 end
 SaveConfig("Tab_4", _G.ESPenabledHandler, "ESP", "Enabled")
 end; })
+ESPenabledToggle:Set(_G.ESPenabledHandler)
 
 Tab_4:CreateSection("Gui Management ε=( o｀ω′)ノ")
 
@@ -2510,7 +2531,308 @@ end; })
 
 Tab_4:CreateSection("Custom Skins")
 
-Tab_4:CreateLabel("soon...")
+-- i am sorry this was made by ai because i dont know accessory things
+function weldAttachments(attach1, attach2)
+  local weld = Instance.new("Weld")
+  weld.Part0 = attach1.Parent
+  weld.Part1 = attach2.Parent
+  weld.C0 = attach1.CFrame
+  weld.C1 = attach2.CFrame
+  weld.Parent = attach1.Parent
+  return weld
+end
+local function buildWeld(weldName, parent, part0, part1, c0, c1)
+  local weld = Instance.new("Weld")
+  weld.Name = weldName
+  weld.Part0 = part0
+  weld.Part1 = part1
+  weld.C0 = c0
+  weld.C1 = c1
+  weld.Parent = parent
+  return weld
+end
+local function findFirstMatchingAttachment(model, name)
+  for _, child in pairs(model:GetChildren()) do
+    if child:IsA("Attachment") and child.Name == name then
+      return child
+    elseif not child:IsA("Accoutrement") and not child:IsA("Tool") then
+      local foundAttachment = findFirstMatchingAttachment(child, name)
+      if foundAttachment then
+        return foundAttachment
+      end
+    end
+  end
+end
+function AddAccessory(character, accoutrement, bodyPartName)
+  accoutrement.Parent = character
+  local handle = accoutrement:FindFirstChild("Handle")
+  if not handle then
+    return
+  end
+  local bodyPart = character:FindFirstChild(bodyPartName or "Head")
+  if not bodyPart then
+    return
+  end
+  local accAttachment = handle:FindFirstChildOfClass("Attachment")
+  if accAttachment then
+    local bodyAttachment = bodyPart:FindFirstChild(accAttachment.Name)
+    if not bodyAttachment then
+      bodyAttachment = Instance.new("Attachment")
+      bodyAttachment.Name = accAttachment.Name
+      bodyAttachment.Parent = bodyPart
+      if bodyPartName == "Head" then
+        bodyAttachment.Position = Vector3.new(0, 0.5, 0)
+      elseif bodyPartName == "Torso" then
+        bodyAttachment.Position = Vector3.new(0, 1, 0)
+      elseif bodyPartName == "Right Arm" then
+        bodyAttachment.Position = Vector3.new(1, 0.5, 0)
+      elseif bodyPartName == "Left Arm" then
+        bodyAttachment.Position = Vector3.new(-1, 0.5, 0)
+      elseif bodyPartName == "Right Leg" then
+        bodyAttachment.Position = Vector3.new(0.5, 1, 0)
+      elseif bodyPartName == "Left Leg" then
+        bodyAttachment.Position = Vector3.new(-0.5, 1, 0)
+      else
+        bodyAttachment.Position = Vector3.new(0, 0, 0)
+      end
+    end
+    weldAttachments(bodyAttachment, accAttachment)
+  else
+    local weld = Instance.new("Weld")
+    weld.Name = bodyPartName .. "Weld"
+    weld.Part0 = bodyPart
+    weld.Part1 = handle
+    weld.Parent = bodyPart
+    if bodyPartName == "Head" then
+      weld.C0 = CFrame.new(0, 0.5, 0)
+      weld.C1 = CFrame.new(0, 0, 0)
+    elseif bodyPartName == "Torso" then
+      weld.C0 = CFrame.new(0, 1.5, 0)
+      weld.C1 = CFrame.new(0, 0, 0)
+    elseif bodyPartName == "Right Arm" then
+      weld.C0 = CFrame.new(1.5, 0.5, 0)
+      weld.C1 = CFrame.new(0, 0, 0)
+    elseif bodyPartName == "Left Arm" then
+      weld.C0 = CFrame.new(-1.5, 0.5, 0)
+      weld.C1 = CFrame.new(0, 0, 0)
+    elseif bodyPartName == "Right Leg" then
+      weld.C0 = CFrame.new(0.5, 2, 0)
+      weld.C1 = CFrame.new(0, 0, 0)
+    elseif bodyPartName == "Left Leg" then
+      weld.C0 = CFrame.new(-0.5, 2, 0)
+      weld.C1 = CFrame.new(0, 0, 0)
+    else
+      weld.C0 = CFrame.new(0, 0, 0)
+      weld.C1 = CFrame.new(0, 0, 0)
+    end
+  end
+  return accoutrement
+end
+function EditHumanoidChild(char, part, value)
+if part == "Pants" then
+char:FindFirstChildOfClass("Pants").PantsTemplate = value
+elseif part == "Shirt" then
+char:FindFirstChildOfClass("Shirt").ShirtTemplate = value
+elseif part == "TShirt" then
+char:FindFirstChildOfClass("ShirtGraphic").Graphic = value
+else
+char:FindFirstChild(part).Value = value
+end
+end
+
+local function ArtfulForsakenSetUp(c)
+--head
+local head_asset = game:GetObjects("rbxassetid://"..tostring(114257201579610))[1]
+repeat task.wait(.05) until head_asset ~= nil and head_asset:FindFirstChild("Handle") and head_asset.Handle:FindFirstChild("SpecialMesh")
+local head = AddAccessory(c, head_asset, "Head")
+task.wait(.05)
+head:WaitForChild("Handle").CanCollide = false
+-- right sleeve
+local rs_asset = game:GetObjects("rbxassetid://"..tostring(83730135593176))[1]
+repeat task.wait(.05) until rs_asset ~= nil and rs_asset:FindFirstChild("Handle") and rs_asset.Handle:FindFirstChild("SpecialMesh")
+local rs = AddAccessory(c, rs_asset, "Right Arm")
+task.wait(.05)
+rs:WaitForChild("Handle").CanCollide = false
+rs:WaitForChild("Handle"):WaitForChild("SpecialMesh").Offset = Vector3.new(-1,0.5,0)
+-- left sleeve
+local ls_asset = game:GetObjects("rbxassetid://"..tostring(82696867944296))[1]
+repeat task.wait(.05) until ls_asset ~= nil and ls_asset:FindFirstChild("Handle") and ls_asset.Handle:FindFirstChild("SpecialMesh")
+local ls = AddAccessory(c, ls_asset, "Left Arm")
+task.wait(.05)
+ls:WaitForChild("Handle").CanCollide = false
+ls:WaitForChild("Handle"):WaitForChild("SpecialMesh").Offset = Vector3.new(1,0.5,0)
+-- torso
+local torso_asset = game:GetObjects("rbxassetid://"..tostring(127089746240385))[1]
+repeat task.wait(.05) until torso_asset ~= nil and torso_asset:FindFirstChild("Handle") and torso_asset.Handle:FindFirstChild("SpecialMesh")
+local torso = AddAccessory(c, torso_asset, "Torso")
+task.wait(.05)
+torso:WaitForChild("Handle").CanCollide = false
+torso:WaitForChild("Handle"):WaitForChild("SpecialMesh").Offset = Vector3.new(0,-1,-0.5)
+-- making body parts visible
+repeat task.wait(.05) until c:FindFirstChild("Left Leg") and c:FindFirstChild("Left Arm")
+c["Left Arm"].Transparency = 0
+c["Left Leg"].Transparency = 0
+end
+
+local function ArtfulLORSetUp(c)
+
+local function Ability()
+local a = Humanoid:LoadAnimation(game:GetService("ReplicatedStorage").Characters.Killer.Harken.Default.Animations.Throw)
+repeat task.wait() until a.Length > 0
+task.spawn(function()
+local a = nil
+for i = 1,10 do
+if a == true then return end
+a = game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Swing")
+end
+end)
+local function onswing()
+a:Play()
+repeat task.wait() until a.IsPlaying
+a.TimePosition = .6
+local BodyVelocity = Instance.new("BodyVelocity")
+BodyVelocity.MaxForce = Vector3.new(1000000,1000,1000000)
+BodyVelocity.P = 1250
+BodyVelocity.Velocity = HumanoidRootPart.CFrame.LookVector * 80
+BodyVelocity.Parent = HumanoidRootPart
+game.Debris:AddItem(BodyVelocity, .25)
+task.wait(.15)
+Character:SetAttribute("SprintSpeed", (Character:GetAttribute("SprintSpeed")*2))
+Character:SetAttribute("WalkSpeed", (Character:GetAttribute("WalkSpeed")*2))
+end
+local c = nil
+local d = nil
+c = Humanoid.AnimationPlayed:Connect(function(track)
+if track.Animation.AnimationId == "rbxassetid://80787680522855" then
+c:Disconnect()
+track:Stop()
+task.spawn(onswing)
+end
+end)
+end
+local lunge_abil = function()
+local a = Humanoid:LoadAnimation(game:GetService("ReplicatedStorage").Characters.Killer.Harken.Default.Animations.Throw)
+repeat task.wait() until a.Length > 0
+a:Play()
+repeat task.wait() until a.IsPlaying
+a.TimePosition = 0.6
+a:AdjustSpeed(0)
+Character:SetAttribute("SprintSpeed", (Character:GetAttribute("SprintSpeed")/2))
+Character:SetAttribute("WalkSpeed", (Character:GetAttribute("WalkSpeed")/2))
+task.spawn(Ability)
+repeat task.wait() until Character:GetAttribute("SprintSpeed") > 13
+a:Stop()
+end
+
+
+if c:FindFirstChild("CloneTool") then
+c:FindFirstChild("CloneTool"):Destroy()
+end
+if c:FindFirstChild("Pants") and c:FindFirstChild("Shirt") then
+c:FindFirstChild("Pants").PantsTemplate = "http://www.roblox.com/asset/?id=12803009530"
+c:FindFirstChild("Shirt").ShirtTemplate = "http://www.roblox.com/asset/?id=12803009530"
+end
+for i,v in next, c:GetChildren() do
+if v and v:IsA("BasePart") and v.Name ~= "Face" and v.Name ~= "MusicBox" then
+v.Color = Color3.fromRGB(255,254,226)
+end
+if v and v:IsA("CharacterMesh") then
+if v.BodyPart == Enum.BodyPart.LeftArm then
+v.MeshId = 83001137
+elseif v.BodyPart == Enum.BodyPart.RightArm then
+v.MeshId = 83001181
+elseif v.BodyPart == Enum.BodyPart.LeftLeg then
+v.MeshId = 746826007
+elseif v.BodyPart == Enum.BodyPart.RightLeg then
+v.MeshId = 746825633
+elseif v.BodyPart == Enum.BodyPart.Torso then
+v.MeshId = 82987757
+end
+end
+end
+if c:FindFirstChild("Face") and c:WaitForChild("Face"):FindFirstChild("Face") then
+c:FindFirstChild("Face"):WaitForChild("Face"):Destroy()
+end
+--head
+local head_asset = game:GetObjects("rbxassetid://"..tostring(15395102950))[1]
+repeat task.wait(.05) until head_asset ~= nil and head_asset:FindFirstChild("Handle") and head_asset.Handle:FindFirstChild("SpecialMesh")
+local head = AddAccessory(c, head_asset, "Head")
+task.wait(.05)
+head:WaitForChild("Handle").CanCollide = false
+--anims
+c.Animations.Idle.AnimationId = "rbxassetid://96089657207073"
+c.Animations.Sprint.AnimationId = "rbxassetid://84734698021418"
+c.Animations.Walk.AnimationId = "rbxassetid://86166363798441"
+if game.Players:GetPlayerFromCharacter(c) ~= game.Players.LocalPlayer then return end
+-- effect
+if not game:GetService("Lighting"):FindFirstChild("String Theocracy") then
+local cce = Instance.new("ColorCorrectionEffect",game:GetService("Lighting"))
+cce.Name = "String Theocracy"
+cce.Brightness = 0.175
+cce.TintColor = Color3.fromRGB(120,80,15)
+cce.Enabled = true
+elseif game:GetService("Lighting"):FindFirstChild("String Theocracy") then
+game:GetService("Lighting"):FindFirstChild("String Theocracy").Enabled = true
+end
+game.Players.LocalPlayer.CharacterAdded:Once(function()
+game:GetService("Lighting"):FindFirstChild("String Theocracy").Enabled = false
+end)
+--applying anims
+ApplyNewAnimations()
+repeat task.wait() until game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Repurpose")
+AbilityModule.CreateAbility({Client = true,ClientFunction = lunge_abil,Name = "Lunge_NH",InputShown = "E",Tip = "Lunge forwards to deal damage.",Cooldown = 5,Icon = "rbxassetid://105910997361738",DisplayName = "Lunge"})
+game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Implement"):Destroy()
+game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Copywrite"):Destroy()
+local a = game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Repurpose")
+a.Parent = game:GetService("LogService")
+task.wait()
+a.Parent = game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Abilities.Folder
+end
+
+
+Tab_4:CreateButton({Name = "Forsaken Artful ( Noliful Variant )"; Callback = function()
+if not _G.mp3_conversion_module then
+_G.mp3_conversion_module = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/Encryption-Center/refs/heads/main/mp3_conversion.luau"))()
+end
+if not isfile("NexerHub/Core/Artful.mp3") then
+writefile("NexerHub/Core/Artful.mp3", _G.mp3_conversion_module:ConvertMP3Data(_G.mp3_conversion_module["Artful?"]))
+repeat task.wait(.1) until isfile("NexerHub/Core/Artful.mp3")
+end
+local temp_table = {
+	["Name"] = "Artful?";
+	["Bio"] = "''I sure do wonder why am i here.''";
+	["Icon"] = "rbxassetid://134690353237803";
+	["ClearMainAccessories"] = true;
+	["ChaseTheme"] = ((getcustomasset and GetFile("NexerHub/Core/Artful.mp3","gca")) or tostring(game.ReplicatedStorage.Characters.Killer.Artful.Cementful.Animations.ChaseTheme.SoundId));
+	["CharacterAdded"] = function(c) task.spawn(ArtfulForsakenSetUp, c) end
+}
+pcall(function()
+MainModule:ModifySkin("Cementful", temp_table)
+end)
+end; })
+
+Tab_4:CreateButton({Name = "String Theocracy ( Artful Skin )"; Callback = function()
+if not _G.mp3_conversion_module then
+_G.mp3_conversion_module = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/Encryption-Center/refs/heads/main/mp3_conversion.luau"))()
+end
+if not isfile("NexerHub/Core/LOR.mp3") then
+writefile("NexerHub/Core/LOR.mp3", _G.mp3_conversion_module:ConvertMP3Data(_G.mp3_conversion_module["String Theocracy"]))
+repeat task.wait(.1) until isfile("NexerHub/Core/LOR.mp3")
+end
+local temp_table = {
+	["Name"] = "String Theocracy";
+	["Bio"] = "''...''";
+	["Icon"] = "rbxassetid://18662155";
+	["ClearMainAccessories"] = true;
+	["ChaseTheme"] = ((getcustomasset and GetFile("NexerHub/Core/LOR.mp3","gca")) or tostring(game.ReplicatedStorage.Characters.Killer.Artful.Builder.Animations.ChaseTheme.SoundId));
+	["CharacterAdded"] = function(c) task.spawn(ArtfulLORSetUp, c) end
+}
+pcall(function()
+MainModule:ModifySkin("Builder", temp_table)
+end)
+end; })
+
+
 
 Tab_4:CreateSection("Intro / Special Round Starter")
 
@@ -3317,19 +3639,22 @@ end; end
 return temp_table
 end
 
-local ChoosenRunAnim = "Civilian Run"
-Tab_6:CreateDropdown({Name = "Run Animation"; Options = GetAllRunNames(); CurrentOption = "Civilian Run"; MultiSelection = false; Callback = function(Value)
+local ChoosenRunAnim = LoadConfig("Tab_6", "CustomAnimations", "Run")
+Tab_6:CreateDropdown({Name = "Run Animation"; Options = GetAllRunNames(); CurrentOption = ChoosenRunAnim; MultiSelection = false; Callback = function(Value)
 ChoosenRunAnim = tostring(ConvertDropdownValue(Value))
+SaveConfig("Tab_6", ChoosenRunAnim, "CustomAnimations", "Run")
 end; })
 
-local ChoosenWalkAnim = "Civilian Walk"
-Tab_6:CreateDropdown({Name = "Walk Animation"; Options = GetAllWalkNames(); CurrentOption = "Civilian Walk"; MultiSelection = false; Callback = function(Value)
+local ChoosenWalkAnim = LoadConfig("Tab_6", "CustomAnimations", "Walk")
+Tab_6:CreateDropdown({Name = "Walk Animation"; Options = GetAllWalkNames(); CurrentOption = ChoosenWalkAnim; MultiSelection = false; Callback = function(Value)
 ChoosenWalkAnim = tostring(ConvertDropdownValue(Value))
+SaveConfig("Tab_6", ChoosenWalkAnim, "CustomAnimations", "Walk")
 end; })
 
-local ChoosenIdleAnim = "Civilian Idle"
-Tab_6:CreateDropdown({Name = "Idle Animation"; Options = GetAllIdleNames(); CurrentOption = "Civilian Idle"; MultiSelection = false; Callback = function(Value)
+local ChoosenIdleAnim = LoadConfig("Tab_6", "CustomAnimations", "Idle")
+Tab_6:CreateDropdown({Name = "Idle Animation"; Options = GetAllIdleNames(); CurrentOption = ChoosenIdleAnim; MultiSelection = false; Callback = function(Value)
 ChoosenIdleAnim = tostring(ConvertDropdownValue(Value))
+SaveConfig("Tab_6", ChoosenIdleAnim, "CustomAnimations", "Idle")
 end; })
 
 Tab_6:CreateButton({Name = "Apply Animations"; Callback = function()
@@ -3368,14 +3693,16 @@ local AbilityAnimData = {
 
 local AbilityAnimNames = {"Punch","Adrenaline","AdrenalineEnd","Caretaker","CloakStart","BlockStart","Dash","PadBuild","Hotdog","Revolver","Taunt","RevolverReload","CloakEnd","DynamiteWindup","DynamiteThrow","DynamiteHold","Banana","BlockLand"}
 
-local ReplaceWhatAbil = "Punch"
-Tab_6:CreateDropdown({Name = "Replace what"; Options = AbilityAnimNames; CurrentOption = "Punch"; MultiSelection = false; Callback = function(Value)
+local ReplaceWhatAbil = LoadConfig("Tab_6", "Swap", "What")
+Tab_6:CreateDropdown({Name = "Replace what"; Options = AbilityAnimNames; CurrentOption = ReplaceWhatAbil; MultiSelection = false; Callback = function(Value)
 ReplaceWhatAbil = ConvertDropdownValue(Value)
+SaveConfig("Tab_6", ReplaceWhatAbil, "Swap", "What")
 end; })
 
-local ReplaceWithWhatAbil = "BlockStart"
-Tab_6:CreateDropdown({Name = "Replace with what"; Options = AbilityAnimNames; CurrentOption = "BlockStart"; MultiSelection = false; Callback = function(Value)
+local ReplaceWithWhatAbil = LoadConfig("Tab_6", "Swap", "WithWhat")
+Tab_6:CreateDropdown({Name = "Replace with what"; Options = AbilityAnimNames; CurrentOption = ReplaceWithWhatAbil; MultiSelection = false; Callback = function(Value)
 ReplaceWithWhatAbil = ConvertDropdownValue(Value)
+SaveConfig("Tab_6", ReplaceWithWhatAbil, "Swap", "What")
 end; })
 
 Tab_6:CreateButton({Name = "Replace animation"; Callback = function()
@@ -3390,13 +3717,19 @@ end; })
 
 Tab_6:CreateSection("Miscellaneous")
 
-Tab_6:CreateInput({Name = "Desync in seconds"; PlaceholderText = "1"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+local DesyncInSeconds = LoadConfig("Tab_6", "Misc", "Desync")
+Tab_6:CreateInput({Name = "Desync in seconds"; PlaceholderText = tostring(DesyncInSeconds); NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 workspace:SetAttribute("AnimDesync", tonumber(Value))
+SaveConfig("Tab_6", tonumber(Value), "Misc", "Desync")
 end; })
+workspace:SetAttribute("AnimDesync", DesyncInSeconds)
 
-Tab_6:CreateToggle({Name = "Animations Desync"; CurrentValue = false; Callback = function(Value)
+local DesyncEnabled = LoadConfig("Tab_6", "Misc", "DesyncEnabled")
+local DesyncEnabledToggle = Tab_6:CreateToggle({Name = "Animations Desync"; CurrentValue = false; Callback = function(Value)
 workspace:SetAttribute("AnimDesyncEnabled", Value)
+SaveConfig("Tab_6", Value, "Misc", "DesyncEnabled")
 end; })
+DesyncEnabledToggle:Set(DesyncEnabled)
 
 Tab_6:CreateButton({Name = "No animations [ Apply any animation to revert! ]"; Callback = function()
 pcall(function()
@@ -5499,323 +5832,9 @@ end; })
 Tab_9:CreateButton({Name = "Close Hub"; Callback = function()
 DestroyRayfield()
 end; })
-Tab_8:CreateButton({Name = "Make dash stronger"; Callback = function(Value)
-HumanoidRootPart.ChildAdded:Connect(function(c)
-if c.Name == "BodyVelocity" then
-task.wait()
-c.MaxForce = Vector3.new(1000000,1000000,1000000)
-c.P = 1550
-c.Velocity = Vector3.new(c.Velocity.X, 9, c.Velocity.Z)
-end
-end)
-Notify("Success!","Made dash stronger!",3,true)
-end; })
 
 
 
--- i am sorry this was made by ai because i dont know accessory things
-function weldAttachments(attach1, attach2)
-  local weld = Instance.new("Weld")
-  weld.Part0 = attach1.Parent
-  weld.Part1 = attach2.Parent
-  weld.C0 = attach1.CFrame
-  weld.C1 = attach2.CFrame
-  weld.Parent = attach1.Parent
-  return weld
-end
-local function buildWeld(weldName, parent, part0, part1, c0, c1)
-  local weld = Instance.new("Weld")
-  weld.Name = weldName
-  weld.Part0 = part0
-  weld.Part1 = part1
-  weld.C0 = c0
-  weld.C1 = c1
-  weld.Parent = parent
-  return weld
-end
-local function findFirstMatchingAttachment(model, name)
-  for _, child in pairs(model:GetChildren()) do
-    if child:IsA("Attachment") and child.Name == name then
-      return child
-    elseif not child:IsA("Accoutrement") and not child:IsA("Tool") then
-      local foundAttachment = findFirstMatchingAttachment(child, name)
-      if foundAttachment then
-        return foundAttachment
-      end
-    end
-  end
-end
-function AddAccessory(character, accoutrement, bodyPartName)
-  accoutrement.Parent = character
-  local handle = accoutrement:FindFirstChild("Handle")
-  if not handle then
-    return
-  end
-  local bodyPart = character:FindFirstChild(bodyPartName or "Head")
-  if not bodyPart then
-    return
-  end
-  local accAttachment = handle:FindFirstChildOfClass("Attachment")
-  if accAttachment then
-    local bodyAttachment = bodyPart:FindFirstChild(accAttachment.Name)
-    if not bodyAttachment then
-      bodyAttachment = Instance.new("Attachment")
-      bodyAttachment.Name = accAttachment.Name
-      bodyAttachment.Parent = bodyPart
-      if bodyPartName == "Head" then
-        bodyAttachment.Position = Vector3.new(0, 0.5, 0)
-      elseif bodyPartName == "Torso" then
-        bodyAttachment.Position = Vector3.new(0, 1, 0)
-      elseif bodyPartName == "Right Arm" then
-        bodyAttachment.Position = Vector3.new(1, 0.5, 0)
-      elseif bodyPartName == "Left Arm" then
-        bodyAttachment.Position = Vector3.new(-1, 0.5, 0)
-      elseif bodyPartName == "Right Leg" then
-        bodyAttachment.Position = Vector3.new(0.5, 1, 0)
-      elseif bodyPartName == "Left Leg" then
-        bodyAttachment.Position = Vector3.new(-0.5, 1, 0)
-      else
-        bodyAttachment.Position = Vector3.new(0, 0, 0)
-      end
-    end
-    weldAttachments(bodyAttachment, accAttachment)
-  else
-    local weld = Instance.new("Weld")
-    weld.Name = bodyPartName .. "Weld"
-    weld.Part0 = bodyPart
-    weld.Part1 = handle
-    weld.Parent = bodyPart
-    if bodyPartName == "Head" then
-      weld.C0 = CFrame.new(0, 0.5, 0)
-      weld.C1 = CFrame.new(0, 0, 0)
-    elseif bodyPartName == "Torso" then
-      weld.C0 = CFrame.new(0, 1.5, 0)
-      weld.C1 = CFrame.new(0, 0, 0)
-    elseif bodyPartName == "Right Arm" then
-      weld.C0 = CFrame.new(1.5, 0.5, 0)
-      weld.C1 = CFrame.new(0, 0, 0)
-    elseif bodyPartName == "Left Arm" then
-      weld.C0 = CFrame.new(-1.5, 0.5, 0)
-      weld.C1 = CFrame.new(0, 0, 0)
-    elseif bodyPartName == "Right Leg" then
-      weld.C0 = CFrame.new(0.5, 2, 0)
-      weld.C1 = CFrame.new(0, 0, 0)
-    elseif bodyPartName == "Left Leg" then
-      weld.C0 = CFrame.new(-0.5, 2, 0)
-      weld.C1 = CFrame.new(0, 0, 0)
-    else
-      weld.C0 = CFrame.new(0, 0, 0)
-      weld.C1 = CFrame.new(0, 0, 0)
-    end
-  end
-  return accoutrement
-end
-function EditHumanoidChild(char, part, value)
-if part == "Pants" then
-char:FindFirstChildOfClass("Pants").PantsTemplate = value
-elseif part == "Shirt" then
-char:FindFirstChildOfClass("Shirt").ShirtTemplate = value
-elseif part == "TShirt" then
-char:FindFirstChildOfClass("ShirtGraphic").Graphic = value
-else
-char:FindFirstChild(part).Value = value
-end
-end
-
-local function ArtfulForsakenSetUp(c)
---head
-local head_asset = game:GetObjects("rbxassetid://"..tostring(114257201579610))[1]
-repeat task.wait(.05) until head_asset ~= nil and head_asset:FindFirstChild("Handle") and head_asset.Handle:FindFirstChild("SpecialMesh")
-local head = AddAccessory(c, head_asset, "Head")
-task.wait(.05)
-head:WaitForChild("Handle").CanCollide = false
--- right sleeve
-local rs_asset = game:GetObjects("rbxassetid://"..tostring(83730135593176))[1]
-repeat task.wait(.05) until rs_asset ~= nil and rs_asset:FindFirstChild("Handle") and rs_asset.Handle:FindFirstChild("SpecialMesh")
-local rs = AddAccessory(c, rs_asset, "Right Arm")
-task.wait(.05)
-rs:WaitForChild("Handle").CanCollide = false
-rs:WaitForChild("Handle"):WaitForChild("SpecialMesh").Offset = Vector3.new(-1,0.5,0)
--- left sleeve
-local ls_asset = game:GetObjects("rbxassetid://"..tostring(82696867944296))[1]
-repeat task.wait(.05) until ls_asset ~= nil and ls_asset:FindFirstChild("Handle") and ls_asset.Handle:FindFirstChild("SpecialMesh")
-local ls = AddAccessory(c, ls_asset, "Left Arm")
-task.wait(.05)
-ls:WaitForChild("Handle").CanCollide = false
-ls:WaitForChild("Handle"):WaitForChild("SpecialMesh").Offset = Vector3.new(1,0.5,0)
--- torso
-local torso_asset = game:GetObjects("rbxassetid://"..tostring(127089746240385))[1]
-repeat task.wait(.05) until torso_asset ~= nil and torso_asset:FindFirstChild("Handle") and torso_asset.Handle:FindFirstChild("SpecialMesh")
-local torso = AddAccessory(c, torso_asset, "Torso")
-task.wait(.05)
-torso:WaitForChild("Handle").CanCollide = false
-torso:WaitForChild("Handle"):WaitForChild("SpecialMesh").Offset = Vector3.new(0,-1,-0.5)
--- making body parts visible
-repeat task.wait(.05) until c:FindFirstChild("Left Leg") and c:FindFirstChild("Left Arm")
-c["Left Arm"].Transparency = 0
-c["Left Leg"].Transparency = 0
-end
-
-
-
-
-if not _G.mp3_conversion_module then
-_G.mp3_conversion_module = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/Encryption-Center/refs/heads/main/mp3_conversion.luau"))()
-end
-if not isfile("NexerHub/Core/Artful.mp3") then
-writefile("NexerHub/Core/Artful.mp3", _G.mp3_conversion_module:ConvertMP3Data(_G.mp3_conversion_module["Artful?"]))
-repeat task.wait(.1) until isfile("NexerHub/Core/Artful.mp3")
-end
-local temp_table = {
-	["Name"] = "Artful?";
-	["Bio"] = "''I sure do wonder why am i here.''";
-	["Icon"] = "rbxassetid://134690353237803";
-	["ClearMainAccessories"] = true;
-	["ChaseTheme"] = ((getcustomasset and GetFile("NexerHub/Core/Artful.mp3","gca")) or tostring(game.ReplicatedStorage.Characters.Killer.Artful.Cementful.Animations.ChaseTheme.SoundId));
-	["CharacterAdded"] = function(c) task.spawn(ArtfulForsakenSetUp, c) end
-}
-pcall(function()
-MainModule:ModifySkin("Cementful", temp_table)
-end)
-
-
-
-
-
-local function ArtfulLORSetUp(c)
-
-local function Ability()
-local a = Humanoid:LoadAnimation(game:GetService("ReplicatedStorage").Characters.Killer.Harken.Default.Animations.Throw)
-repeat task.wait() until a.Length > 0
-task.spawn(function()
-local a = nil
-for i = 1,10 do
-if a == true then return end
-a = game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Swing")
-end
-end)
-local function onswing()
-a:Play()
-repeat task.wait() until a.IsPlaying
-a.TimePosition = .6
-local BodyVelocity = Instance.new("BodyVelocity")
-BodyVelocity.MaxForce = Vector3.new(1000000,1000,1000000)
-BodyVelocity.P = 1250
-BodyVelocity.Velocity = HumanoidRootPart.CFrame.LookVector * 80
-BodyVelocity.Parent = HumanoidRootPart
-game.Debris:AddItem(BodyVelocity, .25)
-task.wait(.15)
-Character:SetAttribute("SprintSpeed", (Character:GetAttribute("SprintSpeed")*2))
-Character:SetAttribute("WalkSpeed", (Character:GetAttribute("WalkSpeed")*2))
-end
-local c = nil
-local d = nil
-c = Humanoid.AnimationPlayed:Connect(function(track)
-if track.Animation.AnimationId == "rbxassetid://80787680522855" then
-c:Disconnect()
-track:Stop()
-task.spawn(onswing)
-end
-end)
-end
-local lunge_abil = function()
-local a = Humanoid:LoadAnimation(game:GetService("ReplicatedStorage").Characters.Killer.Harken.Default.Animations.Throw)
-repeat task.wait() until a.Length > 0
-a:Play()
-repeat task.wait() until a.IsPlaying
-a.TimePosition = 0.6
-a:AdjustSpeed(0)
-Character:SetAttribute("SprintSpeed", (Character:GetAttribute("SprintSpeed")/2))
-Character:SetAttribute("WalkSpeed", (Character:GetAttribute("WalkSpeed")/2))
-task.spawn(Ability)
-repeat task.wait() until Character:GetAttribute("SprintSpeed") > 13
-a:Stop()
-end
-
-
-if c:FindFirstChild("CloneTool") then
-c:FindFirstChild("CloneTool"):Destroy()
-end
-if c:FindFirstChild("Pants") and c:FindFirstChild("Shirt") then
-c:FindFirstChild("Pants").PantsTemplate = "http://www.roblox.com/asset/?id=12803009530"
-c:FindFirstChild("Shirt").ShirtTemplate = "http://www.roblox.com/asset/?id=12803009530"
-end
-for i,v in next, c:GetChildren() do
-if v and v:IsA("BasePart") and v.Name ~= "Face" and v.Name ~= "MusicBox" then
-v.Color = Color3.fromRGB(255,254,226)
-end
-if v and v:IsA("CharacterMesh") then
-if v.BodyPart == Enum.BodyPart.LeftArm then
-v.MeshId = 83001137
-elseif v.BodyPart == Enum.BodyPart.RightArm then
-v.MeshId = 83001181
-elseif v.BodyPart == Enum.BodyPart.LeftLeg then
-v.MeshId = 746826007
-elseif v.BodyPart == Enum.BodyPart.RightLeg then
-v.MeshId = 746825633
-elseif v.BodyPart == Enum.BodyPart.Torso then
-v.MeshId = 82987757
-end
-end
-end
-if c:FindFirstChild("Face") and c:WaitForChild("Face"):FindFirstChild("Face") then
-c:FindFirstChild("Face"):WaitForChild("Face"):Destroy()
-end
---head
-local head_asset = game:GetObjects("rbxassetid://"..tostring(15395102950))[1]
-repeat task.wait(.05) until head_asset ~= nil and head_asset:FindFirstChild("Handle") and head_asset.Handle:FindFirstChild("SpecialMesh")
-local head = AddAccessory(c, head_asset, "Head")
-task.wait(.05)
-head:WaitForChild("Handle").CanCollide = false
---anims
-c.Animations.Idle.AnimationId = "rbxassetid://96089657207073"
-c.Animations.Sprint.AnimationId = "rbxassetid://84734698021418"
-c.Animations.Walk.AnimationId = "rbxassetid://86166363798441"
-if game.Players:GetPlayerFromCharacter(c) ~= game.Players.LocalPlayer then return end
--- effect
-if not game:GetService("Lighting"):FindFirstChild("String Theocracy") then
-local cce = Instance.new("ColorCorrectionEffect",game:GetService("Lighting"))
-cce.Name = "String Theocracy"
-cce.Brightness = 0.175
-cce.TintColor = Color3.fromRGB(120,80,15)
-cce.Enabled = true
-elseif game:GetService("Lighting"):FindFirstChild("String Theocracy") then
-game:GetService("Lighting"):FindFirstChild("String Theocracy").Enabled = true
-end
-game.Players.LocalPlayer.CharacterAdded:Once(function()
-game:GetService("Lighting"):FindFirstChild("String Theocracy").Enabled = false
-end)
---applying anims
-ApplyNewAnimations()
-repeat task.wait() until game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Repurpose")
-AbilityModule.CreateAbility({Client = true,ClientFunction = lunge_abil,Name = "Lunge_NH",InputShown = "E",Tip = "Lunge forwards to deal damage.",Cooldown = 5,Icon = "rbxassetid://105910997361738",DisplayName = "Lunge"})
-game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Implement"):Destroy()
-game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Copywrite"):Destroy()
-local a = game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Repurpose")
-a.Parent = game:GetService("LogService")
-task.wait()
-a.Parent = game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Abilities.Folder
-end
-
-
-if not _G.mp3_conversion_module then
-_G.mp3_conversion_module = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/Encryption-Center/refs/heads/main/mp3_conversion.luau"))()
-end
-if not isfile("NexerHub/Core/LOR.mp3") then
-writefile("NexerHub/Core/LOR.mp3", _G.mp3_conversion_module:ConvertMP3Data(_G.mp3_conversion_module["String Theocracy"]))
-repeat task.wait(.1) until isfile("NexerHub/Core/LOR.mp3")
-end
-local temp_table = {
-	["Name"] = "String Theocracy";
-	["Bio"] = "''Open the curtains.''";
-	["Icon"] = "rbxassetid://18662155";
-	["ClearMainAccessories"] = true;
-	["ChaseTheme"] = ((getcustomasset and GetFile("NexerHub/Core/LOR.mp3","gca")) or tostring(game.ReplicatedStorage.Characters.Killer.Artful.Builder.Animations.ChaseTheme.SoundId));
-	["CharacterAdded"] = function(c) task.spawn(ArtfulLORSetUp, c) end
-}
-pcall(function()
-MainModule:ModifySkin("Builder", temp_table)
-end)
 
 
 function PowerDebug()
