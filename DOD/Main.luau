@@ -176,7 +176,7 @@ if not isfolder("NexerHub/Core") then
 makefolder("NexerHub/Core")
 repeat task.wait() until isfolder("NexerHub/Core")
 end
-if not isfile("NexerHub/Core/"..config_save.."") then
+--if not isfile("NexerHub/Core/"..config_save.."") then
 writefile("NexerHub/Core/"..config_save.."", [[return {
     ["Tab_1"] = {
         ["AutoInjection"] = {
@@ -314,7 +314,7 @@ writefile("NexerHub/Core/"..config_save.."", [[return {
     ["Tab_12"] = {}
 }]])
 repeat task.wait() until isfile("NexerHub/Core/"..config_save.."")
-end
+--end
 if not isfile("NexerHub/Core/PreloadData.luau") then
 writefile("NexerHub/Core/PreloadData.luau", [[return {
     ["LoadConfig"] = true,
