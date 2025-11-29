@@ -5,6 +5,7 @@ Loading Variables
 ]]--
 _G.dod_developer_key = "Nexer" -- my name yaa
 _G.API_last_update = "23/11/2025" -- last time update (dd/mm/yyyy)
+_G.dod_repository = "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Main.EarlyAccess" -- input repository for savings
 
 
 
@@ -303,7 +304,9 @@ writefile("NexerHub/Core/"..config_save.."", [[return {
     },
     ["Tab_7"] = {},
     ["Tab_8"] = {},
-    ["Tab_9"] = {},
+    ["Tab_9"] = {
+        ["GuiTheme"] = "Amethyst"
+    },
     ["Tab_10"] = {},
     ["Tab_11"] = {},
     ["Tab_12"] = {}
@@ -319,8 +322,8 @@ writefile("NexerHub/Core/PreloadData.luau", [[return {
 }]])
 repeat task.wait() until isfile("NexerHub/Core/PreloadData.luau")
 end
-local SaveConfig = function(tab,value,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); if not element_2 then temp_table[tab][element_1] = value elseif not element_3 then temp_table[tab][element_1][element_2] = value else temp_table[tab][element_1][element_2][element_3] = value end CreateFile("NexerHub/Core/"..config_save.."", 'return '..TableToLuauString(temp_table)..'') end
-local LoadConfig = function(tab,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); if not element_2 then return temp_table[tab][element_1] elseif not element_3 then return temp_table[tab][element_1][element_2] else return temp_table[tab][element_1][element_2][element_3] end end
+local SaveConfig = function(tab,value,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); if not element_2 then pcall(function() temp_table[tab][element_1] = value end) elseif not element_3 then pcall(function() temp_table[tab][element_1][element_2] = value end) else pcall(function() temp_table[tab][element_1][element_2][element_3] = value end) end CreateFile("NexerHub/Core/"..config_save.."", 'return '..TableToLuauString(temp_table)..'') end
+local LoadConfig = function(tab,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); local returnelement = nil; if not element_2 then pcall(function() returnelement = temp_table[tab][element_1] end) elseif not element_3 then pcall(function() returnelement = temp_table[tab][element_1][element_2] end) else pcall(function() returnelement = temp_table[tab][element_1][element_2][element_3] end) end return returnelement end
 
 
 Instance.new("Folder",game:GetService("CoreGui")).Name = "DOD_Assets"
@@ -622,12 +625,13 @@ end)
 end)
 end
 
+local RayfieldGuiTheme = LoadConfig("Tab_9", "GuiTheme")
 local Window = Rayfield:CreateWindow({
    Name = ""..((_G.dod_developer_key ~= nil and _G.dod_developer_key) or "Unknown").." Hub : Die Of Death",
    Icon = 0,    
    LoadingTitle = "NH:DOD",
    LoadingSubtitle = "by nexer",
-   Theme = "Amethyst",
+   Theme = RayfieldGuiTheme,
    DisableRayfieldPrompts = true,
    DisableBuildWarnings = true,
 
@@ -1745,6 +1749,7 @@ UIModule.AbilitySelection(unpack(CardSettings))
 end; })
 
 Tab_3:CreateSection("")
+Tab_3:CreateSection("")
 
 Tab_3:CreateParagraph({Title = "Immunities / Buffs", Content = "Immunities and buffs for workspace side"})
 
@@ -2134,6 +2139,9 @@ ApplyKilldroidConfigurations()
 Notify("Success!", "Applied configurations.", 3, true)
 end; })
 
+
+Tab_5:CreateSection("")
+Tab_5:CreateSection("")
 
 Tab_5:CreateParagraph({Title = "Immunities / Buffs", Content = "Immunities and buffs for workspace side"})
 
@@ -2796,6 +2804,7 @@ end
 
 
 Tab_4:CreateButton({Name = "Forsaken Artful ( Noliful Variant )"; Callback = function()
+Notify("Success!", "Loading new skin... Please wait!", 5, true)
 if not _G.mp3_conversion_module then
 _G.mp3_conversion_module = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/Encryption-Center/refs/heads/main/mp3_conversion.luau"))()
 end
@@ -2813,10 +2822,12 @@ local temp_table = {
 }
 pcall(function()
 MainModule:ModifySkin("Cementful", temp_table)
+Notify("Success!", "Loaded new skin!", 5, true)
 end)
 end; })
 
 Tab_4:CreateButton({Name = "String Theocracy ( Artful Skin )"; Callback = function()
+Notify("Success!", "Loading new skin... Please wait!", 5, true)
 if not _G.mp3_conversion_module then
 _G.mp3_conversion_module = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/Encryption-Center/refs/heads/main/mp3_conversion.luau"))()
 end
@@ -2834,6 +2845,7 @@ local temp_table = {
 }
 pcall(function()
 MainModule:ModifySkin("Builder", temp_table)
+Notify("Success!", "Loaded new skin!", 5, true)
 end)
 end; })
 
@@ -4766,6 +4778,7 @@ Notify("Success!","Removed File!",3,true)
 end; })
 
 
+Tab_10:CreateSection("")
 
 
 Tab_10:CreateSection("Custom Chase Themes")
@@ -5150,455 +5163,6 @@ end
 end; })
 
 
-function DamageEffect()
-task.spawn(function()
-game:GetService("Lighting").DamageEffect.Enabled = true
-game:GetService("Lighting").DamageEffect.Contrast = 0
-game:GetService("Lighting").DamageEffect.TintColor = Color3.fromRGB(255, 255, 255)
-game:GetService("TweenService"):Create(game:GetService("Lighting").DamageEffect, TweenInfo.new(0.5), {
-	["Contrast"] = 0.5
-}):Play()
-game:GetService("TweenService"):Create(game:GetService("Lighting").DamageEffect, TweenInfo.new(0.5), {
-	["TintColor"] = Color3.fromRGB(255, 52, 52)
-}):Play()
-task.wait(0.5)
-game:GetService("TweenService"):Create(game:GetService("Lighting").DamageEffect, TweenInfo.new(1), {
-	["Contrast"] = 0
-}):Play()
-game:GetService("TweenService"):Create(game:GetService("Lighting").DamageEffect, TweenInfo.new(1), {
-	["TintColor"] = Color3.fromRGB(255, 255, 255)
-}):Play()
-end)
-end
-
-function Jumpscare(duration)
-local soundhahaha = Instance.new("Sound")
-soundhahaha.SoundId = "rbxassetid://123871865507678"
-soundhahaha.Volume = 3
-soundhahaha.Name = "TROLLED ! ! !"
-soundhahaha.Parent = game.Players.LocalPlayer.PlayerGui
-repeat task.wait() until game.Players.LocalPlayer.PlayerGui:FindFirstChild("TROLLED ! ! !")
-if not soundhahaha.IsLoaded then
-repeat task.wait() until soundhahaha.IsLoaded
-end
-soundhahaha:Play()
-task.spawn(function()
-soundhahaha.Ended:Connect(function() soundhahaha:Destroy() end)
-end)
-local INTENSITY = 3
-local SPEED = 12
-local ROLL_DOMINANCE = 8.5
-local random = Random.new()
-local timeOffset = random:NextNumber(0, 10)
-local lastBaseCFrame = CFrame.new()
-local function updateNauseaEffect()
-    local baseCFrame = LP.Character:WaitForChild("Head").CFrame
-    lastBaseCFrame = baseCFrame
-    local time = os.clock() * SPEED + timeOffset
-    local roll = math.sin(time * 1.7) * math.rad(INTENSITY * ROLL_DOMINANCE)
-    local pitch = math.cos(time * 0.9) * math.rad(INTENSITY)
-    local yaw = math.sin(time * 1.3) * math.rad(INTENSITY)
-    local rotation = CFrame.Angles(pitch, yaw, roll)
-    workspace.CurrentCamera.CFrame = CFrame.new(baseCFrame.Position) * (baseCFrame.Rotation * rotation)
-end
-game:GetService("RunService"):BindToRenderStep("NauseaEffect", Enum.RenderPriority.Camera.Value + 1, updateNauseaEffect)
-local function disableNauseaEffect()
-    game:GetService("RunService"):UnbindFromRenderStep("NauseaEffect")
-    workspace.CurrentCamera.CFrame = lastBaseCFrame
-end
-task.delay(tonumber(duration),function()
-disableNauseaEffect()
-end)
-end
-
-
-function FakeKiller(npcname, targettingtime)
---local ragdoll = require(game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Client.Modules.Effect)
-local npc = nil
-local ognpc = nil
-for i,v in pairs(game:GetService("ReplicatedStorage").Characters.Killer:GetDescendants()) do
-if v and v:IsA("Model") and v.Name and v.Parent:IsA("Folder") and v.Name:find(tostring(npcname)) or v.Name:match(tostring(npcname)) then
-npc = v:Clone()
-ognpc = v
-end
-end
-pcall(function()
-npc:WaitForChild("Humanoid").DisplayDistanceType = "None"
-end)
-npc.Parent = workspace.GameAssets.Teams.Killer
-if game.Players.LocalPlayer.Character:FindFirstChild("Vanities") and workspace.GameAssets:FindFirstChild("Map") then
-npc:WaitForChild("HumanoidRootPart").CFrame = workspace.GameAssets.Map.Config.Spawns.Killer:GetChildren()[math.random(1,#workspace.GameAssets.Map.Config.Spawns.Killer:GetChildren())].CFrame * CFrame.new(0,10,0)
-else
-npc:WaitForChild("HumanoidRootPart").CFrame = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame
-end
-if ognpc.Parent.Name == "Badware" then
-npc:WaitForChild("Humanoid").WalkSpeed = 22
-elseif ognpc.Parent.Name == "Pursuer" then
-npc:WaitForChild("Humanoid").WalkSpeed = 26
-elseif ognpc.Parent.Name == "Artful" then
-npc:WaitForChild("Humanoid").WalkSpeed = 24.5
-else
-npc:WaitForChild("Humanoid").WalkSpeed = 24.5
-end
-local loadedanim_run = npc:WaitForChild("Humanoid"):LoadAnimation(npc:WaitForChild("Animations"):WaitForChild("Sprint"))
-loadedanim_run:Play()
-loadedanim_run:AdjustSpeed(tonumber(1))
-local loadedanim_swing = npc:WaitForChild("Humanoid"):LoadAnimation(npc:WaitForChild("Animations"):WaitForChild("Swing"))
-local cd = false
-local start = tick()
-while tick() - start < tonumber(targettingtime) do
-pcall(function()
-newpath = game:GetService("PathfindingService"):CreatePath({
-	AgentRadius = 3,
-	AgentHeight = 6,
-	AgentCanJump = false,
-	AgentCanClimb = false,
-	WaypointSpacing = 6,
-})
-newpath:ComputeAsync(npc:WaitForChild("HumanoidRootPart").Position, game:GetService("Players").LocalPlayer.Character:WaitForChild("HumanoidRootPart").Position)
-waypoints = newpath:GetWaypoints()
-if waypoints ~= nil and waypoints[2] ~= nil then
-npc:WaitForChild("Humanoid"):MoveTo(waypoints[2].Position)
-end
-newpath = nil
-end)
-task.wait()
-local magnitude = (npc:WaitForChild("HumanoidRootPart").Position - game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").Position).magnitude
-if magnitude < 7 and cd == false and game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Health ~= 0 then
-if game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Health < 26 then
-game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Health = tonumber(game.Players.LocalPlayer.Character:WaitForChild("Humanoid").MaxHealth)
-loadedanim_run:Stop()
-loadedanim_run:AdjustSpeed(tonumber(0))
-loadedanim_swing:Stop()
-loadedanim_swing:AdjustSpeed(tonumber(0))
---ragdoll.Ragdoll(npc)
-task.spawn(function()
-Jumpscare(4)
-end)
-npc:Destroy()
-return nil
-end
-cd = true
-loadedanim_swing:Play()
-task.wait(.5)
-DamageEffect()
-game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Health = game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Health - 20
-npc:WaitForChild("HumanoidRootPart"):WaitForChild("Hit"):Play()
-task.delay(1,function()
-cd = false
-end)
-end
-end
-game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Health = tonumber(game.Players.LocalPlayer.Character:WaitForChild("Humanoid").MaxHealth)
-loadedanim_run:Stop()
-loadedanim_run:AdjustSpeed(tonumber(0))
-loadedanim_swing:Stop()
-loadedanim_swing:AdjustSpeed(tonumber(0))
---ragdoll.Ragdoll(npc)
-task.spawn(function()
-Jumpscare(4)
-end)
-npc:Destroy()
-end
-
-
-
-local ragdoll = nil
-function FakeSurvivor()
-pcall(function()
-ragdoll = require(game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Client.Modules.Effect)
-end)
-local npc = game:GetService("ReplicatedStorage").Characters.Survivor.Civilian:Clone()
-pcall(function()
-npc:WaitForChild("Humanoid").DisplayDistanceType = "None"
-end)
-npc.Name = tostring(game.Players:GetChildren()[math.random(1,#game.Players:GetChildren())].Name)
-npc.Parent = workspace.GameAssets.Teams.Survivor
-if workspace.GameAssets:FindFirstChild("Map") then
-npc:WaitForChild("HumanoidRootPart").CFrame = workspace.GameAssets.Map.Config.Spawns.Survivor:GetChildren()[math.random(1,#workspace.GameAssets.Map.Config.Spawns.Survivor:GetChildren())].CFrame * CFrame.new(0,10,0)
-else
-npc:WaitForChild("HumanoidRootPart").CFrame = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame
-end
-local loadedanim_idle = npc:WaitForChild("Humanoid"):LoadAnimation(npc:WaitForChild("Animations"):WaitForChild("Idle"))
-loadedanim_idle:Play()
-loadedanim_idle:AdjustSpeed(tonumber(1))
-for i,v in pairs(npc:WaitForChild("Vanities"):GetChildren()) do
-if v and v:IsA("BasePart") then
-v.Transparency = 1
-end
-end
-local luck = math.random(1,3)
-if luck == 1 then
-npc:WaitForChild("Vanities"):WaitForChild("Caretaker").Transparency = 0
-npc:WaitForChild("Torso").Color = Color3.fromRGB(255,255,255)
-elseif luck == 2 then
-npc:WaitForChild("Vanities"):WaitForChild("Aussie Slouch").Transparency = 0
-npc:WaitForChild("Torso").Color = Color3.fromRGB(150,100,0)
-elseif luck == 3 then
-npc:WaitForChild("Vanities"):WaitForChild("Cloak").Transparency = 0
-npc:WaitForChild("Vanities"):WaitForChild("NinjaMask").Transparency = 0
-npc:WaitForChild("Torso").Color = Color3.fromRGB(255,255,255)
-end
-npc:WaitForChild("HumanoidRootPart").CanTouch = true
-local alr_jumpscared = false
-local touch_connection = npc:WaitForChild("HumanoidRootPart").Touched:Connect(function(child)
-local magnitude = (npc:WaitForChild("HumanoidRootPart").Position - game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").Position).magnitude
-if child and child:IsA("BasePart") and child.Name == "Hitbox" and child.Color == Color3.fromRGB(255,0,0) and child.Material == Enum.Material.ForceField and magnitude < 25 then
-loadedanim_idle:Stop()
-loadedanim_idle:AdjustSpeed(tonumber(0))
-alr_jumpscared = true
-task.spawn(function()
-Jumpscare(4)
-end)
-if require and ragdoll ~= nil then
-ragdoll.Ragdoll(npc)
-ragdoll = nil
-else
-npc:Destroy()
-end
-pcall(function()
-touch_connection:Disconnect()
-end)
-end
-end)
-if not workspace.GameAssets.Teams.Killer:FindFirstChildOfClass("Model") then
-loadedanim_idle:Stop()
-loadedanim_idle:AdjustSpeed(tonumber(0))
-npc:Destroy()
-pcall(function()
-touch_connection:Disconnect()
-end)
-else
-repeat task.wait() until workspace.GameAssets.Teams.Killer:FindFirstChildOfClass("Model") == nil or alr_jumpscared == true
-if alr_jumpscared == true then return nil end
-loadedanim_idle:Stop()
-loadedanim_idle:AdjustSpeed(tonumber(0))
-npc:Destroy()
-pcall(function()
-touch_connection:Disconnect()
-end)
-end
-end
-
-
-function FakeTimer()
-local start = tick()
-local timerisalmostup = game:GetService("ReplicatedStorage").Sounds.Songs["30SecondsLeft"]:Clone()
-timerisalmostup.Parent = game.LogService
-timerisalmostup.Volume = 2
-timerisalmostup:Play()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:30"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:29"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:28"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:27"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:26"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:25"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:24"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:23"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:22"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:21"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:20"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:19"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:18"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:17"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:16"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:15"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:14"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:13"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:12"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:11"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:10"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:09"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:08"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:07"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:06"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:05"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:04"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:03"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:02"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:01"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:00"
-task.wait()
-end
-game:GetService("ReplicatedStorage").Sounds.SFX.SurvivorWin:Play()
-local start = tick()
-while tick() - start < 7 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "Time's up! The Survivors win!"
-task.wait()
-end
-Jumpscare(4)
-end
-
-function FakeEvilScary()
-local savedvolume = 1.5
-local lungeattack = game:GetService("ReplicatedStorage").Assets.EvilScary.Lunge:Clone()
-lungeattack.Parent = game.LogService
-lungeattack.Volume = savedvolume
-lungeattack:Play()
-task.wait(2)
-for i = 1, math.random(2,5) do
-savedvolume = savedvolume + 0.5
-local moveattackcopy = game:GetService("ReplicatedStorage").Assets.EvilScary.Move:Clone()
-moveattackcopy.Parent = game.LogService
-moveattackcopy.Volume = savedvolume
-moveattackcopy:Play()
-task.wait(.47)
-end
-local fuckingscream = game:GetService("ReplicatedStorage").Assets.EvilScary.Scream:Clone()
-fuckingscream.Parent = game.LogService
-fuckingscream:Play()
-game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("EvilScary").Visible = true
-game:GetService("ReplicatedStorage").Sounds.SFX.KillSound:Play()
-task.wait(3.25)
-game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("EvilScary").Visible = false
-task.spawn(function()
-Jumpscare(4)
-end)
-end
-
-
-local FakeKillerAppearance = "Devesto"
-Tab_8:CreateInput({Name = "Fake Killer Appearance ( put any killer skin name here )"; PlaceholderText = "Devesto"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-FakeKillerAppearance = ConvertDropdownValue(Value)
-end; })
-
-Tab_8:CreateButton({Name = "Spawn Fake Killer"; Callback = function()
-FakeKiller(FakeKillerAppearance, 60)
-end; })
-
-Tab_8:CreateButton({Name = "Spawn Fake Survivor"; Callback = function()
-FakeSurvivor()
-end; })
-
-Tab_8:CreateButton({Name = "Spawn Fake Timer"; Callback = function()
-FakeTimer()
-end; })
-
-Tab_8:CreateButton({Name = "Spawn Fake Evil Scary"; Callback = function()
-FakeEvilScary()
-end; })
-
 
 
 local Tab_11 = Window:CreateTab("Config Settings",0)
@@ -5810,6 +5374,11 @@ end
 return {["decompile_config"]=decompile_config;["compile_config"]=compile_config;}]]
 local ConfigurationModule = loadstring(temp_module)()
 
+Tab_11:CreateButton({Name = "Re-Execute Script"; Callback = function()
+loadstring(game:HttpGet(_G.dod_repository))()
+Notify("Success!", "Re-Executing script...", 5, true)
+end; })
+
 Tab_11:CreateSection("Config Save")
 Tab_11:CreateLabel("Configurations are being auto-saved.")
 Tab_11:CreateButton({Name = "Copy Config Values"; Callback = function()
@@ -5831,18 +5400,13 @@ end; })
 
 local Tab_9 = Window:CreateTab("Other",0)
 Tab_9:CreateParagraph({Title = "Other", Content = "Other random thingiez"})
-Tab_9:CreateDropdown({Name = "Gui Theme"; Options = {"Amethyst","Default","AmberGlow","Bloom","DarkBlue","Green","Light","Ocean","Serenity"}; CurrentOption = "Amethyst"; MultiSelection = false; Callback = function(Value)
-Window.ModifyTheme(ConvertDropdownValue(Value))
+Tab_9:CreateDropdown({Name = "Gui Theme"; Options = {"Amethyst","Default","AmberGlow","Bloom","DarkBlue","Green","Light","Ocean","Serenity"}; CurrentOption = RayfieldGuiTheme; MultiSelection = false; Callback = function(Value)
+RayfieldGuiTheme = ConvertDropdownValue(Value)
+Window.ModifyTheme(RayfieldGuiTheme)
+SaveConfig("Tab_9", RayfieldGuiTheme, "GuiTheme")
 end; })
-Tab_9:CreateButton({Name = "Close Hub"; Callback = function()
-DestroyRayfield()
-end; })
-
-
-
-
-
-function PowerDebug()
+Tab_9:CreateButton({Name = "Show Ping"; Callback = function()
+local function PowerDebug()
 game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.ID.Visible = true
 game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.PlaceVersion.Visible = true
 game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.Ping.Visible = true
@@ -5853,3 +5417,11 @@ game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.Ping.Text = "
 end
 end
 task.spawn(PowerDebug)
+end; })
+Tab_9:CreateButton({Name = "Close Hub"; Callback = function()
+DestroyRayfield()
+end; })
+
+
+
+
