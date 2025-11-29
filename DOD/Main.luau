@@ -357,27 +357,26 @@ end
 
 temp_msg.Text = "Loading API Module... (0/1)"; task.wait(.2)
 
+repeat task.wait()
 --if not isfile("NexerHub/Core/APIMODULE.luau") or (isfile("NexerHub/Core/APIMODULE.luau") and loadstring(GetFile("NexerHub/Core/APIMODULE.luau","rf"))()["last_updated"]~=_G.API_last_update) then
 local lodsuc, loderr = pcall(function()
 MainModule = loadstring(game:HttpGet("https://pastebin.com/raw/G17DaBUh"))()
 end)
 if not lodsuc then
-temp_msg.Text = "Failed loading API Module, please try again."
+temp_msg.Text = "Failed loading API Module, re-trying..."
 task.wait(3)
-temp_msg:Destroy()
-return
 elseif lodsuc and MainModule.IsWorking ~= nil then
 temp_msg.Text = "Loading API Module... (1/1)"
 task.wait(1)
 else
-temp_msg.Text = "Failed loading API Module, please try again."
+temp_msg.Text = "Failed loading API Module, re-trying..."
 task.wait(3)
-temp_msg:Destroy()
-return
 end
 --elseif isfile("NexerHub/Core/APIMODULE.luau") then
 
 --end
+until temp_msg.Text = "Loading API Module... (1/1)"
+
 
 function RequestModule(module)
 if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) or (string.find(identifyexecutor(), "Solara") or string.find(identifyexecutor(), "solara") or string.find(identifyexecutor(), "SOLARA")) then return nil end
