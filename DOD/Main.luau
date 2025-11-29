@@ -375,7 +375,7 @@ end
 --elseif isfile("NexerHub/Core/APIMODULE.luau") then
 
 --end
-until temp_msg.Text = "Loading API Module... (1/1)"
+until temp_msg.Text == "Loading API Module... (1/1)"
 
 
 function RequestModule(module)
