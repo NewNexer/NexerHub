@@ -313,7 +313,7 @@ end
 if not isfile("NexerHub/Core/PreloadData.luau") then
 writefile("NexerHub/Core/PreloadData.luau", [[return {
     ["LoadConfig"] = true,
-    ["GUID"] = ]]..tostring(game:GetService("HttpService"):GenerateGUID())..[[,
+    ["GUID"] = "]]..tostring(game:GetService("HttpService"):GenerateGUID())..[[",
     ["CoreVersion"] = 1,
     ["LoadAssets"] = true
 }]])
@@ -436,7 +436,7 @@ Rayfield = loadstring(GetFile("NexerHub/Core/Rayfield.luau","rf"))()
 end
 
 temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/25)"
-if HaveWorkspaceAccess() and loadstring(readfile("NexerHub/Core/PreloadData.luau"))().LoadAssets == true then
+if HaveWorkspaceAccess() and loadstring(GetFile("NexerHub/Core/PreloadData.luau","rf"))().LoadAssets == true then
 if not isfolder("NexerHub") then
 makefolder("NexerHub")
 repeat task.wait(.1) until isfolder("NexerHub")
