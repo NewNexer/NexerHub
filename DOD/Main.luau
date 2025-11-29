@@ -427,7 +427,8 @@ return
 end
 
 temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/25)"
-if HaveWorkspaceAccess() and loadstring(GetFile("NexerHub/Core/PreloadData.luau","rf"))().LoadAssets == true then
+--loadstring(GetFile("NexerHub/Core/PreloadData.luau","rf"))().LoadAssets == true
+if HaveWorkspaceAccess() and false == true then
 if not isfolder("NexerHub") then
 makefolder("NexerHub")
 repeat task.wait(.1) until isfolder("NexerHub")
