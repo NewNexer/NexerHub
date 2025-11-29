@@ -4199,8 +4199,9 @@ MainModule:SetNoEvilnessLimit(Value)
 end; })
 MainModule:InitiateNoEvilnessLimit()
 
-Tab_7:CreateLabel("Respawns your character, but makes game think that you are still alive as killer/survivor.")
+Tab_7:CreateLabel("Respawns your character, but makes game think that you are still alive as killer/survivor. ( replicatesignal required )")
 Tab_7:CreateButton({Name = "Respawn"; Callback = function()
+if not replicatesignal then Notify("Error!", "Couldn't use function ''Respawn'', missing function ''replicatesignal''!", 5, false) return end
 MainModule:Respawn()
 end; })
 
