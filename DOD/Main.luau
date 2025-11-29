@@ -1766,21 +1766,11 @@ InstaDestroyComputer = Value
 SaveConfig("Tab_3", InstaDestroyComputer, "IB", "InstaDestroyComputer")
 end; })
 game:GetService("ProximityPromptService").PromptShown:Connect(function(a,b)
-if InstaDestroyComputer == true and a.HoldDuration ~= 0 then
+if InstaDestroyComputer ~= true then return end
 a.HoldDuration = 0
-end
-end)
-local alreadydestroyingpc = false
-game:GetService("ProximityPromptService").PromptTriggered:Connect(function(a,b)
-if alreadydestroyingpc or InstaDestroyComputer ~= true then return end
-alreadydestroyingpc = true
-a.HoldDuration = 0
-a.RequiresLineOfSight = false
-a.Enabled = true
 for i = 1,40 do
 pcall(fireproximityprompt, a)
 end
-alreadydestroyingpc = false
 end)
 InstaDestroyComputerToggle:Set(InstaDestroyComputer)
 
