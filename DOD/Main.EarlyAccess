@@ -362,16 +362,16 @@ local lodsuc, loderr = pcall(function()
 MainModule = loadstring(game:HttpGet("https://pastebin.com/raw/G17DaBUh"))()
 end)
 if not lodsuc then
-temp_msg.Text = "Failed loading API Module, please try using VPN or another DNS server."
-task.wait(5)
+temp_msg.Text = "Failed loading API Module, please try again."
+task.wait(3)
 temp_msg:Destroy()
 return
 elseif lodsuc and MainModule.IsWorking ~= nil then
 temp_msg.Text = "Loading API Module... (1/1)"
 task.wait(1)
 else
-temp_msg.Text = "Failed loading API Module, please try using VPN or another DNS server."
-task.wait(5)
+temp_msg.Text = "Failed loading API Module, please try again."
+task.wait(3)
 temp_msg:Destroy()
 return
 end
@@ -425,8 +425,8 @@ local RAYFIELD_SUCCESS, RAYFIELD_FAIL = pcall(function()
 Rayfield = game:HttpGet("https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/main/source.lua")
 end)
 if not RAYFIELD_SUCCESS then
-temp_msg.Text = "Failed loading Rayfield, please try using VPN or another DNS server."
-task.wait(5)
+temp_msg.Text = "Failed loading Rayfield, please try again."
+task.wait(3)
 temp_msg:Destroy()
 return
 end
