@@ -5,7 +5,7 @@ Loading Variables
 ]]--
 local config_save = "DOD_config_ea.luau"
 _G.dod_developer_key = "Nexer" -- my name yaa
-_G.API_last_update = "23/11/2025" -- last time update (dd/mm/yyyy)
+_G.API_last_update = "29/11/2025" -- last time update (dd/mm/yyyy)
 _G.dod_repository = "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Main.EarlyAccess" -- input repository for savings
 
 
@@ -4199,6 +4199,11 @@ MainModule:SetNoEvilnessLimit(Value)
 end; })
 MainModule:InitiateNoEvilnessLimit()
 
+Tab_7:CreateLabel("Respawns your character, but makes game think that you are still alive as killer/survivor.")
+Tab_7:CreateButton({Name = "Respawn"; Callback = function()
+MainModule:Respawn()
+end; })
+
 
 Tab_7:CreateSection("FE Game Breaks")
 
@@ -4248,7 +4253,7 @@ MorphIntoGhost()
 Notify("Auto-Softlock Enabled!", "Check the label above to see when will specific killers get softlocked.", 5, true)
 end; })
 
-Tab_7:CreateLabel("To use model breaker, you must play as badware during round! You'll have to inject first, and only then destroy models. You can search models using explorer scripts. DO NOT SPAM CLICK OR IT'LL BREAK!")
+--[[Tab_7:CreateLabel("To use model breaker, you must play as badware during round! You'll have to inject first, and only then destroy models. You can search models using explorer scripts. DO NOT SPAM CLICK OR IT'LL BREAK!")
 
 local modeldservice, modeldname = "Workspace", "Type Here!"
 Tab_7:CreateDropdown({Name = "Model Service"; Options = {"Workspace","ReplicatedStorage"}; CurrentOption = "Workspace"; MultiSelection = false; Callback = function(Value)
@@ -4287,7 +4292,7 @@ return
 end
 end
 Notify("Error!", "Model not found.", 2, false)
-end; })
+end; })]]--
 
 Tab_7:CreateSection("Auto Block")
 Tab_7:CreateLabel("{ VERY W.I.P. !!!! } Uses block ability when the killer is attacking you. Your ping must be less than 60 for it to work.")
@@ -4786,7 +4791,7 @@ end; })
 Tab_10:CreateSection("Custom LMS ( settings )")
 local lms_file_name = "Type Here!"
 Tab_10:CreateParagraph({Title = "How to add your own music?", Content = "Find your executor's folder in your phone's explorer, then find the ''workspace'' folder, and inside it you must find ''NexerHub'' folder, now go inside it, then click ''Assets'' and ''LMS''. And now, in this folder, input your mp3 music."})
-Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here! ( ONLY NAME, WITHOUT ''.mp3'' )"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here! ( WRITE ONLY NAME, WITHOUT ''.mp3'' )"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 lms_file_name = ConvertDropdownValue(Value)
 end; })
 Tab_10:CreateButton({Name = "Add File"; Callback = function()
@@ -4863,7 +4868,7 @@ end; })
 Tab_10:CreateSection("Custom Chase Themes ( settings )")
 local chase_file_name = "Type Here!"
 Tab_10:CreateParagraph({Title = "How to add your own music?", Content = "Find your executor's folder in your phone's explorer, then find the ''workspace'' folder, and inside it you must find ''NexerHub'' folder, now go inside it, then click ''Assets'' and ''Chases''. And now, in this folder, input your mp3 music."})
-Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here! ( ONLY NAME, WITHOUT ''.mp3'' )"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here! ( WRITE ONLY NAME, WITHOUT ''.mp3'' )"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 chase_file_name = ConvertDropdownValue(Value)
 end; })
 Tab_10:CreateButton({Name = "Add File"; Callback = function()
