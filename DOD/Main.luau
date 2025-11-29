@@ -1754,7 +1754,6 @@ end; })
 
 Tab_3:CreateSection("")
 Tab_3:CreateSection("")
-Tab_3:CreateSection("")
 
 Tab_3:CreateParagraph({Title = "Immunities / Buffs", Content = "Immunities and buffs for workspace side"})
 
@@ -2135,7 +2134,6 @@ Notify("Success!", "Applied configurations.", 3, true)
 end; })
 
 
-Tab_5:CreateSection("")
 Tab_5:CreateSection("")
 Tab_5:CreateSection("")
 
@@ -4809,7 +4807,6 @@ Notify("Success!","Removed File!",3,true)
 end; })
 
 
-Tab_10:CreateSection("")
 Tab_10:CreateSection("")
 Tab_10:CreateSection("")
 
