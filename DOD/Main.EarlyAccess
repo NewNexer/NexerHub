@@ -1,8 +1,9 @@
---[[
+ --[[
 
 Loading Variables
 
 ]]--
+local config_save = "DOD_config_ea.luau"
 _G.dod_developer_key = "Nexer" -- my name yaa
 _G.API_last_update = "23/11/2025" -- last time update (dd/mm/yyyy)
 _G.dod_repository = "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Main.EarlyAccess" -- input repository for savings
@@ -167,7 +168,6 @@ local InsertElement = function(tf, element) local temp_table = loadstring(tostri
 local RemoveElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); for i,v in pairs(temp_table) do if v == element then temp_table[i]=nil end end; CreateFile(tf, TableToLuauString(temp_table)) end
 --local InsertElement_test = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); temp_table[element] = value; CreateFile(tf, TableToLuauString(temp_table)) end
 
-local config_save = "DOD_config_ea.luau"
 if not isfolder("NexerHub") then
 makefolder("NexerHub")
 repeat task.wait() until isfolder("NexerHub")
@@ -300,12 +300,14 @@ writefile("NexerHub/Core/"..config_save.."", [[return {
         ["Misc"] = {
             ["Desync"] = 1,
             ["DesyncEnabled"] = false
-        }
+        },
+        ["ToEdit"] = "Adrenaline",
+        ["CustomID"] = "0"
     },
     ["Tab_7"] = {},
     ["Tab_8"] = {},
     ["Tab_9"] = {
-        ["GuiTheme"] = "Amethyst"
+        ["GuiTheme"] = "AmberGlow"
     },
     ["Tab_10"] = {},
     ["Tab_11"] = {},
@@ -663,6 +665,8 @@ local Window = Rayfield:CreateWindow({
 pcall(function()
 local Announcements = Window:CreateTab("Announce",0)
 Announcements:CreateParagraph({Title = "W.I.P.", Content = "A lot of stuff haven't been added yet. Work is in progress. I have a lot of studies which is why it takes a lot of time."})
+Announcements:CreateParagraph({Title = "Discord suggestions", Content = "They'll be added soon! I will be updating everyday i can."})
+Announcements:CreateParagraph({Title = "Configuration", Content = "At this moment, configurations in premium tab aren't being saving. The premium tab will be re-ordered soon."})
 Announcements:CreateButton({Name = "Copy Discord Server Link"; Callback = function()
 setclipboard(tostring("https://discord.gg/7u5GRNw3xn"))
 Notify("Success!", "Copied Link!", 3, true)
@@ -3732,6 +3736,35 @@ ApplyNewAnimations()
 end)
 Notify("Success!", "Applying replacion, it may take up to 10 seconds.", 3, true)
 end; })
+
+
+Tab_6:CreateSection("Custom Ability Animation Changer")
+
+local abilityList = {}
+for name,_ in pairs(AbilityAnimData) do
+	table.insert(abilityList,name)
+end
+
+local SelectedAbility = LoadConfig("Tab_6","ToEdit")
+Tab_6:CreateDropdown({Name = "Select Ability"; Options = abilityList; CurrentOption = SelectedAbility; MultiSelection = false; Callback = function(v)
+SelectedAbility = ConvertDropdownValue(v)
+SaveConfig("Tab_6",SelectedAbility,"ToEdit")
+end
+});
+
+local CustomAnimID = LoadConfig("Tab_6","CustomID")
+Tab_6:CreateInput({Name = "Animation ID"; PlaceholderText = tostring(CustomAnimID); NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(v)
+CustomAnimID = tostring(v)
+SaveConfig("Tab_6",CustomAnimID,"CustomID")
+end});
+
+Tab_6:CreateButton({Name = "Apply Animation"; Callback = function()
+local idexists = not pcall(function() game:GetService("ContentProvider"):PreloadAsync({tonumber(id)}) end)
+AbilityAnimData[SelectedAbility] = ((idexists == true and "rbxassetid://"..CustomAnimID) or CustomAnimID)
+Character.Animations.Abilities[SelectedAbility].AnimationId = AbilityAnimData[SelectedAbility]
+ApplyNewAnimations()
+Notify("Success!", "Changed Ability Animation.", 3, true)
+end});
 
 
 Tab_6:CreateSection("Miscellaneous")
