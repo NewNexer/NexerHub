@@ -2280,6 +2280,7 @@ end)
 
 if not game:GetService("CoreGui"):FindFirstChild("DOD_ESP_HANDLER") then
 Instance.new("Folder", game:GetService("CoreGui")).Name = "DOD_ESP_HANDLER"
+task.wait()
 end
 
 _G.ESPenabledHandler = LoadConfig("Tab_4", "ESP", "Enabled")
@@ -2412,6 +2413,10 @@ plrremoved_esp = nil
 local ESPenabledToggle = Tab_4:CreateToggle({Name = "Turn On/Off ESP"; CurrentValue = false; Callback = function(Value)
 _G.ESPenabledHandler = Value
 if _G.ESPenabledHandler == true then
+if not game:GetService("CoreGui"):FindFirstChild("DOD_ESP_HANDLER") then
+Instance.new("Folder", game:GetService("CoreGui")).Name = "DOD_ESP_HANDLER"
+task.wait()
+end
 for i,v in pairs(game:GetService("Players"):GetPlayers()) do
 if v and v ~= game:GetService("Players").LocalPlayer then
 CreateHighlight(v)
