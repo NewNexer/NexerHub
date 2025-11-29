@@ -415,28 +415,15 @@ end
 
 temp_msg.Text = "Loading Rayfield..."; task.wait(.2)
 local Rayfield = nil
-if not isfile("NexerHub/Core/Rayfield.luau") then
 local RAYFIELD_SUCCESS, RAYFIELD_FAIL = pcall(function()
-Rayfield = game:HttpGet("https://sirius.menu/rayfield")
+Rayfield = MainModule:GetWorkingRayfield()
 end)
-if not RAYFIELD_SUCCESS then
-local RAYFIELD_SUCCESS, RAYFIELD_FAIL = pcall(function()
-Rayfield = game:HttpGet("https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/main/source.lua")
-end)
-if not RAYFIELD_SUCCESS then
-temp_msg.Text = "Failed loading Rayfield, please try again."
-task.wait(3)
+if not RAYFIELD_SUCCESS or Rayfield == nil then
+task.delay(0, function() print(RAYFIELD_FAIL) end)
+temp_msg.Text = "Failed to load Rayfield, please try again."
+task.wait(5)
 temp_msg:Destroy()
 return
-end
-end
-if RAYFIELD_SUCCESS then
-writefile("NexerHub/Core/Rayfield.luau", Rayfield)
-repeat task.wait() until isfile("NexerHub/Core/Rayfield.luau")
-Rayfield = loadstring(Rayfield)()
-end
-elseif isfile("NexerHub/Core/Rayfield.luau") then
-Rayfield = loadstring(GetFile("NexerHub/Core/Rayfield.luau","rf"))()
 end
 
 temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/25)"
