@@ -797,9 +797,9 @@ SetStaminaProperty("Fatigue", 0)
 end
 until NoFatigue == false
 end; })
-NoFatigueToggle:Set(NoFatigue)
+--NoFatigueToggle:Set(NoFatigue)
 
-Tab_1:CreateSection("Advanced")
+--[[Tab_1:CreateSection("Advanced")
 
 Tab_1:CreateInput({Name = "Max Stamina"; PlaceholderText = "Type Here!"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = true; Callback = function(Value)
 SetStaminaProperty("MaxStamina", tonumber(Value))
@@ -867,7 +867,7 @@ pcall(function()
 SetStaminaProperty("SprintSpeed", AI_SprintSpeed)
 end)
 end
-end)
+end)]]
 
 
 
