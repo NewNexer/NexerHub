@@ -1,25 +1,447 @@
-if getgenv then
-getgenv().dod_developer_key = "Nexer"
-else
-_G.dod_developer_key = "Nexer"
+ --[[
+
+Loading Variables
+
+]]--
+local config_save = "DOD_config.luau"
+_G.dod_developer_key = "Nexer" -- my name yaa
+_G.API_last_update = "29/11/2025" -- last time update (dd/mm/yyyy)
+_G.dod_repository = "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Main.luau" -- input repository for savings
+
+
+
+--[[
+
+Table And Configuration Things
+
+]]--
+local SpecialCharacters = {['\a'] = '\\a', ['\b'] = '\\b', ['\f'] = '\\f', ['\n'] = '\\n', ['\r'] = '\\r', ['\t'] = '\\t', ['\v'] = '\\v', ['\0'] = '\\0'}
+local Keywords = { ['and'] = true, ['break'] = true, ['do'] = true, ['else'] = true, ['elseif'] = true, ['end'] = true, ['false'] = true, ['for'] = true, ['function'] = true, ['if'] = true, ['in'] = true, ['local'] = true, ['nil'] = true, ['not'] = true, ['or'] = true, ['repeat'] = true, ['return'] = true, ['then'] = true, ['true'] = true, ['until'] = true, ['while'] = true, ['continue'] = true}
+local Functions = {
+    [pairs] = "pairs",
+    [ipairs] = "ipairs", 
+    [next] = "next",
+    [type] = "type",
+    [tostring] = "tostring",
+    [tonumber] = "tonumber",
+    [print] = "print",
+    [error] = "error",
+    [assert] = "assert",
+    [pcall] = "pcall",
+    [xpcall] = "xpcall",
+    [select] = "select",
+    [rawget] = "rawget",
+    [rawset] = "rawset",
+    [rawequal] = "rawequal",
+    [getmetatable] = "getmetatable",
+    [setmetatable] = "setmetatable",
+    [require] = "require",
+}
+if loadstring then Functions[loadstring] = "loadstring" end
+if load then Functions[load] = "load" end
+local function safeTypeof(value)
+    if typeof then
+        return typeof(value)
+    else
+        return type(value)
+    end
 end
+function GetHierarchy(Object)
+    if not Object or (type(Object) ~= "table" and safeTypeof(Object) ~= "Instance") then
+        return tostring(Object)
+    end
+    local Hierarchy = {}
+    local current = Object
+    while current do
+        local name = tostring(current.Name or current.name or "Unknown")
+        name = string.gsub(name, '[%c%z]', SpecialCharacters)
+        if current == game or current == _G.game then
+            table.insert(Hierarchy, 1, "game")
+        elseif Keywords[name] or not string.match(name, '^[_%a][_%w]*$') then
+            table.insert(Hierarchy, 1, '["' .. name .. '"]')
+        else
+            table.insert(Hierarchy, 1, name)
+        end
+        current = current.Parent
+    end
+    
+    return table.concat(Hierarchy, ".")
+end
+local function SerializeType(Value, Class)
+    if Class == 'string' then
+        return string.format('"%s"', string.gsub(Value, '[%c%z]', SpecialCharacters))
+    elseif Class == 'Instance' then
+        return GetHierarchy(Value)
+    elseif Class == 'function' then
+        return Functions[Value] or "'[Function: " .. tostring(Value) .. "]'"
+    elseif Class == 'userdata' then
+        return "'[userdata: " .. tostring(Value) .. "]'"
+    elseif Class == 'thread' then
+        if coroutine and coroutine.status then
+            local status = pcall(function() return coroutine.status(Value) end)
+            return "'[thread: " .. tostring(Value) .. (status and ", status: " .. coroutine.status(Value) or "") .. "]'"
+        else
+            return "'[thread: " .. tostring(Value) .. "]'"
+        end
+    else
+        return tostring(Value)
+    end
+end
+function TableToLuauString(Table, IgnoredTables, DepthData, Path)
+    if type(Table) ~= "table" then
+        return SerializeType(Table, safeTypeof(Table))
+    end
+    IgnoredTables = IgnoredTables or {}
+    Path = Path or "ROOT"
+    if not DepthData then
+        DepthData = {0, Path}
+    end
+    local CyclicData = IgnoredTables[Table]
+    if CyclicData then
+        local currentDepth = DepthData[1] or 0
+        local cyclicDepth = CyclicData[1] or 0
+        return ((cyclicDepth == currentDepth - 1 and "'[Cyclic Parent " or "'[Cyclic ") .. tostring(Table) .. ', path: ' .. (CyclicData[2] or "unknown") .. "]'")
+    end
+    DepthData[1] = (DepthData[1] or 0) + 1
+    DepthData[2] = Path
+    IgnoredTables[Table] = {DepthData[1], DepthData[2]}
+    local currentDepth = DepthData[1] or 1
+    local Tab = string.rep('    ', currentDepth)
+    local TrailingTab = string.rep('    ', currentDepth - 1)
+    local Result = '{'
+    local LineTab = '\n' .. Tab
+    local HasOrder = true
+    local Index = 1
+    local IsEmpty = true
+    for Key, Value in pairs(Table) do
+        IsEmpty = false
+        if Index ~= Key then
+            HasOrder = false
+        else
+            Index = Index + 1
+        end
+        local KeyClass = safeTypeof(Key)
+        local ValueClass = safeTypeof(Value)
+        local HasBrackets = false
+        local KeyStr
+        if KeyClass == 'string' then
+            local cleanKey = string.gsub(Key, '[%c%z]', SpecialCharacters)
+            if Keywords[cleanKey] or not string.match(cleanKey, '^[_%a][_%w]*$') then
+                HasBrackets = true
+                KeyStr = string.format('["%s"]', cleanKey)
+            else
+                KeyStr = cleanKey
+            end
+        else
+            HasBrackets = true
+            if KeyClass == 'table' then
+                KeyStr = '[' .. TableToLuauString(Key, IgnoredTables, {currentDepth + 1, Path}) .. ']'
+            else
+                KeyStr = '[' .. SerializeType(Key, KeyClass) .. ']'
+            end
+        end
+        local ValueStr
+        if ValueClass == 'table' then
+            local newPath = Path .. (HasBrackets and '' or '.') .. KeyStr
+            ValueStr = TableToLuauString(Value, IgnoredTables, {currentDepth + 1, Path}, newPath)
+        else
+            ValueStr = SerializeType(Value, ValueClass)
+        end
+        Result = Result .. LineTab .. (HasOrder and ValueStr or KeyStr .. ' = ' .. ValueStr) .. ','
+    end
+    local donetable = IsEmpty and Result .. '}' or string.sub(Result, 1, -2) .. '\n' .. TrailingTab .. '}'
+    IgnoredTables[Table] = nil
+    return donetable
+end
+
+
 
 local asset_counter = 0
 local temp_msg = Instance.new("Message",game.CoreGui)
-temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/24)"
 
--- Functions were created fully by me. No AI contributions.
 local Execute = function(f, ...) return function(f, ...) return task.spawn(f, ...) end end
 local HaveWorkspaceAccess = function() if isfile and writefile and readfile and isfolder and makefolder and (getcustomasset or get_custom_asset) then return true end return false end
 local CreateFile = function(f,c) writefile(f,c) end
 local IsFile = function(f) return isfile(f) end
 local GetFile = function(f,m) local gca = (getcustomasset or get_custom_asset); return ((m=="gca" and (gca(f))) or readfile(f)) end
-local TableToLuauString = function(tbl,showkeys) local h_1 = ""; h_1 = "return {"..h_1; for i,v in pairs(tbl) do h_1 = h_1..'\n"'..v..'";' end; h_1 = h_1.."\n}"; local h_2 = ""; h_2 = "return {"..h_2; for i,v in pairs(tbl) do h_2 = h_2..'\n["'..i..'"] = "'..v..'";' end; h_2 = h_2.."\n}"; return ((showkeys and h_2) or h_1) end
-local InsertElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); table.insert(temp_table,element); CreateFile(tf, TableToLuauString(temp_table,false)) end
-local RemoveElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); for i,v in pairs(temp_table) do if v == element then temp_table[i]=nil end end; CreateFile(tf, TableToLuauString(temp_table,false)) end
---local InsertElement_test = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); temp_table[element] = value; CreateFile(tf, TableToLuauString(temp_table,false)) end
+local InsertElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); table.insert(temp_table,element); CreateFile(tf, TableToLuauString(temp_table)) end
+local RemoveElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); for i,v in pairs(temp_table) do if v == element then temp_table[i]=nil end end; CreateFile(tf, TableToLuauString(temp_table)) end
+--local InsertElement_test = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); temp_table[element] = value; CreateFile(tf, TableToLuauString(temp_table)) end
 
-if HaveWorkspaceAccess() then
+if not isfolder("NexerHub") then
+makefolder("NexerHub")
+repeat task.wait() until isfolder("NexerHub")
+end
+if not isfolder("NexerHub/Core") then
+makefolder("NexerHub/Core")
+repeat task.wait() until isfolder("NexerHub/Core")
+end
+if not isfile("NexerHub/Core/"..config_save.."") then
+writefile("NexerHub/Core/"..config_save.."", [[return {
+    ["Tab_1"] = {
+        ["AutoInjection"] = {
+            ["MaxStamina"] = "Type Here!",
+            ["WalkSpeed"] = "Type Here!",
+            ["SprintSpeed"] = "Type Here!"
+        },
+        ["NoStaminaLossMethod"] = "require",
+        ["NoStaminaLoss"] = false,
+        ["NoFatigue"] = false
+    },
+    ["Tab_2"] = {},
+    ["Tab_3"] = {
+        ["Bind"] = "None",
+        ["FastFunctions"] = {
+            ["ChoosenAbility"] = "Cloak"
+        },
+        ["CloakConfig"] = {
+            ["Bind"] = "None",
+            ["InvisibilityTime"] = 5
+        },
+        ["PunchConfig"] = {
+            ["Bind"] = "None"
+        },
+        ["TauntConfig"] = {
+            ["Bind"] = "None"
+        },
+        ["BonusPadConfig"] = {
+            ["Bind"] = "None",
+            ["SpeedModifier"] = 7
+        },
+        ["BlockConfig"] = {
+            ["Bind"] = "None"
+        },
+        ["CaretakerConfig"] = {
+            ["Bind"] = "None"
+        },
+        ["DashConfig"] = {
+            ["Bind"] = "None",
+            ["Power"] = 1250,
+            ["MaxForce"] = 30000,
+            ["Duration"] = 0.3
+        },
+        ["HotdogConfig"] = {
+            ["Bind"] = "None",
+            ["StaminaLoss"] = 5
+        },
+        ["RevolverConfig"] = {
+            ["Bind"] = "None"
+        },
+        ["AdrenalineConfig"] = {
+            ["Bind"] = "None"
+        },
+        ["BananaConfig"] = {
+            ["Bind"] = "None"
+        },
+        ["Cards"] = {
+            ["FirstCard"] = {
+                [1] = "Revolver",
+                [2] = "Caretaker"
+            },
+            ["SecondCard"] = {
+                [1] = "BonusPad",
+                [2] = "Caretaker"
+            },
+            ["ThirdCard"] = {
+                [1] = "Revolver",
+                [2] = "Punch"
+            }
+        },
+        ["IB"] = {
+            ["InstaDestroyComputer"] = false,
+            ["AntiWalls"] = false,
+            ["AntiEvilScary"] = false,
+            ["AntiFallRagdoll"] = false
+        }
+    },
+    ["Tab_4"] = {
+        ["ESP"] = {
+            ["Enabled"] = false,
+            ["Transparency"] = 0.3,
+            ["ShowUsernames"] = true,
+            ["ShowHealth"] = true
+        },
+        ["Money"] = {
+            ["Amount"] = "10",
+            ["Reason"] = "for surviving for atleast 60 seconds."
+        }
+    },
+    ["Tab_5"] = {
+        ["IB"] = {
+            ["AntiEvilScary"] = false,
+            ["AntiTaunt"] = false
+        },
+        ["PursuerConfig"] = {
+            ["CleaveBoost"] = 6
+        },
+        ["BadwareConfig"] = {
+            ["HipHeight"] = 5
+        },
+        ["ArtfulConfig"] = {
+            ["HipHeight"] = 5
+        },
+        ["HarkenConfig"] = {},
+        ["KilldroidConfig"] = {
+            ["Power"] = 1250,
+            ["MaxForce"] = 1000000,
+            ["Don'tDescendDuringTheFlight"] = false
+        }
+    },
+    ["Tab_6"] = {
+        ["CustomAnimations"] = {
+            ["Run"] = "Civilian Run",
+            ["Walk"] = "Civilian Walk",
+            ["Idle"] = "Civilian Idle"
+        },
+        ["Swap"] = {
+            ["What"] = "Punch",
+            ["WithWhat"] = "BlockStart"
+        },
+        ["Misc"] = {
+            ["Desync"] = 1,
+            ["DesyncEnabled"] = false
+        },
+        ["ToEdit"] = "Adrenaline",
+        ["CustomID"] = "0"
+    },
+    ["Tab_7"] = {},
+    ["Tab_8"] = {},
+    ["Tab_9"] = {
+        ["GuiTheme"] = "AmberGlow"
+    },
+    ["Tab_10"] = {},
+    ["Tab_11"] = {},
+    ["Tab_12"] = {}
+}]])
+repeat task.wait() until isfile("NexerHub/Core/"..config_save.."")
+end
+if not isfile("NexerHub/Core/PreloadData.luau") then
+writefile("NexerHub/Core/PreloadData.luau", [[return {
+    ["LoadConfig"] = true,
+    ["GUID"] = "]]..tostring(game:GetService("HttpService"):GenerateGUID())..[[",
+    ["CoreVersion"] = 1,
+    ["LoadAssets"] = true
+}]])
+repeat task.wait() until isfile("NexerHub/Core/PreloadData.luau")
+end
+local SaveConfig = function(tab,value,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); if not element_2 then pcall(function() temp_table[tab][element_1] = value end) elseif not element_3 then pcall(function() temp_table[tab][element_1][element_2] = value end) else pcall(function() temp_table[tab][element_1][element_2][element_3] = value end) end CreateFile("NexerHub/Core/"..config_save.."", 'return '..TableToLuauString(temp_table)..'') end
+local LoadConfig = function(tab,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); local returnelement = nil; if not element_2 then pcall(function() returnelement = temp_table[tab][element_1] end) elseif not element_3 then pcall(function() returnelement = temp_table[tab][element_1][element_2] end) else pcall(function() returnelement = temp_table[tab][element_1][element_2][element_3] end) end return ((returnelement~=nil and returnelement) or "nil") end
+
+
+Instance.new("Folder",game:GetService("CoreGui")).Name = "DOD_Assets"
+--[[function XenoClear()
+local a = game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Leaderstats
+a:GetPropertyChangedSignal("Visible"):Connect(function()
+a.Visible = true
+end)
+a.Visible = true
+local b = game:GetService("Players").LocalPlayer.PlayerGui.MainGui.KillerIntro
+b:GetPropertyChangedSignal("Visible"):Connect(function()
+b.Visible = false
+end)
+b.Visible = false
+end
+if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) then
+task.spawn(XenoClear)
+end]]
+
+function ConvertDropdownValue(tbl)
+if type(tbl) == "table" then
+for _,element in ipairs(tbl) do
+return tostring(element)
+end
+else
+return tostring(tbl)
+end
+end
+
+temp_msg.Text = "Loading API Module... (0/1)"; task.wait(.2)
+
+--if not isfile("NexerHub/Core/APIMODULE.luau") or (isfile("NexerHub/Core/APIMODULE.luau") and loadstring(GetFile("NexerHub/Core/APIMODULE.luau","rf"))()["last_updated"]~=_G.API_last_update) then
+local lodsuc, loderr = pcall(function()
+MainModule = loadstring(game:HttpGet("https://pastebin.com/raw/G17DaBUh"))()
+end)
+if not lodsuc then
+temp_msg.Text = "Failed loading API Module, please try again."
+task.wait(3)
+temp_msg:Destroy()
+return
+elseif lodsuc and MainModule.IsWorking ~= nil then
+temp_msg.Text = "Loading API Module... (1/1)"
+task.wait(1)
+else
+temp_msg.Text = "Failed loading API Module, please try again."
+task.wait(3)
+temp_msg:Destroy()
+return
+end
+--elseif isfile("NexerHub/Core/APIMODULE.luau") then
+
+--end
+
+function RequestModule(module)
+if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) or (string.find(identifyexecutor(), "Solara") or string.find(identifyexecutor(), "solara") or string.find(identifyexecutor(), "SOLARA")) then return nil end
+local result = nil
+local Success, Error = pcall(function()
+result = require(module)
+end)
+if Success then
+return result
+elseif not Success then
+return nil
+end
+end
+
+local GetRequestMethod = function()
+local iqnd = request or http_request or HttpPost or (syn and syn.request) or (http and http.request) or (fluxus and fluxus.request) or (KRNL and KRNL.request) or (Xeno and Xeno.request) or (game and game.HttpPost)
+if iqnd then
+return iqnd
+else
+return nil
+end
+end
+function CopyLink(link)
+local url = tostring(link)
+setclipboard(url)
+Notify("Success!", "Copied Link!", 4, true)
+end
+function OpenLink(link)
+local url = tostring(link)
+if WebHandler then
+local suc, err = pcall(function() game:GetService("GuiService"):BroadcastNotification(game:GetService("HttpService"):JSONEncode({["title"] = "Roblox", ["presentationStyle"] = 2, ["visible"] = true, ["url"] = tostring(url)}), 20) end) if not suc then CopyLink(url) end
+else
+CopyLink(url)
+end
+end
+
+temp_msg.Text = "Loading Rayfield..."; task.wait(.2)
+local Rayfield = nil
+if not isfile("NexerHub/Core/Rayfield.luau") then
+local RAYFIELD_SUCCESS, RAYFIELD_FAIL = pcall(function()
+Rayfield = game:HttpGet("https://sirius.menu/rayfield")
+end)
+if not RAYFIELD_SUCCESS then
+local RAYFIELD_SUCCESS, RAYFIELD_FAIL = pcall(function()
+Rayfield = game:HttpGet("https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/main/source.lua")
+end)
+if not RAYFIELD_SUCCESS then
+temp_msg.Text = "Failed loading Rayfield, please try again."
+task.wait(3)
+temp_msg:Destroy()
+return
+end
+end
+if RAYFIELD_SUCCESS then
+writefile("NexerHub/Core/Rayfield.luau", Rayfield)
+repeat task.wait() until isfile("NexerHub/Core/Rayfield.luau")
+Rayfield = loadstring(Rayfield)()
+end
+elseif isfile("NexerHub/Core/Rayfield.luau") then
+Rayfield = loadstring(GetFile("NexerHub/Core/Rayfield.luau","rf"))()
+end
+
+temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/25)"
+if HaveWorkspaceAccess() and loadstring(GetFile("NexerHub/Core/PreloadData.luau","rf"))().LoadAssets == true then
 if not isfolder("NexerHub") then
 makefolder("NexerHub")
 repeat task.wait(.1) until isfolder("NexerHub")
@@ -49,10 +471,34 @@ if isfolder("NexerHub") and isfolder("NexerHub/DieOfDeath") and isfolder("NexerH
 makefolder("NexerHub/DieOfDeath/Assets/Chases")
 end
 end
-asset_counter = 5
-temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/24)"
+asset_counter = 6
+temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/25)"
 end
 
+local music_assets = {
+["HELLFIRE V2"] = "https://files.catbox.moe/2pehs1.mp3";
+["Middle Big Brother"] = "https://files.catbox.moe/65l2f8.mp3";
+["MISO"] = "https://files.catbox.moe/urog51.mp3";
+["Orchestra"] = "https://files.catbox.moe/i9b6vl.mp3";
+["Pretence"] = "https://files.catbox.moe/pkohdd.mp3";
+["Screw Time"] = "https://files.catbox.moe/jhy3lr.mp3";
+["Derptastic"] = "https://files.catbox.moe/r0rzbz.mp3";
+["FAKEOUT"] = "https://files.catbox.moe/ul88my.mp3";
+["A God with No Time"] = "https://files.catbox.moe/xruwh4.mp3";
+
+["One Bounce"] = "https://files.catbox.moe/ruavt7.mp3";
+["Showtime"] = "https://files.catbox.moe/fo5h65.mp3";
+["Teapot Palace Tour"] = "https://files.catbox.moe/jvk4pn.mp3";
+["Vigilante Shootdown"] = "https://files.catbox.moe/oepxa0.mp3";
+["Eternity V2"] = "https://files.catbox.moe/uxtj1z.mp3";
+["Hero"] = "https://files.catbox.moe/1jazm7.mp3";
+["Omega's Final Stand"] = "https://files.catbox.moe/p435fz.mp3";
+["Careless"] = "https://files.catbox.moe/9t45f8.mp3";
+["A Retro Soul"] = "https://files.catbox.moe/u375iy.mp3";
+}
+local download_failed = false
+local catboxstatus = "working"
+if catboxstatus == "working" then
 if HaveWorkspaceAccess() and not IsFile("NexerHub/DieOfDeath/Assets/LMS/data.luau") then CreateFile("NexerHub/DieOfDeath/Assets/LMS/data.luau", [[return {
     "One Bounce";
     "Showtime";
@@ -76,15 +522,28 @@ local temp_table = {
     "Hero";
 }
 for i,v in pairs(temp_table) do
-CreateFile("NexerHub/DieOfDeath/Assets/LMS/"..v..".mp3",game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Assets/"..(string.gsub(v, " ", "%%20"))..".mp3"))
+local music_data = nil
+pcall(function()
+music_data = game:HttpGet(music_assets[v])
+end)
+if (not music_data or music_data == nil) or (music_data and music_data["errors"]) then
+download_failed = true
+end
+if download_failed == true then
+temp_msg.Text = "Failed Loading Core Assets. (Timeout)"
+task.wait(3)
+break
+end
+CreateFile("NexerHub/DieOfDeath/Assets/LMS/"..v..".mp3",music_data)
 asset_counter += 1
-temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/24)"
+temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/25, will be cancelled if doesn't load )"
 end
 end
+end
+if catboxstatus == "working" then
 if HaveWorkspaceAccess() and not IsFile("NexerHub/DieOfDeath/Assets/Chases/data.luau") then CreateFile("NexerHub/DieOfDeath/Assets/Chases/data.luau", [[return {
     "A God with No Time";
     "Derptastic";
-    "Omega's Final Stand";
     "FAKEOUT";
     "HELLFIRE V2";
     "MISO";
@@ -96,7 +555,6 @@ if HaveWorkspaceAccess() and not IsFile("NexerHub/DieOfDeath/Assets/Chases/data.
 local temp_table = {
     "A God with No Time";
     "Derptastic";
-    "Omega's Final Stand";
     "FAKEOUT";
     "HELLFIRE V2";
     "MISO";
@@ -105,86 +563,24 @@ local temp_table = {
     "Screw Time";
     "Middle Big Brother";
 }
+if download_failed ~= true then
 for i,v in pairs(temp_table) do
-CreateFile("NexerHub/DieOfDeath/Assets/Chases/"..v..".mp3",game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Assets/"..(string.gsub(v, " ", "%%20"))..".mp3"))
+local music_data = nil
+pcall(function()
+music_data = game:HttpGet(music_assets[v])
+end)
+if (not music_data or music_data == nil) or (music_data and music_data["errors"]) then
+download_failed = true
+end
+if download_failed == true then
+temp_msg.Text = "Failed Loading Core Assets."
+break
+end
+CreateFile("NexerHub/DieOfDeath/Assets/Chases/"..v..".mp3",music_data)
 asset_counter += 1
-temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/24)"
+temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/25, will be cancelled if doesn't load)"
 end
 end
-
-Instance.new("Folder",game:GetService("CoreGui")).Name = "DOD_Assets"
-
-function ConvertDropdownValue(tbl)
-if type(tbl) == "table" then
-for _,element in ipairs(tbl) do
-return tostring(element)
-end
-else
-return tostring(tbl)
-end
-end
-
-local WebHandler = {}
-function WebHandler:OpenRBX(url)
-game:GetService("GuiService"):BroadcastNotification(game:GetService("HttpService"):JSONEncode({["title"] = "Roblox", ["presentationStyle"] = 2, ["visible"] = true, ["url"] = tostring(url)}), 20)
-end
-temp_msg.Text = "Loading Modules... (0/2)"
-local Encryptor = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/Encryption-Center/refs/heads/main/Main.luau"))()
-temp_msg.Text = "Loading Modules... (1/2)"
-local MainModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Module.luau"))()
-temp_msg.Text = "Loading Modules... (2/2)"
-
-function RequestModule(module)
-local result = nil
-local Success, Error = pcall(function()
-result = require(module)
-end)
-if Success then
-return result
-elseif not Success then
-return nil
-end
-end
-
-local GetRequestMethod = function()
-local iqnd = request or http_request or HttpPost or (syn and syn.request) or (http and http.request) or (fluxus and fluxus.request) or (KRNL and KRNL.request) or (Xeno and Xeno.request) or (game and game.HttpPost)
-if iqnd then
-return iqnd
-else
-return nil
-end
-end
-function CopyLink(link)
-local url = tostring(link)
-setclipboard(url)
-Notify("Success!", "Copied Link!", 4, true)
-end
-function OpenLink(link)
-local url = tostring(link)
-if WebHandler then
-local suc, err = pcall(function() WebHandler:OpenRBX(url) end) if not suc then CopyLink(url) end
-else
-CopyLink(url)
-end
-end
-
-temp_msg.Text = "Loading Rayfield..."
-local Rayfield
-local RAYFIELD_SUCCESS, RAYFIELD_FAIL = pcall(function()
-Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
-end)
-if not RAYFIELD_SUCCESS then
-local RAYFIELD_SUCCESS, RAYFIELD_FAIL = pcall(function()
-Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/main/source.lua"))()
-end)
-if not RAYFIELD_SUCCESS then
-game:GetService("StarterGui"):SetCore("SendNotification",{
-	Title = "Failed to launch rayfield.",
-	Text = "Please check your internet connection, or try using VPN.",
-  Icon = "rbxassetid://125704683916878",
-	Duration = 10,
-})
-return
 end
 end
 temp_msg:Destroy()
@@ -231,13 +627,13 @@ end)
 end)
 end
 
+local RayfieldGuiTheme = LoadConfig("Tab_9", "GuiTheme")
 local Window = Rayfield:CreateWindow({
-   Name = ""..((getgenv and getgenv().dod_developer_key) or ((_G.dod_developer_key ~= nil and _G.dod_developer_key) or "Unknown")).." Hub : Die Of Death",
+   Name = ""..((_G.dod_developer_key ~= nil and _G.dod_developer_key) or "Unknown").." Hub : Die Of Death",
    Icon = 0,    
    LoadingTitle = "NH:DOD",
    LoadingSubtitle = "by nexer",
-   ShowText = "Nexer Hub",
-   Theme = "Amethyst",
+   Theme = RayfieldGuiTheme,
    DisableRayfieldPrompts = true,
    DisableBuildWarnings = true,
 
@@ -268,14 +664,15 @@ local Window = Rayfield:CreateWindow({
 
 pcall(function()
 local Announcements = Window:CreateTab("Announce",0)
-Announcements:CreateParagraph({Title = "Warning!", Content = "Recently there were multiple skidded scripts of mine hub. The great example of this are oshub, nyxer hub and others. Those so called ''hubs'' are full copy pastes of mine script. They can't deny it."})
-Announcements:CreateSection("")
-Announcements:CreateParagraph({Title = "Hi there!", Content = "Script Version: 2.35 ( WORK IN PROGRESS, EXCEPT A LOT OF BUGS )\n\nThis script was fully recoded and fixed. Thank you for using my script. ❤️\n\nAlso join our discord server for early updates, free premium access and many other things..."})
+Announcements:CreateParagraph({Title = "W.I.P.", Content = "A lot of stuff haven't been added yet. Work is in progress. I have a lot of studies which is why it takes a lot of time."})
+Announcements:CreateParagraph({Title = "Discord suggestions", Content = "They'll be added soon! I will be updating everyday i can."})
+Announcements:CreateParagraph({Title = "Configuration", Content = "At this moment, configurations in premium tab aren't being saving. The premium tab will be re-ordered soon."})
 Announcements:CreateButton({Name = "Copy Discord Server Link"; Callback = function()
 setclipboard(tostring("https://discord.gg/7u5GRNw3xn"))
 Notify("Success!", "Copied Link!", 3, true)
 end; })
 end)
+
 
 
 local LocalPlayer, LP = game.Players.LocalPlayer, game.Players.LocalPlayer
@@ -291,7 +688,6 @@ end)
 pcall(function()
 Humanoid, Hum = Character.Humanoid, Character.Humanoid
 end)
-
 LocalPlayer.CharacterAdded:Connect(function()
 pcall(function()
 Character, Char = nil, nil
@@ -310,7 +706,12 @@ end)
 end)
 
 pcall(function()
+if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) then
+StaminaModule = {}
+StaminaModule.Stamina = 100
+else
 StaminaModule = RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("Movement"))
+end
 end)
 
 function SetStaminaProperty(property, value)
@@ -318,7 +719,7 @@ if property == "MaxStamina" then
 Char:SetAttribute("MaxStamina", value)
 elseif property == "Stamina" then
 if StaminaModule then
-StaminaModule["Stamina"] = value
+StaminaModule.Stamina = value
 end
 elseif property == "Fatigue" then
 Char:SetAttribute("Fatigue", value)
@@ -328,6 +729,10 @@ elseif property == "SprintSpeed" then
 Char:SetAttribute("SprintSpeed", value)
 elseif property == "WalkSpeed" then
 Char:SetAttribute("WalkSpeed", value)
+elseif property == "DisableSprint" then
+Char:SetAttribute("DisableSprint", value)
+elseif property == "PauseRegen" then
+Char:SetAttribute("PauseRegen", value)
 elseif property == "CanJump" then
 if value == true then Hum.JumpPower = 50 else Hum.JumpPower = 0 end
 end
@@ -357,27 +762,56 @@ SetStaminaProperty("CanJump", false)
 end
 end; })
 
-Tab_1:CreateToggle({Name = "No Stamina Loss"; CurrentValue = false; Callback = function(Value)
-NoStaminaLoss = Value
-if NoStaminaLoss == true then
+local ChoosenNoStamLossMethod = LoadConfig("Tab_1", "NoStaminaLossMethod")
+local lastusedmethod = ""
+Tab_1:CreateDropdown({Name = "Choosen No Stamina Loss Method"; Options = {"require","scriptbreak (toggle while running)"}; CurrentOption = ChoosenNoStamLossMethod; MultiSelection = false; Callback = function(Value)
+ChoosenNoStamLossMethod = ((ConvertDropdownValue(Value)=="scriptbreak (toggle while running)" and "scriptbreak") or "require")
+SaveConfig("Tab_1", ChoosenNoStamLossMethod, "NoStaminaLossMethod")
+end; })
+
+local NoStaminaLoss = LoadConfig("Tab_1", "NoStaminaLoss")
+local NoStaminaLossToggle = Tab_1:CreateToggle({Name = "No Stamina Loss"; CurrentValue = false; Callback = function(Value)
+if lastusedmethod == "require" then
+NoStaminaLoss = false
+lastusedmethod = ""
+return
+elseif lastusedmethod == "scriptbreak" then
+SetStaminaProperty("Fatigue", 0)
+lastusedmethod = ""
+return
+end
+SaveConfig("Tab_1", Value, "NoStaminaLoss")
+if Value == true then
+if ChoosenNoStamLossMethod == "require" then
+NoStaminaLoss = true
+lastusedmethod = "require"
+task.spawn(function()
 repeat task.wait(0.003)
 if Character and Character:GetAttribute("MaxStamina") then
 SetStaminaProperty("Stamina", Character:GetAttribute("MaxStamina"))
 end
 until NoStaminaLoss == false
+end)
+elseif ChoosenNoStamLossMethod == "scriptbreak" then
+lastusedmethod = "scriptbreak"
+SetStaminaProperty("Fatigue", true)
+end
 end
 end; })
+NoStaminaLossToggle:Set(NoStaminaLoss)
 
-Tab_1:CreateToggle({Name = "No Fatigue"; CurrentValue = false; Callback = function(Value)
+local NoFatigue = LoadConfig("Tab_1", "NoFatigue")
+local NoFatigueToggle = Tab_1:CreateToggle({Name = "No Fatigue"; CurrentValue = false; Callback = function(Value)
 NoFatigue = Value
-if NoFatigue == true then
+SaveConfig("Tab_1", Value, "NoFatigue")
+if NoFatigue ~= true then return end
 repeat task.wait(0.003)
-if Character and Character:GetAttribute("Fatigue") and Character:GetAttribute("Fatigue") == true then
-SetStaminaProperty("Fatigue", false)
+if Character and Character:GetAttribute("Fatigue") and Character:GetAttribute("Fatigue") == 1 then
+SetStaminaProperty("Fatigue", 0)
 end
 until NoFatigue == false
-end
 end; })
+NoFatigueToggle:Set(NoFatigue)
 
 Tab_1:CreateSection("Advanced")
 
@@ -397,6 +831,18 @@ Tab_1:CreateInput({Name = "Sprint Speed"; PlaceholderText = "Type Here!"; Number
 SetStaminaProperty("SprintSpeed", tonumber(Value))
 end; })
 
+Tab_1:CreateToggle({Name = "Fatigue"; CurrentValue = false; Callback = function(Value)
+SetStaminaProperty("Fatigue", ((Value==true and 1) or 0))
+end; })
+
+Tab_1:CreateToggle({Name = "Stamina Regen Paused"; CurrentValue = false; Callback = function(Value)
+SetStaminaProperty("PauseRegen", ((Value==true and 1) or 0))
+end; })
+
+Tab_1:CreateToggle({Name = "Sprint Disabled"; CurrentValue = false; Callback = function(Value)
+SetStaminaProperty("DisableSprint", Value)
+end; })
+
 Tab_1:CreateSection("Auto Injection")
 local AI_MaxStamina, AI_WalkSpeed, AI_SprintSpeed
 
@@ -407,7 +853,7 @@ AutoInjectStamina = Value
 end; })
 
 Tab_1:CreateInput({Name = "Max Stamina"; PlaceholderText = "Type Here!"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-AI_MaxStamina = Value
+AI_MaxStamina = tonumber(Value)
 end; })
 
 Tab_1:CreateInput({Name = "Walk Speed"; PlaceholderText = "Type Here!"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
@@ -462,7 +908,79 @@ end)
 local Tab_2 = Window:CreateTab("Emotes",0)
 Tab_2:CreateParagraph({Title = "Emotes", Content = "Functions that are related to emotes."})
 
-Tab_2:CreateSection("ITZZZZ PARTY TIME!!!!")
+Tab_2:CreateButton({Name = "Sync Emotes"; Callback = function()
+task.spawn(function()
+local Songs = {
+	["rbxassetid://95332984406426"] = "rbxassetid://73591689210949";
+	["rbxassetid://91496313320059"] = "rbxassetid://117826199625726";
+	["rbxassetid://72840218506214"] = "rbxassetid://87502844893473";
+	["rbxassetid://76016409017292"] = "rbxassetid://125027188864914";
+	["rbxassetid://33810432"] = "rbxassetid://81883187469620";
+}
+local function SyncEmoteWithClosestPlayer(e)
+    local NewClosest = nil
+    local ClosestDistance = math.huge
+    local timeposem = 0
+    local animtrackpos = nil
+    local idklol = nil
+    for i, v in pairs(game.Players:GetPlayers()) do
+        if v and v.Name ~= game.Players.LocalPlayer.Name and v.Character and v.Character:FindFirstChild("Head") and v.Character:FindFirstChild("HumanoidRootPart") then
+            local emote = (v.Character.Head:FindFirstChild("EmoteSong") or v.Character.HumanoidRootPart:FindFirstChild("EmoteSong"))
+            if not emote or tostring(emote.SoundId) ~= e then
+                continue
+            end
+            local Distance = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).Magnitude
+            if Distance < ClosestDistance then
+                ClosestDistance = Distance
+                NewClosest = (v.Character.Humanoid:FindFirstChild("Animator") ~= nil and v.Character.Humanoid.Animator) or v.Character.Humanoid
+                timeposem = emote.TimePosition
+                local hah = NewClosest:GetPlayingAnimationTracks()
+                for _, track in pairs(hah) do
+                    if track.Animation and Songs[e] == tostring(track.Animation.AnimationId) then
+                        idklol = tostring(track.Animation.AnimationId)
+                        animtrackpos = track.TimePosition
+                        break
+                    end
+                end
+            end
+        end
+    end
+    if NewClosest == nil or ClosestDistance > 20 then
+        return nil, nil, nil
+    end
+    return idklol, animtrackpos, timeposem
+end
+game.Players.LocalPlayer.Character.Head.ChildAdded:Connect(function(c)
+if c.Name=="EmoteSong" then
+local a,b,v = SyncEmoteWithClosestPlayer(tostring(c.SoundId))
+print(a,b,v)
+c.TimePosition = v
+local hoh = (game.Players.LocalPlayer.Character.Humanoid:FindFirstChild("Animator")~=nil and game.Players.LocalPlayer.Character.Humanoid.Animator) or game.Players.LocalPlayer.Character.Humanoid
+local hah = hoh:GetPlayingAnimationTracks()
+for _,track in pairs(hah) do
+if tostring(track.Animation.AnimationId) == a then
+track.TimePosition = b
+end
+end
+end
+end)
+game.Players.LocalPlayer.Character.HumanoidRootPart.ChildAdded:Connect(function(c)
+if c.Name=="EmoteSong" then
+local a,b,v = FindClosestPlayerWithEmote(tostring(c.SoundId))
+print(a,b,v)
+c.TimePosition = v
+local hoh = (game.Players.LocalPlayer.Character.Humanoid:FindFirstChild("Animator")~=nil and game.Players.LocalPlayer.Character.Humanoid.Animator) or game.Players.LocalPlayer.Character.Humanoid
+local hah = hoh:GetPlayingAnimationTracks()
+for _,track in pairs(hah) do
+if tostring(track.Animation.AnimationId) == a then
+track.TimePosition = b
+end
+end
+end
+end)
+Notify("Success!", "Enabled sync!", 2, true)
+end)
+end; })
 
 Tab_2:CreateButton({Name = "Open Emote Selection"; Callback = function()
 LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("EmoteSelection").Visible = true
@@ -489,7 +1007,7 @@ Tab_2:CreateButton({Name = "Use Tornado"; Callback = function()
 game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("Emote"):FireServer("Tornado")
 end; })
 
-Tab_2:CreateButton({Name = "Use Rainbow Waves (CLIENT VFX)"; Callback = function()
+Tab_2:CreateButton({Name = "Use Rainbow Waves (CLIENT VFX/SFX)"; Callback = function()
 local anim = Instance.new("Animation")
 anim.AnimationId = "rbxassetid://75513960644342"
 local planim = Humanoid:LoadAnimation(anim)
@@ -631,25 +1149,23 @@ end; })
 
 
 
-local AbilityNames = {"Cloak","Punch","Taunt","BonusPad","Block","Caretaker","Dash","Hotdog","Revolver","Adrenaline","Banana","Nothing"}
+local AbilityNames = {"Cloak","Punch","Taunt","BonusPad","Block","Caretaker","Dash","Hotdog","Revolver","Adrenaline","Banana"}
 
 local AbilityDatas = {
-    ["Adrenaline"] = {Name = "Adrenaline",InputShown = "",Tip = "Get a temporary speed boost for 6 seconds, highlighting you to your teamates and slowing you down after it\'s over.",Cooldown = 35,Icon = "rbxassetid://116399911657417",DisplayName = "Adrenaline"};
-    ["Punch"] = {Name = "Punch",InputShown = "",Tip = "Swing foward stunning any killers hit for 3 seconds, if missed you\'ll get severe endlag.",Cooldown = 40,Icon = "rbxassetid://97428323453639",DisplayName = "Punch"};
-    ["Caretaker"] = {Name = "Caretaker",InputShown = "",Tip = "Splash a potion infront of you, any survivors hit will heal 20 HP in total. Having this ability makes you lose 75 max health though!",Cooldown = 30,Icon = "rbxassetid://90712805517714",DisplayName = "Caretaker"};
-    ["Cloak"] = {Name = "Cloak",InputShown = "",Tip = "Becoming heavily slowed but invisible for a short amount of time, Killers can still hit you though!",Cooldown = 50,Icon = "rbxassetid://90476367580326",DisplayName = "Cloak"};
-    ["Block"] = {Name = "Block",InputShown = "",Tip = "Try blocking any form of damage, if successful heal 10 HP, get a speed boost and negate all the damage.",Cooldown = 40,Icon = "rbxassetid://120929805037270",DisplayName = "Block"};
-    ["Dash"] = {Name = "Dash",InputShown = "",Tip = "Dash foward, after you will get fatigue for 2 seconds which slows stamina regeneration and makes it drain faster.",Cooldown = 20,Icon = "rbxassetid://73777691791017",DisplayName = "Dash"};
-    ["BonusPad"] = {Name = "BonusPad",InputShown = "",Tip = "Build a temporary speed pad that speeds up any survivor who steps on it. Having this ability makes you lose 10 max health though!",Cooldown = 70,Icon = "rbxassetid://86775625332300",DisplayName = "BonusPad"};
-    ["Hotdog"] = {Name = "Hotdog",InputShown = "",Tip = "Eat a hotdog, healing 15 HP at the cost of 10 stamina.",Cooldown = 15,Icon = "rbxassetid://134322360499381",DisplayName = "Hotdog"};
-    ["Revolver"] = {Name = "Revolver",InputShown = "",Tip = "Shoot with your revolver stunning any killers hit for 2 seconds, you\'ll have to reload after. Having this ability makes you lose 20 max stamina though!",Cooldown = 15,Icon = "rbxassetid://107624957891469",DisplayName = "Revolver"};
-    ["Taunt"] = {Name = "Taunt",InputShown = "",Tip = "Taunt the killer gaining a forcefield, highlighting the killer, and slowing them down for 5 seconds or until you\'re hit for the duration of the effect (1.25x damage).",Cooldown = 25,Icon = "rbxassetid://85436299122876",DisplayName = "Taunt"};
-    ["Banana"] = {Name = "Banana",InputShown = "",Tip = "Toss a banana onto the floor, if the killer or the civilian who made it touch the banana, they will slip and be briefly stunned, the banana will naturally decay over time.",Cooldown = 20,Icon = "rbxassetid://96202444819611",DisplayName = "Banana Peel"};
+    ["Adrenaline"] = {Name = "Adrenaline",InputShown = "",Tip = "Get a massive speed boost for 6 seconds, once the 6 seconds are over you will be given Exhaust and stunned briefly while also revealing your location to teammates for the duration.",Cooldown = 35,Icon = "rbxassetid://116399911657417",DisplayName = "Adrenaline",Noise = "Causes 3 noise upon the first use, and 2 noise once the ability ends."};
+    ["Punch"] = {Name = "Punch",InputShown = "",Tip = "Take a moment to swing forward and stun the killer for 3 seconds if landed, dealing 25 damage. Missing will result with heavy end-lag.",Cooldown = 40,Icon = "rbxassetid://97428323453639",DisplayName = "Punch",Noise = "Causes 2 noise upon use, and 3 noise if landed."};
+    ["Caretaker"] = {Name = "Caretaker",InputShown = "",Tip = "Splash a potion in front of you and heal anyone for 10 HP instantly, and another 10 overtime. This ability lowers Max HP by 25.",Cooldown = 30,Icon = "rbxassetid://90712805517714",DisplayName = "Caretaker",Noise = "Causes 1 noise upon use."};
+    ["Cloak"] = {Name = "Cloak",InputShown = "",Tip = "Go invisible over the span of 1.5 seconds and stay invisible for 10 seconds, being given Exhaust for its duration. At the end of the invisibility, take another second to fully turn visible again. Being hit while invisible forces you to turn visible again.",Cooldown = 40,Icon = "rbxassetid://90476367580326",DisplayName = "Cloak",Noise = "Causes no noise upon use."};
+    ["Block"] = {Name = "Block",InputShown = "",Tip = "Raise your arm up and get in a blocking stance for 2 seconds, getting hit by (mostly) anything will grant a speed boost and regen 10 HP, also locking killer abilities for a second.",Cooldown = 40,Icon = "rbxassetid://120929805037270",DisplayName = "Block",Noise = "Causes 1 noise upon use, and 5 noise if landed."};
+    ["Dash"] = {Name = "Dash",InputShown = "",Tip = "Dash a great distance forward and drain 35 SP. Can be used even below 35 SP.",Cooldown = 20,Icon = "rbxassetid://73777691791017",DisplayName = "Dash",Noise = "Causes 1 noise upon use."};
+    ["BonusPad"] = {Name = "BonusPad",InputShown = "",Tip = "Build a pad on the floor over the span of 5 seconds, stepping on the pad will grant a speed boost for 2 seconds. After 50 seconds, the pad will disappear. This ability lowers your Max HP by 10.",Cooldown = 60,Icon = "rbxassetid://86775625332300",DisplayName = "BonusPad",Noise = "Causes 6 noise upon use. Additionally causes 1 noise every time someone steps on a pad."};
+    ["Hotdog"] = {Name = "Hotdog",InputShown = "",Tip = "Take out a delicious hotdog and eat it over the span of 3 seconds and be given an additional 5 max HP and 15 HP, at the cost of -5 SP. The max HP bonus caps at 125.",Cooldown = 25,Icon = "rbxassetid://134322360499381",DisplayName = "Hotdog",Noise = "Causes 5 noise upon use."};
+    ["Revolver"] = {Name = "Revolver",InputShown = "",Tip = "Stand still and fire your revolver forwards, shoot out a projectile with an explosive AOE, stunning for 2 seconds and dealing 50 damage. After firing you need to reload your revolver in order to shoot it again. This ability lowers SP by 10.",Cooldown = 15,Icon = "rbxassetid://107624957891469",DisplayName = "Revolver",Noise = "Causes 4 noise upon use, 5 noise if landed. And 2 noise on reload."};
+    ["Taunt"] = {Name = "Taunt",InputShown = "",Tip = "Taunt the killer at close range with a hitbox that slowly gets larger. Successfully taunting the killer will highlight them to everyone and cover their screen, and also give you damage immunity for a bit. Missing embarrasses you to everyone.",Cooldown = 25,Icon = "rbxassetid://85436299122876",DisplayName = "Taunt",Noise = "Causes 6 noise upon use, and 2 noise if landed. 2 noise is also done on miss."};
+    ["Banana"] = {Name = "Banana",InputShown = "",Tip = "Shoot a banana peel onto the floor, if the civilian who placed it or the killer steps on it, they'll be ragdolled for 2 seconds. The banana will decay over the span of 25 seconds.",Cooldown = 20,Icon = "rbxassetid://96202444819611",DisplayName = "Banana Peel",Noise = "Causes 2 noise upon use, and 2 noise if someone slips on the banana peel."};
 }
 
 pcall(function()
-AbilityModule = RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("Ability"))
-if AbilityModule == nil or not AbilityModule then
 local temp_module = [[
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
@@ -659,7 +1175,6 @@ local UserInputService = game:GetService("UserInputService")
 
 local Events = ReplicatedStorage:WaitForChild("Events")
 local ClientModules = ReplicatedStorage:WaitForChild("ClientModules")
-local AbilityConfig = require(ClientModules.AbilityConfig)
 
 local LocalPlayer = Players.LocalPlayer
 local script = LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("Ability")
@@ -677,34 +1192,12 @@ local AbilitySystem = {
     PreferredInput = UserInputService.PreferredInput
 }
 
-function AbilitySystem.CreateAbility(AbilityData, IsExtraAbility)
-    if AbilitiesFolder:FindFirstChild(AbilityData.Name) then return end
+function AbilitySystem.CreateAbility(AbilityData)
+    if AbilitiesFolder:FindFirstChild(AbilityData.Name) then AbilitiesFolder:FindFirstChild(AbilityData.Name):Destroy() task.wait() end
     
     local AbilityButton = script.AbilityTemplate:Clone()
-    
-    if AbilitySystem.PreferredInput == Enum.PreferredInput.Gamepad then
-        AbilitySystem.Input1 = "X"
-        AbilitySystem.Input2 = "Y" 
-        AbilitySystem.Input3 = "B"
-        AbilitySystem.Input4 = "A"
-        AbilitySystem.Input5 = "R2"
-    end
-    
-    local InputKey = AbilitySystem.Input1
-    if IsExtraAbility then
-        local AbilityCount = #AbilitiesFolder:GetChildren()
-        if AbilityCount <= 1 then
-            InputKey = AbilitySystem.Input1
-        elseif AbilityCount == 2 then
-            InputKey = AbilitySystem.Input2
-        elseif AbilityCount == 3 then
-            InputKey = AbilitySystem.Input3
-        else
-            InputKey = AbilitySystem.Input4
-        end
-    else
-        InputKey = AbilitySystem[AbilityData.InputShown] or AbilityData.InputShown
-    end
+
+    local InputKey = AbilitySystem[AbilityData.InputShown] or AbilityData.InputShown
     
     AbilityButton.Parent = AbilitiesFolder
     AbilityButton.Name = AbilityData.Name
@@ -731,7 +1224,36 @@ function AbilitySystem.CreateAbility(AbilityData, IsExtraAbility)
     AbilityButton.Activated:Connect(function()
         AbilitySystem.UseAbility(AbilityData, AbilityButton)
     end)
+
+	if not AbilityData.InputShown then return end
+	task.spawn(function()
+	AbilitySystem:Bind(AbilityData, AbilityButton)
+	end)
+	
 end
+
+function AbilitySystem:Bind(AbilityData, AbilityButton)
+    local connection
+    connection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+        if gameProcessed then return end
+        local triggerFound = false
+        if AbilityData.InputShown == "M1" and input.UserInputType == Enum.UserInputType.MouseButton1 then
+            triggerFound = true
+        elseif input.KeyCode == Enum.KeyCode[AbilityData.InputShown] then
+            triggerFound = true
+        end
+        if triggerFound and AbilityButton.Parent then
+            AbilitySystem.UseAbility(AbilityData, AbilityButton)
+			task.wait(1)
+        end
+    end)
+    AbilityButton.AncestryChanged:Connect(function()
+        if not AbilityButton.Parent then
+            connection:Disconnect()
+        end
+    end)
+end
+
 
 function AbilitySystem.AbilityTween(AbilityButton)
     TweenService:Create(AbilityButton, TweenInfo.new(0.2), {Size = UDim2.new(0.9, 0, 0.9, 0)}):Play()
@@ -777,40 +1299,56 @@ function AbilitySystem.PutOnCooldown(AbilityButton, CooldownTime)
     end
 end
 
+local canuseagain = true
 function AbilitySystem.UseAbility(AbilityData, AbilityButton)
-    if AbilityButton.Cooldown.Visible then return end
+    if AbilityButton.Cooldown.Visible or canuseagain == false then return end
+	canuseagain = false
+	task.delay((Cooldown or AbilityData.Cooldown), function() canuseagain = true end)
     local Success, Cooldown = Events.RemoteFunctions.UseAbility:InvokeServer(AbilityData.Name)
-    if Success then
+    if Success or AbilityData.Client == true then
+		if AbilityData.Client == true then
+			Cooldown = AbilityData.Cooldown
+		end
         AbilitySystem.AbilityTween(AbilityButton)
         if Success ~= "MultipleUse" then
-            AbilitySystem.PutOnCooldown(AbilityButton, Cooldown or AbilityData.Cooldown)
+            task.spawn(function() AbilitySystem.PutOnCooldown(AbilityButton, Cooldown or AbilityData.Cooldown) end)
+			if AbilityData.Client == true then
+				AbilityData.ClientFunction()
+			end
         end
     end
+	return Success
 end
 
 return AbilitySystem]]
 AbilityModule = loadstring(temp_module)()
-end
 end)
 pcall(function()
+if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) then
+UIModule = {}
+UIModule.AbilitySelection = function(v841) Notify("Error!", "Couldn't use function ''AbilitySelection'', missing function ''require'' or ''decompile''!", 5, false) return end
+UIModule.OpenShop = function(v841) Notify("Error!", "Couldn't use function ''OpenShop'', missing function ''require'' or ''decompile''!", 5, false) return end
+UIModule.TeamateDeathEffect = function(v841) Notify("Error!", "Couldn't use function ''TeamateDeathEffect'', missing function ''require'' or ''decompile''!", 5, false) return end
+else
+if LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):FindFirstChild("UI") then
 UIModule = RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("UI"))
+end
+end
 end)
 
-local Tab_3 = Window:CreateTab("Abilities",0)
-Tab_3:CreateParagraph({Title = "Abilities", Content = "You can give yourself abilities or cards with abilities."})
-Tab_3:CreateSection("Get Ability")
-local InputBind = "None"
-Tab_3:CreateKeybind({
-   Name = "Ability Keybind",
-   CurrentKeybind = "E",
-   HoldToInteract = false,
-   Callback = function(Value)
-InputBind = Value
-   end,
-})
-local ChoosenAbility = "Block"
-Tab_3:CreateDropdown({Name = "Choose Ability"; Options = AbilityNames; CurrentOption = "Block"; MultiSelection = false; Callback = function(Value)
+local Tab_3 = Window:CreateTab("Civilian",0)
+Tab_3:CreateParagraph({Title = "Abilities", Content = "You can give yourself abilities or cards with abilities. If you gave yourself an ability you already had, the old ability will be replaced with new settings."})
+
+Tab_3:CreateSection("Fast Functions")
+local InputBind = LoadConfig("Tab_3", "Bind")
+Tab_3:CreateInput({Name = "Ability Keybind"; PlaceholderText = InputBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+InputBind = tostring(Value)
+SaveConfig("Tab_3", InputBind, "Bind")
+end; })
+local ChoosenAbility = LoadConfig("Tab_3", "FastFunctions", "ChoosenAbility")
+Tab_3:CreateDropdown({Name = "Choose Ability"; Options = AbilityNames; CurrentOption = ChoosenAbility; MultiSelection = false; Callback = function(Value)
 ChoosenAbility = ConvertDropdownValue(Value)
+SaveConfig("Tab_3", ChoosenAbility, "FastFunctions", "ChoosenAbility")
 end; })
 Tab_3:CreateButton({Name = "Get Choosen Ability"; Callback = function()
 local temp_table = table.clone(AbilityDatas[ChoosenAbility])
@@ -822,7 +1360,6 @@ temp_table.InputShown = (InputBind ~= "None" and InputBind) or ""
 end)
 AbilityModule.CreateAbility(temp_table)
 end; })
-
 Tab_3:CreateButton({Name = "Get All Abilities"; Callback = function()
 game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer(unpack({{tostring(AbilityNames[math.random(1, 11)]);tostring(AbilityNames[math.random(1, 11)]);}}))
 for _,ability in pairs(AbilityNames) do
@@ -837,89 +1374,906 @@ AbilityModule.CreateAbility(temp_table)
 end
 end; })
 
+Tab_3:CreateSection("Abilities")
+
+--[[
+Taunt
+]]--
+local TauntConfig = LoadConfig("Tab_3", "TauntConfig")
+Tab_3:CreateLabel("Taunt Ability")
+local TauntBind = TauntConfig.Bind
+Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = TauntBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+TauntBind = tostring(Value)
+SaveConfig("Tab_3", TauntBind, "TauntConfig", "Bind")
+end; })
+Tab_3:CreateButton({Name = "Get Taunt"; Callback = function()
+local temp_table = table.clone(AbilityDatas["Taunt"])
+pcall(function()
+temp_table.InputShown = (TauntBind ~= "None" and TauntBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (TauntBind ~= "None" and TauntBind) or ""
+end)
+AbilityModule.CreateAbility(temp_table)
+end; })
+
+--[[
+Punch
+]]--
+local PunchConfig = LoadConfig("Tab_3", "PunchConfig")
+Tab_3:CreateLabel("Punch Ability")
+local PunchBind = PunchConfig.Bind
+Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = PunchBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+PunchBind = tostring(Value)
+SaveConfig("Tab_3", PunchBind, "PunchConfig", "Bind")
+end; })
+Tab_3:CreateButton({Name = "Get Punch"; Callback = function()
+local temp_table = table.clone(AbilityDatas["Punch"])
+pcall(function()
+temp_table.InputShown = (PunchBind ~= "None" and PunchBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (PunchBind ~= "None" and PunchBind) or ""
+end)
+AbilityModule.CreateAbility(temp_table)
+end; })
+
+--[[
+Revolver
+]]--
+local RevolverConfig = LoadConfig("Tab_3", "RevolverConfig")
+Tab_3:CreateLabel("Revolver Ability")
+local RevolverBind = RevolverConfig.Bind
+Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = RevolverBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+RevolverBind = tostring(Value)
+SaveConfig("Tab_3", RevolverBind, "RevolverConfig", "Bind")
+end; })
+Tab_3:CreateButton({Name = "Get Revolver"; Callback = function()
+local temp_table = table.clone(AbilityDatas["Revolver"])
+pcall(function()
+temp_table.InputShown = (RevolverBind ~= "None" and RevolverBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (RevolverBind ~= "None" and RevolverBind) or ""
+end)
+AbilityModule.CreateAbility(temp_table)
+end; })
+
+--[[
+Caretaker
+]]--
+local CaretakerConfig = LoadConfig("Tab_3", "CaretakerConfig")
+Tab_3:CreateLabel("Caretaker Ability")
+local CaretakerBind = CaretakerConfig.Bind
+Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = CaretakerBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+CaretakerBind = tostring(Value)
+SaveConfig("Tab_3", CaretakerBind, "CaretakerConfig", "Bind")
+end; })
+Tab_3:CreateButton({Name = "Get Caretaker"; Callback = function()
+local temp_table = table.clone(AbilityDatas["Caretaker"])
+pcall(function()
+temp_table.InputShown = (CaretakerBind ~= "None" and CaretakerBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (CaretakerBind ~= "None" and CaretakerBind) or ""
+end)
+AbilityModule.CreateAbility(temp_table)
+end; })
+
+--[[
+Banana
+]]--
+local BananaConfig = LoadConfig("Tab_3", "BananaConfig")
+Tab_3:CreateLabel("Banana Ability")
+local BananaBind = BananaConfig.Bind
+Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = BananaBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+BananaBind = tostring(Value)
+SaveConfig("Tab_3", BananaBind, "BananaConfig", "Bind")
+end; })
+Tab_3:CreateButton({Name = "Get Banana"; Callback = function()
+local temp_table = table.clone(AbilityDatas["Banana"])
+pcall(function()
+temp_table.InputShown = (BananaBind ~= "None" and BananaBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (BananaBind ~= "None" and BananaBind) or ""
+end)
+AbilityModule.CreateAbility(temp_table)
+end; })
+
+--[[
+Dash
+]]--
+local DashConfig = LoadConfig("Tab_3", "DashConfig")
+Tab_3:CreateLabel("Dash Ability")
+local DashBind = DashConfig.Bind
+Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = DashBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+DashBind = tostring(Value)
+SaveConfig("Tab_3", DashBind, "DashConfig", "Bind")
+end; })
+local DashPower = DashConfig.Power
+Tab_3:CreateInput({Name = "Power"; PlaceholderText = DashPower; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+DashPower = tonumber(Value)
+SaveConfig("Tab_3", DashPower, "DashConfig", "Power")
+end; })
+local DashMaxForce = DashConfig.MaxForce
+Tab_3:CreateInput({Name = "Max Force"; PlaceholderText = DashMaxForce; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+DashMaxForce = tonumber(Value)
+SaveConfig("Tab_3", DashMaxForce, "DashConfig", "MaxForce")
+end; })
+local DashDuration = DashConfig.Duration
+Tab_3:CreateInput({Name = "Duration"; PlaceholderText = DashDuration; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+DashDuration = tonumber(Value)
+SaveConfig("Tab_3", DashDuration, "DashConfig", "Duration")
+end; })
+--------------------------------------------------------------------------------------
+local DashConfigEffects = nil
+function ApplyDashConfigurations()
+if DashConfigEffects then
+DashConfigEffects:Disconnect()
+DashConfigEffects = nil
+end
+if not HumanoidRootPart then return end
+if not (DashDuration > 0.3) then
+DashConfigEffects = HumanoidRootPart.ChildAdded:Connect(function(c)
+if c.Name == "BodyVelocity" then
+c.MaxForce = Vector3.new(DashMaxForce,(DashMaxForce*0.1),DashMaxForce)
+c.P = DashPower
+game.Debris:AddItem(c, DashDuration)
+end
+end)
+elseif DashDuration > 0.3 then
+DashConfigEffects = HumanoidRootPart.ChildAdded:Connect(function(c)
+if c.Name == "BodyVelocity" then
+c:Destroy()
+local BodyVelocity = Instance.new("BodyVelocity")
+BodyVelocity.MaxForce = Vector3.new(DashMaxForce,(DashMaxForce*0.1),DashMaxForce)
+BodyVelocity.P = DashPower
+BodyVelocity.Velocity = HumanoidRootPart.CFrame.LookVector * 80
+BodyVelocity.Parent = HumanoidRootPart
+game.Debris:AddItem(BodyVelocity, DashDuration)
+end
+end)
+end
+end
+--------------------------------------------------------------------------------------
+Tab_3:CreateButton({Name = "Get Dash"; Callback = function()
+local temp_table = table.clone(AbilityDatas["Dash"])
+pcall(function()
+temp_table.InputShown = (DashBind ~= "None" and DashBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (DashBind ~= "None" and DashBind) or ""
+end)
+AbilityModule.CreateAbility(temp_table)
+ApplyDashConfigurations()
+end; })
+
+--[[
+Hotdog
+]]--
+local HotdogConfig = LoadConfig("Tab_3", "HotdogConfig")
+Tab_3:CreateLabel("Hotdog Ability")
+local HotdogBind = HotdogConfig.Bind
+Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = HotdogBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+HotdogBind = tostring(Value)
+SaveConfig("Tab_3", HotdogBind, "HotdogConfig", "Bind")
+end; })
+local HotdogStaminaLoss = HotdogConfig.StaminaLoss
+Tab_3:CreateInput({Name = "Stamina Loss per Hotdog"; PlaceholderText = HotdogStaminaLoss; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+HotdogStaminaLoss = tonumber(Value)
+SaveConfig("Tab_3", HotdogStaminaLoss, "HotdogConfig", "StaminaLoss")
+end; })
+--------------------------------------------------------------------------------------
+local HotdogConfigEffects = nil
+function ApplyHotdogConfigurations()
+if HotdogConfigEffects then
+HotdogConfigEffects:Disconnect()
+HotdogConfigEffects = nil
+end
+if not HumanoidRootPart then return end
+if HotdogStaminaLoss == 5 then return end
+HotdogConfigEffects = HumanoidRootPart.Hotdog:GetPropertyChangedSignal("Playing"):Connect(function(c)
+if HumanoidRootPart.Hotdog.Playing == true then
+local OldMaxStamina = tonumber(Character:GetAttribute("MaxStamina"))
+if not OldMaxStamina then return end
+Character:GetAttributeChangedSignal("MaxStamina"):Once(function()
+Character:SetAttribute("MaxStamina", tonumber(OldMaxStamina-HotdogStaminaLoss))
+end)
+end
+end)
+end
+--------------------------------------------------------------------------------------
+Tab_3:CreateButton({Name = "Get Hotdog"; Callback = function()
+local temp_table = table.clone(AbilityDatas["Hotdog"])
+pcall(function()
+temp_table.InputShown = (HotdogBind ~= "None" and HotdogBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (HotdogBind ~= "None" and HotdogBind) or ""
+end)
+AbilityModule.CreateAbility(temp_table)
+ApplyHotdogConfigurations()
+end; })
+
+--[[
+Block
+]]--
+local BlockConfig = LoadConfig("Tab_3", "BlockConfig")
+Tab_3:CreateLabel("Block Ability")
+local BlockBind = BlockConfig.Bind
+Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = BlockBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+BlockBind = tostring(Value)
+SaveConfig("Tab_3", BlockBind, "BlockConfig", "Bind")
+end; })
+Tab_3:CreateButton({Name = "Get Block"; Callback = function()
+local temp_table = table.clone(AbilityDatas["Block"])
+pcall(function()
+temp_table.InputShown = (BlockBind ~= "None" and BlockBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (BlockBind ~= "None" and BlockBind) or ""
+end)
+AbilityModule.CreateAbility(temp_table)
+end; })
+
+--[[
+Adrenaline
+]]--
+local AdrenalineConfig = LoadConfig("Tab_3", "AdrenalineConfig")
+Tab_3:CreateLabel("Adrenaline Ability")
+local AdrenalineBind = AdrenalineConfig.Bind
+Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = AdrenalineBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+AdrenalineBind = tostring(Value)
+SaveConfig("Tab_3", AdrenalineBind, "AdrenalineConfig", "Bind")
+end; })
+Tab_3:CreateButton({Name = "Get Adrenaline"; Callback = function()
+local temp_table = table.clone(AbilityDatas["Adrenaline"])
+pcall(function()
+temp_table.InputShown = (AdrenalineBind ~= "None" and AdrenalineBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (AdrenalineBind ~= "None" and AdrenalineBind) or ""
+end)
+AbilityModule.CreateAbility(temp_table)
+end; })
+
+--[[
+BonusPad
+]]--
+local BonusPadConfig = LoadConfig("Tab_3", "BonusPadConfig")
+Tab_3:CreateLabel("BonusPad Ability")
+local BonusPadBind = BonusPadConfig.Bind
+Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = BonusPadBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+BonusPadBind = tostring(Value)
+SaveConfig("Tab_3", BonusPadBind, "BonusPadConfig", "Bind")
+end; })
+local BonusPadSpeedModifier = BonusPadConfig.SpeedModifier
+Tab_3:CreateInput({Name = "Speed Modifier"; PlaceholderText = BonusPadSpeedModifier; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+BonusPadSpeedModifier = tonumber(Value)
+SaveConfig("Tab_3", BonusPadSpeedModifier, "BonusPadConfig", "SpeedModifier")
+end; })
+--------------------------------------------------------------------------------------
+local BonusPadConfigEffects = nil
+function ApplyBonusPadConfigurations()
+if BonusPadConfigEffects then
+BonusPadConfigEffects:Disconnect()
+BonusPadConfigEffects = nil
+end
+if not HumanoidRootPart then return end
+if BonusPadSpeedModifier == 7 then return end
+BonusPadConfigEffects = Character.ChildAdded:Connect(function(c)
+if c:IsA("Highlight") and c.Name == "CoolHighlight" then
+task.wait()
+local OldWalkSpeedModifier = tonumber(Character:GetAttribute("WalkSpeedModifier"))
+if not OldWalkSpeedModifier then return end
+if OldWalkSpeedModifier > 6 then
+Character:SetAttribute("WalkSpeedModifier", tonumber((OldWalkSpeedModifier-7)+BonusPadSpeedModifier))
+end
+end
+end)
+end
+--------------------------------------------------------------------------------------
+Tab_3:CreateButton({Name = "Get BonusPad"; Callback = function()
+local temp_table = table.clone(AbilityDatas["BonusPad"])
+pcall(function()
+temp_table.InputShown = (BonusPadBind ~= "None" and BonusPadBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (BonusPadBind ~= "None" and BonusPadBind) or ""
+end)
+AbilityModule.CreateAbility(temp_table)
+ApplyBonusPadConfigurations()
+end; })
+
+
+
+--[[
+Cloak
+]]--
+local CloakConfig = LoadConfig("Tab_3", "CloakConfig")
+Tab_3:CreateLabel("Cloak Ability")
+local CloakBind = CloakConfig.Bind
+Tab_3:CreateInput({Name = "Keybind"; PlaceholderText = CloakBind; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+CloakBind = tostring(Value)
+SaveConfig("Tab_3", CloakBind, "CloakConfig", "Bind")
+end; })
+Tab_3:CreateButton({Name = "Get Cloak"; Callback = function()
+local temp_table = table.clone(AbilityDatas["Cloak"])
+pcall(function()
+temp_table.InputShown = (CloakBind ~= "None" and CloakBind.Name) or ""
+end)
+pcall(function()
+temp_table.InputShown = (CloakBind ~= "None" and CloakBind) or ""
+end)
+AbilityModule.CreateAbility(temp_table)
+end; })
+
+
+
 Tab_3:CreateSection("Get Cards")
 
 local CardSettings = {
-    [1] = {[1]="Revolver",[2]="Caretaker"},
-    [2] = {[1]="BonusPad",[2]="Caretaker"},
-    [3] = {[1]="Revolver",[2]="Punch"}
+    [1] = LoadConfig("Tab_3", "Cards", "FirstCard"),
+    [2] = LoadConfig("Tab_3", "Cards", "SecondCard"),
+    [3] = LoadConfig("Tab_3", "Cards", "ThirdCard")
 }
 Tab_3:CreateLabel("First Card Settings")
-Tab_3:CreateDropdown({Name = "First Ability"; Options = AbilityNames; CurrentOption = "Revolver"; MultiSelection = false; Callback = function(Value)
+Tab_3:CreateDropdown({Name = "First Ability"; Options = AbilityNames; CurrentOption = CardSettings[1][1]; MultiSelection = false; Callback = function(Value)
 CardSettings[1][1] = ConvertDropdownValue(Value)
+SaveConfig("Tab_3", CardSettings[1][1], "Cards", "FirstCard", 1)
 end; })
-Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOption = "Caretaker"; MultiSelection = false; Callback = function(Value)
+Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOption = CardSettings[1][2]; MultiSelection = false; Callback = function(Value)
 CardSettings[1][2] = ConvertDropdownValue(Value)
+SaveConfig("Tab_3", CardSettings[1][2], "Cards", "FirstCard", 2)
 end; })
 
 Tab_3:CreateLabel("Second Card Settings")
-Tab_3:CreateDropdown({Name = "First Ability"; Options = AbilityNames; CurrentOption = "BonusPad"; MultiSelection = false; Callback = function(Value)
+Tab_3:CreateDropdown({Name = "First Ability"; Options = AbilityNames; CurrentOption = CardSettings[2][1]; MultiSelection = false; Callback = function(Value)
 CardSettings[2][1] = ConvertDropdownValue(Value)
+SaveConfig("Tab_3", CardSettings[2][1], "Cards", "SecondCard", 1)
 end; })
-Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOption = "Caretaker"; MultiSelection = false; Callback = function(Value)
+Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOption = CardSettings[2][2]; MultiSelection = false; Callback = function(Value)
 CardSettings[2][2] = ConvertDropdownValue(Value)
+SaveConfig("Tab_3", CardSettings[2][2], "Cards", "SecondCard", 2)
 end; })
 
 Tab_3:CreateLabel("Third Card Settings")
-Tab_3:CreateDropdown({Name = "First Ability"; Options = AbilityNames; CurrentOption = "Revolver"; MultiSelection = false; Callback = function(Value)
+Tab_3:CreateDropdown({Name = "First Ability"; Options = AbilityNames; CurrentOption = CardSettings[3][1]; MultiSelection = false; Callback = function(Value)
 CardSettings[3][1] = ConvertDropdownValue(Value)
+SaveConfig("Tab_3", CardSettings[3][1], "Cards", "ThirdCard", 1)
 end; })
-Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOption = "Punch"; MultiSelection = false; Callback = function(Value)
+Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOption = CardSettings[3][2]; MultiSelection = false; Callback = function(Value)
 CardSettings[3][2] = ConvertDropdownValue(Value)
+SaveConfig("Tab_3", CardSettings[3][2], "Cards", "ThirdCard", 2)
 end; })
 
 Tab_3:CreateButton({Name = "Summon Chosen Cards"; Callback = function()
 UIModule.AbilitySelection(unpack(CardSettings))
 end; })
 
+Tab_3:CreateSection("")
+Tab_3:CreateSection("")
+Tab_3:CreateSection("")
 
-Tab_3:CreateSection("Spam Ability")
+Tab_3:CreateParagraph({Title = "Immunities / Buffs", Content = "Immunities and buffs for workspace side"})
 
-local SpamAbility = "Hotdog"
-Tab_3:CreateDropdown({Name = "Ability to Spam"; Options = AbilityNames; CurrentOption = "Hotdog"; MultiSelection = false; Callback = function(Value)
-SpamAbility = ConvertDropdownValue(Value)
+Tab_3:CreateSection("Workspace Side")
+
+local InstaDestroyComputer = LoadConfig("Tab_3", "IB", "InstaDestroyComputer")
+local InstaDestroyComputerToggle = Tab_3:CreateToggle({Name = "Insta-Destroy Badware Computer"; CurrentValue = false; Callback = function(Value)
+InstaDestroyComputer = Value
+SaveConfig("Tab_3", InstaDestroyComputer, "IB", "InstaDestroyComputer")
 end; })
-
-Tab_3:CreateToggle({Name = "Spam Ability"; CurrentValue = false; Callback = function(Value)
-AutoSpamAbility = Value
-if AutoSpamAbility == true then
-repeat task.wait(0.1)
-pcall(function()
-game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteFunctions"):WaitForChild("UseAbility"):InvokeServer(unpack({tostring(SpamAbility)}))
-end)
-until AutoSpamAbility == false
-end
-end; })
-
-Tab_3:CreateSection("Auto Ability Injection")
-local AI_Abilities, AutoInjectAbility
-
-Tab_3:CreateLabel("Ability will automatically get equipped ( along side with their accessories ) 8 seconds after the round starts.")
-
-Tab_3:CreateToggle({Name = "Auto Inject"; CurrentValue = false; Callback = function(Value)
-AutoInjectAbility = Value
-end; })
-
-Tab_3:CreateDropdown({Name = "First Ability"; Options = AbilityNames; CurrentOption = ""; MultiSelection = false; Callback = function(Value)
-AI_Abilities1 = ConvertDropdownValue(Value)
-end; })
-Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOption = ""; MultiSelection = false; Callback = function(Value)
-AI_Abilities2 = ConvertDropdownValue(Value)
-end; })
-
-game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams").DescendantAdded:Connect(function(descendant)
-task.wait()
-if descendant.Name == ""..LP.Name.."" and descendant.Parent.Name == "Survivor" and AutoInjectAbility == true then
-task.wait(8)
-pcall(function()
-game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer({""..tostring(AI_Abilities1)..""})
-game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("AbilitySelection"):FireServer({""..tostring(AI_Abilities2)..""})
-end)
+game:GetService("ProximityPromptService").PromptShown:Connect(function(a,b)
+if InstaDestroyComputer == true and a.HoldDuration ~= 0 then
+a.HoldDuration = 0
 end
 end)
+local alreadydestroyingpc = false
+game:GetService("ProximityPromptService").PromptTriggered:Connect(function(a,b)
+if alreadydestroyingpc or InstaDestroyComputer ~= true then return end
+alreadydestroyingpc = true
+a.HoldDuration = 0
+a.RequiresLineOfSight = false
+a.Enabled = true
+for i = 1,40 do
+pcall(fireproximityprompt, a)
+end
+alreadydestroyingpc = false
+end)
+InstaDestroyComputerToggle:Set(InstaDestroyComputer)
+
+local AntiWalls = LoadConfig("Tab_3", "IB", "AntiWalls")
+local AntiWallsToggle = Tab_3:CreateToggle({Name = "Anti-Artful Walls"; CurrentValue = false; Callback = function(Value)
+AntiWalls = Value
+task.spawn(ClearWalls)
+SaveConfig("Tab_3", AntiWalls, "IB", "AntiWalls")
+end; })
+function ClearWalls()
+for _,d in next, game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Other"):GetDescendants() do
+if AntiWalls ~= true then return end
+if d and d.Name == "HumanoidRootPart" and d.Anchored == true then
+d.CanCollide = false
+d.CanTouch = false
+d.Transparency = 0.5
+end
+end
+end
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Other").DescendantAdded:Connect(function(d)
+if AntiWalls ~= true then return end
+if d and d.Name == "HumanoidRootPart" and d.Anchored == true then
+d.CanCollide = false
+d.CanTouch = false
+d.Transparency = 0.5
+end
+end)
+AntiWallsToggle:Set(AntiWalls)
+
+local AntiEvilScary1 = LoadConfig("Tab_3", "IB", "AntiEvilScary")
+local AntiEvilScary1Toggle = Tab_3:CreateToggle({Name = "Anti Evil Scary"; CurrentValue = false; Callback = function(Value)
+AntiEvilScary1 = Value
+if AntiEvilScary1 == true then
+for i,v in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable"):GetChildren()) do
+if v and v.Name == "EvilScary" then
+for _,trans in pairs(v:GetChildren()) do
+if trans and trans:IsA("TouchTransmitter") then
+trans:Destroy()
+end
+end
+for _,part in pairs(v:GetChildren()) do
+if part and part:IsA("BasePart") then
+part.CanCollide = false
+part.CanTouch = false
+pcall(function()
+part.CanQuery = false
+end)
+end
+end
+v.CanCollide = false
+v.CanTouch = false
+pcall(function()
+v.CanQuery = false
+end)
+end
+end
+end
+SaveConfig("Tab_3", AntiEvilScary1, "IB", "AntiEvilScary")
+end; })
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable").ChildAdded:Connect(function(child)
+if child and child.Name == "EvilScary" and AntiEvilScary1 == true then
+for _,trans in pairs(child:GetChildren()) do
+if trans and trans:IsA("TouchTransmitter") then
+trans:Destroy()
+end
+end
+for _,part in pairs(child:GetChildren()) do
+if part and part:IsA("BasePart") then
+part.CanCollide = false
+part.CanTouch = false
+pcall(function()
+part.CanQuery = false
+end)
+end
+end
+child.CanCollide = false
+child.CanTouch = false
+pcall(function()
+child.CanQuery = false
+end)
+end
+end)
+AntiEvilScary1Toggle:Set(AntiEvilScary1)
+
+
+local AntiBarriers1 = false
+local AntiBarriers1_con = nil
+local AntiBarriers1_toggle = nil
+AntiBarriers1_toggle = Tab_3:CreateToggle({Name = "Anti Barriers"; CurrentValue = AntiBarriers1; Callback = function(Value)
+AntiBarriers1 = Value
+pcall(function()
+if AntiBarriers1 == true then
+if workspace.GameAssets:FindFirstChild("Map") == nil then
+AntiBarriers1_toggle:Set(false)
+return
+end
+workspace.GameAssets.Map.Config.Barriers.Parent = game:GetService("LogService")
+AntiBarriers1_con = workspace.GameAssets.ChildRemoved:Once(function(c)
+if c.Name == "Map" and AntiBarriers == true then
+game:GetService("LogService").Barriers:Destroy()
+end
+end)
+else
+if AntiBarriers1_con then
+AntiBarriers1_con:Disconnect()
+AntiBarriers1_con = nil
+end
+game:GetService("LogService").Barriers.Parent = workspace.GameAssets.Map.Config
+end
+end)
+end; })
+workspace.GameAssets.ChildRemoved:Connect(function(c)
+if c.Name == "Map" and AntiBarriers1 == true then
+AntiBarriers_toggle:Set(false)
+end
+end)
+
+
+local AntiFallRagdoll = LoadConfig("Tab_3", "IB", "AntiFallRagdoll")
+local AntiFallRagdollToggle = Tab_3:CreateToggle({Name = "Anti Fall Ragdoll"; CurrentValue = false; Callback = function(Value)
+AntiFallRagdoll = Value
+for i,v in next, workspace.GameAssets:GetDescendants() do
+if v.Name == "FallDamage" and v:IsA("BasePart") then
+child.CanCollide = not AntiFallRagdoll
+child.CanTouch = not AntiFallRagdoll
+pcall(function()
+child.CanQuery = not AntiFallRagdoll
+end)
+end
+end
+SaveConfig("Tab_3", AntiFallRagdoll, "IB", "AntiFallRagdoll")
+end; })
+workspace.GameAssets.DescendantAdded:Connect(function(child)
+if AntiFallRagdoll ~= true then return end
+if child.Name == "FallDamage" and child:IsA("BasePart") then
+child.CanCollide = false
+child.CanTouch = false
+pcall(function()
+child.CanQuery = false
+end)
+end
+end)
+AntiFallRagdollToggle:Set(AntiFallRagdoll)
 
 
 
+
+
+
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+local Tab_5 = Window:CreateTab("Killer",0)
+Tab_5:CreateParagraph({Title = "Abilities Editor", Content = "Ability Editor and giver"})
+
+Tab_5:CreateSection("Universal ( except for killdroid ☹ )")
+Tab_5:CreateButton({Name = "Get Faster Swing"; Callback = function(Value)
+AbilityModule.CreateAbility({Client = true,ClientFunction = function() game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Swing") end,Name = "Whack_NH",InputShown = "M2",Tip = "Swing but faster.",Cooldown = 0.01, Icon = "rbxassetid://13771861804",DisplayName = "Whack"})
+end; })
+Tab_5:CreateButton({Name = "Get Lunge Attack"; Callback = function(Value)
+local function Ability()
+local a = Humanoid:LoadAnimation(game:GetService("ReplicatedStorage").Characters.Killer.Harken.Default.Animations.Throw)
+repeat task.wait() until a.Length > 0
+task.spawn(function()
+local a = nil
+for i = 1,10 do
+if a == true then return end
+a = game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Swing")
+end
+end)
+local function onswing()
+a:Play()
+repeat task.wait() until a.IsPlaying
+a.TimePosition = .6
+local BodyVelocity = Instance.new("BodyVelocity")
+BodyVelocity.MaxForce = Vector3.new(1000000,1000,1000000)
+BodyVelocity.P = 1250
+BodyVelocity.Velocity = HumanoidRootPart.CFrame.LookVector * 80
+BodyVelocity.Parent = HumanoidRootPart
+game.Debris:AddItem(BodyVelocity, .25)
+task.wait(.15)
+Character:SetAttribute("SprintSpeed", (Character:GetAttribute("SprintSpeed")*2))
+Character:SetAttribute("WalkSpeed", (Character:GetAttribute("WalkSpeed")*2))
+end
+local c = nil
+local d = nil
+c = Humanoid.AnimationPlayed:Connect(function(track)
+if track.Animation.AnimationId == "rbxassetid://80787680522855" then
+c:Disconnect()
+track:Stop()
+task.spawn(onswing)
+end
+end)
+end
+local lunge_abil = function()
+local a = Humanoid:LoadAnimation(game:GetService("ReplicatedStorage").Characters.Killer.Harken.Default.Animations.Throw)
+repeat task.wait() until a.Length > 0
+a:Play()
+repeat task.wait() until a.IsPlaying
+a.TimePosition = 0.6
+a:AdjustSpeed(0)
+Character:SetAttribute("SprintSpeed", (Character:GetAttribute("SprintSpeed")/2))
+Character:SetAttribute("WalkSpeed", (Character:GetAttribute("WalkSpeed")/2))
+task.spawn(Ability)
+repeat task.wait() until Character:GetAttribute("SprintSpeed") > 13
+a:Stop()
+end
+AbilityModule.CreateAbility({Client = true,ClientFunction = lunge_abil,Name = "Lunge_NH",InputShown = "F",Tip = "Lunge forwards to deal damage.",Cooldown = 3,Icon = "rbxassetid://105910997361738",DisplayName = "Lunge"})
+end; })
+
+Tab_5:CreateSection("Pursuer")
+local PursuerConfig = LoadConfig("Tab_5", "PursuerConfig")
+local PursuerCleaveBoost = PursuerConfig.CleaveBoost
+Tab_5:CreateInput({Name = "Cleave Boost"; PlaceholderText = PursuerCleaveBoost; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+PursuerCleaveBoost = Value
+SaveConfig("Tab_5", PursuerCleaveBoost, "PursuerConfig", "CleaveBoost")
+end; })
+--------------------------------------------------------------------------------------
+local PursuerConfigEffects = nil
+function ApplyPursuerConfigurations()
+if PursuerConfigEffects then
+PursuerConfigEffects:Disconnect()
+PursuerConfigEffects = nil
+end
+if not Character then return end
+if PursuerCleaveBoost == 6 then return end
+PursuerConfigEffects = Character:GetAttributeChangedSignal("WalkSpeedModifier"):Connect(function()
+local OldWalkSpeedModifier = Character:GetAttribute("WalkSpeedModifier")
+if not OldWalkSpeedModifier then return end
+if OldWalkSpeedModifier == 6 then
+Character:SetAttribute("WalkSpeedModifier", PursuerCleaveBoost)
+end
+end)
+end
+--------------------------------------------------------------------------------------
+Tab_5:CreateButton({Name = "Apply Pursuer Configurations"; Callback = function()
+ApplyPursuerConfigurations()
+Notify("Success!", "Applied configurations.", 3, true)
+end; })
+
+Tab_5:CreateSection("Badware")
+local BadwareConfig = LoadConfig("Tab_5", "BadwareConfig")
+local BadwareHipHeight = BadwareConfig.HipHeight
+Tab_5:CreateInput({Name = "Hip Height when placing computers"; PlaceholderText = BadwareHipHeight; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+BadwareHipHeight = Value
+SaveConfig("Tab_5", BadwareHipHeight, "BadwareConfig", "HipHeight")
+end; })
+--------------------------------------------------------------------------------------
+local BadwareConfigEffects = nil
+function ApplyBadwareConfigurations()
+if BadwareConfigEffects then
+BadwareConfigEffects:Disconnect()
+BadwareConfigEffects = nil
+end
+if not HumanoidRootPart then return end
+if not Humanoid then return end
+if BadwareHipHeight == 0 then return end
+BadwareConfigEffects = HumanoidRootPart.FirewallBypass:GetPropertyChangedSignal("Playing"):Connect(function(c)
+if HumanoidRootPart.FirewallBypass.Playing ~= true then return end
+Humanoid.HipHeight = tonumber(BadwareHipHeight)
+task.wait(2)
+Humanoid.HipHeight = 0
+end)
+end
+--------------------------------------------------------------------------------------
+Tab_5:CreateButton({Name = "Apply Badware Configurations"; Callback = function()
+ApplyBadwareConfigurations()
+Notify("Success!", "Applied configurations.", 3, true)
+end; })
+
+Tab_5:CreateSection("Artful")
+local ArtfulConfig = LoadConfig("Tab_5", "ArtfulConfig")
+local ArtfulHipHeight = ArtfulConfig.HipHeight
+Tab_5:CreateInput({Name = "Hip Height when placing walls/music box"; PlaceholderText = ArtfulHipHeight; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+ArtfulHipHeight = Value
+SaveConfig("Tab_5", ArtfulHipHeight, "ArtfulConfig", "HipHeight")
+end; })
+--------------------------------------------------------------------------------------
+local ArtfulConfigEffects = nil
+function ApplyArtfulConfigurations()
+if ArtfulConfigEffects then
+ArtfulConfigEffects:Disconnect()
+ArtfulConfigEffects = nil
+end
+if not HumanoidRootPart then return end
+if not Humanoid then return end
+if ArtfulHipHeight == 0 then return end
+ArtfulConfigEffects = HumanoidRootPart["CopyThrice2"]:GetPropertyChangedSignal("Playing"):Connect(function(c)
+if HumanoidRootPart["CopyThrice2"].Playing ~= true then return end
+Humanoid.HipHeight = tonumber(ArtfulHipHeight)
+task.wait(2)
+Humanoid.HipHeight = 0
+end)
+end
+--------------------------------------------------------------------------------------
+Tab_5:CreateButton({Name = "Apply Artful Configurations"; Callback = function()
+ApplyArtfulConfigurations()
+Notify("Success!", "Applied configurations.", 3, true)
+end; })
+
+Tab_5:CreateSection("Harken")
+Tab_5:CreateLabel("Nothing Yet...")
+
+Tab_5:CreateSection("Killdroid")
+local KilldroidConfig = LoadConfig("Tab_5", "KilldroidConfig")
+local KilldroidPower = KilldroidConfig.Power
+Tab_5:CreateInput({Name = "Power"; PlaceholderText = KilldroidPower; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+KilldroidPower = tonumber(Value)
+SaveConfig("Tab_5", KilldroidPower, "KilldroidConfig", "Power")
+end; })
+local KilldroidMaxForce = KilldroidConfig.MaxForce
+Tab_5:CreateInput({Name = "Max Force"; PlaceholderText = KilldroidMaxForce; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+KilldroidMaxForce = tonumber(Value)
+SaveConfig("Tab_5", KilldroidMaxForce, "KilldroidConfig", "MaxForce")
+end; })
+local KilldroidDD = KilldroidConfig["Don'tDescendDuringTheFlight"]
+Tab_5:CreateToggle({Name = "Dont Descend During the Flight"; CurrentValue = KilldroidDD; Callback = function(Value)
+KilldroidDD = Value
+SaveConfig("Tab_5", KilldroidDD, "KilldroidConfig", "Don'tDescendDuringTheFlight")
+end; })
+--------------------------------------------------------------------------------------
+local KilldroidConfigEffects = nil
+function ApplyKilldroidConfigurations()
+if KilldroidConfigEffects then
+KilldroidConfigEffects:Disconnect()
+KilldroidConfigEffects = nil
+end
+if not HumanoidRootPart then return end
+KilldroidConfigEffects = HumanoidRootPart.ChildAdded:Connect(function(c)
+if c.Name == "BodyVelocity" then
+c.MaxForce = Vector3.new(KilldroidMaxForce,KilldroidMaxForce,KilldroidMaxForce)
+c.P = KilldroidPower
+if KilldroidDD ~= true then return end
+task.spawn(function()
+pcall(function()
+while task.wait() do
+if c.Velocity.Y < 0 then
+c.Velocity = Vector3.new(c.Velocity.X,0,c.Velocity.Z)
+end
+end
+end)
+end)
+end
+end)
+end
+--------------------------------------------------------------------------------------
+Tab_5:CreateButton({Name = "Apply Killdroid Configurations"; Callback = function(Value)
+ApplyKilldroidConfigurations()
+Notify("Success!", "Applied configurations.", 3, true)
+end; })
+
+
+Tab_5:CreateSection("")
+Tab_5:CreateSection("")
+Tab_5:CreateSection("")
+
+Tab_5:CreateParagraph({Title = "Immunities / Buffs", Content = "Immunities and buffs for workspace side"})
+
+Tab_5:CreateSection("Workspace Side")
+
+local BackupEffect = game:GetService("ReplicatedStorage").Events.RemoteEvents.TauntEffect:Clone()
+BackupEffect.Parent = game.LogService
+local AntiTaunt = LoadConfig("Tab_5", "IB", "AntiTaunt")
+local AntiTauntToggle = Tab_5:CreateToggle({Name = "Anti Taunt"; CurrentValue = false; Callback = function(Value)
+AntiTaunt = Value
+if AntiTaunt == true then
+LocalPlayer.PlayerGui.MainGui.RoundUI.TauntTemplate:Destroy()
+else
+if LocalPlayer.PlayerGui.MainGui.RoundUI:FindFirstChild("TauntTemplate") == nil then
+local a = BackupEffect:Clone()
+a.Parent = LocalPlayer.PlayerGui.MainGui.RoundUI
+end
+end
+SaveConfig("Tab_5", AntiTaunt, "IB", "AntiTaunt")
+end; })
+LocalPlayer.PlayerGui.MainGui.RoundUI.ChildAdded:Connect(function(child)
+if child.Name == "TauntTemplate" and AntiTaunt == true then
+child:Destroy()
+if Character:GetAttribute("WalkSpeedModifier") ~= nil and Character:GetAttribute("WalkSpeedModifier") < 0 then
+Character:SetAttribute("WalkSpeedModifier", 0)
+else
+task.wait(.05)
+Character:SetAttribute("WalkSpeedModifier", 0)
+end
+end
+end)
+AntiTauntToggle:Set(AntiTaunt)
+
+Tab_5:CreateButton({Name = "Remove Destroyable Objects"; Callback = function(Value)
+pcall(function()
+workspace.GameAssets.Map.Build.Destroyable:Destroy()
+end)
+end; })
+
+local AntiEvilScary2 = LoadConfig("Tab_5", "IB", "AntiEvilScary")
+local AntiEvilScary2Toggle = Tab_5:CreateToggle({Name = "Anti Evil Scary"; CurrentValue = false; Callback = function(Value)
+AntiEvilScary2 = Value
+if AntiEvilScary2 == true then
+for i,v in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable"):GetChildren()) do
+if v and v.Name == "EvilScary" then
+for _,trans in pairs(v:GetChildren()) do
+if trans and trans:IsA("TouchTransmitter") then
+trans:Destroy()
+end
+end
+for _,part in pairs(v:GetChildren()) do
+if part and part:IsA("BasePart") then
+part.CanCollide = false
+part.CanTouch = false
+pcall(function()
+part.CanQuery = false
+end)
+end
+end
+v.CanCollide = false
+v.CanTouch = false
+pcall(function()
+v.CanQuery = false
+end)
+end
+end
+end
+SaveConfig("Tab_5", AntiEvilScary2, "IB", "AntiEvilScary")
+end; })
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable").ChildAdded:Connect(function(child)
+if child and child.Name == "EvilScary" and AntiEvilScary2 == true then
+for _,trans in pairs(child:GetChildren()) do
+if trans and trans:IsA("TouchTransmitter") then
+trans:Destroy()
+end
+end
+for _,part in pairs(child:GetChildren()) do
+if part and part:IsA("BasePart") then
+part.CanCollide = false
+part.CanTouch = false
+pcall(function()
+part.CanQuery = false
+end)
+end
+end
+child.CanCollide = false
+child.CanTouch = false
+pcall(function()
+child.CanQuery = false
+end)
+end
+end)
+AntiEvilScary2Toggle:Set(AntiEvilScary2)
+
+
+local AntiBarriers2 = false
+local AntiBarriers2_con = nil
+local AntiBarriers2_toggle = nil
+AntiBarriers2_toggle = Tab_5:CreateToggle({Name = "Anti Barriers"; CurrentValue = AntiBarriers2; Callback = function(Value)
+AntiBarriers2 = Value
+pcall(function()
+if AntiBarriers2 == true then
+if workspace.GameAssets:FindFirstChild("Map") == nil then
+AntiBarriers2_toggle:Set(false)
+return
+end
+workspace.GameAssets.Map.Config.Barriers.Parent = game:GetService("LogService")
+AntiBarriers2_con = workspace.GameAssets.ChildRemoved:Once(function(c)
+if c.Name == "Map" and AntiBarriers == true then
+game:GetService("LogService").Barriers:Destroy()
+end
+end)
+else
+if AntiBarriers2_con then
+AntiBarriers2_con:Disconnect()
+AntiBarriers2_con = nil
+end
+game:GetService("LogService").Barriers.Parent = workspace.GameAssets.Map.Config
+end
+end)
+end; })
+workspace.GameAssets.ChildRemoved:Connect(function(c)
+if c.Name == "Map" and AntiBarriers2 == true then
+AntiBarriers2_toggle:Set(false)
+end
+end)
 
 
 
@@ -940,12 +2294,13 @@ end)
 
 if not game:GetService("CoreGui"):FindFirstChild("DOD_ESP_HANDLER") then
 Instance.new("Folder", game:GetService("CoreGui")).Name = "DOD_ESP_HANDLER"
+task.wait()
 end
 
-_G.ESPenabledHandler = false
-_G.ESPtransHandler = 0.3
-_G.ESPshowusers = true
-_G.ESPshowhealth = true
+_G.ESPenabledHandler = LoadConfig("Tab_4", "ESP", "Enabled")
+_G.ESPtransHandler = LoadConfig("Tab_4", "ESP", "Transparency")
+_G.ESPshowusers = LoadConfig("Tab_4", "ESP", "ShowUsernames")
+_G.ESPshowhealth = LoadConfig("Tab_4", "ESP", "ShowHealth")
 
 
 function CreateHighlight(plr)
@@ -1051,24 +2406,31 @@ local Tab_4 = Window:CreateTab("Visual",0)
 Tab_4:CreateParagraph({Title = "Visual", Content = "You can change some of the visual parts of the game here."})
 Tab_4:CreateSection("ESP")
 
-Tab_4:CreateSlider({Name = "ESP Transparency (in %)"; Range = {0, 100}; Increment = 5; Suffix = "%"; CurrentValue = 30; Callback = function(Value)
+Tab_4:CreateSlider({Name = "ESP Transparency (in %)"; Range = {0, 100}; Increment = 5; Suffix = "%"; CurrentValue = (_G.ESPtransHandler*100); Callback = function(Value)
 _G.ESPtransHandler = (tonumber(Value) / 100)
 ChangeTransparency(tonumber(_G.ESPtransHandler))
+SaveConfig("Tab_4", _G.ESPtransHandler, "ESP", "Transparency")
 end; })
 
-Tab_4:CreateToggle({Name = "Show Username"; CurrentValue = true; Callback = function(Value)
+Tab_4:CreateToggle({Name = "Show Username"; CurrentValue = _G.ESPshowusers; Callback = function(Value)
 _G.ESPshowusers = Value
+SaveConfig("Tab_4", _G.ESPshowusers, "ESP", "ShowUsernames")
 end; })
 
-Tab_4:CreateToggle({Name = "Show Health"; CurrentValue = true; Callback = function(Value)
+Tab_4:CreateToggle({Name = "Show Health"; CurrentValue = _G.ESPshowhealth; Callback = function(Value)
 _G.ESPshowhealth = Value
+SaveConfig("Tab_4", _G.ESPshowhealth, "ESP", "ShowHealth")
 end; })
 
 plradded_esp = nil
 plrremoved_esp = nil
-Tab_4:CreateToggle({Name = "Turn On/Off ESP"; CurrentValue = false; Callback = function(Value)
+local ESPenabledToggle = Tab_4:CreateToggle({Name = "Turn On/Off ESP"; CurrentValue = false; Callback = function(Value)
 _G.ESPenabledHandler = Value
 if _G.ESPenabledHandler == true then
+if not game:GetService("CoreGui"):FindFirstChild("DOD_ESP_HANDLER") then
+Instance.new("Folder", game:GetService("CoreGui")).Name = "DOD_ESP_HANDLER"
+task.wait()
+end
 for i,v in pairs(game:GetService("Players"):GetPlayers()) do
 if v and v ~= game:GetService("Players").LocalPlayer then
 CreateHighlight(v)
@@ -1093,7 +2455,9 @@ plrremoved_esp:Disconnect()
 plrremoved_esp = nil
 end
 end
+SaveConfig("Tab_4", _G.ESPenabledHandler, "ESP", "Enabled")
 end; })
+ESPenabledToggle:Set(_G.ESPenabledHandler)
 
 Tab_4:CreateSection("Gui Management ε=( o｀ω′)ノ")
 
@@ -1165,17 +2529,19 @@ function AwardPoints(points, reason)
 		end
 	end)
 end
-MoneyToGet = 10
-ReasonForMoney = "for surviving for atleast 60 seconds."
+MoneyToGet = LoadConfig("Tab_4", "Money", "Amount")
+ReasonForMoney = LoadConfig("Tab_4", "Money", "Reason")
 
 Tab_4:CreateSection("Money Giver ( Visual )")
 
-Tab_4:CreateInput({Name = "Money amount"; PlaceholderText = "10"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-MoneyToGet = tonumber(Value)
+Tab_4:CreateInput({Name = "Money amount"; PlaceholderText = MoneyToGet; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+MoneyToGet = Value
+SaveConfig("Tab_4", MoneyToGet, "Money", "Amount")
 end; })
 
-Tab_4:CreateInput({Name = "Reason for getting money"; PlaceholderText = "for surviving for atleast 60 seconds."; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+Tab_4:CreateInput({Name = "Reason for getting money"; PlaceholderText = ReasonForMoney; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 ReasonForMoney = tostring(Value)
+SaveConfig("Tab_4", ReasonForMoney, "Money", "Reason")
 end; })
 
 Tab_4:CreateButton({Name = "Give money"; Callback = function()
@@ -1184,12 +2550,317 @@ end; })
 
 Tab_4:CreateSection("Custom Skins")
 
-Tab_4:CreateLabel("soon...")
+-- i am sorry this was made by ai because i dont know accessory things
+function weldAttachments(attach1, attach2)
+  local weld = Instance.new("Weld")
+  weld.Part0 = attach1.Parent
+  weld.Part1 = attach2.Parent
+  weld.C0 = attach1.CFrame
+  weld.C1 = attach2.CFrame
+  weld.Parent = attach1.Parent
+  return weld
+end
+local function buildWeld(weldName, parent, part0, part1, c0, c1)
+  local weld = Instance.new("Weld")
+  weld.Name = weldName
+  weld.Part0 = part0
+  weld.Part1 = part1
+  weld.C0 = c0
+  weld.C1 = c1
+  weld.Parent = parent
+  return weld
+end
+local function findFirstMatchingAttachment(model, name)
+  for _, child in pairs(model:GetChildren()) do
+    if child:IsA("Attachment") and child.Name == name then
+      return child
+    elseif not child:IsA("Accoutrement") and not child:IsA("Tool") then
+      local foundAttachment = findFirstMatchingAttachment(child, name)
+      if foundAttachment then
+        return foundAttachment
+      end
+    end
+  end
+end
+function AddAccessory(character, accoutrement, bodyPartName)
+  accoutrement.Parent = character
+  local handle = accoutrement:FindFirstChild("Handle")
+  if not handle then
+    return
+  end
+  local bodyPart = character:FindFirstChild(bodyPartName or "Head")
+  if not bodyPart then
+    return
+  end
+  local accAttachment = handle:FindFirstChildOfClass("Attachment")
+  if accAttachment then
+    local bodyAttachment = bodyPart:FindFirstChild(accAttachment.Name)
+    if not bodyAttachment then
+      bodyAttachment = Instance.new("Attachment")
+      bodyAttachment.Name = accAttachment.Name
+      bodyAttachment.Parent = bodyPart
+      if bodyPartName == "Head" then
+        bodyAttachment.Position = Vector3.new(0, 0.5, 0)
+      elseif bodyPartName == "Torso" then
+        bodyAttachment.Position = Vector3.new(0, 1, 0)
+      elseif bodyPartName == "Right Arm" then
+        bodyAttachment.Position = Vector3.new(1, 0.5, 0)
+      elseif bodyPartName == "Left Arm" then
+        bodyAttachment.Position = Vector3.new(-1, 0.5, 0)
+      elseif bodyPartName == "Right Leg" then
+        bodyAttachment.Position = Vector3.new(0.5, 1, 0)
+      elseif bodyPartName == "Left Leg" then
+        bodyAttachment.Position = Vector3.new(-0.5, 1, 0)
+      else
+        bodyAttachment.Position = Vector3.new(0, 0, 0)
+      end
+    end
+    weldAttachments(bodyAttachment, accAttachment)
+  else
+    local weld = Instance.new("Weld")
+    weld.Name = bodyPartName .. "Weld"
+    weld.Part0 = bodyPart
+    weld.Part1 = handle
+    weld.Parent = bodyPart
+    if bodyPartName == "Head" then
+      weld.C0 = CFrame.new(0, 0.5, 0)
+      weld.C1 = CFrame.new(0, 0, 0)
+    elseif bodyPartName == "Torso" then
+      weld.C0 = CFrame.new(0, 1.5, 0)
+      weld.C1 = CFrame.new(0, 0, 0)
+    elseif bodyPartName == "Right Arm" then
+      weld.C0 = CFrame.new(1.5, 0.5, 0)
+      weld.C1 = CFrame.new(0, 0, 0)
+    elseif bodyPartName == "Left Arm" then
+      weld.C0 = CFrame.new(-1.5, 0.5, 0)
+      weld.C1 = CFrame.new(0, 0, 0)
+    elseif bodyPartName == "Right Leg" then
+      weld.C0 = CFrame.new(0.5, 2, 0)
+      weld.C1 = CFrame.new(0, 0, 0)
+    elseif bodyPartName == "Left Leg" then
+      weld.C0 = CFrame.new(-0.5, 2, 0)
+      weld.C1 = CFrame.new(0, 0, 0)
+    else
+      weld.C0 = CFrame.new(0, 0, 0)
+      weld.C1 = CFrame.new(0, 0, 0)
+    end
+  end
+  return accoutrement
+end
+function EditHumanoidChild(char, part, value)
+if part == "Pants" then
+char:FindFirstChildOfClass("Pants").PantsTemplate = value
+elseif part == "Shirt" then
+char:FindFirstChildOfClass("Shirt").ShirtTemplate = value
+elseif part == "TShirt" then
+char:FindFirstChildOfClass("ShirtGraphic").Graphic = value
+else
+char:FindFirstChild(part).Value = value
+end
+end
+
+local function ArtfulForsakenSetUp(c)
+--head
+local head_asset = game:GetObjects("rbxassetid://"..tostring(114257201579610))[1]
+repeat task.wait(.05) until head_asset ~= nil and head_asset:FindFirstChild("Handle") and head_asset.Handle:FindFirstChild("SpecialMesh")
+local head = AddAccessory(c, head_asset, "Head")
+task.wait(.05)
+head:WaitForChild("Handle").CanCollide = false
+-- right sleeve
+local rs_asset = game:GetObjects("rbxassetid://"..tostring(83730135593176))[1]
+repeat task.wait(.05) until rs_asset ~= nil and rs_asset:FindFirstChild("Handle") and rs_asset.Handle:FindFirstChild("SpecialMesh")
+local rs = AddAccessory(c, rs_asset, "Right Arm")
+task.wait(.05)
+rs:WaitForChild("Handle").CanCollide = false
+rs:WaitForChild("Handle"):WaitForChild("SpecialMesh").Offset = Vector3.new(-1,0.5,0)
+-- left sleeve
+local ls_asset = game:GetObjects("rbxassetid://"..tostring(82696867944296))[1]
+repeat task.wait(.05) until ls_asset ~= nil and ls_asset:FindFirstChild("Handle") and ls_asset.Handle:FindFirstChild("SpecialMesh")
+local ls = AddAccessory(c, ls_asset, "Left Arm")
+task.wait(.05)
+ls:WaitForChild("Handle").CanCollide = false
+ls:WaitForChild("Handle"):WaitForChild("SpecialMesh").Offset = Vector3.new(1,0.5,0)
+-- torso
+local torso_asset = game:GetObjects("rbxassetid://"..tostring(127089746240385))[1]
+repeat task.wait(.05) until torso_asset ~= nil and torso_asset:FindFirstChild("Handle") and torso_asset.Handle:FindFirstChild("SpecialMesh")
+local torso = AddAccessory(c, torso_asset, "Torso")
+task.wait(.05)
+torso:WaitForChild("Handle").CanCollide = false
+torso:WaitForChild("Handle"):WaitForChild("SpecialMesh").Offset = Vector3.new(0,-1,-0.5)
+-- making body parts visible
+repeat task.wait(.05) until c:FindFirstChild("Left Leg") and c:FindFirstChild("Left Arm")
+c["Left Arm"].Transparency = 0
+c["Left Leg"].Transparency = 0
+end
+
+local function ArtfulLORSetUp(c)
+
+local function Ability()
+local a = Humanoid:LoadAnimation(game:GetService("ReplicatedStorage").Characters.Killer.Harken.Default.Animations.Throw)
+repeat task.wait() until a.Length > 0
+task.spawn(function()
+local a = nil
+for i = 1,10 do
+if a == true then return end
+a = game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Swing")
+end
+end)
+local function onswing()
+a:Play()
+repeat task.wait() until a.IsPlaying
+a.TimePosition = .6
+local BodyVelocity = Instance.new("BodyVelocity")
+BodyVelocity.MaxForce = Vector3.new(1000000,1000,1000000)
+BodyVelocity.P = 1250
+BodyVelocity.Velocity = HumanoidRootPart.CFrame.LookVector * 80
+BodyVelocity.Parent = HumanoidRootPart
+game.Debris:AddItem(BodyVelocity, .25)
+task.wait(.15)
+Character:SetAttribute("SprintSpeed", (Character:GetAttribute("SprintSpeed")*2))
+Character:SetAttribute("WalkSpeed", (Character:GetAttribute("WalkSpeed")*2))
+end
+local c = nil
+local d = nil
+c = Humanoid.AnimationPlayed:Connect(function(track)
+if track.Animation.AnimationId == "rbxassetid://80787680522855" then
+c:Disconnect()
+track:Stop()
+task.spawn(onswing)
+end
+end)
+end
+local lunge_abil = function()
+local a = Humanoid:LoadAnimation(game:GetService("ReplicatedStorage").Characters.Killer.Harken.Default.Animations.Throw)
+repeat task.wait() until a.Length > 0
+a:Play()
+repeat task.wait() until a.IsPlaying
+a.TimePosition = 0.6
+a:AdjustSpeed(0)
+Character:SetAttribute("SprintSpeed", (Character:GetAttribute("SprintSpeed")/2))
+Character:SetAttribute("WalkSpeed", (Character:GetAttribute("WalkSpeed")/2))
+task.spawn(Ability)
+repeat task.wait() until Character:GetAttribute("SprintSpeed") > 13
+a:Stop()
+end
+
+
+if c:FindFirstChild("CloneTool") then
+c:FindFirstChild("CloneTool"):Destroy()
+end
+if c:FindFirstChild("Pants") and c:FindFirstChild("Shirt") then
+c:FindFirstChild("Pants").PantsTemplate = "http://www.roblox.com/asset/?id=12803009530"
+c:FindFirstChild("Shirt").ShirtTemplate = "http://www.roblox.com/asset/?id=12803009530"
+end
+for i,v in next, c:GetChildren() do
+if v and v:IsA("BasePart") and v.Name ~= "Face" and v.Name ~= "MusicBox" then
+v.Color = Color3.fromRGB(255,254,226)
+end
+if v and v:IsA("CharacterMesh") then
+if v.BodyPart == Enum.BodyPart.LeftArm then
+v.MeshId = 83001137
+elseif v.BodyPart == Enum.BodyPart.RightArm then
+v.MeshId = 83001181
+elseif v.BodyPart == Enum.BodyPart.LeftLeg then
+v.MeshId = 746826007
+elseif v.BodyPart == Enum.BodyPart.RightLeg then
+v.MeshId = 746825633
+elseif v.BodyPart == Enum.BodyPart.Torso then
+v.MeshId = 82987757
+end
+end
+end
+if c:FindFirstChild("Face") and c:WaitForChild("Face"):FindFirstChild("Face") then
+c:FindFirstChild("Face"):WaitForChild("Face"):Destroy()
+end
+--head
+local head_asset = game:GetObjects("rbxassetid://"..tostring(15395102950))[1]
+repeat task.wait(.05) until head_asset ~= nil and head_asset:FindFirstChild("Handle") and head_asset.Handle:FindFirstChild("SpecialMesh")
+local head = AddAccessory(c, head_asset, "Head")
+task.wait(.05)
+head:WaitForChild("Handle").CanCollide = false
+--anims
+c.Animations.Idle.AnimationId = "rbxassetid://96089657207073"
+c.Animations.Sprint.AnimationId = "rbxassetid://84734698021418"
+c.Animations.Walk.AnimationId = "rbxassetid://86166363798441"
+if game.Players:GetPlayerFromCharacter(c) ~= game.Players.LocalPlayer then return end
+-- effect
+if not game:GetService("Lighting"):FindFirstChild("String Theocracy") then
+local cce = Instance.new("ColorCorrectionEffect",game:GetService("Lighting"))
+cce.Name = "String Theocracy"
+cce.Brightness = 0.175
+cce.TintColor = Color3.fromRGB(120,80,15)
+cce.Enabled = true
+elseif game:GetService("Lighting"):FindFirstChild("String Theocracy") then
+game:GetService("Lighting"):FindFirstChild("String Theocracy").Enabled = true
+end
+game.Players.LocalPlayer.CharacterAdded:Once(function()
+game:GetService("Lighting"):FindFirstChild("String Theocracy").Enabled = false
+end)
+--applying anims
+ApplyNewAnimations()
+repeat task.wait() until game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Repurpose")
+AbilityModule.CreateAbility({Client = true,ClientFunction = lunge_abil,Name = "Lunge_NH",InputShown = "E",Tip = "Lunge forwards to deal damage.",Cooldown = 5,Icon = "rbxassetid://105910997361738",DisplayName = "Lunge"})
+game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Implement"):Destroy()
+game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Copywrite"):Destroy()
+local a = game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Repurpose")
+a.Parent = game:GetService("LogService")
+task.wait()
+a.Parent = game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Abilities.Folder
+end
+
+
+Tab_4:CreateButton({Name = "Forsaken Artful ( Noliful Variant )"; Callback = function()
+Notify("Success!", "Loading new skin... Please wait!", 5, true)
+if not _G.mp3_conversion_module then
+_G.mp3_conversion_module = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/Encryption-Center/refs/heads/main/mp3_conversion.luau"))()
+end
+if not isfile("NexerHub/Core/Artful.mp3") then
+writefile("NexerHub/Core/Artful.mp3", _G.mp3_conversion_module:ConvertMP3Data(_G.mp3_conversion_module["Artful?"]))
+repeat task.wait(.1) until isfile("NexerHub/Core/Artful.mp3")
+end
+local temp_table = {
+	["Name"] = "Artful?";
+	["Bio"] = "''I sure do wonder why am i here.''";
+	["Icon"] = "rbxassetid://134690353237803";
+	["ClearMainAccessories"] = true;
+	["ChaseTheme"] = ((getcustomasset and GetFile("NexerHub/Core/Artful.mp3","gca")) or tostring(game.ReplicatedStorage.Characters.Killer.Artful.Cementful.Animations.ChaseTheme.SoundId));
+	["CharacterAdded"] = function(c) task.spawn(ArtfulForsakenSetUp, c) end
+}
+pcall(function()
+MainModule:ModifySkin("Cementful", temp_table)
+Notify("Success!", "Loaded new skin!", 5, true)
+end)
+end; })
+
+Tab_4:CreateButton({Name = "String Theocracy ( Artful Skin )"; Callback = function()
+Notify("Success!", "Loading new skin... Please wait!", 5, true)
+if not _G.mp3_conversion_module then
+_G.mp3_conversion_module = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/Encryption-Center/refs/heads/main/mp3_conversion.luau"))()
+end
+if not isfile("NexerHub/Core/LOR.mp3") then
+writefile("NexerHub/Core/LOR.mp3", _G.mp3_conversion_module:ConvertMP3Data(_G.mp3_conversion_module["String Theocracy"]))
+repeat task.wait(.1) until isfile("NexerHub/Core/LOR.mp3")
+end
+local temp_table = {
+	["Name"] = "String Theocracy";
+	["Bio"] = "''...''";
+	["Icon"] = "rbxassetid://18662155";
+	["ClearMainAccessories"] = true;
+	["ChaseTheme"] = ((getcustomasset and GetFile("NexerHub/Core/LOR.mp3","gca")) or tostring(game.ReplicatedStorage.Characters.Killer.Artful.Builder.Animations.ChaseTheme.SoundId));
+	["CharacterAdded"] = function(c) task.spawn(ArtfulLORSetUp, c) end
+}
+pcall(function()
+MainModule:ModifySkin("Builder", temp_table)
+Notify("Success!", "Loaded new skin!", 5, true)
+end)
+end; })
+
+
 
 Tab_4:CreateSection("Intro / Special Round Starter")
 
 killerintro = "Pursuer"
-Tab_4:CreateDropdown({Name = "Killer Intro"; Options = {"Pursuer","Artful","Badware","Killdroid","Harken","Paranoy","MR.O.B."}; CurrentOption = "Pursuer"; MultiSelection = false; Callback = function(Value)
+Tab_4:CreateDropdown({Name = "Killer Intro"; Options = {"Pursuer","Artful","Badware","Killdroid","Harken"}; CurrentOption = "Pursuer"; MultiSelection = false; Callback = function(Value)
 killerintro = ConvertDropdownValue(Value)
 end; })
 
@@ -1200,7 +2871,7 @@ end; })
 
 
 specialroundevent = "Double Trouble"
-Tab_4:CreateDropdown({Name = "Special Round Event"; Options = {"Double Trouble","Evil Scary","One Bounce","Gunslinger","Dienation","Mini Brawl"}; CurrentOption = "Double Trouble"; MultiSelection = false; Callback = function(Value)
+Tab_4:CreateDropdown({Name = "Special Round Event"; Options = {"Double Trouble","Evil Scary","One Bounce","Gunslinger","Dienation"}; CurrentOption = "Double Trouble"; MultiSelection = false; Callback = function(Value)
 specialroundevent = ConvertDropdownValue(Value)
 end; })
 
@@ -1219,6 +2890,7 @@ end; })
 
 
 
+
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
@@ -1229,337 +2901,504 @@ end; })
 
 
 
-
-
-
-
-
-local Tab_5 = Window:CreateTab("Anti / Immunities",0)
-Tab_5:CreateParagraph({Title = "Anti / Immunities", Content = "You can get immunities to multiple things yeah."})
-Tab_5:CreateSection("Server")
-
-
-local path = {"GameAssets", "Map", "Config", "KillerOnly"}
-
-local function getFolder()
-local f = workspace
-for _, v in ipairs(path) do
-	if not f then return nil end
-	f = f:FindFirstChild(v)
-	if not f then return nil end
+local AnimationsModule = [[task.spawn(function()
+pcall(function()
+local stopper = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") or game.Players.LocalPlayer.Character:FindFirstChildOfClass("AnimationController")
+for i,v in next, stopper:GetPlayingAnimationTracks() do
+v:Stop()
 end
-return f
-end
+end)
+end)
 
-local ogState = {}
-local conns = {}
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Events = ReplicatedStorage:WaitForChild("Events")
+local RunService = game:GetService("RunService")
 
-local function setNoCollide(v, state)
-if not v or not v:IsA("BasePart") then return end
-if state then
-	if ogState[v] == nil then
-		ogState[v] = v.CanCollide
-	end
-	v.CanCollide = false
-else
-	if ogState[v] ~= nil then
-		if v.Parent then
-			v.CanCollide = ogState[v]
-		end
-		ogState[v] = nil
-	end
+-- Animation control system
+local AnimationController = {}
+AnimationController.Enabled = true
+AnimationController.ActiveAnimations = {}
+AnimationController.CharacterConnections = {}
+AnimationController.CharacterAnimators = {}
+AnimationController.LoadedTracks = {}
+
+-- Initialize workspace attribute if not exists
+if workspace:GetAttribute("AnimationsEnabled") == nil then
+	workspace:SetAttribute("AnimationsEnabled", true)
 end
+-- and also init this anim desync lolz
+if workspace:GetAttribute("AnimDesyncEnabled") == nil then
+	workspace:SetAttribute("AnimDesyncEnabled", false)
+end
+if workspace:GetAttribute("AnimDesync") == nil then
+	workspace:SetAttribute("AnimDesync", 1)
 end
 
-local function enable()
-	local gameAssets = workspace:FindFirstChild("GameAssets")
-	local map = gameAssets and gameAssets:FindFirstChild("Map")
 
-	if not map then
-		Notify("Error!", "Round Haven't Started Yet!", 5, false)
-		return
-	end
-
-	local f = getFolder()
-	if not f then
-		Notify("Error!", "Map Doesn't Support Killer Door!", 5, warn)
-		return
-	end
-
-	local hasPart = false
-	for _, v in ipairs(f:GetDescendants()) do
-		if v:IsA("BasePart") then
-			hasPart = true
-			setNoCollide(v, true)
+-- Listen for attribute changes
+workspace:GetAttributeChangedSignal("AnimationsEnabled"):Connect(function()
+	AnimationController.Enabled = workspace:GetAttribute("AnimationsEnabled")
+	if not AnimationController.Enabled then
+		AnimationController:UnloadAllAnimations()
+	else
+		-- Reload animations for all valid characters
+		for character, _ in pairs(AnimationController.CharacterAnimators) do
+			if character and character.Parent and character:IsDescendantOf(workspace) then
+				if character:FindFirstChild("Humanoid") and character:FindFirstChild("Animations") then
+					task.spawn(function()
+						AnimationController:LoadCharacterAnimations(character)
+					end)
+				end
+			else
+				-- Clean up invalid characters
+				AnimationController.CharacterAnimators[character] = nil
+			end
 		end
 	end
+end)
 
-	if not hasPart then
-		Notify("Error!", "Map Doesn't Have Any Killer Door!", 5, warn)
-		return
-	end
-
-	local c = f.DescendantAdded:Connect(function(v)
-		setNoCollide(v, true)
-	end)
-	table.insert(conns, c)
-
-	Notify("Success!", "You can now enter through Killer Door!", 3, true)
-end
-
-local function disable()
-	for v in pairs(ogState) do
-		setNoCollide(v, false)
-	end
-	table.clear(ogState)
-
-	for _, c in ipairs(conns) do
-		if c.Connected then
-			c:Disconnect()
+function AnimationController:UnloadAllAnimations()
+	-- Stop and remove all animation tracks
+	for character, tracks in pairs(self.LoadedTracks) do
+		for trackName, track in pairs(tracks) do
+			if track and track.IsPlaying then
+				track:Stop()
+			end
 		end
 	end
-	table.clear(conns)
+	self.LoadedTracks = {}
+	
+	-- Stop active animations
+	self:StopAllAnimations()
 end
 
-Tab_5:CreateToggle({Name = "Enter Through Killer Door"; CurrentValue = false; Callback = function(Value)
-if Value then
-enable()
-else
-disable()
+function AnimationController:StopAllAnimations()
+	for character, animations in pairs(self.ActiveAnimations) do
+		for animName, track in pairs(animations) do
+			if track and track.IsPlaying then
+				track:Stop()
+			end
+		end
+	end
+	self.ActiveAnimations = {}
 end
-end; })
 
+function AnimationController:CleanupCharacter(character)
+	-- Clean up loaded tracks
+	if self.LoadedTracks[character] then
+		for trackName, track in pairs(self.LoadedTracks[character]) do
+			if track and track.IsPlaying then
+				track:Stop()
+			end
+		end
+		self.LoadedTracks[character] = nil
+	end
+	
+	-- Clean up active animations
+	if self.ActiveAnimations[character] then
+		for animName, track in pairs(self.ActiveAnimations[character]) do
+			if track and track.IsPlaying then
+				track:Stop()
+			end
+		end
+		self.ActiveAnimations[character] = nil
+	end
 
+	-- Clean up connections
+	if self.CharacterConnections[character] then
+		for _, connection in ipairs(self.CharacterConnections[character]) do
+			connection:Disconnect()
+		end
+		self.CharacterConnections[character] = nil
+	end
 
-
-
-
-
-
---[[ 
-
-
-
-
-
-
-
-                                         
-
-
-
-
-
-
-
-
-]]--
-
-
-
-
-
-
-
-
-
-
-
-Tab_5:CreateSection("Anti")
-local AntiWalls
-AntiWalls = false
-Tab_5:CreateToggle({Name = "Anti-Artful Walls"; CurrentValue = false; Callback = function(Value)
-AntiWalls = Value
-if AntiWalls == true then
-for i,v in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Other"):GetDescendants()) do
-if v and v.Name == "HumanoidRootPart" and v.Anchored == true then
-v.CanCollide = false
-v.CanTouch = false
-v.Transparency = 0.5
+	self.CharacterAnimators[character] = nil
 end
+
+function AnimationController:LoadAnimationTrack(character, animationName, animationId)
+	if not self.Enabled then return nil end
+	if not character or not character.Parent then return nil end
+	
+	local humanoid, renderHumanoid = self:GetHumanoid(character)
+	local actualHumanoid = renderHumanoid or humanoid
+	if not actualHumanoid then return nil end
+
+	local animator = actualHumanoid:FindFirstChildOfClass("Animator")
+	if not animator then
+		animator = Instance.new("Animator")
+		animator.Parent = actualHumanoid
+	end
+
+	-- Create animation instance
+	local animation = Instance.new("Animation")
+	animation.AnimationId = animationId
+	
+	-- Load animation track
+	local track = animator:LoadAnimation(animation)
+	
+	-- Store in loaded tracks
+	if not self.LoadedTracks[character] then
+		self.LoadedTracks[character] = {}
+	end
+	self.LoadedTracks[character][animationName] = track
+	
+	return track
 end
+
+function AnimationController:GetHumanoid(character)
+	if not self.Enabled then return nil end
+
+	local humanoid = character:FindFirstChildWhichIsA("Humanoid")
+	local renderHumanoid = nil
+	if character:GetAttribute("MROB") and RunService:IsClient() then
+		pcall(function()
+			local renderUI = character:FindFirstChild("RenderUIPath")
+			if renderUI and renderUI.Value then
+				local viewport = renderUI.Value
+				if viewport then
+					renderHumanoid = viewport.ViewportFrame.WorldModel.RenderModel:FindFirstChildWhichIsA("Humanoid")
+				end
+			end
+		end)
+	end
+	return humanoid, renderHumanoid
 end
-end; })
-game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Other").DescendantAdded:Connect(function(descendant)
-if descendant and descendant.Name == "HumanoidRootPart" and descendant.Anchored == true and AntiWalls == true then
-descendant.CanCollide = false
-descendant.CanTouch = false
-descendant.Transparency = 0.5
+
+function AnimationController:LoadCharacterAnimations(character)
+	if not self.Enabled then return end
+	if not character or not character.Parent then return end
+	if not character:FindFirstChild("Humanoid") then return end
+	if not character:FindFirstChild("Animations") then return end
+
+	local animationsFolder = character:FindFirstChild("Animations")
+	if not animationsFolder then return end
+
+	-- Clean up existing animations for this character
+	self:CleanupCharacter(character)
+
+	-- Load all animations from the folder
+	local loadedTracks = {}
+	
+	for _, animationObject in ipairs(animationsFolder:GetChildren()) do
+		if animationObject:IsA("Animation") then
+			local track = self:LoadAnimationTrack(character, animationObject.Name, animationObject.AnimationId)
+			if track then
+				loadedTracks[animationObject.Name] = track
+			end
+		end
+	end
+
+	-- Store animator reference
+	local humanoid, renderHumanoid = self:GetHumanoid(character)
+	local actualHumanoid = renderHumanoid or humanoid
+	if actualHumanoid then
+		local animator = actualHumanoid:FindFirstChildOfClass("Animator")
+		if animator then
+			self.CharacterAnimators[character] = animator
+		end
+	end
+
+	-- Start animation system if we have the required animations
+	if loadedTracks["Idle"] then
+		self:StartCharacterAnimationSystem(character, loadedTracks)
+	end
 end
+
+function AnimationController:StartCharacterAnimationSystem(character, loadedTracks)
+	if not self.Enabled then return end
+	if not character or not character.Parent then return end
+	if not character:FindFirstChild("HumanoidRootPart") then return end
+
+	local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+	local humanoid, renderHumanoid = self:GetHumanoid(character)
+	local actualHumanoid = renderHumanoid or humanoid
+	if not actualHumanoid then return end
+
+	local animations = character:FindFirstChild("Animations")
+	if not animations then return end
+
+	local player = Players:GetPlayerFromCharacter(character)
+	if player and player ~= Players.LocalPlayer then return end
+
+	local transitionSpeed = animations:GetAttribute("TransitionSpeed") or 0.25
+
+	-- Start with idle animation
+	if loadedTracks["Idle"] then
+		loadedTracks["Idle"]:Play()
+		self:AddActiveAnimation(character, "Idle", loadedTracks["Idle"])
+	end
+
+	-- Play passive animation if exists
+	if loadedTracks["PassiveAnimation"] then
+		loadedTracks["PassiveAnimation"]:Play()
+		self:AddActiveAnimation(character, "PassiveAnimation", loadedTracks["PassiveAnimation"])
+	end
+
+	-- Jump animation handling
+	if loadedTracks["Jump"] then
+		local stateConnection = actualHumanoid.StateChanged:Connect(function(oldState, newState)
+			if not self.Enabled then return end
+			if not character or not character.Parent then return end
+			
+			-- Jump and fall handling
+			if newState == Enum.HumanoidStateType.Jumping or newState == Enum.HumanoidStateType.Freefall then
+				loadedTracks["Jump"]:Play(0)
+				self:AddActiveAnimation(character, "Jump", loadedTracks["Jump"])
+				if ReplicatedStorage:FindFirstChild("Sounds") and ReplicatedStorage.Sounds:FindFirstChild("SFX") then if character.PrimaryPart:FindFirstChild("Jump") then return end local jumpSound = ReplicatedStorage.Sounds.SFX.Jump:Clone() jumpSound.Parent = character.PrimaryPart jumpSound:Play() jumpSound.Ended:Once(function() jumpSound:Destroy() end) end
+			else
+				loadedTracks["Jump"]:Stop(0.2)
+				self:RemoveActiveAnimation(character, "Jump")
+			end
+		end)
+		
+		-- Store connection for cleanup
+		if not self.CharacterConnections[character] then
+			self.CharacterConnections[character] = {}
+		end
+		table.insert(self.CharacterConnections[character], stateConnection)
+	end
+
+	-- Movement animations with speed attributes (from original script)
+	if loadedTracks["Walk"] then
+		local walkAnim = loadedTracks["Walk"]
+		local sprintAnim = loadedTracks["Sprint"]
+		
+		if loadedTracks["Idle"] then
+			loadedTracks["Idle"].Priority = Enum.AnimationPriority.Core
+		end
+		walkAnim.Priority = Enum.AnimationPriority.Idle
+		if sprintAnim then
+			sprintAnim.Priority = Enum.AnimationPriority.Movement
+		end
+
+		-- Get speed attributes from character (like original script)
+		local baseWalkSpeed = (character:GetAttribute("WalkSpeed") or 6) + (character:GetAttribute("WalkSpeedModifier") or 0)
+		local baseSprintSpeed = (character:GetAttribute("SprintSpeed") or 23) + (character:GetAttribute("WalkSpeedModifier") or 0)
+		
+		-- Adjust animation speeds based on current walk speed (like original script)
+		local function adjustAnimationSpeeds()
+			if not self.Enabled then return end
+			if not character or not character.Parent then return end
+			
+			local currentWalkSpeed = actualHumanoid.WalkSpeed
+			local walkSpeedRatio = currentWalkSpeed / (character:GetAttribute("WalkSpeed") or 6)
+			local sprintSpeedRatio = currentWalkSpeed / (character:GetAttribute("SprintSpeed") or 23)
+			
+			walkAnim:AdjustSpeed(walkSpeedRatio < 0 and 0.1 or walkSpeedRatio)
+			if sprintAnim then
+				sprintAnim:AdjustSpeed(sprintSpeedRatio < 0 and 0.1 or sprintSpeedRatio)
+			end
+		end
+
+		-- Connect to WalkSpeed changes (like original script)
+		local speedConnection = actualHumanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(adjustAnimationSpeeds)
+		if not self.CharacterConnections[character] then
+			self.CharacterConnections[character] = {}
+		end
+		table.insert(self.CharacterConnections[character], speedConnection)
+
+		-- Initial speed adjustment
+		adjustAnimationSpeeds()
+
+		local function updateMovement(speed)
+			if not self.Enabled then return end
+			if not character or not character.Parent then return end
+			if not humanoidRootPart or not actualHumanoid then return end
+
+			if speed >= 0.25 and not humanoidRootPart.Anchored then
+				-- Use speed thresholds from attributes (like original script)
+				if sprintAnim and speed >= (baseSprintSpeed - baseWalkSpeed) then
+					if not sprintAnim.IsPlaying then 
+						sprintAnim:Play(transitionSpeed) 
+						self:AddActiveAnimation(character, "Sprint", sprintAnim)
+					end
+					walkAnim:Stop(transitionSpeed)
+					self:RemoveActiveAnimation(character, "Walk")
+					if loadedTracks["Idle"] then
+						loadedTracks["Idle"]:Stop(transitionSpeed)
+					end
+				else
+					if not walkAnim.IsPlaying then 
+						walkAnim:Play(transitionSpeed) 
+						self:AddActiveAnimation(character, "Walk", walkAnim)
+					end
+					if sprintAnim then 
+						sprintAnim:Stop(transitionSpeed) 
+						self:RemoveActiveAnimation(character, "Sprint")
+					end
+					if loadedTracks["Idle"] then
+						loadedTracks["Idle"]:Stop(transitionSpeed)
+					end
+				end
+			else
+				if loadedTracks["Idle"] and not loadedTracks["Idle"].IsPlaying then 
+					loadedTracks["Idle"]:Play(transitionSpeed) 
+					self:AddActiveAnimation(character, "Idle", loadedTracks["Idle"])
+				end
+				walkAnim:Stop(transitionSpeed)
+				self:RemoveActiveAnimation(character, "Walk")
+				if sprintAnim then 
+					sprintAnim:Stop(transitionSpeed) 
+					self:RemoveActiveAnimation(character, "Sprint")
+				end
+			end
+		end
+
+		local runningConnection = actualHumanoid.Running:Connect(updateMovement)
+		
+		-- Store connection for cleanup
+		if not self.CharacterConnections[character] then
+			self.CharacterConnections[character] = {}
+		end
+		table.insert(self.CharacterConnections[character], runningConnection)
+	end
+end
+
+function AnimationController:AddActiveAnimation(character, animationName, track)
+	if not self.ActiveAnimations[character] then
+		self.ActiveAnimations[character] = {}
+	end
+	self.ActiveAnimations[character][animationName] = track
+end
+
+function AnimationController:RemoveActiveAnimation(character, animationName)
+	if self.ActiveAnimations[character] then
+		self.ActiveAnimations[character][animationName] = nil
+	end
+end
+
+-- Remote event handlers
+Events.RemoteEvents.PlayAnimation.OnClientEvent:Connect(function(animation, character, delay)
+	if not AnimationController.Enabled then return end
+	if not character or not character.Parent then return end
+	if workspace:GetAttribute("AnimDesyncEnabled") == true then task.wait(workspace:GetAttribute("AnimDesync")) end
+
+	if character and (not Players:GetPlayerFromCharacter(character) or Players:GetPlayerFromCharacter(character) == Players.LocalPlayer) then
+		local humanoid = AnimationController:GetHumanoid(character)
+		if not humanoid then return end
+
+		local animator = humanoid:FindFirstChildOfClass("Animator") or Instance.new("Animator", humanoid)
+		for _, track in animator:GetPlayingAnimationTracks() do
+			if track.Name == animation.Name then
+				track:Play()
+				return
+			end
+		end
+		animator:LoadAnimation(animation):Play(delay or 0.1)
+	end
+end)
+
+Events.RemoteEvents.StopAnimation.OnClientEvent:Connect(function(animation, character)
+	if not character or not character.Parent then return end
+	if workspace:GetAttribute("AnimDesyncEnabled") == true then task.wait(workspace:GetAttribute("AnimDesync")) end
+
+	local humanoid = AnimationController:GetHumanoid(character)
+	if not humanoid then return end
+
+	local animator = humanoid:FindFirstChildOfClass("Animator") or Instance.new("Animator", humanoid)
+	for _, track in animator:GetPlayingAnimationTracks() do
+		if track.Name == animation.Name then
+			track:Stop()
+			return
+		end
+	end
+end)
+
+function AnimationController:SetupDefaultCharacter(character)
+	if not self.Enabled then return end
+	if not character or not character.Parent then return end
+	if not character:FindFirstChild("Humanoid") then return end
+
+	local civilian = ReplicatedStorage:FindFirstChild("Characters") and 
+					ReplicatedStorage.Characters.Survivor:FindFirstChild("Civilian")
+	local defaultAnimations = civilian and civilian:FindFirstChild("Animations")
+
+	if defaultAnimations then
+		-- Remove existing animations folder
+		local existingAnimations = character:FindFirstChild("Animations")
+		if existingAnimations then
+			existingAnimations:Destroy()
+		end
+
+		-- Clone new animations
+		local newAnimations = defaultAnimations:Clone()
+		newAnimations.Parent = character
+
+		if character:FindFirstChild("HumanoidRootPart") then
+			character.PrimaryPart = character:WaitForChild("HumanoidRootPart")
+		end
+
+		-- Load animations from the new folder
+		self:LoadCharacterAnimations(character)
+		character:SetAttribute("WalkSpeed", 10)
+		character:SetAttribute("SprintSpeed", 26)
+	end
+end
+
+-- Update initial state
+AnimationController.Enabled = workspace:GetAttribute("AnimationsEnabled")
+
+-- Player character handling
+local localPlayer = Players.LocalPlayer
+
+localPlayer.CharacterAdded:Connect(function(character)
+	task.wait(1)
+	if AnimationController.Enabled then
+		if character:FindFirstChild("Animations") then
+			AnimationController:LoadCharacterAnimations(character)
+		else
+			AnimationController:SetupDefaultCharacter(character)
+		end
+	end
+end)
+
+localPlayer.CharacterRemoving:Connect(function(character)
+	AnimationController:CleanupCharacter(character)
+end)
+
+task.spawn(function()
+	if AnimationController.Enabled and localPlayer.Character then
+		AnimationController:SetupDefaultCharacter(localPlayer.Character)
+	end
+end)
+
+-- NPC handling
+local teamsFolder = workspace:WaitForChild("GameAssets"):WaitForChild("Teams")
+local otherTeam = teamsFolder:WaitForChild("Other")
+
+otherTeam.ChildAdded:Connect(function(npc)
+	if not AnimationController.Enabled then return end
+	if not npc:FindFirstChild("Humanoid") then return end
+	if not npc:FindFirstChild("Animations") then return end
+
+	local humanoid = npc:FindFirstChild("Humanoid")
+	if humanoid then
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics, false)
+		AnimationController:LoadCharacterAnimations(npc)
+	end
+end)
+
+-- Clean up when NPCs are removed
+otherTeam.ChildRemoved:Connect(function(npc)
+	AnimationController:CleanupCharacter(npc)
 end)
 
 
-local AntiComputer
-AntiComputer = false
-Tab_5:CreateToggle({Name = "Anti Cooldown in Badware Computer Prompts"; CurrentValue = false; Callback = function(Value)
-AntiComputer = Value
-if AntiComputer == true then
-for _,descendant in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Other"):GetDescendants()) do
-if descendant and descendant:IsA("ProximityPrompt") and AntiComputer == true then
-pcall(function()
-descendant.HoldDuration = 0
-descendant.RequiresLineOfSight = false
-descendant.Enabled = true
-end)
-end
-end
-end
-end; })
-game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Other").DescendantAdded:Connect(function(descendant)
-if descendant and descendant:IsA("ProximityPrompt") and AntiComputer == true then
-pcall(function()
-descendant.HoldDuration = 0
-descendant.RequiresLineOfSight = false
-descendant.Enabled = true
-end)
-end
-end)
-
-local AntiEvilScary
-AntiEvilScary = false
-Tab_5:CreateToggle({Name = "Anti Evil Scary"; CurrentValue = false; Callback = function(Value)
-AntiEvilScary = Value
-if AntiEvilScary == true then
-for i,v in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable"):GetChildren()) do
-if v and v.Name == "EvilScary" then
-for _,trans in pairs(v:GetChildren()) do
-if trans and trans:IsA("TouchTransmitter") then
-trans:Destroy()
-end
-end
-for _,part in pairs(v:GetChildren()) do
-if part and part:IsA("BasePart") then
-part.CanCollide = false
-part.CanTouch = false
-pcall(function()
-part.CanQuery = false
-end)
-part:Destroy()
-end
-end
-v.CanCollide = false
-v.CanTouch = false
-pcall(function()
-v.CanQuery = false
-end)
-v:Destroy()
-end
-end
-end
-end; })
-game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable").ChildAdded:Connect(function(child)
-if child and child.Name == "EvilScary" and AntiEvilScary == true then
-for _,trans in pairs(child:GetChildren()) do
-if trans and trans:IsA("TouchTransmitter") then
-trans:Destroy()
-end
-end
-for _,part in pairs(child:GetChildren()) do
-if part and part:IsA("BasePart") then
-part.CanCollide = false
-part.CanTouch = false
-pcall(function()
-part.CanQuery = false
-end)
-part:Destroy()
-end
-end
-child.CanCollide = false
-child.CanTouch = false
-pcall(function()
-child.CanQuery = false
-end)
-child:Destroy()
-end
-end)
-
-local BackupEffect = game:GetService("ReplicatedStorage").Events.RemoteEvents.TauntEffect:Clone()
-BackupEffect.Parent = game.LogService
-local AntiTaunt = false
-Tab_5:CreateToggle({Name = "Anti Taunt"; CurrentValue = false; Callback = function(Value)
-AntiTaunt = Value
-if AntiTaunt == true then
-LocalPlayer.PlayerGui.MainGui.RoundUI.TauntTemplate:Destroy()
-else
-if LocalPlayer.PlayerGui.MainGui.RoundUI:FindFirstChild("TauntTemplate") == nil then
-local a = BackupEffect:Clone()
-a.Parent = LocalPlayer.PlayerGui.MainGui.RoundUI
-end
-end
-end; })
-
-LocalPlayer.PlayerGui.MainGui.RoundUI.ChildAdded:Connect(function(child)
-if child.Name == "TauntTemplate" and AntiTaunt == true then
-child:Destroy()
-Character:SetAttribute("WalkSpeedModifier", 0)
-end
-end)
-
-local AntiFallDamage = false
-Tab_5:CreateToggle({Name = "Anti Fall Damage"; CurrentValue = false; Callback = function(Value)
-AntiFallDamage = Value
-for i,v in next, workspace.GameAssets:GetDescendants() do
-if v.Name == "FallDamage" and v:IsA("BasePart") and AntiFallDamage == true then
-v:Destroy()
-end
-end
-end; })
-workspace.GameAssets.DescendantAdded:Connect(function(child)
-if child.Name == "FallDamage" and child:IsA("BasePart") and AntiFallDamage == true then
-child:Destroy()
-end
-end)
-
-
-local AutoRemoveDestroyableObject = false
-Tab_5:CreateToggle({Name = "Anti Destroyable Object"; CurrentValue = false; Callback = function(Value)
-AutoRemoveDestroyableObject = Value
-pcall(function()
-if Value == true then
-workspace.GameAssets.Map.Build.Destroyable:Destroy()
-end
-end)
-end; })
-
-
-local AutoRemoveBarriers = false
-Tab_5:CreateToggle({Name = "Anti Barriers"; CurrentValue = false; Callback = function(Value)
-AutoRemoveBarriers = Value
-pcall(function()
-if Value == true then
-workspace.GameAssets.Map.Config.Barriers:Destroy()
-end
-end)
-end; })
-
-game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams").DescendantAdded:Connect(function(d)
+-- Periodic cleanup of invalid characters
+game:GetService("RunService").Heartbeat:Connect(function()
+	for character, _ in pairs(AnimationController.CharacterAnimators) do
+		if not character or not character.Parent or not character:IsDescendantOf(workspace) then
+			AnimationController:CleanupCharacter(character)
+		end
+	end
+end)]]
+if workspace:GetAttribute("AnimationsEnabled") == nil and game:GetService("Players").LocalPlayer.PlayerScripts:FindFirstChild("ClientAnimations") then
+game:GetService("Players").LocalPlayer.PlayerScripts.ClientAnimations:Destroy()
 task.wait()
-if d.Name == LocalPlayer.Name then
-task.wait(1)
-pcall(function()
-if AutoRemoveBarriers == true then
-workspace.GameAssets.Map.Config.Barriers:Destroy()
+loadstring(AnimationsModule)()
 end
-end)
-end
-end)
-
-
-
-
-
-----------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1572,8 +3411,6 @@ return nil
 end
 
 local Tab_6 = Window:CreateTab("Animations",0)
-Tab_6:CreateParagraph({Title = "Animations", Content = "You can change your anims here."})
-Tab_6:CreateSection("Pre-loaded animations")
 
 function SetRunAnim(run)
 pcall(function()
@@ -1647,18 +3484,21 @@ end
 
 function ApplyNewAnimations()
 pcall(function()
-Character.Animate.Disabled = true
+workspace:SetAttribute("AnimationsEnabled", false)
 task.wait()
-Character.Animate.Disabled = false
-end)
-task.wait()
-pcall(function()
-LocalPlayer.PlayerScripts.ClientAnimations.Disabled = true
-task.wait()
-LocalPlayer.PlayerScripts.ClientAnimations.Disabled = false
+workspace:SetAttribute("AnimationsEnabled", true)
 end)
 end
 
+
+
+task.wait()
+if workspace:GetAttribute("AnimationsEnabled") == nil then
+Tab_6:CreateParagraph({Title = "Not Supported", Content = "clientscript not found"})
+end
+if workspace:GetAttribute("AnimationsEnabled") ~= nil then
+Tab_6:CreateParagraph({Title = "Animations", Content = "You can change your anims here."})
+Tab_6:CreateSection("Pre-loaded animations")
 Tab_6:CreateLabel("Civilian animations")
 Tab_6:CreateButton({Name = "Apply New Civilian Animations"; Callback = function()
 local RunAnim = "rbxassetid://137375023685630"
@@ -1822,19 +3662,22 @@ end; end
 return temp_table
 end
 
-local ChoosenRunAnim = "Civilian Run"
-Tab_6:CreateDropdown({Name = "Run Animation"; Options = GetAllRunNames(); CurrentOption = "Civilian Run"; MultiSelection = false; Callback = function(Value)
+local ChoosenRunAnim = LoadConfig("Tab_6", "CustomAnimations", "Run")
+Tab_6:CreateDropdown({Name = "Run Animation"; Options = GetAllRunNames(); CurrentOption = ChoosenRunAnim; MultiSelection = false; Callback = function(Value)
 ChoosenRunAnim = tostring(ConvertDropdownValue(Value))
+SaveConfig("Tab_6", ChoosenRunAnim, "CustomAnimations", "Run")
 end; })
 
-local ChoosenWalkAnim = "Civilian Walk"
-Tab_6:CreateDropdown({Name = "Walk Animation"; Options = GetAllWalkNames(); CurrentOption = "Civilian Walk"; MultiSelection = false; Callback = function(Value)
+local ChoosenWalkAnim = LoadConfig("Tab_6", "CustomAnimations", "Walk")
+Tab_6:CreateDropdown({Name = "Walk Animation"; Options = GetAllWalkNames(); CurrentOption = ChoosenWalkAnim; MultiSelection = false; Callback = function(Value)
 ChoosenWalkAnim = tostring(ConvertDropdownValue(Value))
+SaveConfig("Tab_6", ChoosenWalkAnim, "CustomAnimations", "Walk")
 end; })
 
-local ChoosenIdleAnim = "Civilian Idle"
-Tab_6:CreateDropdown({Name = "Idle Animation"; Options = GetAllIdleNames(); CurrentOption = "Civilian Idle"; MultiSelection = false; Callback = function(Value)
+local ChoosenIdleAnim = LoadConfig("Tab_6", "CustomAnimations", "Idle")
+Tab_6:CreateDropdown({Name = "Idle Animation"; Options = GetAllIdleNames(); CurrentOption = ChoosenIdleAnim; MultiSelection = false; Callback = function(Value)
 ChoosenIdleAnim = tostring(ConvertDropdownValue(Value))
+SaveConfig("Tab_6", ChoosenIdleAnim, "CustomAnimations", "Idle")
 end; })
 
 Tab_6:CreateButton({Name = "Apply Animations"; Callback = function()
@@ -1873,14 +3716,16 @@ local AbilityAnimData = {
 
 local AbilityAnimNames = {"Punch","Adrenaline","AdrenalineEnd","Caretaker","CloakStart","BlockStart","Dash","PadBuild","Hotdog","Revolver","Taunt","RevolverReload","CloakEnd","DynamiteWindup","DynamiteThrow","DynamiteHold","Banana","BlockLand"}
 
-local ReplaceWhatAbil = "Punch"
-Tab_6:CreateDropdown({Name = "Replace what"; Options = AbilityAnimNames; CurrentOption = "Punch"; MultiSelection = false; Callback = function(Value)
+local ReplaceWhatAbil = LoadConfig("Tab_6", "Swap", "What")
+Tab_6:CreateDropdown({Name = "Replace what"; Options = AbilityAnimNames; CurrentOption = ReplaceWhatAbil; MultiSelection = false; Callback = function(Value)
 ReplaceWhatAbil = ConvertDropdownValue(Value)
+SaveConfig("Tab_6", ReplaceWhatAbil, "Swap", "What")
 end; })
 
-local ReplaceWithWhatAbil = "BlockStart"
-Tab_6:CreateDropdown({Name = "Replace with what"; Options = AbilityAnimNames; CurrentOption = "BlockStart"; MultiSelection = false; Callback = function(Value)
+local ReplaceWithWhatAbil = LoadConfig("Tab_6", "Swap", "WithWhat")
+Tab_6:CreateDropdown({Name = "Replace with what"; Options = AbilityAnimNames; CurrentOption = ReplaceWithWhatAbil; MultiSelection = false; Callback = function(Value)
 ReplaceWithWhatAbil = ConvertDropdownValue(Value)
+SaveConfig("Tab_6", ReplaceWithWhatAbil, "Swap", "What")
 end; })
 
 Tab_6:CreateButton({Name = "Replace animation"; Callback = function()
@@ -1893,46 +3738,54 @@ Notify("Success!", "Applying replacion, it may take up to 10 seconds.", 3, true)
 end; })
 
 
-
-
 Tab_6:CreateSection("Custom Ability Animation Changer")
-Tab_6:CreateSection("DONT REQUIRE rbxassetid ONLY NUMBER REQUIRED")
-
 
 local abilityList = {}
 for name,_ in pairs(AbilityAnimData) do
 	table.insert(abilityList,name)
 end
 
-local SelectedAbility = abilityList[1]
-Tab_6:CreateDropdown({Name = "Select Ability"; Options = abilityList; CurrentOption = abilityList[1]; MultiSelection = false; Callback = function(v)
-	SelectedAbility = ConvertDropdownValue(v)
+local SelectedAbility = LoadConfig("Tab_6","ToEdit")
+Tab_6:CreateDropdown({Name = "Select Ability"; Options = abilityList; CurrentOption = SelectedAbility; MultiSelection = false; Callback = function(v)
+SelectedAbility = ConvertDropdownValue(v)
+SaveConfig("Tab_6",SelectedAbility,"ToEdit")
 end
 });
 
-local CustomAnimID = ""
-Tab_6:CreateInput({Name = "Animation ID"; PlaceholderText = "Enter ID only"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(v)
-	CustomAnimID = v
-end
-});
+local CustomAnimID = LoadConfig("Tab_6","CustomID")
+Tab_6:CreateInput({Name = "Animation ID"; PlaceholderText = tostring(CustomAnimID); NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(v)
+CustomAnimID = tostring(v)
+SaveConfig("Tab_6",CustomAnimID,"CustomID")
+end});
 
-Tab_6:CreateButton({Name = "Apply"; Callback = function()
-if CustomAnimID ~= "" then
-	AbilityAnimData[SelectedAbility] = "rbxassetid://" .. CustomAnimID
-	Character.Animations.Abilities[SelectedAbility].AnimationId = AbilityAnimData[SelectedAbility]
-	ApplyNewAnimations()
-	Notify("Success!", "Custom Ability animation changed", 1, true)
-end
-end
-});
+Tab_6:CreateButton({Name = "Apply Animation"; Callback = function()
+local idexists = not pcall(function() game:GetService("ContentProvider"):PreloadAsync({tonumber(id)}) end)
+AbilityAnimData[SelectedAbility] = ((idexists == true and "rbxassetid://"..CustomAnimID) or CustomAnimID)
+Character.Animations.Abilities[SelectedAbility].AnimationId = AbilityAnimData[SelectedAbility]
+ApplyNewAnimations()
+Notify("Success!", "Changed Ability Animation.", 3, true)
+end});
 
 
 Tab_6:CreateSection("Miscellaneous")
 
+local DesyncInSeconds = LoadConfig("Tab_6", "Misc", "Desync")
+Tab_6:CreateInput({Name = "Desync in seconds"; PlaceholderText = tostring(DesyncInSeconds); NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+workspace:SetAttribute("AnimDesync", tonumber(Value))
+SaveConfig("Tab_6", tonumber(Value), "Misc", "Desync")
+end; })
+workspace:SetAttribute("AnimDesync", DesyncInSeconds)
+
+local DesyncEnabled = LoadConfig("Tab_6", "Misc", "DesyncEnabled")
+local DesyncEnabledToggle = Tab_6:CreateToggle({Name = "Animations Desync"; CurrentValue = false; Callback = function(Value)
+workspace:SetAttribute("AnimDesyncEnabled", Value)
+SaveConfig("Tab_6", Value, "Misc", "DesyncEnabled")
+end; })
+DesyncEnabledToggle:Set(DesyncEnabled)
 
 Tab_6:CreateButton({Name = "No animations [ Apply any animation to revert! ]"; Callback = function()
 pcall(function()
-LocalPlayer.PlayerScripts.ClientAnimations.Disabled = true
+workspace:SetAttribute("AnimationsEnabled", false)
 end)
 end; })
 
@@ -1946,6 +3799,7 @@ end
 end
 end)
 end; })
+end
 
 
 ----------------------------------------------------------------------------------------------
@@ -1965,10 +3819,8 @@ return (MarketplaceService:GetProductInfo(Id,Enum.InfoType.Asset).PriceInRobux)
 end)
 end
 local PremiumPrice = GetAssetPrice(1264479709) or 39
--- WAIT PLEASE LISTEN
 -- YOU CAN GET PREMIUM FOR FREE BY ENTERING A KEY
--- KEY IS IN MY DISCORD SERVER 😭🙏
--- AAAAAAH!!!!!!!!!!!!
+-- KEY IS IN MY DISCORD SERVER!!
 local HavePremium = false
 if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(LocalPlayer.UserId, 1264479709) then
 HavePremium = true
@@ -2008,9 +3860,9 @@ setclipboard(tostring("https://discord.gg/7u5GRNw3xn"))
 Notify("Success!", "Copied Link!", 3, true)
 end; })
 
-Tab_7:CreateInput({Name = "Input Key"; PlaceholderText = "Type Here!"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = true; Callback = function(Value)
+Tab_7:CreateInput({Name = "Input Key"; PlaceholderText = "Type Here!"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 local key = MainModule:GetKey()
-if tostring(Value) == tostring(key) then
+if string.lower(string.gsub(tostring(Value), "^%s*(.-)%s*$", "%1")) == tostring(key) then
 HavePremium = true
 Notify("Success!", "Redeemed key, enjoy your premium!", 5, true)
 end
@@ -2073,9 +3925,6 @@ AntiSlowDown = nil
 end
 end
 end; })
-
-
-
 
 
 ----------------------------
@@ -2256,7 +4105,7 @@ NewClosest = v.Character.HumanoidRootPart
 end
 end
 end
-if AutoAim == true and ClosestDistance < AimRange then
+if AutoAim == true and ClosestDistance < tonumber(AimRange) then
 local LookingPosition = CFrame.lookAt(HumanoidRootPart.Position, NewClosest.Position)
 if Freeze_XAxis or Freeze_YAxis or Freeze_ZAxis then
 local x_1, y_1, z_1 = LookingPosition:ToOrientation()
@@ -2303,7 +4152,7 @@ end; })
 
 Tab_7:CreateSection("Aimbot")
 
-Tab_7:CreateInput({Name = "Aim Range"; PlaceholderText = "inf"; NumbersOnly = true; OnEnter = false; RemoveTextAfterFocusLost = false; Callback = function(Value)
+Tab_7:CreateInput({Name = "Aim Range"; PlaceholderText = "9000000000"; NumbersOnly = true; OnEnter = false; RemoveTextAfterFocusLost = false; Callback = function(Value)
 AimRange = Value
 end; })
 
@@ -2330,7 +4179,47 @@ Tab_7:CreateToggle({Name = "Freeze Z Axis"; CurrentValue = false; Callback = fun
 Freeze_ZAxis = Value
 end; })
 
+Tab_7:CreateSection("FE Game Manipulation")
 
+Tab_7:CreateLabel("You can end round only if you are last survivor ( LMS ) or you are the only killer!")
+Tab_7:CreateButton({Name = "FE End Round"; Callback = function()
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
+MainModule:InitiateRoundEnd()
+end; })
+
+Tab_7:CreateLabel("You can start LMS only if there are two survivors! ( You and someone else )")
+Tab_7:CreateButton({Name = "FE Two Players LMS"; Callback = function()
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
+MainModule:InitiateTwoPlayersLMS()
+end; })
+
+Tab_7:CreateLabel("No evilness limit will make you earn evilness but never make you killer, must enable in lobby! ( After turning on, don't change anything in DOD settings )")
+Tab_7:CreateToggle({Name = "No Evilness Limit"; CurrentValue = false; Callback = function(Value)
+MainModule:SetNoEvilnessLimit(Value)
+end; })
+MainModule:InitiateNoEvilnessLimit()
+
+Tab_7:CreateLabel("Respawns your character, but makes game think that you are still alive as killer/survivor. ( replicatesignal required )")
+Tab_7:CreateButton({Name = "Respawn"; Callback = function()
+if not replicatesignal then Notify("Error!", "Couldn't use function ''Respawn'', missing function ''replicatesignal''!", 5, false) return end
+MainModule:Respawn()
+end; })
+
+
+Tab_7:CreateSection("FE Game Breaks")
+
+
+-- Code is obfuscated to prevent those methods to get patched
+
+
+Tab_7:CreateLabel("Invincibility / God Mode only can be applied only during dienation gamemode!")
+Tab_7:CreateButton({Name = "FE Invincibility / God Mode"; Callback = function()
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
+if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChild(LocalPlayer.Name) then Notify("Error!", "You must be killer!", 4, false) return end
+Notify("Applying Invincibility...", "Please wait!", 7, true)
+MainModule:StartGodMode()
+Notify("Applied Invincibility!", "Now no one can damage you.", 3, true)
+end; })
 
 function MorphIntoGhost()
     local a = game:GetService("ReplicatedStorage").Characters.Other.Ghost:Clone()
@@ -2354,35 +4243,57 @@ function MorphIntoGhost()
     end)
 end
 
-Tab_7:CreateSection("FE Hitbox Breaker")
-
-
--- Code is obfuscated to prevent those methods to get patched
-
-
-Tab_7:CreateLabel("Invincibility / God Mode only can be applied only during dienation gamemode, and you must be killdroid!")
-Tab_7:CreateButton({Name = "FE Invincibility / God Mode"; Callback = function()
-if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
-if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChild(LocalPlayer.Name) then Notify("Error!", "You must be killer!", 4, false) return end
-Notify("Applying Invincibility...", "Please wait!", 7, true)
---If you're not a skid, you can easily de-obfuscate that.
-Encryptor.load("\48\48\49\49\48\48\49\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\48\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\49\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\49\48\48\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\48\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\49\48\48\48\49\49\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\48\48\49\48\48\48\49\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\48\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\48\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\49\48\49\48\48\48\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\48\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\48\48\49\48\48\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\49\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\48\48\48")
-Notify("Applied Invincibility!", "Now no one can damage you.", 3, true)
-end; })
-
-
-Tab_7:CreateSection("FE Server Glitcher / Softlock Utility")
 Tab_7:CreateLabel("Only Harken, Badware and Killdroid can be softlocked. Harken will softlock if she uses Immolate or Tangle. Badware will softlock if he uses Rift. All Killdroid Deploys will get softlocked.")
 Tab_7:CreateLabel("WARNING! You will play as ghost after activating this feature.")
 Tab_7:CreateButton({Name = "FE Softlock Killers"; Callback = function()
 if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
 if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChildWhichIsA("Model") then Notify("Error!", "No Killers!", 3, warn) return end
 Notify("Enabling Auto-Softlock...", "Please wait!", 7, true)
---If you're not a skid, you can easily de-obfuscate that.
-Encryptor.load("\48\48\49\49\48\48\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\49\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\48\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\49\48\49\48\48\48\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\49\48\48\48\49\48\48\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\49\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\48\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\49\48\48\48\49\49\48\49\49\49\48\49\48\48\48\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\48\48\48\49\48\48\48\49\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\49\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\49\49\48\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\48\49\48\49\48\48\48\48\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\48\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\49\49\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\48\48\48\49\49\48\48\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\49\48\48\48\49\48\48\48\48\49\48\48\48\49\49\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\48\48\49\48\48\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\48\48\48\49\49\48\49\48\48\48\49\48\48\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\49\49\49\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\49\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\48\48\48\49\49\48\49\49\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\48\48\48\49\48\48\48\49\48\48\48\48\49\49\48\49\49\48\48\48\49\49\49\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\49\48\48\48\49\49\48\49\48\49\48\48\49\49\48\48\48\49\48\48\49\49\48\49\48\48\48\48\49\49\48\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\49\49\48\48\49\49\48\49\48\48\48\48\49\49\49\48\48\49\48\48\49\49\48\48\49\49\48\48\49\49\48\48\48\48\48\48\49\49\48\49\49\48\48\49\48\48\48\48\48\49\48\48\49\49\48\49\49\48\48\48\49\49\48\48\48\49")
+MainModule:StartSoftlock()
 MorphIntoGhost()
 Notify("Auto-Softlock Enabled!", "Check the label above to see when will specific killers get softlocked.", 5, true)
 end; })
+
+--[[Tab_7:CreateLabel("To use model breaker, you must play as badware during round! You'll have to inject first, and only then destroy models. You can search models using explorer scripts. DO NOT SPAM CLICK OR IT'LL BREAK!")
+
+local modeldservice, modeldname = "Workspace", "Type Here!"
+Tab_7:CreateDropdown({Name = "Model Service"; Options = {"Workspace","ReplicatedStorage"}; CurrentOption = "Workspace"; MultiSelection = false; Callback = function(Value)
+modeldservice = ConvertDropdownValue(Value)
+end; })
+
+Tab_7:CreateInput({Name = "Model Name"; PlaceholderText = "Type Here!"; NumbersOnly = false; OnEnter = false; RemoveTextAfterFocusLost = false; Callback = function(Value)
+modeldname = Value
+end; })
+
+Tab_7:CreateButton({Name = "Inject Model Destroyer"; Callback = function()
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
+MainModule:InjectDestroyer()
+end; })
+
+--credits to infinite yield i guess
+function getstring(begin)
+local start = begin-1
+local AA = '' for i,v in pairs(cargs) do
+if i > start then
+if AA ~= '' then
+AA = AA .. ' ' .. v
+else
+AA = AA .. v
+end
+end
+end
+return AA
+end
+Tab_7:CreateButton({Name = "Destroy Model"; Callback = function()
+if not HavePremium then Notify("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
+for i,v in pairs(game:GetService(tostring(modeldservice)):GetDescendants()) do
+if v.Name:lower() == getstring(1):lower() and v:IsA("BasePart") then
+MainModule:DestroyDataModel(v)
+return
+end
+end
+Notify("Error!", "Model not found.", 2, false)
+end; })]]--
 
 Tab_7:CreateSection("Auto Block")
 Tab_7:CreateLabel("{ VERY W.I.P. !!!! } Uses block ability when the killer is attacking you. Your ping must be less than 60 for it to work.")
@@ -2820,6 +4731,11 @@ if HaveWorkspaceAccess() then
 local LMSes_Backup = game:GetService("ReplicatedStorage").Sounds.Songs.LMSSongs:Clone()
 LMSes_Backup.Name = "LMSSongs"
 LMSes_Backup.Parent = game.CoreGui.DOD_Assets
+for i,v in next, LMSes_Backup:GetDescendants() do
+if v and v:IsA("Sound") and v.Playing == true then
+v.Playing = false
+end
+end
 
 Tab_10:CreateParagraph({Title = "Audio", Content = "Audio Management ( Mostly LMS and chases )"})
 Tab_10:CreateSection("Custom LMS")
@@ -2841,6 +4757,10 @@ if not table.find(temp_table, choosen_lms) then
 Notify("Error!","File isn't added! ( Please reload lms audios and choose again. )",3,false)
 return
 end
+if not IsFile("NexerHub/DieOfDeath/Assets/Chases/"..choosen_lms..".mp3") then
+Notify("Error!","File not found! ( Please check ''Chases'' folder and make sure it is here. )",3,false)
+return
+end
 for i,v in next, game:GetService("ReplicatedStorage").Sounds.Songs.LMSSongs:GetChildren() do
 if v and v:IsA("Sound") then
 v.SoundId = GetFile("NexerHub/DieOfDeath/Assets/LMS/"..choosen_lms..".mp3","gca")
@@ -2859,7 +4779,7 @@ Tab_10:CreateSlider({Name = "LMS Volume ( Restore Normal LMS to Reset )"; Range 
 for i,v in next, game:GetService("ReplicatedStorage").Sounds.Songs.LMSSongs:GetChildren() do
 if v and v:IsA("Sound") then
 local temp_volume = tonumber(Value)
-v:GetAttributeChangedSignal("Volume"):Connect(function()
+v:GetPropertyChangedSignal("Volume"):Connect(function()
 v.Volume = temp_volume
 end)
 v.Volume = temp_volume
@@ -2872,12 +4792,12 @@ end; })
 Tab_10:CreateSection("Custom LMS ( settings )")
 local lms_file_name = "Type Here!"
 Tab_10:CreateParagraph({Title = "How to add your own music?", Content = "Find your executor's folder in your phone's explorer, then find the ''workspace'' folder, and inside it you must find ''NexerHub'' folder, now go inside it, then click ''Assets'' and ''LMS''. And now, in this folder, input your mp3 music."})
-Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here!"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here! ( WRITE ONLY NAME, WITHOUT ''.mp3'' )"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 lms_file_name = ConvertDropdownValue(Value)
 end; })
 Tab_10:CreateButton({Name = "Add File"; Callback = function()
 if not IsFile("NexerHub/DieOfDeath/Assets/LMS/"..lms_file_name..".mp3") then
-Notify("Error!","File not found! ( Did you entered name correctly? Make sure it is mp3. )",3,false)
+Notify("Error!","File not found! ( Did you entered name correctly? Make sure it is mp3. Don't write ''.mp3'' at the end, only the name of the file. )",5,false)
 return
 end
 local temp_table = loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))()
@@ -2899,7 +4819,9 @@ Notify("Success!","Removed File!",3,true)
 end; })
 
 
-
+Tab_10:CreateSection("")
+Tab_10:CreateSection("")
+Tab_10:CreateSection("")
 
 Tab_10:CreateSection("Custom Chase Themes")
 local choosen_chase = ""
@@ -2920,6 +4842,10 @@ if not table.find(temp_table, choosen_chase) then
 Notify("Error!","File isn't added! ( Please reload chase themes and choose again. )",3,false)
 return
 end
+if not IsFile("NexerHub/DieOfDeath/Assets/Chases/"..choosen_chase..".mp3") then
+Notify("Error!","File not found! ( Please check ''Chases'' folder and make sure it is here. )",3,false)
+return
+end
 for i,v in next, workspace:WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):GetDescendants() do
 if v and v:IsA("Sound") and v.Name == "ChaseTheme" then
 v.SoundId = GetFile("NexerHub/DieOfDeath/Assets/Chases/"..choosen_chase..".mp3","gca")
@@ -2931,7 +4857,7 @@ Tab_10:CreateSlider({Name = "Chase Themes Volume"; Range = {0, 10}; Increment = 
 for i,v in next, workspace:WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):GetDescendants() do
 if v and v:IsA("Sound") and v.Name == "ChaseTheme" then
 local temp_volume = tonumber(Value)
-v:GetAttributeChangedSignal("Volume"):Connect(function()
+v:GetPropertyChangedSignal("Volume"):Connect(function()
 v.Volume = temp_volume
 end)
 v.Volume = temp_volume
@@ -2943,12 +4869,12 @@ end; })
 Tab_10:CreateSection("Custom Chase Themes ( settings )")
 local chase_file_name = "Type Here!"
 Tab_10:CreateParagraph({Title = "How to add your own music?", Content = "Find your executor's folder in your phone's explorer, then find the ''workspace'' folder, and inside it you must find ''NexerHub'' folder, now go inside it, then click ''Assets'' and ''Chases''. And now, in this folder, input your mp3 music."})
-Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here!"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here! ( WRITE ONLY NAME, WITHOUT ''.mp3'' )"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 chase_file_name = ConvertDropdownValue(Value)
 end; })
 Tab_10:CreateButton({Name = "Add File"; Callback = function()
 if not IsFile("NexerHub/DieOfDeath/Assets/Chases/"..chase_file_name..".mp3") then
-Notify("Error!","File not found! ( Did you entered name correctly? Make sure it is mp3. )",3,false)
+Notify("Error!","File not found! ( Did you entered name correctly? Make sure it is mp3. Don't write ''.mp3'' at the end, only the name of the file. )",5,false)
 return
 end
 local temp_table = loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))()
@@ -3058,12 +4984,7 @@ stalk_loop:Stop()
 Humanoid.Parent:SetAttribute("WalkSpeed",old_ws)
 Humanoid.Parent:SetAttribute("SprintSpeed",old_ss)
 end
-AbilityModule.CreateAbility({Name = "Stalk_NH",InputShown = "",Tip = "Turn invisible and gain speed, cant use abilities and a long endlag after.",Cooldown = 15, Icon = "rbxassetid://92577246919936", DisplayName = "Stalk"})
-repeat task.wait() until LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Stalk_NH")
-LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Stalk_NH").MouseButton1Down:Connect(function()
-Stalk()
-AbilityModule.PutOnCooldown("Stalk_NH",15)
-end)
+AbilityModule.CreateAbility({Client = true, ClientFunction = Stalk, Name = "Stalk_NH",InputShown = "",Tip = "Turn invisible and gain speed, cant use abilities and a long endlag after.",Cooldown = 15, Icon = "rbxassetid://92577246919936", DisplayName = "Stalk"})
 end; })
 
 
@@ -3114,15 +5035,10 @@ BodyVelocity.MaxForce = Vector3.new(1000000,1000,1000000)
 BodyVelocity.P = 1250
 BodyVelocity.Velocity = HumanoidRootPart.CFrame.LookVector * 80
 BodyVelocity.Parent = HumanoidRootPart
-game.Debris:AddItem(BodyVelocity, .35)
+game.Debris:AddItem(BodyVelocity, .3)
 EmitDash()
 end
-AbilityModule.CreateAbility({Name = "Dash_NH",InputShown = "",Tip = "Dash foward, and gain no cooldown.",Cooldown = .2, Icon = "rbxassetid://73777691791017",DisplayName = "Dash without cooldown"})
-repeat task.wait() until LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Dash_NH")
-LocalPlayer.PlayerGui.MainGui.Abilities.Folder:FindFirstChild("Dash_NH").MouseButton1Down:Connect(function()
-Dash()
-AbilityModule.PutOnCooldown("Dash_NH",.2)
-end)
+AbilityModule.CreateAbility({Client = true, ClientFunction = Dash, Name = "Dash_NH",InputShown = "",Tip = "Dash foward, and gain no cooldown.",Cooldown = .2, Icon = "rbxassetid://73777691791017",DisplayName = "Dash without cooldown"})
 end; })
 
 
@@ -3138,15 +5054,9 @@ for i,v in pairs(Model1:GetChildren()) do
 end
 local function setnewchanges()
 pcall(function()
-game.Players:GetPlayerFromCharacter(Model1).Character.Animate.Disabled = true
+workspace:SetAttribute("AnimationsEnabled", false)
 task.wait()
-game.Players:GetPlayerFromCharacter(Model1).Character.Animate.Disabled = false
-end)
-task.wait()
-pcall(function()
-game.Players:GetPlayerFromCharacter(Model1).PlayerScripts.ClientAnimations.Disabled = true
-task.wait()
-game.Players:GetPlayerFromCharacter(Model1).PlayerScripts.ClientAnimations.Disabled = false
+workspace:SetAttribute("AnimationsEnabled", true)
 end)
 pcall(function()
 for i,v in next, game.Players:GetPlayerFromCharacter(Model1).Character.Humanoid:GetPlayingAnimationTracks() do
@@ -3280,7 +5190,7 @@ if GetKillerModelByName(KillerAppearance) == nil then
 Notify("Error!","Incorrect killer name.",3,warn)
 return
 end
-ReplaceModel(workspace.GameAssets.Teams.Killer:FindFirstChildOfClass("Model"), GetKillerModelByName(KillerAppearance))
+ReplaceModel(workspace.GameAssets.Teams:FindFirstChild(game.Players.LocalPlayer.Name, true), GetKillerModelByName(KillerAppearance))
 end; })
 Tab_8:CreateButton({Name = "Change current killer(s) appearance"; Callback = function()
 if GetKillerModelByName(KillerAppearance) == nil then
@@ -3295,488 +5205,265 @@ end
 end; })
 
 
-function DamageEffect()
-task.spawn(function()
-game:GetService("Lighting").DamageEffect.Enabled = true
-game:GetService("Lighting").DamageEffect.Contrast = 0
-game:GetService("Lighting").DamageEffect.TintColor = Color3.fromRGB(255, 255, 255)
-game:GetService("TweenService"):Create(game:GetService("Lighting").DamageEffect, TweenInfo.new(0.5), {
-	["Contrast"] = 0.5
-}):Play()
-game:GetService("TweenService"):Create(game:GetService("Lighting").DamageEffect, TweenInfo.new(0.5), {
-	["TintColor"] = Color3.fromRGB(255, 52, 52)
-}):Play()
-task.wait(0.5)
-game:GetService("TweenService"):Create(game:GetService("Lighting").DamageEffect, TweenInfo.new(1), {
-	["Contrast"] = 0
-}):Play()
-game:GetService("TweenService"):Create(game:GetService("Lighting").DamageEffect, TweenInfo.new(1), {
-	["TintColor"] = Color3.fromRGB(255, 255, 255)
-}):Play()
-end)
-end
-
-function Jumpscare(duration)
-local soundhahaha = Instance.new("Sound")
-soundhahaha.SoundId = "rbxassetid://123871865507678"
-soundhahaha.Volume = 3
-soundhahaha.Name = "TROLLED ! ! !"
-soundhahaha.Parent = game.Players.LocalPlayer.PlayerGui
-repeat task.wait() until game.Players.LocalPlayer.PlayerGui:FindFirstChild("TROLLED ! ! !")
-if not soundhahaha.IsLoaded then
-repeat task.wait() until soundhahaha.IsLoaded
-end
-soundhahaha:Play()
-task.spawn(function()
-soundhahaha.Ended:Connect(function() soundhahaha:Destroy() end)
-end)
-local INTENSITY = 3
-local SPEED = 12
-local ROLL_DOMINANCE = 8.5
-local random = Random.new()
-local timeOffset = random:NextNumber(0, 10)
-local lastBaseCFrame = CFrame.new()
-local function updateNauseaEffect()
-    local baseCFrame = LP.Character:WaitForChild("Head").CFrame
-    lastBaseCFrame = baseCFrame
-    local time = os.clock() * SPEED + timeOffset
-    local roll = math.sin(time * 1.7) * math.rad(INTENSITY * ROLL_DOMINANCE)
-    local pitch = math.cos(time * 0.9) * math.rad(INTENSITY)
-    local yaw = math.sin(time * 1.3) * math.rad(INTENSITY)
-    local rotation = CFrame.Angles(pitch, yaw, roll)
-    workspace.CurrentCamera.CFrame = CFrame.new(baseCFrame.Position) * (baseCFrame.Rotation * rotation)
-end
-game:GetService("RunService"):BindToRenderStep("NauseaEffect", Enum.RenderPriority.Camera.Value + 1, updateNauseaEffect)
-local function disableNauseaEffect()
-    game:GetService("RunService"):UnbindFromRenderStep("NauseaEffect")
-    workspace.CurrentCamera.CFrame = lastBaseCFrame
-end
-task.delay(tonumber(duration),function()
-disableNauseaEffect()
-end)
-end
 
 
-function FakeKiller(npcname, targettingtime)
---local ragdoll = require(game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Client.Modules.Effect)
-local npc = nil
-local ognpc = nil
-for i,v in pairs(game:GetService("ReplicatedStorage").Characters.Killer:GetDescendants()) do
-if v and v:IsA("Model") and v.Name and v.Parent:IsA("Folder") and v.Name:find(tostring(npcname)) or v.Name:match(tostring(npcname)) then
-npc = v:Clone()
-ognpc = v
+local Tab_11 = Window:CreateTab("Config Settings",0)
+Tab_11:CreateParagraph({Title = "Config Settings", Content = "Save and load config files. You can share your config to other people."})
+local temp_module = [[local SpecialCharacters = {['\a'] = '\\a', ['\b'] = '\\b', ['\f'] = '\\f', ['\n'] = '\\n', ['\r'] = '\\r', ['\t'] = '\\t', ['\v'] = '\\v', ['\0'] = '\\0'}
+local Keywords = { ['and'] = true, ['break'] = true, ['do'] = true, ['else'] = true, ['elseif'] = true, ['end'] = true, ['false'] = true, ['for'] = true, ['function'] = true, ['if'] = true, ['in'] = true, ['local'] = true, ['nil'] = true, ['not'] = true, ['or'] = true, ['repeat'] = true, ['return'] = true, ['then'] = true, ['true'] = true, ['until'] = true, ['while'] = true, ['continue'] = true}
+local Functions = {
+    [pairs] = "pairs",
+    [ipairs] = "ipairs", 
+    [next] = "next",
+    [type] = "type",
+    [tostring] = "tostring",
+    [tonumber] = "tonumber",
+    [print] = "print",
+    [error] = "error",
+    [assert] = "assert",
+    [pcall] = "pcall",
+    [xpcall] = "xpcall",
+    [select] = "select",
+    [rawget] = "rawget",
+    [rawset] = "rawset",
+    [rawequal] = "rawequal",
+    [getmetatable] = "getmetatable",
+    [setmetatable] = "setmetatable",
+    [require] = "require",
+}
+if loadstring then Functions[loadstring] = "loadstring" end
+if load then Functions[load] = "load" end
+local function safeTypeof(value)
+    if typeof then
+        return typeof(value)
+    else
+        return type(value)
+    end
 end
+function GetHierarchy(Object)
+    if not Object or (type(Object) ~= "table" and safeTypeof(Object) ~= "Instance") then
+        return tostring(Object)
+    end
+    local Hierarchy = {}
+    local current = Object
+    while current do
+        local name = tostring(current.Name or current.name or "Unknown")
+        name = string.gsub(name, '[%c%z]', SpecialCharacters)
+        if current == game or current == _G.game then
+            table.insert(Hierarchy, 1, "game")
+        elseif Keywords[name] or not string.match(name, '^[_%a][_%w]*$') then
+            table.insert(Hierarchy, 1, '["' .. name .. '"]')
+        else
+            table.insert(Hierarchy, 1, name)
+        end
+        current = current.Parent
+    end
+    
+    return table.concat(Hierarchy, ".")
 end
-pcall(function()
-npc:WaitForChild("Humanoid").DisplayDistanceType = "None"
-end)
-npc.Parent = workspace.GameAssets.Teams.Killer
-if game.Players.LocalPlayer.Character:FindFirstChild("Vanities") and workspace.GameAssets:FindFirstChild("Map") then
-npc:WaitForChild("HumanoidRootPart").CFrame = workspace.GameAssets.Map.Config.Spawns.Killer:GetChildren()[math.random(1,#workspace.GameAssets.Map.Config.Spawns.Killer:GetChildren())].CFrame * CFrame.new(0,10,0)
-else
-npc:WaitForChild("HumanoidRootPart").CFrame = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame
+local function SerializeType(Value, Class)
+    if Class == 'string' then
+        return string.format('"%s"', string.gsub(Value, '[%c%z]', SpecialCharacters))
+    elseif Class == 'Instance' then
+        return GetHierarchy(Value)
+    elseif Class == 'function' then
+        return Functions[Value] or "'[Function: " .. tostring(Value) .. "]'"
+    elseif Class == 'userdata' then
+        return "'[userdata: " .. tostring(Value) .. "]'"
+    elseif Class == 'thread' then
+        if coroutine and coroutine.status then
+            local status = pcall(function() return coroutine.status(Value) end)
+            return "'[thread: " .. tostring(Value) .. (status and ", status: " .. coroutine.status(Value) or "") .. "]'"
+        else
+            return "'[thread: " .. tostring(Value) .. "]'"
+        end
+    else
+        return tostring(Value)
+    end
 end
-if ognpc.Parent.Name == "Badware" then
-npc:WaitForChild("Humanoid").WalkSpeed = 22
-elseif ognpc.Parent.Name == "Pursuer" then
-npc:WaitForChild("Humanoid").WalkSpeed = 26
-elseif ognpc.Parent.Name == "Artful" then
-npc:WaitForChild("Humanoid").WalkSpeed = 24.5
-else
-npc:WaitForChild("Humanoid").WalkSpeed = 24.5
-end
-local loadedanim_run = npc:WaitForChild("Humanoid"):LoadAnimation(npc:WaitForChild("Animations"):WaitForChild("Sprint"))
-loadedanim_run:Play()
-loadedanim_run:AdjustSpeed(tonumber(1))
-local loadedanim_swing = npc:WaitForChild("Humanoid"):LoadAnimation(npc:WaitForChild("Animations"):WaitForChild("Swing"))
-local cd = false
-local start = tick()
-while tick() - start < tonumber(targettingtime) do
-pcall(function()
-newpath = game:GetService("PathfindingService"):CreatePath({
-	AgentRadius = 3,
-	AgentHeight = 6,
-	AgentCanJump = false,
-	AgentCanClimb = false,
-	WaypointSpacing = 6,
-})
-newpath:ComputeAsync(npc:WaitForChild("HumanoidRootPart").Position, game:GetService("Players").LocalPlayer.Character:WaitForChild("HumanoidRootPart").Position)
-waypoints = newpath:GetWaypoints()
-if waypoints ~= nil and waypoints[2] ~= nil then
-npc:WaitForChild("Humanoid"):MoveTo(waypoints[2].Position)
-end
-newpath = nil
-end)
-task.wait()
-local magnitude = (npc:WaitForChild("HumanoidRootPart").Position - game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").Position).magnitude
-if magnitude < 7 and cd == false and game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Health ~= 0 then
-if game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Health < 26 then
-game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Health = tonumber(game.Players.LocalPlayer.Character:WaitForChild("Humanoid").MaxHealth)
-loadedanim_run:Stop()
-loadedanim_run:AdjustSpeed(tonumber(0))
-loadedanim_swing:Stop()
-loadedanim_swing:AdjustSpeed(tonumber(0))
---ragdoll.Ragdoll(npc)
-task.spawn(function()
-Jumpscare(4)
-end)
-npc:Destroy()
-return nil
-end
-cd = true
-loadedanim_swing:Play()
-task.wait(.5)
-DamageEffect()
-game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Health = game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Health - 20
-npc:WaitForChild("HumanoidRootPart"):WaitForChild("Hit"):Play()
-task.delay(1,function()
-cd = false
-end)
-end
-end
-game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Health = tonumber(game.Players.LocalPlayer.Character:WaitForChild("Humanoid").MaxHealth)
-loadedanim_run:Stop()
-loadedanim_run:AdjustSpeed(tonumber(0))
-loadedanim_swing:Stop()
-loadedanim_swing:AdjustSpeed(tonumber(0))
---ragdoll.Ragdoll(npc)
-task.spawn(function()
-Jumpscare(4)
-end)
-npc:Destroy()
-end
-
-
-
-local ragdoll = nil
-function FakeSurvivor()
-pcall(function()
-ragdoll = require(game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Client.Modules.Effect)
-end)
-local npc = game:GetService("ReplicatedStorage").Characters.Survivor.Civilian:Clone()
-pcall(function()
-npc:WaitForChild("Humanoid").DisplayDistanceType = "None"
-end)
-npc.Name = tostring(game.Players:GetChildren()[math.random(1,#game.Players:GetChildren())].Name)
-npc.Parent = workspace.GameAssets.Teams.Survivor
-if workspace.GameAssets:FindFirstChild("Map") then
-npc:WaitForChild("HumanoidRootPart").CFrame = workspace.GameAssets.Map.Config.Spawns.Survivor:GetChildren()[math.random(1,#workspace.GameAssets.Map.Config.Spawns.Survivor:GetChildren())].CFrame * CFrame.new(0,10,0)
-else
-npc:WaitForChild("HumanoidRootPart").CFrame = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame
-end
-local loadedanim_idle = npc:WaitForChild("Humanoid"):LoadAnimation(npc:WaitForChild("Animations"):WaitForChild("Idle"))
-loadedanim_idle:Play()
-loadedanim_idle:AdjustSpeed(tonumber(1))
-for i,v in pairs(npc:WaitForChild("Vanities"):GetChildren()) do
-if v and v:IsA("BasePart") then
-v.Transparency = 1
-end
-end
-local luck = math.random(1,3)
-if luck == 1 then
-npc:WaitForChild("Vanities"):WaitForChild("Caretaker").Transparency = 0
-npc:WaitForChild("Torso").Color = Color3.fromRGB(255,255,255)
-elseif luck == 2 then
-npc:WaitForChild("Vanities"):WaitForChild("Aussie Slouch").Transparency = 0
-npc:WaitForChild("Torso").Color = Color3.fromRGB(150,100,0)
-elseif luck == 3 then
-npc:WaitForChild("Vanities"):WaitForChild("Cloak").Transparency = 0
-npc:WaitForChild("Vanities"):WaitForChild("NinjaMask").Transparency = 0
-npc:WaitForChild("Torso").Color = Color3.fromRGB(255,255,255)
-end
-npc:WaitForChild("HumanoidRootPart").CanTouch = true
-local alr_jumpscared = false
-local touch_connection = npc:WaitForChild("HumanoidRootPart").Touched:Connect(function(child)
-local magnitude = (npc:WaitForChild("HumanoidRootPart").Position - game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").Position).magnitude
-if child and child:IsA("BasePart") and child.Name == "Hitbox" and child.Color == Color3.fromRGB(255,0,0) and child.Material == Enum.Material.ForceField and magnitude < 25 then
-loadedanim_idle:Stop()
-loadedanim_idle:AdjustSpeed(tonumber(0))
-alr_jumpscared = true
-task.spawn(function()
-Jumpscare(4)
-end)
-if require and ragdoll ~= nil then
-ragdoll.Ragdoll(npc)
-ragdoll = nil
-else
-npc:Destroy()
-end
-pcall(function()
-touch_connection:Disconnect()
-end)
-end
-end)
-if not workspace.GameAssets.Teams.Killer:FindFirstChildOfClass("Model") then
-loadedanim_idle:Stop()
-loadedanim_idle:AdjustSpeed(tonumber(0))
-npc:Destroy()
-pcall(function()
-touch_connection:Disconnect()
-end)
-else
-repeat task.wait() until workspace.GameAssets.Teams.Killer:FindFirstChildOfClass("Model") == nil or alr_jumpscared == true
-if alr_jumpscared == true then return nil end
-loadedanim_idle:Stop()
-loadedanim_idle:AdjustSpeed(tonumber(0))
-npc:Destroy()
-pcall(function()
-touch_connection:Disconnect()
-end)
-end
+function TableToLuauString(Table, IgnoredTables, DepthData, Path)
+    if type(Table) ~= "table" then
+        return SerializeType(Table, safeTypeof(Table))
+    end
+    IgnoredTables = IgnoredTables or {}
+    Path = Path or "ROOT"
+    if not DepthData then
+        DepthData = {0, Path}
+    end
+    local CyclicData = IgnoredTables[Table]
+    if CyclicData then
+        local currentDepth = DepthData[1] or 0
+        local cyclicDepth = CyclicData[1] or 0
+        return ((cyclicDepth == currentDepth - 1 and "'[Cyclic Parent " or "'[Cyclic ") .. tostring(Table) .. ', path: ' .. (CyclicData[2] or "unknown") .. "]'")
+    end
+    DepthData[1] = (DepthData[1] or 0) + 1
+    DepthData[2] = Path
+    IgnoredTables[Table] = {DepthData[1], DepthData[2]}
+    local currentDepth = DepthData[1] or 1
+    local Tab = string.rep('    ', currentDepth)
+    local TrailingTab = string.rep('    ', currentDepth - 1)
+    local Result = '{'
+    local LineTab = '\n' .. Tab
+    local HasOrder = true
+    local Index = 1
+    local IsEmpty = true
+    for Key, Value in pairs(Table) do
+        IsEmpty = false
+        if Index ~= Key then
+            HasOrder = false
+        else
+            Index = Index + 1
+        end
+        local KeyClass = safeTypeof(Key)
+        local ValueClass = safeTypeof(Value)
+        local HasBrackets = false
+        local KeyStr
+        if KeyClass == 'string' then
+            local cleanKey = string.gsub(Key, '[%c%z]', SpecialCharacters)
+            if Keywords[cleanKey] or not string.match(cleanKey, '^[_%a][_%w]*$') then
+                HasBrackets = true
+                KeyStr = string.format('["%s"]', cleanKey)
+            else
+                KeyStr = cleanKey
+            end
+        else
+            HasBrackets = true
+            if KeyClass == 'table' then
+                KeyStr = '[' .. TableToLuauString(Key, IgnoredTables, {currentDepth + 1, Path}) .. ']'
+            else
+                KeyStr = '[' .. SerializeType(Key, KeyClass) .. ']'
+            end
+        end
+        local ValueStr
+        if ValueClass == 'table' then
+            local newPath = Path .. (HasBrackets and '' or '.') .. KeyStr
+            ValueStr = TableToLuauString(Value, IgnoredTables, {currentDepth + 1, Path}, newPath)
+        else
+            ValueStr = SerializeType(Value, ValueClass)
+        end
+        Result = Result .. LineTab .. (HasOrder and ValueStr or KeyStr .. ' = ' .. ValueStr) .. ','
+    end
+    local donetable = IsEmpty and Result .. '}' or string.sub(Result, 1, -2) .. '\n' .. TrailingTab .. '}'
+    IgnoredTables[Table] = nil
+    return donetable
 end
 
-
-function FakeTimer()
-local start = tick()
-local timerisalmostup = game:GetService("ReplicatedStorage").Sounds.Songs["30SecondsLeft"]:Clone()
-timerisalmostup.Parent = game.LogService
-timerisalmostup.Volume = 2
-timerisalmostup:Play()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:30"
-task.wait()
+function minify_config(tblz)
+    if not tblz then return end
+    local tblz_loader = loadstring or load
+    local tbl = tblz_loader(tblz)()
+    local seen = {}
+    local function serialize(value)
+        local t = type(value)
+        if t == "string" then 
+            return string.format("%q", value)
+        elseif t == "number" then 
+            return tostring(value)
+        elseif t == "boolean" then 
+            return value and "true" or "false"
+        elseif t == "table" then
+            if seen[value] then return "\"<circular>\"" end
+            seen[value] = true
+            local parts = {}
+            for i = 1,#value do
+                parts[i] = serialize(value[i])
+            end
+            for k,v in pairs(value) do
+                if not (type(k) == "number" and k >= 1 and k <= #value and math.floor(k) == k) then
+                    local key = type(k) == "string" and k:match("^[%a_][%w_]*$") and k or "["..serialize(k).."]"
+                    parts[#parts + 1] = key.."="..serialize(v)
+                end
+            end
+            seen[value] = nil
+            return "{"..table.concat(parts, ",").."}"
+        else
+            return "nil"
+        end
+    end
+    return serialize(tbl)
 end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:29"
-task.wait()
+function compile_config(txt)
+    if not txt then return "" end
+    local text = minify_config(txt)
+    local shifted = text:gsub(".", function(char)
+        local byte = string.byte(char)
+        return string.char(byte + 5)
+    end)
+    local hexed = shifted:gsub(".", function(char)
+        return string.format("%02X", string.byte(char))
+    end)
+    local separators = {"-", ":", "|", ".", "_", "~", "#", "!"}
+    local withSeparators = hexed:gsub("(%x%x)", function(hexPair)
+        return hexPair .. "-"
+    end)
+    return "[" .. withSeparators:sub(1,-2) .. "]"
 end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:28"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:27"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:26"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:25"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:24"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:23"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:22"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:21"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:20"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:19"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:18"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:17"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:16"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:15"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:14"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:13"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:12"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:11"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:10"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:09"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:08"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:07"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:06"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:05"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:04"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:03"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:02"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:01"
-task.wait()
-end
-local start = tick()
-while tick() - start < 1 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "00:00"
-task.wait()
-end
-game:GetService("ReplicatedStorage").Sounds.SFX.SurvivorWin:Play()
-local start = tick()
-while tick() - start < 7 do
-game:GetService("ReplicatedStorage").StringConfig.Status.Value = "Time's up! The Survivors win!"
-task.wait()
-end
-Jumpscare(4)
+function decompile_config(obfuscatedText)
+    if not obfuscatedText then return "" end
+    local content = obfuscatedText:sub(2, -2)
+    local hexOnly = content:gsub("[%-%:|%.%_%~%#%!]", "")
+    local shifted = hexOnly:gsub("(%x%x)", function(hex)
+        return string.char(tonumber(hex, 16))
+    end)
+    local original = shifted:gsub(".", function(char)
+        local byte = string.byte(char)
+        return string.char(byte - 5)
+    end)
+    local tblz_loader = loadstring or load
+    return ('return '..TableToLuauString(tblz_loader('return '..original..'')()))
 end
 
-function FakeEvilScary()
-local savedvolume = 1.5
-local lungeattack = game:GetService("ReplicatedStorage").Assets.EvilScary.Lunge:Clone()
-lungeattack.Parent = game.LogService
-lungeattack.Volume = savedvolume
-lungeattack:Play()
-task.wait(2)
-for i = 1, math.random(2,5) do
-savedvolume = savedvolume + 0.5
-local moveattackcopy = game:GetService("ReplicatedStorage").Assets.EvilScary.Move:Clone()
-moveattackcopy.Parent = game.LogService
-moveattackcopy.Volume = savedvolume
-moveattackcopy:Play()
-task.wait(.47)
-end
-local fuckingscream = game:GetService("ReplicatedStorage").Assets.EvilScary.Scream:Clone()
-fuckingscream.Parent = game.LogService
-fuckingscream:Play()
-game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("EvilScary").Visible = true
-game:GetService("ReplicatedStorage").Sounds.SFX.KillSound:Play()
-task.wait(3.25)
-game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("EvilScary").Visible = false
-task.spawn(function()
-Jumpscare(4)
-end)
-end
+return {["decompile_config"]=decompile_config;["compile_config"]=compile_config;}]]
+local ConfigurationModule = loadstring(temp_module)()
 
-
-local FakeKillerAppearance = "Devesto"
-Tab_8:CreateInput({Name = "Fake Killer Appearance ( put any killer skin name here )"; PlaceholderText = "Devesto"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-FakeKillerAppearance = ConvertDropdownValue(Value)
+Tab_11:CreateButton({Name = "Re-Execute Script"; Callback = function()
+loadstring(game:HttpGet(_G.dod_repository))()
+Notify("Success!", "Re-Executing script...", 5, true)
 end; })
 
-Tab_8:CreateButton({Name = "Spawn Fake Killer"; Callback = function()
-FakeKiller(FakeKillerAppearance, 60)
+Tab_11:CreateSection("Config Save")
+Tab_11:CreateLabel("Configurations are being auto-saved.")
+Tab_11:CreateButton({Name = "Copy Config Values"; Callback = function()
+setclipboard(tostring(ConfigurationModule.compile_config(GetFile("NexerHub/Core/"..config_save.."", "rf"))))
+Notify("Success!", "Copied Config Values!", 4, true)
 end; })
 
-Tab_8:CreateButton({Name = "Spawn Fake Survivor"; Callback = function()
-FakeSurvivor()
+Tab_11:CreateSection("Config Load")
+Tab_11:CreateLabel("You will have to re-execute script for new configurations to apply!")
+local ConfigValue = "Enter Here!"
+Tab_11:CreateInput({Name = "Enter Config Values"; PlaceholderText = ConfigValue; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+ConfigValue = Value
+end; })
+Tab_11:CreateButton({Name = "Load Config Values"; Callback = function()
+writefile("NexerHub/Core/"..config_save.."", ConfigurationModule.decompile_config(ConfigValue))
+Notify("Success!", "Applied New Config Values! You will have to re-execute script for new configurations to apply.", 10, true)
 end; })
 
-Tab_8:CreateButton({Name = "Spawn Fake Timer"; Callback = function()
-FakeTimer()
-end; })
-
-Tab_8:CreateButton({Name = "Spawn Fake Evil Scary"; Callback = function()
-FakeEvilScary()
-end; })
-
-
-
-local Tab_11 = Window:CreateTab("CMDS",0)
-Tab_11:CreateParagraph({Title = "Commands", Content = "Coming soon!!!"})
 
 local Tab_9 = Window:CreateTab("Other",0)
 Tab_9:CreateParagraph({Title = "Other", Content = "Other random thingiez"})
-Tab_9:CreateDropdown({Name = "Gui Theme"; Options = {"Amethyst","Default","AmberGlow","Bloom","DarkBlue","Green","Light","Ocean","Serenity"}; CurrentOption = "Amethyst"; MultiSelection = false; Callback = function(Value)
-Window.ModifyTheme(ConvertDropdownValue(Value))
+Tab_9:CreateDropdown({Name = "Gui Theme"; Options = {"Amethyst","Default","AmberGlow","Bloom","DarkBlue","Green","Light","Ocean","Serenity"}; CurrentOption = RayfieldGuiTheme; MultiSelection = false; Callback = function(Value)
+RayfieldGuiTheme = ConvertDropdownValue(Value)
+Window.ModifyTheme(RayfieldGuiTheme)
+SaveConfig("Tab_9", RayfieldGuiTheme, "GuiTheme")
 end; })
-Tab_9:CreateButton({Name = "Close Hub"; Callback = function()
-DestroyRayfield()
-end; })
-Tab_8:CreateButton({Name = "Make dash stronger"; Callback = function(Value)
-HumanoidRootPart.ChildAdded:Connect(function(c)
-if c.Name == "BodyVelocity" then
-task.wait()
-c.MaxForce = Vector3.new(1000000,1000000,1000000)
-c.P = 1550
-c.Velocity = Vector3.new(c.Velocity.X, 9, c.Velocity.Z)
-end
-end)
-Notify("Success!","Made dash stronger!",3,true)
-end; })
-
-function PowerDebug()
+Tab_9:CreateButton({Name = "Show Ping"; Callback = function()
+local function PowerDebug()
 game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.ID.Visible = true
 game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.PlaceVersion.Visible = true
 game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.Ping.Visible = true
 while task.wait(1) do
-game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.ID.Text = "Information Powered by "..((getgenv and getgenv().dod_developer_key) or ((_G.dod_developer_key ~= nil and _G.dod_developer_key) or "Unknown")).." Hub"
+game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.ID.Text = "Information Powered by "..((_G.dod_developer_key ~= nil and _G.dod_developer_key) or "Unknown").." Hub"
 game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.PlaceVersion.Text = "Place Version: "..game.PlaceVersion..""
 game:GetService("Players").LocalPlayer.PlayerGui.MainGui.DebugInfo.Ping.Text = "Ping: "..tonumber(math.round(string.split(game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString(), "(")[1])).."ms (round-trip)"
 end
 end
 task.spawn(PowerDebug)
+end; })
+Tab_9:CreateButton({Name = "Close Hub"; Callback = function()
+DestroyRayfield()
+end; })
+
+
+
+
