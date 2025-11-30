@@ -2155,10 +2155,15 @@ SaveConfig("Tab_5", KilldroidDD, "KilldroidConfig", "Don'tDescendDuringTheFlight
 end; })
 --------------------------------------------------------------------------------------
 local KilldroidConfigEffects = nil
+local KilldroidFlightConfig = nil
 function ApplyKilldroidConfigurations()
 if KilldroidConfigEffects then
 KilldroidConfigEffects:Disconnect()
 KilldroidConfigEffects = nil
+end
+if KilldroidFlightConfig then
+KilldroidFlightConfig:Disconnect()
+KilldroidFlightConfig = nil
 end
 if not HumanoidRootPart then return end
 KilldroidConfigEffects = HumanoidRootPart.ChildAdded:Connect(function(c)
@@ -2168,15 +2173,32 @@ c.P = KilldroidPower
 if KilldroidDD ~= true then return end
 task.spawn(function()
 pcall(function()
-while task.wait() do
+KilldroidFlightConfig = game:GetService("RunService").RenderStepped:Connect(function()
 if c.Velocity.Y < 0 then
 c.Velocity = Vector3.new(c.Velocity.X,0,c.Velocity.Z)
 end
+end)
+end)
+end)
+end
+end)
+for _,c in next, HumanoidRootPart:GetChildren() do
+if c.Name == "BodyVelocity" then
+c.MaxForce = Vector3.new(KilldroidMaxForce,KilldroidMaxForce,KilldroidMaxForce)
+c.P = KilldroidPower
+if KilldroidDD ~= true then return end
+task.spawn(function()
+pcall(function()
+KilldroidFlightConfig = game:GetService("RunService").RenderStepped:Connect(function()
+if c.Velocity.Y < 0 then
+c.Velocity = Vector3.new(c.Velocity.X,0,c.Velocity.Z)
 end
 end)
 end)
-end
 end)
+end
+end
+
 end
 --------------------------------------------------------------------------------------
 Tab_5:CreateButton({Name = "Apply Killdroid Configurations"; Callback = function(Value)
