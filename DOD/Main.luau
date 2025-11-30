@@ -324,9 +324,63 @@ writefile("NexerHub/Core/PreloadData.luau", [[return {
 }]])
 repeat task.wait() until isfile("NexerHub/Core/PreloadData.luau")
 end
-local SaveConfig = function(tab,value,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); if not element_2 then pcall(function() temp_table[tab][element_1] = value end) elseif not element_3 then pcall(function() temp_table[tab][element_1][element_2] = value end) else pcall(function() temp_table[tab][element_1][element_2][element_3] = value end) end CreateFile("NexerHub/Core/"..config_save.."", 'return '..TableToLuauString(temp_table)..'') end
-local LoadConfig = function(tab,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); local returnelement = nil; if not element_2 then pcall(function() returnelement = temp_table[tab][element_1] end) elseif not element_3 then pcall(function() returnelement = temp_table[tab][element_1][element_2] end) else pcall(function() returnelement = temp_table[tab][element_1][element_2][element_3] end) end return returnelement end
-
+--local SaveConfig = function(tab,value,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); if not element_2 then pcall(function() temp_table[tab][element_1] = value end) elseif not element_3 then pcall(function() temp_table[tab][element_1][element_2] = value end) else pcall(function() temp_table[tab][element_1][element_2][element_3] = value end) end CreateFile("NexerHub/Core/"..config_save.."", 'return '..TableToLuauString(temp_table)..'') end
+--local LoadConfig = function(tab,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); local returnelement = nil; if not element_2 then pcall(function() returnelement = temp_table[tab][element_1] end) elseif not element_3 then pcall(function() returnelement = temp_table[tab][element_1][element_2] end) else pcall(function() returnelement = temp_table[tab][element_1][element_2][element_3] end) end return returnelement end
+local LoadConfig = function(tab, element_1, element_2, element_3)
+    local success, temp_table = pcall(function()
+        return loadstring(GetFile("NexerHub/Core/"..config_save.."", "rf"))()
+    end)
+    if not success or not temp_table then
+        warn("Failed to load config config table")
+		pcall(error, "Failed to load config config table")
+        return
+    end
+    local returnelement = nil
+    if not element_2 then
+        if temp_table[tab] and temp_table[tab][element_1] ~= nil then
+            returnelement = temp_table[tab][element_1]
+        end
+    elseif not element_3 then
+        if temp_table[tab] and temp_table[tab][element_1] and temp_table[tab][element_1][element_2] ~= nil then
+            returnelement = temp_table[tab][element_1][element_2]
+        end
+    else
+        if temp_table[tab] and temp_table[tab][element_1] and temp_table[tab][element_1][element_2] and temp_table[tab][element_1][element_2][element_3] ~= nil then
+            returnelement = temp_table[tab][element_1][element_2][element_3]
+        end
+    end
+    return returnelement
+end
+local SaveConfig = function(tab, value, element_1, element_2, element_3)
+    local success, temp_table = pcall(function()
+        return loadstring(GetFile("NexerHub/Core/"..config_save.."", "rf"))()
+    end)
+    if not success or not temp_table then
+        warn("Failed to load config for saving")
+		pcall(error, "Failed to load config for saving")
+        return
+    end
+    if not temp_table[tab] then
+        temp_table[tab] = {}
+    end
+    if not element_2 then
+        temp_table[tab][element_1] = value
+    elseif not element_3 then
+        if not temp_table[tab][element_1] then
+            temp_table[tab][element_1] = {}
+        end
+        temp_table[tab][element_1][element_2] = value
+    else
+        if not temp_table[tab][element_1] then
+            temp_table[tab][element_1] = {}
+        end
+        if not temp_table[tab][element_1][element_2] then
+            temp_table[tab][element_1][element_2] = {}
+        end
+        temp_table[tab][element_1][element_2][element_3] = value
+    end
+    CreateFile("NexerHub/Core/"..config_save.."", 'return '..TableToLuauString(temp_table)..'')
+end
 
 Instance.new("Folder",game:GetService("CoreGui")).Name = "DOD_Assets"
 --[[function XenoClear()
@@ -345,32 +399,36 @@ if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "
 task.spawn(XenoClear)
 end]]
 
-function ConvertDropdownValue(tbl)
+local function ConvertDropdownValue(tbl)
 if type(tbl) == "table" then
 for _,element in ipairs(tbl) do
 return tostring(element)
 end
+return ""
 else
-return tostring(tbl)
+return tostring(tbl or "")
 end
 end
 
 temp_msg.Text = "Loading API Module... (0/1)"; task.wait(.2)
 
+loadmoduleattempt = 0
 repeat task.wait()
 --if not isfile("NexerHub/Core/APIMODULE.luau") or (isfile("NexerHub/Core/APIMODULE.luau") and loadstring(GetFile("NexerHub/Core/APIMODULE.luau","rf"))()["last_updated"]~=_G.API_last_update) then
 local lodsuc, loderr = pcall(function()
 MainModule = loadstring(game:HttpGet("https://pastebin.com/raw/G17DaBUh"))()
 end)
 if not lodsuc then
-temp_msg.Text = "Failed loading API Module, re-trying..."
-task.wait(3)
+loadmoduleattempt += 1
+temp_msg.Text = "Failed loading API Module, re-trying... ( Attempt "..tostring(loadmoduleattempt).." )"
+task.wait(1)
 elseif lodsuc and MainModule.IsWorking ~= nil then
 temp_msg.Text = "Loading API Module... (1/1)"
 task.wait(1)
 else
-temp_msg.Text = "Failed loading API Module, re-trying..."
-task.wait(3)
+loadmoduleattempt += 1
+temp_msg.Text = "Failed loading API Module, re-trying... ( Attempt "..tostring(loadmoduleattempt).." )"
+task.wait(1)
 end
 --elseif isfile("NexerHub/Core/APIMODULE.luau") then
 
@@ -426,9 +484,11 @@ temp_msg:Destroy()
 return
 end
 
+
 temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/25)"
+local temp_variable_a = false
 --loadstring(GetFile("NexerHub/Core/PreloadData.luau","rf"))().LoadAssets == true
-if HaveWorkspaceAccess() and false == true then
+if HaveWorkspaceAccess() and temp_variable_a == true then
 if not isfolder("NexerHub") then
 makefolder("NexerHub")
 repeat task.wait(.1) until isfolder("NexerHub")
