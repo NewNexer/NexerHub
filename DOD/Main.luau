@@ -800,7 +800,7 @@ until NoFatigue == false
 end; })
 --NoFatigueToggle:Set(NoFatigue)
 
---[[Tab_1:CreateSection("Advanced")
+Tab_1:CreateSection("Advanced")
 
 Tab_1:CreateInput({Name = "Max Stamina"; PlaceholderText = "Type Here!"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = true; Callback = function(Value)
 SetStaminaProperty("MaxStamina", tonumber(Value))
@@ -830,6 +830,7 @@ Tab_1:CreateToggle({Name = "Sprint Disabled"; CurrentValue = false; Callback = f
 SetStaminaProperty("DisableSprint", Value)
 end; })
 
+--[[
 Tab_1:CreateSection("Auto Injection")
 local AI_MaxStamina, AI_WalkSpeed, AI_SprintSpeed
 
