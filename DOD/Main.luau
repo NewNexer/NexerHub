@@ -1180,6 +1180,9 @@ local AbilitySystem = {
     PreferredInput = UserInputService.PreferredInput
 }
 
+-- Store cooldown status per ability
+local abilityCooldowns = {}
+
 function AbilitySystem.CreateAbility(AbilityData)
     if AbilitiesFolder:FindFirstChild(AbilityData.Name) then AbilitiesFolder:FindFirstChild(AbilityData.Name):Destroy() task.wait() end
     
@@ -1231,8 +1234,7 @@ function AbilitySystem:Bind(AbilityData, AbilityButton)
             triggerFound = true
         end
         if triggerFound and AbilityButton.Parent then
-            AbilitySystem.UseAbility(AbilityData, AbilityButton)
-			task.wait(1)
+            task.spawn(function() AbilitySystem.UseAbility(AbilityData, AbilityButton) end)
         end
     end)
     AbilityButton.AncestryChanged:Connect(function()
@@ -1241,7 +1243,6 @@ function AbilitySystem:Bind(AbilityData, AbilityButton)
         end
     end)
 end
-
 
 function AbilitySystem.AbilityTween(AbilityButton)
     TweenService:Create(AbilityButton, TweenInfo.new(0.2), {Size = UDim2.new(0.9, 0, 0.9, 0)}):Play()
@@ -1287,25 +1288,25 @@ function AbilitySystem.PutOnCooldown(AbilityButton, CooldownTime)
     end
 end
 
-local canuseagain = true
 function AbilitySystem.UseAbility(AbilityData, AbilityButton)
-    if AbilityButton.Cooldown.Visible or canuseagain == false then return end
-	canuseagain = false
-	task.delay((Cooldown or AbilityData.Cooldown), function() canuseagain = true end)
+    if AbilityButton.Cooldown.Visible then return end
+	task.spawn(AbilitySystem.AbilityTween, AbilityButton)
+	if AbilityData.Client == true then
+	task.spawn(function() AbilitySystem.PutOnCooldown(AbilityButton, Cooldown or AbilityData.Cooldown) end)
+    end
+
     local Success, Cooldown = Events.RemoteFunctions.UseAbility:InvokeServer(AbilityData.Name)
     if Success or AbilityData.Client == true then
-		if AbilityData.Client == true then
-			Cooldown = AbilityData.Cooldown
-		end
-        AbilitySystem.AbilityTween(AbilityButton)
+        if AbilityData.Client == true then
+            Cooldown = AbilityData.Cooldown
+        end
         if Success ~= "MultipleUse" then
-            task.spawn(function() AbilitySystem.PutOnCooldown(AbilityButton, Cooldown or AbilityData.Cooldown) end)
-			if AbilityData.Client == true then
-				AbilityData.ClientFunction()
-			end
+            if AbilityData.Client == true then
+                AbilityData.ClientFunction()
+            end
         end
     end
-	return Success
+    return Success
 end
 
 return AbilitySystem]]
