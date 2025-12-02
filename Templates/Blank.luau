@@ -184,3 +184,5 @@ end; })
 Tab1:CreateSlider({Name = "Slider"; Range = {0, 100}; Increment = 5; Suffix = "%"; CurrentValue = 50; Callback = function(Value)
 print(Value)
 end; })
+
+msg:Destroy()
