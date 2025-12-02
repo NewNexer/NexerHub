@@ -70,7 +70,7 @@ if not lodsuc then
 loadmoduleattempt += 1
 msg.Text = "Failed loading API Module, re-trying... ( Attempt "..tostring(loadmoduleattempt).." )"
 task.wait(1)
-elseif lodsuc and MainModule.IsWorking ~= nil then
+elseif lodsuc and Module.IsWorking ~= nil then
 msg.Text = "Loading API Module... (1/1)"
 task.wait(1)
 else
