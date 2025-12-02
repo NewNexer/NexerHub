@@ -237,3 +237,5 @@ Tab2:CreateSection("Camera")
 Tab2:CreateSlider({Name = "FOV"; Range = {0,360}; Increment = 1; Suffix = ""; CurrentValue = workspace.CurrentCamera.FieldOfView; Callback = function(Value)
 workspace.CurrentCamera.FieldOfView = Value
 end; })
+
+msg:Destroy()
