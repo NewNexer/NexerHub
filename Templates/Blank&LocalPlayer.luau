@@ -196,7 +196,7 @@ end; })
 Tab2:CreateToggle({Name = "Loop Set WalkSpeed"; CurrentValue = false; Callback = function(Value)
 if Value == true then
 Heartbeat.LoopWalkSpeed = function() Humanoid.WalkSpeed = WalkSpeed end
-elseif Value == false
+elseif Value == false then
 if Heartbeat.LoopWalkSpeed~=nil then
 Heartbeat.LoopWalkSpeed = nil
 end
@@ -225,7 +225,7 @@ end; })
 Tab2:CreateToggle({Name = "Loop Set JumpPower"; CurrentValue = false; Callback = function(Value)
 if Value == true then
 Heartbeat.LoopJumpPower = function() Humanoid.JumpPower = JumpPower end
-elseif Value == false
+elseif Value == false then
 if Heartbeat.LoopJumpPower~=nil then
 Heartbeat.LoopJumpPower = nil
 end
