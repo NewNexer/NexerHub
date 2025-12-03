@@ -209,12 +209,12 @@ if not IsNormal(game:GetService("Players").LocalPlayer.Character) then
 ClosestHRP = nil
 return
 end
-for i,v in pairs(game.Players:GetPlayers()) do
-if v ~= game:GetService("Players").LocalPlayer and IsNormal(v.Character) then
-local Distance = (HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).Magnitude
+for i,v in pairs(workspace.Char:GetChildren()) do
+if v.Name ~= game:GetService("Players").LocalPlayer.Name and IsNormal(v) then
+local Distance = (HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
 if Distance < ClosestDistance then
 ClosestDistance = Distance
-NewClosest = v.Character.HumanoidRootPart
+NewClosest = v.HumanoidRootPart
 end
 end
 end
@@ -327,6 +327,89 @@ end; })
 msg:Destroy()
 
 local Tab3 = Window:CreateTab("Other",0)
+
+Tab3:CreateButton({Name = "EXTERMINATE THE CLOSEST PLAYER TO YOU."; Callback = function()
+
+
+local spinning = true
+local a = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(game:GetService("ReplicatedStorage").src.Identities.Meursault["The Thumb East Capo IIII"].Animations.Base.Attack.Combo3)
+a:Play()
+local BodyVelocity = Instance.new("BodyVelocity")
+BodyVelocity.MaxForce = Vector3.new(9e9,9e9,9e9)
+BodyVelocity.P = 2000
+BodyVelocity.Velocity = (game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.LookVector * 80) * tonumber(-1)
+BodyVelocity.Parent = game.Players.LocalPlayer.Character.HumanoidRootPart
+game.Debris:AddItem(BodyVelocity, .1)
+task.wait(.15)
+task.wait(.05)
+a:AdjustSpeed(0)
+task.wait(.35)
+a:AdjustSpeed(1)
+local BodyVelocity = Instance.new("BodyVelocity")
+BodyVelocity.MaxForce = Vector3.new(9e9,9e9,9e9)
+BodyVelocity.P = 5000
+BodyVelocity.Velocity = (game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.LookVector * 80) * tonumber(1.5)
+BodyVelocity.Parent = game.Players.LocalPlayer.Character.HumanoidRootPart
+game.Debris:AddItem(BodyVelocity, .2)
+task.wait(.3)
+a:Stop()
+task.wait()
+local BodyVelocity = Instance.new("BodyPosition")
+BodyVelocity.MaxForce = Vector3.new(9e9,9e9,9e9)
+BodyVelocity.P = 2000
+BodyVelocity.D = 100
+BodyVelocity.Position = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+BodyVelocity.Parent = game.Players.LocalPlayer.Character.HumanoidRootPart
+task.spawn(function()
+local a = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(game:GetService("ReplicatedStorage").src.Identities.Meursault["The Thumb East Capo IIII"].Animations.Base.Attack.Combo3)
+while spinning do
+a.Priority = Enum.AnimationPriority.Action4
+a:AdjustSpeed(2)
+a:Play()
+if math.random(1,2) == 1 then
+a.TimePosition = .55
+task.wait(.4)
+else
+a.TimePosition = .6
+task.wait(.3)
+end
+if spinning == false then
+a:AdjustSpeed(1)
+else
+a:Stop()
+end
+end
+end)
+local TargetHumanoid = ClosestHRP.Parent:FindFirstChildOfClass("Humanoid")
+local localPlayer = game.Players.LocalPlayer
+repeat task.wait()
+for i,v in next,game:GetService("ReplicatedStorage").src:GetDescendants() do
+if v and v:IsA("ModuleScript") and tonumber(v.Name)~=nil and (v.Parent.Name == "Coinss" or (v.Parent.Name == "Combos" and tonumber(v.Name)~=3)) then
+BodyVelocity.Position = ClosestHRP.Position
+local args = {
+    {
+        Module = v,
+        Humanoid = localPlayer.Character:WaitForChild("Humanoid"),
+        Attempt = "M1",
+        HRP = localPlayer.Character:WaitForChild("HumanoidRootPart"),
+        Char = localPlayer.Character
+    }
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Net"):WaitForChild("Character"):WaitForChild("Combat"):FireServer(unpack(args))
+task.wait(.135)
+if not TargetHumanoid or TargetHumanoid.Health < 1 then
+spinning = false
+BodyVelocity:Destroy()
+return
+end
+end
+end
+until not TargetHumanoid or TargetHumanoid.Health < 1
+spinning = false
+BodyVelocity:Destroy()
+
+end; })
+
 Tab3:CreateButton({Name = "Close Hub"; Callback = function()
 for i,v in next, Heartbeat do
 if i then
