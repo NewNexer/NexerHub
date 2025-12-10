@@ -4818,8 +4818,8 @@ if not table.find(temp_table, choosen_lms) then
 Notify("Error!","File isn't added! ( Please reload lms audios and choose again. )",3,false)
 return
 end
-if not IsFile("NexerHub/DieOfDeath/Assets/Chases/"..choosen_lms..".mp3") then
-Notify("Error!","File not found! ( Please check ''Chases'' folder and make sure it is here. )",3,false)
+if not IsFile("NexerHub/DieOfDeath/Assets/LMS/"..choosen_lms..".mp3") then
+Notify("Error!","File not found! ( Please check ''LMS'' folder and make sure it is here. )",3,false)
 return
 end
 for i,v in next, game:GetService("ReplicatedStorage").Sounds.Songs.LMSSongs:GetChildren() do
