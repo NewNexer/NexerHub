@@ -1,8 +1,162 @@
 local module = {}
 
-function module.IsWorking()
-return true
+--[[
+Table Things
+]]--
+local SpecialCharacters = {['\a'] = '\\a', ['\b'] = '\\b', ['\f'] = '\\f', ['\n'] = '\\n', ['\r'] = '\\r', ['\t'] = '\\t', ['\v'] = '\\v', ['\0'] = '\\0'}
+local Keywords = { ['and'] = true, ['break'] = true, ['do'] = true, ['else'] = true, ['elseif'] = true, ['end'] = true, ['false'] = true, ['for'] = true, ['function'] = true, ['if'] = true, ['in'] = true, ['local'] = true, ['nil'] = true, ['not'] = true, ['or'] = true, ['repeat'] = true, ['return'] = true, ['then'] = true, ['true'] = true, ['until'] = true, ['while'] = true, ['continue'] = true}
+local Functions = {
+    [pairs] = "pairs",
+    [ipairs] = "ipairs", 
+    [next] = "next",
+    [type] = "type",
+    [tostring] = "tostring",
+    [tonumber] = "tonumber",
+    [print] = "print",
+    [error] = "error",
+    [assert] = "assert",
+    [pcall] = "pcall",
+    [xpcall] = "xpcall",
+    [select] = "select",
+    [rawget] = "rawget",
+    [rawset] = "rawset",
+    [rawequal] = "rawequal",
+    [getmetatable] = "getmetatable",
+    [setmetatable] = "setmetatable",
+    [require] = "require",
+}
+if loadstring then Functions[loadstring] = "loadstring" end
+if load then Functions[load] = "load" end
+local function safeTypeof(value)
+    if typeof then
+        return typeof(value)
+    else
+        return type(value)
+    end
 end
+function GetHierarchy(Object)
+    if not Object or (type(Object) ~= "table" and safeTypeof(Object) ~= "Instance") then
+        return tostring(Object)
+    end
+    local Hierarchy = {}
+    local current = Object
+    while current do
+        local name = tostring(current.Name or current.name or "Unknown")
+        name = string.gsub(name, '[%c%z]', SpecialCharacters)
+        if current == game or current == _G.game then
+            table.insert(Hierarchy, 1, "game")
+        elseif Keywords[name] or not string.match(name, '^[_%a][_%w]*$') then
+            table.insert(Hierarchy, 1, '["' .. name .. '"]')
+        else
+            table.insert(Hierarchy, 1, name)
+        end
+        current = current.Parent
+    end
+    
+    return table.concat(Hierarchy, ".")
+end
+local function SerializeType(Value, Class)
+    if Class == 'string' then
+        return string.format('"%s"', string.gsub(Value, '[%c%z]', SpecialCharacters))
+    elseif Class == 'Instance' then
+        return GetHierarchy(Value)
+    elseif Class == 'function' then
+        return Functions[Value] or "'[Function: " .. tostring(Value) .. "]'"
+    elseif Class == 'userdata' then
+        return "'[userdata: " .. tostring(Value) .. "]'"
+    elseif Class == 'thread' then
+        if coroutine and coroutine.status then
+            local status = pcall(function() return coroutine.status(Value) end)
+            return "'[thread: " .. tostring(Value) .. (status and ", status: " .. coroutine.status(Value) or "") .. "]'"
+        else
+            return "'[thread: " .. tostring(Value) .. "]'"
+        end
+    else
+        return tostring(Value)
+    end
+end
+function TableToLuauString(Table, IgnoredTables, DepthData, Path)
+    if type(Table) ~= "table" then
+        return SerializeType(Table, safeTypeof(Table))
+    end
+    IgnoredTables = IgnoredTables or {}
+    Path = Path or "ROOT"
+    if not DepthData then
+        DepthData = {0, Path}
+    end
+    local CyclicData = IgnoredTables[Table]
+    if CyclicData then
+        local currentDepth = DepthData[1] or 0
+        local cyclicDepth = CyclicData[1] or 0
+        return ((cyclicDepth == currentDepth - 1 and "'[Cyclic Parent " or "'[Cyclic ") .. tostring(Table) .. ', path: ' .. (CyclicData[2] or "unknown") .. "]'")
+    end
+    DepthData[1] = (DepthData[1] or 0) + 1
+    DepthData[2] = Path
+    IgnoredTables[Table] = {DepthData[1], DepthData[2]}
+    local currentDepth = DepthData[1] or 1
+    local Tab = string.rep('    ', currentDepth)
+    local TrailingTab = string.rep('    ', currentDepth - 1)
+    local Result = '{'
+    local LineTab = '\n' .. Tab
+    local HasOrder = true
+    local Index = 1
+    local IsEmpty = true
+    for Key, Value in pairs(Table) do
+        IsEmpty = false
+        if Index ~= Key then
+            HasOrder = false
+        else
+            Index = Index + 1
+        end
+        local KeyClass = safeTypeof(Key)
+        local ValueClass = safeTypeof(Value)
+        local HasBrackets = false
+        local KeyStr
+        if KeyClass == 'string' then
+            local cleanKey = string.gsub(Key, '[%c%z]', SpecialCharacters)
+            if Keywords[cleanKey] or not string.match(cleanKey, '^[_%a][_%w]*$') then
+                HasBrackets = true
+                KeyStr = string.format('["%s"]', cleanKey)
+            else
+                KeyStr = cleanKey
+            end
+        else
+            HasBrackets = true
+            if KeyClass == 'table' then
+                KeyStr = '[' .. TableToLuauString(Key, IgnoredTables, {currentDepth + 1, Path}) .. ']'
+            else
+                KeyStr = '[' .. SerializeType(Key, KeyClass) .. ']'
+            end
+        end
+        local ValueStr
+        if ValueClass == 'table' then
+            local newPath = Path .. (HasBrackets and '' or '.') .. KeyStr
+            ValueStr = TableToLuauString(Value, IgnoredTables, {currentDepth + 1, Path}, newPath)
+        else
+            ValueStr = SerializeType(Value, ValueClass)
+        end
+        Result = Result .. LineTab .. (HasOrder and ValueStr or KeyStr .. ' = ' .. ValueStr) .. ','
+    end
+    local donetable = IsEmpty and Result .. '}' or string.sub(Result, 1, -2) .. '\n' .. TrailingTab .. '}'
+    IgnoredTables[Table] = nil
+    return donetable
+end
+
+
+if _G.GlobalStartupFunctions == nil or not _G.GlobalStartupFunctions then
+_G.GlobalStartupFunctions = {}
+warn("Re-creating functions")
+task.wait()
+end
+_G.GlobalStartupFunctions.ConvertToTable = TableToLuauString
+_G.GlobalStartupFunctions.
+
+
+function module.IsWorking()
+return (module~=nil)
+end
+
+
 
 function IsFollowedTo(userid)
     local function valid_url(which, cursor)
