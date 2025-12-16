@@ -421,6 +421,22 @@ end
 end
 
 
+function module:ClearTouchable(a)
+for i,v in next, a:GetDescendants() do
+if v and v:IsA("TouchTransmitter") then
+v:Destroy()
+elseif v and v:IsA("BasePart") then
+v.CanTouch = false
+v.CanCollide = false
+end
+end
+for i,v in next, a:GetDescendants() do
+if v then v:Destroy() end
+end
+a:Destroy()
+end
+
+
 --[[ Yes, I am aware that this kind of obfuscation can be easily deobfuscated in 5 seconds. ]]--
 local module.GameBreakingFeatures = {}
 function EvilnessToggle()
