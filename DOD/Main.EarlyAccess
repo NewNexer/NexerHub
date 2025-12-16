@@ -1,701 +1,181 @@
  --[[
-
 Loading Variables
-
 ]]--
-local config_save = "DOD_config.luau"
-_G.dod_developer_key = "Nexer" -- my name yaa
-_G.API_last_update = "29/11/2025" -- last time update (dd/mm/yyyy)
-_G.dod_repository = "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Main.luau" -- input repository for savings
 
-
-
---[[
-
-Table And Configuration Things
-
-]]--
-local SpecialCharacters = {['\a'] = '\\a', ['\b'] = '\\b', ['\f'] = '\\f', ['\n'] = '\\n', ['\r'] = '\\r', ['\t'] = '\\t', ['\v'] = '\\v', ['\0'] = '\\0'}
-local Keywords = { ['and'] = true, ['break'] = true, ['do'] = true, ['else'] = true, ['elseif'] = true, ['end'] = true, ['false'] = true, ['for'] = true, ['function'] = true, ['if'] = true, ['in'] = true, ['local'] = true, ['nil'] = true, ['not'] = true, ['or'] = true, ['repeat'] = true, ['return'] = true, ['then'] = true, ['true'] = true, ['until'] = true, ['while'] = true, ['continue'] = true}
-local Functions = {
-    [pairs] = "pairs",
-    [ipairs] = "ipairs", 
-    [next] = "next",
-    [type] = "type",
-    [tostring] = "tostring",
-    [tonumber] = "tonumber",
-    [print] = "print",
-    [error] = "error",
-    [assert] = "assert",
-    [pcall] = "pcall",
-    [xpcall] = "xpcall",
-    [select] = "select",
-    [rawget] = "rawget",
-    [rawset] = "rawset",
-    [rawequal] = "rawequal",
-    [getmetatable] = "getmetatable",
-    [setmetatable] = "setmetatable",
-    [require] = "require",
+--[[ File Checks ]]--
+if not isfolder("NexerHub") then makefolder("NexerHub") repeat task.wait() until isfolder("NexerHub") end
+if not isfolder("NexerHub/Core") then makefolder("NexerHub/Core") repeat task.wait() until isfolder("NexerHub/Core") end
+local GUID = tostring(game:GetService("HttpService"):GenerateGUID())
+if not isfile("NexerHub/Core/PreloadData.luau") then
+writefile("NexerHub/Core/PreloadData.luau", [[return {
+    ["LoadConfig"] = true,
+    ["GUID"] = "]]..GUID..[[",
+    ["CoreVersion"] = 1,
+    ["LoadAssets"] = true
+}]])
+repeat task.wait() until isfile("NexerHub/Core/PreloadData.luau")
+elseif isfile("NexerHub/Core/PreloadData.luau") then
+pcall(function()
+local a = loadstring(readfile("NexerHub/Core/PreloadData.luau"))()
+if a and a.GUID~=nil then
+GUID = a.GUID
+end
+end)
+end
+local WhitelistedGUIDS = {
+    "{4c50eba2-d2ed-4d79-bec1-02a967f49c58}",
+    "{00000000-0000-0000-0000-000000000000}"
 }
-if loadstring then Functions[loadstring] = "loadstring" end
-if load then Functions[load] = "load" end
-local function safeTypeof(value)
-    if typeof then
-        return typeof(value)
-    else
-        return type(value)
-    end
-end
-function GetHierarchy(Object)
-    if not Object or (type(Object) ~= "table" and safeTypeof(Object) ~= "Instance") then
-        return tostring(Object)
-    end
-    local Hierarchy = {}
-    local current = Object
-    while current do
-        local name = tostring(current.Name or current.name or "Unknown")
-        name = string.gsub(name, '[%c%z]', SpecialCharacters)
-        if current == game or current == _G.game then
-            table.insert(Hierarchy, 1, "game")
-        elseif Keywords[name] or not string.match(name, '^[_%a][_%w]*$') then
-            table.insert(Hierarchy, 1, '["' .. name .. '"]')
-        else
-            table.insert(Hierarchy, 1, name)
-        end
-        current = current.Parent
-    end
-    
-    return table.concat(Hierarchy, ".")
-end
-local function SerializeType(Value, Class)
-    if Class == 'string' then
-        return string.format('"%s"', string.gsub(Value, '[%c%z]', SpecialCharacters))
-    elseif Class == 'Instance' then
-        return GetHierarchy(Value)
-    elseif Class == 'function' then
-        return Functions[Value] or "'[Function: " .. tostring(Value) .. "]'"
-    elseif Class == 'userdata' then
-        return "'[userdata: " .. tostring(Value) .. "]'"
-    elseif Class == 'thread' then
-        if coroutine and coroutine.status then
-            local status = pcall(function() return coroutine.status(Value) end)
-            return "'[thread: " .. tostring(Value) .. (status and ", status: " .. coroutine.status(Value) or "") .. "]'"
-        else
-            return "'[thread: " .. tostring(Value) .. "]'"
-        end
-    else
-        return tostring(Value)
-    end
-end
-function TableToLuauString(Table, IgnoredTables, DepthData, Path)
-    if type(Table) ~= "table" then
-        return SerializeType(Table, safeTypeof(Table))
-    end
-    IgnoredTables = IgnoredTables or {}
-    Path = Path or "ROOT"
-    if not DepthData then
-        DepthData = {0, Path}
-    end
-    local CyclicData = IgnoredTables[Table]
-    if CyclicData then
-        local currentDepth = DepthData[1] or 0
-        local cyclicDepth = CyclicData[1] or 0
-        return ((cyclicDepth == currentDepth - 1 and "'[Cyclic Parent " or "'[Cyclic ") .. tostring(Table) .. ', path: ' .. (CyclicData[2] or "unknown") .. "]'")
-    end
-    DepthData[1] = (DepthData[1] or 0) + 1
-    DepthData[2] = Path
-    IgnoredTables[Table] = {DepthData[1], DepthData[2]}
-    local currentDepth = DepthData[1] or 1
-    local Tab = string.rep('    ', currentDepth)
-    local TrailingTab = string.rep('    ', currentDepth - 1)
-    local Result = '{'
-    local LineTab = '\n' .. Tab
-    local HasOrder = true
-    local Index = 1
-    local IsEmpty = true
-    for Key, Value in pairs(Table) do
-        IsEmpty = false
-        if Index ~= Key then
-            HasOrder = false
-        else
-            Index = Index + 1
-        end
-        local KeyClass = safeTypeof(Key)
-        local ValueClass = safeTypeof(Value)
-        local HasBrackets = false
-        local KeyStr
-        if KeyClass == 'string' then
-            local cleanKey = string.gsub(Key, '[%c%z]', SpecialCharacters)
-            if Keywords[cleanKey] or not string.match(cleanKey, '^[_%a][_%w]*$') then
-                HasBrackets = true
-                KeyStr = string.format('["%s"]', cleanKey)
-            else
-                KeyStr = cleanKey
-            end
-        else
-            HasBrackets = true
-            if KeyClass == 'table' then
-                KeyStr = '[' .. TableToLuauString(Key, IgnoredTables, {currentDepth + 1, Path}) .. ']'
-            else
-                KeyStr = '[' .. SerializeType(Key, KeyClass) .. ']'
-            end
-        end
-        local ValueStr
-        if ValueClass == 'table' then
-            local newPath = Path .. (HasBrackets and '' or '.') .. KeyStr
-            ValueStr = TableToLuauString(Value, IgnoredTables, {currentDepth + 1, Path}, newPath)
-        else
-            ValueStr = SerializeType(Value, ValueClass)
-        end
-        Result = Result .. LineTab .. (HasOrder and ValueStr or KeyStr .. ' = ' .. ValueStr) .. ','
-    end
-    local donetable = IsEmpty and Result .. '}' or string.sub(Result, 1, -2) .. '\n' .. TrailingTab .. '}'
-    IgnoredTables[Table] = nil
-    return donetable
-end
 
 
 
-local asset_counter = 0
-local temp_msg = Instance.new("Message",game.CoreGui)
+--[[ Global Variables ]]--
+_G.dod_developer_key = "Nexer" -- my name yaa
+_G.dod_name = "Die Of Death" -- name of the game that we will surely need
+_G.API_last_update = "16/12/2025" -- last time update (dd/mm/yyyy)
+_G.dod_repository = "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Main.luau" -- input repository for savings
+_G.global_module = "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/Global-Module.luau" -- global module ( don't change or else script won't work! )
+_G.HasPremium = false -- don't change
+_G.GlobalStartupFunctions = {} -- don't change
+task.spawn(function()
+if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(game:GetService("Players").LocalPlayer.UserId,1264479709) then
+_G.HasPremium = true
+end
+for i,v in next, WhitelistedGUIDS do
+if v == GUID then
+_G.HasPremium = true
+end
+end
+end)
 
+
+
+--[[ Local Variables ]]--
+local LocalPlayer, LP = game:GetService("Players").LocalPlayer, game:GetService("Players").LocalPlayer
+local Character, Char = nil, nil
+local HumanoidRootPart, HRP = nil, nil
+local Humanoid, Hum = nil, nil
+pcall(function()
+Character, Char = LocalPlayer.Character, LocalPlayer.Character
+end)
+pcall(function()
+HumanoidRootPart, HRP = Character.HumanoidRootPart, Character.HumanoidRootPart
+end)
+pcall(function()
+Humanoid, Hum = Character.Humanoid, Character.Humanoid
+end)
+LocalPlayer.CharacterAdded:Connect(function(char)
+pcall(function()
+Character, Char = nil, nil
+HumanoidRootPart, HRP = nil, nil
+Humanoid, Hum = nil, nil
+task.wait()
+Character, Char = char, char
+repeat task.wait() until char:FindFirstChild("HumanoidRootPart")
+HumanoidRootPart, HRP = char.HumanoidRootPart, char.HumanoidRootPart
+repeat task.wait() until Character:FindFirstChild("Humanoid")
+Humanoid, Hum = char.Humanoid, char.Humanoid
+end)
+end)
+Instance.new("Folder",game:GetService("CoreGui")).Name = "DOD_Assets"
+
+
+
+--[[ Startup Functions ]]--
+local CreateMessage = function(a) local instancename = (a=="Message" and a) or "Hint"; local msg = Instance.new(instancename,game:GetService("CoreGui")); msg.Text = ""; return msg end
 local Execute = function(f, ...) return function(f, ...) return task.spawn(f, ...) end end
 local HaveWorkspaceAccess = function() if isfile and writefile and readfile and isfolder and makefolder and (getcustomasset or get_custom_asset) then return true end return false end
 local CreateFile = function(f,c) writefile(f,c) end
 local IsFile = function(f) return isfile(f) end
 local GetFile = function(f,m) local gca = (getcustomasset or get_custom_asset); return ((m=="gca" and (gca(f))) or readfile(f)) end
-local InsertElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); table.insert(temp_table,element); CreateFile(tf, TableToLuauString(temp_table)) end
-local RemoveElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); for i,v in pairs(temp_table) do if v == element then temp_table[i]=nil end end; CreateFile(tf, TableToLuauString(temp_table)) end
+local InsertElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); table.insert(temp_table,element); CreateFile(tf, _G.GlobalStartupFunctions.ConvertToTable(temp_table)) end
+local RemoveElement = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); for i,v in pairs(temp_table) do if v == element then temp_table[i]=nil end end; CreateFile(tf, _G.GlobalStartupFunctions.ConvertToTable(temp_table)) end
 --local InsertElement_test = function(tf, element) local temp_table = loadstring(tostring(GetFile(tf,"rf")))(); temp_table[element] = value; CreateFile(tf, TableToLuauString(temp_table)) end
 
-if not isfolder("NexerHub") then
-makefolder("NexerHub")
-repeat task.wait() until isfolder("NexerHub")
-end
-if not isfolder("NexerHub/Core") then
-makefolder("NexerHub/Core")
-repeat task.wait() until isfolder("NexerHub/Core")
-end
---if not isfile("NexerHub/Core/"..config_save.."") then
-writefile("NexerHub/Core/"..config_save.."", [[return {
-    ["Tab_1"] = {
-        ["AutoInjection"] = {
-            ["MaxStamina"] = "Type Here!",
-            ["WalkSpeed"] = "Type Here!",
-            ["SprintSpeed"] = "Type Here!"
-        },
-        ["NoStaminaLossMethod"] = "require",
-        ["NoStaminaLoss"] = false,
-        ["NoFatigue"] = false
-    },
-    ["Tab_2"] = {},
-    ["Tab_3"] = {
-        ["Bind"] = "None",
-        ["FastFunctions"] = {
-            ["ChoosenAbility"] = "Cloak"
-        },
-        ["CloakConfig"] = {
-            ["Bind"] = "None",
-            ["InvisibilityTime"] = 5
-        },
-        ["PunchConfig"] = {
-            ["Bind"] = "None"
-        },
-        ["TauntConfig"] = {
-            ["Bind"] = "None"
-        },
-        ["BonusPadConfig"] = {
-            ["Bind"] = "None",
-            ["SpeedModifier"] = 7
-        },
-        ["BlockConfig"] = {
-            ["Bind"] = "None"
-        },
-        ["CaretakerConfig"] = {
-            ["Bind"] = "None"
-        },
-        ["DashConfig"] = {
-            ["Bind"] = "None",
-            ["Power"] = 1250,
-            ["MaxForce"] = 30000,
-            ["Duration"] = 0.3
-        },
-        ["HotdogConfig"] = {
-            ["Bind"] = "None",
-            ["StaminaLoss"] = 5
-        },
-        ["RevolverConfig"] = {
-            ["Bind"] = "None"
-        },
-        ["AdrenalineConfig"] = {
-            ["Bind"] = "None"
-        },
-        ["BananaConfig"] = {
-            ["Bind"] = "None"
-        },
-        ["Cards"] = {
-            ["FirstCard"] = {
-                [1] = "Revolver",
-                [2] = "Caretaker"
-            },
-            ["SecondCard"] = {
-                [1] = "BonusPad",
-                [2] = "Caretaker"
-            },
-            ["ThirdCard"] = {
-                [1] = "Revolver",
-                [2] = "Punch"
-            }
-        },
-        ["IB"] = {
-            ["InstaDestroyComputer"] = false,
-            ["AntiWalls"] = false,
-            ["AntiEvilScary"] = false,
-            ["AntiFallRagdoll"] = false
-        }
-    },
-    ["Tab_4"] = {
-        ["ESP"] = {
-            ["Enabled"] = false,
-            ["Transparency"] = 0.3,
-            ["ShowUsernames"] = true,
-            ["ShowHealth"] = true
-        },
-        ["Money"] = {
-            ["Amount"] = "10",
-            ["Reason"] = "for surviving for atleast 60 seconds."
-        }
-    },
-    ["Tab_5"] = {
-        ["IB"] = {
-            ["AntiEvilScary"] = false,
-            ["AntiTaunt"] = false
-        },
-        ["PursuerConfig"] = {
-            ["CleaveBoost"] = 6
-        },
-        ["BadwareConfig"] = {
-            ["HipHeight"] = 5
-        },
-        ["ArtfulConfig"] = {
-            ["HipHeight"] = 5
-        },
-        ["HarkenConfig"] = {},
-        ["KilldroidConfig"] = {
-            ["Power"] = 1250,
-            ["MaxForce"] = 1000000,
-            ["Don'tDescendDuringTheFlight"] = false
-        }
-    },
-    ["Tab_6"] = {
-        ["CustomAnimations"] = {
-            ["Run"] = "Civilian Run",
-            ["Walk"] = "Civilian Walk",
-            ["Idle"] = "Civilian Idle"
-        },
-        ["Swap"] = {
-            ["What"] = "Punch",
-            ["WithWhat"] = "BlockStart"
-        },
-        ["Misc"] = {
-            ["Desync"] = 1,
-            ["DesyncEnabled"] = false
-        },
-        ["ToEdit"] = "Adrenaline",
-        ["CustomID"] = "0"
-    },
-    ["Tab_7"] = {},
-    ["Tab_8"] = {},
-    ["Tab_9"] = {
-        ["GuiTheme"] = "AmberGlow"
-    },
-    ["Tab_10"] = {},
-    ["Tab_11"] = {},
-    ["Tab_12"] = {}
-}]])
-repeat task.wait() until isfile("NexerHub/Core/"..config_save.."")
---end
-if not isfile("NexerHub/Core/PreloadData.luau") then
-writefile("NexerHub/Core/PreloadData.luau", [[return {
-    ["LoadConfig"] = true,
-    ["GUID"] = "]]..tostring(game:GetService("HttpService"):GenerateGUID())..[[",
-    ["CoreVersion"] = 1,
-    ["LoadAssets"] = true
-}]])
-repeat task.wait() until isfile("NexerHub/Core/PreloadData.luau")
-end
---local SaveConfig = function(tab,value,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); if not element_2 then pcall(function() temp_table[tab][element_1] = value end) elseif not element_3 then pcall(function() temp_table[tab][element_1][element_2] = value end) else pcall(function() temp_table[tab][element_1][element_2][element_3] = value end) end CreateFile("NexerHub/Core/"..config_save.."", 'return '..TableToLuauString(temp_table)..'') end
---local LoadConfig = function(tab,element_1,element_2,element_3) local temp_table = loadstring(tostring(GetFile("NexerHub/Core/"..config_save.."","rf")))(); local returnelement = nil; if not element_2 then pcall(function() returnelement = temp_table[tab][element_1] end) elseif not element_3 then pcall(function() returnelement = temp_table[tab][element_1][element_2] end) else pcall(function() returnelement = temp_table[tab][element_1][element_2][element_3] end) end return returnelement end
-local LoadConfig = function(tab, element_1, element_2, element_3)
-    local success, temp_table = pcall(function()
-        return loadstring(GetFile("NexerHub/Core/"..config_save.."", "rf"))()
-    end)
-    if not success or not temp_table then
-        warn("Failed to load config config table")
-		pcall(error, "Failed to load config config table")
-        return
-    end
-    local returnelement = nil
-    if not element_2 then
-        if temp_table[tab] and temp_table[tab][element_1] ~= nil then
-            returnelement = temp_table[tab][element_1]
-        end
-    elseif not element_3 then
-        if temp_table[tab] and temp_table[tab][element_1] and temp_table[tab][element_1][element_2] ~= nil then
-            returnelement = temp_table[tab][element_1][element_2]
-        end
-    else
-        if temp_table[tab] and temp_table[tab][element_1] and temp_table[tab][element_1][element_2] and temp_table[tab][element_1][element_2][element_3] ~= nil then
-            returnelement = temp_table[tab][element_1][element_2][element_3]
-        end
-    end
-    return returnelement
-end
-local SaveConfig = function(tab, value, element_1, element_2, element_3)
-    local success, temp_table = pcall(function()
-        return loadstring(GetFile("NexerHub/Core/"..config_save.."", "rf"))()
-    end)
-    if not success or not temp_table then
-        warn("Failed to load config for saving")
-		pcall(error, "Failed to load config for saving")
-        return
-    end
-    if not temp_table[tab] then
-        temp_table[tab] = {}
-    end
-    if not element_2 then
-        temp_table[tab][element_1] = value
-    elseif not element_3 then
-        if not temp_table[tab][element_1] then
-            temp_table[tab][element_1] = {}
-        end
-        temp_table[tab][element_1][element_2] = value
-    else
-        if not temp_table[tab][element_1] then
-            temp_table[tab][element_1] = {}
-        end
-        if not temp_table[tab][element_1][element_2] then
-            temp_table[tab][element_1][element_2] = {}
-        end
-        temp_table[tab][element_1][element_2][element_3] = value
-    end
-    CreateFile("NexerHub/Core/"..config_save.."", 'return '..TableToLuauString(temp_table)..'')
-end
 
-Instance.new("Folder",game:GetService("CoreGui")).Name = "DOD_Assets"
---[[function XenoClear()
-local a = game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Leaderstats
-a:GetPropertyChangedSignal("Visible"):Connect(function()
-a.Visible = true
+
+--[[ Additional Connections Handler ]]--
+local rs = game:GetService("RunService")
+local Heartbeat = {}
+rs.Heartbeat:Connect(function()
+for i,v in next, Heartbeat do
+if v~=nil then
+task.spawn(v)
+end
+end
 end)
-a.Visible = true
-local b = game:GetService("Players").LocalPlayer.PlayerGui.MainGui.KillerIntro
-b:GetPropertyChangedSignal("Visible"):Connect(function()
-b.Visible = false
+local TaskTick = {}
+task.spawn(function()
+while task.wait() do
+for i,v in next, TaskTick do
+if v~=nil then
+task.spawn(v)
+end
+end
+end
 end)
-b.Visible = false
-end
-if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) then
-task.spawn(XenoClear)
-end]]
+--upconnections: stepped, renderstepped, postsimulation, while task
 
-local function ConvertDropdownValue(tbl)
-if type(tbl) == "table" then
-for _,element in ipairs(tbl) do
-return tostring(element)
-end
-return ""
-else
-return tostring(tbl or "")
-end
-end
 
-temp_msg.Text = "Loading API Module... (0/1)"; task.wait(.2)
 
-loadmoduleattempt = 0
+
+--[[ Loading my module ]]--
+local msg = CreateMessage()
+msg.Text = "Loading API Module... (0/1)"
+local loadmoduleattempt = 0
+local Module = nil
 repeat task.wait()
---if not isfile("NexerHub/Core/APIMODULE.luau") or (isfile("NexerHub/Core/APIMODULE.luau") and loadstring(GetFile("NexerHub/Core/APIMODULE.luau","rf"))()["last_updated"]~=_G.API_last_update) then
 local lodsuc, loderr = pcall(function()
-MainModule = loadstring(game:HttpGet("https://pastebin.com/raw/G17DaBUh"))()
+Module = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/Global-Module.luau"))()
 end)
 if not lodsuc then
 loadmoduleattempt += 1
-temp_msg.Text = "Failed loading API Module, re-trying... ( Attempt "..tostring(loadmoduleattempt).." )"
+msg.Text = "Failed loading API Module, re-trying... ( Attempt "..tostring(loadmoduleattempt).." )"
 task.wait(1)
-elseif lodsuc and MainModule.IsWorking ~= nil then
-temp_msg.Text = "Loading API Module... (1/1)"
+elseif lodsuc and Module.IsWorking ~= nil then
+msg.Text = "Loading API Module... (1/1)"
 task.wait(1)
 else
 loadmoduleattempt += 1
-temp_msg.Text = "Failed loading API Module, re-trying... ( Attempt "..tostring(loadmoduleattempt).." )"
+msg.Text = "Failed loading API Module, re-trying... ( Attempt "..tostring(loadmoduleattempt).." )"
 task.wait(1)
 end
---elseif isfile("NexerHub/Core/APIMODULE.luau") then
-
---end
-until temp_msg.Text == "Loading API Module... (1/1)"
-
-
-function RequestModule(module)
-if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) or (string.find(identifyexecutor(), "Solara") or string.find(identifyexecutor(), "solara") or string.find(identifyexecutor(), "SOLARA")) then return nil end
-local result = nil
-local Success, Error = pcall(function()
-result = require(module)
+until msg.Text == "Loading API Module... (1/1)"
+task.wait(1)
+msg.Text = "Launching Rayfield..."
+--[[ Loading rayfield here ]] --
+local Rayfield = Module:GetWorkingRayfield()
+task.delay(2,function()
+msg:Destroy()
 end)
-if Success then
-return result
-elseif not Success then
-return nil
-end
-end
-
-local GetRequestMethod = function()
-local iqnd = request or http_request or HttpPost or (syn and syn.request) or (http and http.request) or (fluxus and fluxus.request) or (KRNL and KRNL.request) or (Xeno and Xeno.request) or (game and game.HttpPost)
-if iqnd then
-return iqnd
-else
-return nil
-end
-end
-function CopyLink(link)
-local url = tostring(link)
-setclipboard(url)
-Notify("Success!", "Copied Link!", 4, true)
-end
-function OpenLink(link)
-local url = tostring(link)
-if WebHandler then
-local suc, err = pcall(function() game:GetService("GuiService"):BroadcastNotification(game:GetService("HttpService"):JSONEncode({["title"] = "Roblox", ["presentationStyle"] = 2, ["visible"] = true, ["url"] = tostring(url)}), 20) end) if not suc then CopyLink(url) end
-else
-CopyLink(url)
-end
-end
-
-temp_msg.Text = "Loading Rayfield..."; task.wait(.2)
-local Rayfield = nil
-local RAYFIELD_SUCCESS, RAYFIELD_FAIL = pcall(function()
-Rayfield = MainModule:GetWorkingRayfield()
-end)
-if not RAYFIELD_SUCCESS or Rayfield == nil then
-task.delay(0, function() print(RAYFIELD_FAIL) end)
-temp_msg.Text = "Failed to load Rayfield, please try again."
-task.wait(5)
-temp_msg:Destroy()
-return
-end
 
 
-temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/25)"
-local temp_variable_a = false
---loadstring(GetFile("NexerHub/Core/PreloadData.luau","rf"))().LoadAssets == true
-if HaveWorkspaceAccess() and temp_variable_a == true then
-if not isfolder("NexerHub") then
-makefolder("NexerHub")
-repeat task.wait(.1) until isfolder("NexerHub")
-makefolder("NexerHub/DieOfDeath")
-repeat task.wait(.1) until isfolder("NexerHub/DieOfDeath")
-makefolder("NexerHub/DieOfDeath/Assets")
-repeat task.wait(.1) until isfolder("NexerHub/DieOfDeath/Assets")
-makefolder("NexerHub/DieOfDeath/Assets/LMS")
-makefolder("NexerHub/DieOfDeath/Assets/Chases")
-elseif isfolder("NexerHub") and not isfolder("NexerHub/DieOfDeath") then
-makefolder("NexerHub/DieOfDeath")
-repeat task.wait(.1) until isfolder("NexerHub/DieOfDeath")
-makefolder("NexerHub/DieOfDeath/Assets")
-repeat task.wait(.1) until isfolder("NexerHub/DieOfDeath/Assets")
-makefolder("NexerHub/DieOfDeath/Assets/LMS")
-makefolder("NexerHub/DieOfDeath/Assets/Chases")
-elseif isfolder("NexerHub") and isfolder("NexerHub/DieOfDeath") and not isfolder("NexerHub/DieOfDeath/Assets") then
-makefolder("NexerHub/DieOfDeath/Assets")
-repeat task.wait(.1) until isfolder("NexerHub/DieOfDeath/Assets")
-makefolder("NexerHub/DieOfDeath/Assets/LMS")
-makefolder("NexerHub/DieOfDeath/Assets/Chases")
-elseif isfolder("NexerHub") and isfolder("NexerHub/DieOfDeath") and isfolder("NexerHub/DieOfDeath/Assets") and (not isfolder("NexerHub/DieOfDeath/Assets/LMS") or not isfolder("NexerHub/DieOfDeath/Assets/Chases")) then
-if isfolder("NexerHub") and isfolder("NexerHub/DieOfDeath") and isfolder("NexerHub/DieOfDeath/Assets") and not isfolder("NexerHub/DieOfDeath/Assets/LMS") then
-makefolder("NexerHub/DieOfDeath/Assets/LMS")
-end
-if isfolder("NexerHub") and isfolder("NexerHub/DieOfDeath") and isfolder("NexerHub/DieOfDeath/Assets") and not isfolder("NexerHub/DieOfDeath/Assets/Chases") then
-makefolder("NexerHub/DieOfDeath/Assets/Chases")
-end
-end
-asset_counter = 6
-temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/25)"
-end
 
-local music_assets = {
-["HELLFIRE V2"] = "https://files.catbox.moe/2pehs1.mp3";
-["Middle Big Brother"] = "https://files.catbox.moe/65l2f8.mp3";
-["MISO"] = "https://files.catbox.moe/urog51.mp3";
-["Orchestra"] = "https://files.catbox.moe/i9b6vl.mp3";
-["Pretence"] = "https://files.catbox.moe/pkohdd.mp3";
-["Screw Time"] = "https://files.catbox.moe/jhy3lr.mp3";
-["Derptastic"] = "https://files.catbox.moe/r0rzbz.mp3";
-["FAKEOUT"] = "https://files.catbox.moe/ul88my.mp3";
-["A God with No Time"] = "https://files.catbox.moe/xruwh4.mp3";
+--[[ Re-writing global variables ( btw i am writing this to myself, don't mind those comments i do ) ]]--
+_G.dod_developer_key = ""..((_G.dod_developer_key ~= nil and _G.dod_developer_key) or "Unknown")..""
+_G.dod_name = ""..((_G.dod_name ~= nil and _G.dod_name) or "Unknown")..""
 
-["One Bounce"] = "https://files.catbox.moe/ruavt7.mp3";
-["Showtime"] = "https://files.catbox.moe/fo5h65.mp3";
-["Teapot Palace Tour"] = "https://files.catbox.moe/jvk4pn.mp3";
-["Vigilante Shootdown"] = "https://files.catbox.moe/oepxa0.mp3";
-["Eternity V2"] = "https://files.catbox.moe/uxtj1z.mp3";
-["Hero"] = "https://files.catbox.moe/1jazm7.mp3";
-["Omega's Final Stand"] = "https://files.catbox.moe/p435fz.mp3";
-["Careless"] = "https://files.catbox.moe/9t45f8.mp3";
-["A Retro Soul"] = "https://files.catbox.moe/u375iy.mp3";
-}
-local download_failed = false
-local catboxstatus = "working"
-if catboxstatus == "working" then
-if HaveWorkspaceAccess() and not IsFile("NexerHub/DieOfDeath/Assets/LMS/data.luau") then CreateFile("NexerHub/DieOfDeath/Assets/LMS/data.luau", [[return {
-    "One Bounce";
-    "Showtime";
-    "Omega's Final Stand";
-    "A Retro Soul";
-    "Teapot Palace Tour";
-    "Careless";
-    "Vigilante Shootdown";
-    "Eternity V2";
-    "Hero";
-}]])
-local temp_table = {
-    "One Bounce";
-    "Showtime";
-    "Omega's Final Stand";
-    "A Retro Soul";
-    "Teapot Palace Tour";
-    "Careless";
-    "Vigilante Shootdown";
-    "Eternity V2";
-    "Hero";
-}
-for i,v in pairs(temp_table) do
-local music_data = nil
-pcall(function()
-music_data = game:HttpGet(music_assets[v])
-end)
-if (not music_data or music_data == nil) or (music_data and music_data["errors"]) then
-download_failed = true
-end
-if download_failed == true then
-temp_msg.Text = "Failed Loading Core Assets. (Timeout)"
-task.wait(3)
-break
-end
-CreateFile("NexerHub/DieOfDeath/Assets/LMS/"..v..".mp3",music_data)
-asset_counter += 1
-temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/25, will be cancelled if doesn't load )"
-end
-end
-end
-if catboxstatus == "working" then
-if HaveWorkspaceAccess() and not IsFile("NexerHub/DieOfDeath/Assets/Chases/data.luau") then CreateFile("NexerHub/DieOfDeath/Assets/Chases/data.luau", [[return {
-    "A God with No Time";
-    "Derptastic";
-    "FAKEOUT";
-    "HELLFIRE V2";
-    "MISO";
-    "Orchestra";
-    "Pretence";
-    "Screw Time";
-    "Middle Big Brother";
-}]])
-local temp_table = {
-    "A God with No Time";
-    "Derptastic";
-    "FAKEOUT";
-    "HELLFIRE V2";
-    "MISO";
-    "Orchestra";
-    "Pretence";
-    "Screw Time";
-    "Middle Big Brother";
-}
-if download_failed ~= true then
-for i,v in pairs(temp_table) do
-local music_data = nil
-pcall(function()
-music_data = game:HttpGet(music_assets[v])
-end)
-if (not music_data or music_data == nil) or (music_data and music_data["errors"]) then
-download_failed = true
-end
-if download_failed == true then
-temp_msg.Text = "Failed Loading Core Assets."
-break
-end
-CreateFile("NexerHub/DieOfDeath/Assets/Chases/"..v..".mp3",music_data)
-asset_counter += 1
-temp_msg.Text = "Loading Core Assets... ("..asset_counter.."/25, will be cancelled if doesn't load)"
-end
-end
-end
-end
-temp_msg:Destroy()
 
-function Notify(title, content, time, mode)
-time = time or 4
-mode = mode or false or warn
-if mode == true then
-img = 136186846844342
-elseif mode == false then
-img = 71508738660632
-elseif mode == warn then
-img = 9441432403
-end
-Rayfield:Notify({
-	Title = title,
-	Content = content,
-	Duration = time,
-	Image = img,
-	Actions = {},
-})
-end
 
-function DestroyRayfield()
-task.spawn(function()
-pcall(function()
-Window:Destroy()
-end)
-pcall(function()
-Rayfield:Destroy()
-end)
-pcall(function()
-game.CoreGui.Rayfield:Destroy()
-end)
-pcall(function()
-game.CoreGui.RayField:Destroy()
-end)
-pcall(function()
-game.CoreGui.OldRayfield:Destroy()
-end)
-pcall(function()
-game.CoreGui.OldRayField:Destroy()
-end)
-end)
-end
-
-local RayfieldGuiTheme = LoadConfig("Tab_9", "GuiTheme")
+--[[ Creating Window ]]--
 local Window = Rayfield:CreateWindow({
-   Name = ""..((_G.dod_developer_key ~= nil and _G.dod_developer_key) or "Unknown").." Hub : Die Of Death",
+   Name = "".._G.dod_developer_key.." Hub : ".._G.dod_name.."",
    Icon = 0,    
-   LoadingTitle = "NH:DOD",
-   LoadingSubtitle = "by nexer",
-   Theme = RayfieldGuiTheme,
+   LoadingTitle = ""..string.sub(_G.dod_developer_key,1,1).."H:".._G.dod_name:gsub("(%S)%S+","%1"):gsub("%s+","").."",
+   LoadingSubtitle = "By ".._G.dod_developer_key.."",
+   Theme = "AmberGlow",
    DisableRayfieldPrompts = true,
    DisableBuildWarnings = true,
-
    ConfigurationSaving = {
       Enabled = false,
       FolderName = "",
       FileName = ""
    },
-
    Discord = {
       Enabled = false,
       Invite = "noinvitelink",
       RememberJoins = true
    },
-
    KeySystem = false,
    KeySettings = {
       Title = "Verify yourself firstly!",
@@ -709,6 +189,8 @@ local Window = Rayfield:CreateWindow({
 })
 
 
+
+--[[ Announcements ]] --
 pcall(function()
 local Announcements = Window:CreateTab("Announce",0)
 Announcements:CreateParagraph({Title = "W.I.P.", Content = "A lot of stuff haven't been added yet. Work is in progress. I have a lot of studies which is why it takes a lot of time."})
@@ -721,173 +203,791 @@ end; })
 end)
 
 
-
-local LocalPlayer, LP = game.Players.LocalPlayer, game.Players.LocalPlayer
-local Character, Char
-local HumanoidRootPart, HRP
-local Humanoid, Hum
+--[[ Loading All Modules ]]--
+-- upvalues: StaminaModule, AbilityModule, UIModule, AnimationsModule
 pcall(function()
-Character, Char = LocalPlayer.Character, LocalPlayer.Character
-end)
-pcall(function()
-HumanoidRootPart, HRP = Character.HumanoidRootPart, Character.HumanoidRootPart
-end)
-pcall(function()
-Humanoid, Hum = Character.Humanoid, Character.Humanoid
-end)
-LocalPlayer.CharacterAdded:Connect(function()
-pcall(function()
-Character, Char = nil, nil
-HumanoidRootPart, HRP = nil, nil
-Humanoid, Hum = nil, nil
-task.wait()
-repeat task.wait() until LocalPlayer.Character
-Character, Char = LocalPlayer.Character, LocalPlayer.Character
-task.wait()
-repeat task.wait() until Character:FindFirstChild("HumanoidRootPart")
-HumanoidRootPart, HRP = Character.HumanoidRootPart, Character.HumanoidRootPart
-task.wait()
-repeat task.wait() until Character:FindFirstChild("Humanoid")
-Humanoid, Hum = Character.Humanoid, Character.Humanoid
-end)
-end)
-
-pcall(function()
-if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) then
+if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) or (string.find(identifyexecutor(), "Solara") or string.find(identifyexecutor(), "solara") or string.find(identifyexecutor(), "SOLARA")) or not Module.RequestModule then
 StaminaModule = {}
 StaminaModule.Stamina = 100
 else
-StaminaModule = RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("Movement"))
+StaminaModule = Module:RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("Movement"))
+end
+end)
+pcall(function()
+local temp_module = [[
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local Debris = game:GetService("Debris")
+local UserInputService = game:GetService("UserInputService")
+
+local Events = ReplicatedStorage:WaitForChild("Events")
+local ClientModules = ReplicatedStorage:WaitForChild("ClientModules")
+
+local LocalPlayer = Players.LocalPlayer
+local script = LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("Ability")
+local PlayerGui = LocalPlayer.PlayerGui
+
+local RoundUI = PlayerGui.MainGui.RoundUI
+local AbilitiesFolder = PlayerGui.MainGui.Abilities.Folder
+
+local AbilitySystem = {
+    Input1 = "Q",
+    Input2 = "E", 
+    Input3 = "R",
+    Input4 = "T",
+    Input5 = "M1",
+    PreferredInput = UserInputService.PreferredInput
+}
+
+-- Store cooldown status per ability
+local abilityCooldowns = {}
+
+function AbilitySystem.CreateAbility(AbilityData)
+    if AbilitiesFolder:FindFirstChild(AbilityData.Name) then AbilitiesFolder:FindFirstChild(AbilityData.Name):Destroy() task.wait() end
+    
+    local AbilityButton = script.AbilityTemplate:Clone()
+
+    local InputKey = AbilitySystem[AbilityData.InputShown] or AbilityData.InputShown
+    
+    AbilityButton.Parent = AbilitiesFolder
+    AbilityButton.Name = AbilityData.Name
+    AbilityButton.Input.Text = InputKey
+    AbilityButton.Title.Text = AbilityData.DisplayName
+    
+    AbilityButton.Cooldown.Visible = false
+    AbilityButton.CooldownLabel.Visible = false
+    PlayerGui.MainGui.Abilities.Tip.Visible = false
+    
+    AbilityButton.MouseEnter:Connect(function()
+        PlayerGui.MainGui.Abilities.Tip.Label.Text = "<font color='rgb(137, 255, 26)'>Usage:</font> <font color='rgb(255, 255, 255)'>" .. (AbilityData.Tip or "No tips for this ability.") .. "</font>"
+        PlayerGui.MainGui.Abilities.Tip.Visible = true
+    end)
+    
+    AbilityButton.MouseLeave:Connect(function()
+        PlayerGui.MainGui.Abilities.Tip.Visible = false
+    end)
+    
+    if AbilityData.Icon then
+        AbilityButton.Icon.Image = AbilityData.Icon
+    end
+    
+    AbilityButton.Activated:Connect(function()
+        AbilitySystem.UseAbility(AbilityData, AbilityButton)
+    end)
+
+	if not AbilityData.InputShown then return end
+	task.spawn(function()
+	AbilitySystem:Bind(AbilityData, AbilityButton)
+	end)
+	
+end
+
+function AbilitySystem:Bind(AbilityData, AbilityButton)
+    local connection
+    connection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+        if gameProcessed then return end
+        local triggerFound = false
+        if AbilityData.InputShown == "M1" and input.UserInputType == Enum.UserInputType.MouseButton1 then
+            triggerFound = true
+        elseif input.KeyCode == Enum.KeyCode[AbilityData.InputShown] then
+            triggerFound = true
+        end
+        if triggerFound and AbilityButton.Parent then
+            task.spawn(function() AbilitySystem.UseAbility(AbilityData, AbilityButton) end)
+        end
+    end)
+    AbilityButton.AncestryChanged:Connect(function()
+        if not AbilityButton.Parent then
+            connection:Disconnect()
+        end
+    end)
+end
+
+function AbilitySystem.AbilityTween(AbilityButton)
+    TweenService:Create(AbilityButton, TweenInfo.new(0.2), {Size = UDim2.new(0.9, 0, 0.9, 0)}):Play()
+    
+    if AbilityButton:FindFirstChild("UseEffect") then
+        AbilityButton.UseEffect.Visible = true
+        AbilityButton.UseEffect.BackgroundTransparency = 0.5
+        TweenService:Create(AbilityButton.UseEffect, TweenInfo.new(0.4), {BackgroundTransparency = 1}):Play()
+    end
+    
+    task.wait(0.2)
+    TweenService:Create(AbilityButton, TweenInfo.new(0.5, Enum.EasingStyle.Back), {Size = UDim2.new(1, 0, 1, 0)}):Play()
+end
+
+function AbilitySystem.PutOnCooldown(AbilityButton, CooldownTime)
+    if AbilityButton.Cooldown.Visible then return end
+    
+    AbilityButton.Input.Visible = false
+    AbilityButton.InputImage.Visible = false
+    AbilityButton.Cooldown.Visible = true
+    AbilityButton.CooldownLabel.Visible = true
+    AbilityButton.Icon.ImageColor3 = Color3.fromRGB(90, 90, 90)
+    
+    local TotalSteps = CooldownTime * 10
+    
+    for Step = math.round(TotalSteps), 0, -1 do
+        if not AbilityButton.Parent then break end
+        
+        AbilityButton.Cooldown.Size = UDim2.new(1, 0, Step / math.round(TotalSteps), 0)
+        AbilityButton.CooldownLabel.Text = math.round(CooldownTime) .. "s"
+        
+        task.wait(0.1)
+        CooldownTime = string.format("%.1f", CooldownTime - 0.1)
+    end
+    
+    if AbilityButton.Parent then
+        AbilitySystem.AbilityTween(AbilityButton)
+        AbilityButton.Input.Visible = true
+        AbilityButton.InputImage.Visible = true
+        AbilityButton.Cooldown.Visible = false
+        AbilityButton.CooldownLabel.Visible = false
+        AbilityButton.Icon.ImageColor3 = Color3.fromRGB(255, 255, 255)
+    end
+end
+
+function AbilitySystem.UseAbility(AbilityData, AbilityButton)
+    if AbilityButton.Cooldown.Visible then return end
+	task.spawn(AbilitySystem.AbilityTween, AbilityButton)
+	if AbilityData.Client == true then
+	task.spawn(function() AbilitySystem.PutOnCooldown(AbilityButton, Cooldown or AbilityData.Cooldown) end)
+    end
+
+    local Success, Cooldown = Events.RemoteFunctions.UseAbility:InvokeServer(AbilityData.Name)
+    if Success or AbilityData.Client == true then
+        if AbilityData.Client == true then
+            Cooldown = AbilityData.Cooldown
+        end
+        if Success ~= "MultipleUse" then
+            if AbilityData.Client == true then
+                AbilityData.ClientFunction()
+            end
+        end
+    end
+    return Success
+end
+return AbilitySystem]]
+AbilityModule = loadstring(temp_module)()
+end)
+pcall(function()
+if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) or (string.find(identifyexecutor(), "Solara") or string.find(identifyexecutor(), "solara") or string.find(identifyexecutor(), "SOLARA")) or not Module.RequestModule then
+UIModule = {}
+UIModule.AbilitySelection = function(...) Notify("Error!", "Couldn't use function ''AbilitySelection'', missing function ''require'' or ''decompile''!", 5, false) return end
+UIModule.OpenShop = function(...) Notify("Error!", "Couldn't use function ''OpenShop'', missing function ''require'' or ''decompile''!", 5, false) return end
+UIModule.TeamateDeathEffect = function(...) Notify("Error!", "Couldn't use function ''TeamateDeathEffect'', missing function ''require'' or ''decompile''!", 5, false) return end
+else
+UIModule = Module:RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("UI"))
+end
+end)
+pcall(function()
+AnimationsModule = [[task.spawn(function()
+pcall(function()
+local stopper = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") or game.Players.LocalPlayer.Character:FindFirstChildOfClass("AnimationController")
+for i,v in next, stopper:GetPlayingAnimationTracks() do
+v:Stop()
+end
+end)
+end)
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Events = ReplicatedStorage:WaitForChild("Events")
+local RunService = game:GetService("RunService")
+
+-- Animation control system
+local AnimationController = {}
+AnimationController.Enabled = true
+AnimationController.ActiveAnimations = {}
+AnimationController.CharacterConnections = {}
+AnimationController.CharacterAnimators = {}
+AnimationController.LoadedTracks = {}
+
+-- Initialize workspace attribute if not exists
+if workspace:GetAttribute("AnimationsEnabled") == nil then
+	workspace:SetAttribute("AnimationsEnabled", true)
+end
+-- and also init this anim desync lolz
+if workspace:GetAttribute("AnimDesyncEnabled") == nil then
+	workspace:SetAttribute("AnimDesyncEnabled", false)
+end
+if workspace:GetAttribute("AnimDesync") == nil then
+	workspace:SetAttribute("AnimDesync", 1)
+end
+
+
+-- Listen for attribute changes
+workspace:GetAttributeChangedSignal("AnimationsEnabled"):Connect(function()
+	AnimationController.Enabled = workspace:GetAttribute("AnimationsEnabled")
+	if not AnimationController.Enabled then
+		AnimationController:UnloadAllAnimations()
+	else
+		-- Reload animations for all valid characters
+		for character, _ in pairs(AnimationController.CharacterAnimators) do
+			if character and character.Parent and character:IsDescendantOf(workspace) then
+				if character:FindFirstChild("Humanoid") and character:FindFirstChild("Animations") then
+					task.spawn(function()
+						AnimationController:LoadCharacterAnimations(character)
+					end)
+				end
+			else
+				-- Clean up invalid characters
+				AnimationController.CharacterAnimators[character] = nil
+			end
+		end
+	end
+end)
+
+function AnimationController:UnloadAllAnimations()
+	-- Stop and remove all animation tracks
+	for character, tracks in pairs(self.LoadedTracks) do
+		for trackName, track in pairs(tracks) do
+			if track and track.IsPlaying then
+				track:Stop()
+			end
+		end
+	end
+	self.LoadedTracks = {}
+	
+	-- Stop active animations
+	self:StopAllAnimations()
+end
+
+function AnimationController:StopAllAnimations()
+	for character, animations in pairs(self.ActiveAnimations) do
+		for animName, track in pairs(animations) do
+			if track and track.IsPlaying then
+				track:Stop()
+			end
+		end
+	end
+	self.ActiveAnimations = {}
+end
+
+function AnimationController:CleanupCharacter(character)
+	-- Clean up loaded tracks
+	if self.LoadedTracks[character] then
+		for trackName, track in pairs(self.LoadedTracks[character]) do
+			if track and track.IsPlaying then
+				track:Stop()
+			end
+		end
+		self.LoadedTracks[character] = nil
+	end
+	
+	-- Clean up active animations
+	if self.ActiveAnimations[character] then
+		for animName, track in pairs(self.ActiveAnimations[character]) do
+			if track and track.IsPlaying then
+				track:Stop()
+			end
+		end
+		self.ActiveAnimations[character] = nil
+	end
+
+	-- Clean up connections
+	if self.CharacterConnections[character] then
+		for _, connection in ipairs(self.CharacterConnections[character]) do
+			connection:Disconnect()
+		end
+		self.CharacterConnections[character] = nil
+	end
+
+	self.CharacterAnimators[character] = nil
+end
+
+function AnimationController:LoadAnimationTrack(character, animationName, animationId)
+	if not self.Enabled then return nil end
+	if not character or not character.Parent then return nil end
+	
+	local humanoid, renderHumanoid = self:GetHumanoid(character)
+	local actualHumanoid = renderHumanoid or humanoid
+	if not actualHumanoid then return nil end
+
+	local animator = actualHumanoid:FindFirstChildOfClass("Animator")
+	if not animator then
+		animator = Instance.new("Animator")
+		animator.Parent = actualHumanoid
+	end
+
+	-- Create animation instance
+	local animation = Instance.new("Animation")
+	animation.AnimationId = animationId
+	
+	-- Load animation track
+	local track = animator:LoadAnimation(animation)
+	
+	-- Store in loaded tracks
+	if not self.LoadedTracks[character] then
+		self.LoadedTracks[character] = {}
+	end
+	self.LoadedTracks[character][animationName] = track
+	
+	return track
+end
+
+function AnimationController:GetHumanoid(character)
+	if not self.Enabled then return nil end
+
+	local humanoid = character:FindFirstChildWhichIsA("Humanoid")
+	local renderHumanoid = nil
+	if character:GetAttribute("MROB") and RunService:IsClient() then
+		pcall(function()
+			local renderUI = character:FindFirstChild("RenderUIPath")
+			if renderUI and renderUI.Value then
+				local viewport = renderUI.Value
+				if viewport then
+					renderHumanoid = viewport.ViewportFrame.WorldModel.RenderModel:FindFirstChildWhichIsA("Humanoid")
+				end
+			end
+		end)
+	end
+	return humanoid, renderHumanoid
+end
+
+function AnimationController:LoadCharacterAnimations(character)
+	if not self.Enabled then return end
+	if not character or not character.Parent then return end
+	if not character:FindFirstChild("Humanoid") then return end
+	if not character:FindFirstChild("Animations") then return end
+
+	local animationsFolder = character:FindFirstChild("Animations")
+	if not animationsFolder then return end
+
+	-- Clean up existing animations for this character
+	self:CleanupCharacter(character)
+
+	-- Load all animations from the folder
+	local loadedTracks = {}
+	
+	for _, animationObject in ipairs(animationsFolder:GetChildren()) do
+		if animationObject:IsA("Animation") then
+			local track = self:LoadAnimationTrack(character, animationObject.Name, animationObject.AnimationId)
+			if track then
+				loadedTracks[animationObject.Name] = track
+			end
+		end
+	end
+
+	-- Store animator reference
+	local humanoid, renderHumanoid = self:GetHumanoid(character)
+	local actualHumanoid = renderHumanoid or humanoid
+	if actualHumanoid then
+		local animator = actualHumanoid:FindFirstChildOfClass("Animator")
+		if animator then
+			self.CharacterAnimators[character] = animator
+		end
+	end
+
+	-- Start animation system if we have the required animations
+	if loadedTracks["Idle"] then
+		self:StartCharacterAnimationSystem(character, loadedTracks)
+	end
+end
+
+function AnimationController:StartCharacterAnimationSystem(character, loadedTracks)
+	if not self.Enabled then return end
+	if not character or not character.Parent then return end
+	if not character:FindFirstChild("HumanoidRootPart") then return end
+
+	local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+	local humanoid, renderHumanoid = self:GetHumanoid(character)
+	local actualHumanoid = renderHumanoid or humanoid
+	if not actualHumanoid then return end
+
+	local animations = character:FindFirstChild("Animations")
+	if not animations then return end
+
+	local player = Players:GetPlayerFromCharacter(character)
+	if player and player ~= Players.LocalPlayer then return end
+
+	local transitionSpeed = animations:GetAttribute("TransitionSpeed") or 0.25
+
+	-- Start with idle animation
+	if loadedTracks["Idle"] then
+		loadedTracks["Idle"]:Play()
+		self:AddActiveAnimation(character, "Idle", loadedTracks["Idle"])
+	end
+
+	-- Play passive animation if exists
+	if loadedTracks["PassiveAnimation"] then
+		loadedTracks["PassiveAnimation"]:Play()
+		self:AddActiveAnimation(character, "PassiveAnimation", loadedTracks["PassiveAnimation"])
+	end
+
+	-- Jump animation handling
+	if loadedTracks["Jump"] then
+		local stateConnection = actualHumanoid.StateChanged:Connect(function(oldState, newState)
+			if not self.Enabled then return end
+			if not character or not character.Parent then return end
+			
+			-- Jump and fall handling
+			if newState == Enum.HumanoidStateType.Jumping or newState == Enum.HumanoidStateType.Freefall then
+				loadedTracks["Jump"]:Play(0)
+				self:AddActiveAnimation(character, "Jump", loadedTracks["Jump"])
+				if ReplicatedStorage:FindFirstChild("Sounds") and ReplicatedStorage.Sounds:FindFirstChild("SFX") then if character.PrimaryPart:FindFirstChild("Jump") then return end local jumpSound = ReplicatedStorage.Sounds.SFX.Jump:Clone() jumpSound.Parent = character.PrimaryPart jumpSound:Play() jumpSound.Ended:Once(function() jumpSound:Destroy() end) end
+			else
+				loadedTracks["Jump"]:Stop(0.2)
+				self:RemoveActiveAnimation(character, "Jump")
+			end
+		end)
+		
+		-- Store connection for cleanup
+		if not self.CharacterConnections[character] then
+			self.CharacterConnections[character] = {}
+		end
+		table.insert(self.CharacterConnections[character], stateConnection)
+	end
+
+	-- Movement animations with speed attributes (from original script)
+	if loadedTracks["Walk"] then
+		local walkAnim = loadedTracks["Walk"]
+		local sprintAnim = loadedTracks["Sprint"]
+		
+		if loadedTracks["Idle"] then
+			loadedTracks["Idle"].Priority = Enum.AnimationPriority.Core
+		end
+		walkAnim.Priority = Enum.AnimationPriority.Idle
+		if sprintAnim then
+			sprintAnim.Priority = Enum.AnimationPriority.Movement
+		end
+
+		-- Get speed attributes from character (like original script)
+		local baseWalkSpeed = (character:GetAttribute("WalkSpeed") or 6) + (character:GetAttribute("WalkSpeedModifier") or 0)
+		local baseSprintSpeed = (character:GetAttribute("SprintSpeed") or 23) + (character:GetAttribute("WalkSpeedModifier") or 0)
+		
+		-- Adjust animation speeds based on current walk speed (like original script)
+		local function adjustAnimationSpeeds()
+			if not self.Enabled then return end
+			if not character or not character.Parent then return end
+			
+			local currentWalkSpeed = actualHumanoid.WalkSpeed
+			local walkSpeedRatio = currentWalkSpeed / (character:GetAttribute("WalkSpeed") or 6)
+			local sprintSpeedRatio = currentWalkSpeed / (character:GetAttribute("SprintSpeed") or 23)
+			
+			walkAnim:AdjustSpeed(walkSpeedRatio < 0 and 0.1 or walkSpeedRatio)
+			if sprintAnim then
+				sprintAnim:AdjustSpeed(sprintSpeedRatio < 0 and 0.1 or sprintSpeedRatio)
+			end
+		end
+
+		-- Connect to WalkSpeed changes (like original script)
+		local speedConnection = actualHumanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(adjustAnimationSpeeds)
+		if not self.CharacterConnections[character] then
+			self.CharacterConnections[character] = {}
+		end
+		table.insert(self.CharacterConnections[character], speedConnection)
+
+		-- Initial speed adjustment
+		adjustAnimationSpeeds()
+
+		local function updateMovement(speed)
+			if not self.Enabled then return end
+			if not character or not character.Parent then return end
+			if not humanoidRootPart or not actualHumanoid then return end
+
+			if speed >= 0.25 and not humanoidRootPart.Anchored then
+				-- Use speed thresholds from attributes (like original script)
+				if sprintAnim and speed >= (baseSprintSpeed - baseWalkSpeed) then
+					if not sprintAnim.IsPlaying then 
+						sprintAnim:Play(transitionSpeed) 
+						self:AddActiveAnimation(character, "Sprint", sprintAnim)
+					end
+					walkAnim:Stop(transitionSpeed)
+					self:RemoveActiveAnimation(character, "Walk")
+					if loadedTracks["Idle"] then
+						loadedTracks["Idle"]:Stop(transitionSpeed)
+					end
+				else
+					if not walkAnim.IsPlaying then 
+						walkAnim:Play(transitionSpeed) 
+						self:AddActiveAnimation(character, "Walk", walkAnim)
+					end
+					if sprintAnim then 
+						sprintAnim:Stop(transitionSpeed) 
+						self:RemoveActiveAnimation(character, "Sprint")
+					end
+					if loadedTracks["Idle"] then
+						loadedTracks["Idle"]:Stop(transitionSpeed)
+					end
+				end
+			else
+				if loadedTracks["Idle"] and not loadedTracks["Idle"].IsPlaying then 
+					loadedTracks["Idle"]:Play(transitionSpeed) 
+					self:AddActiveAnimation(character, "Idle", loadedTracks["Idle"])
+				end
+				walkAnim:Stop(transitionSpeed)
+				self:RemoveActiveAnimation(character, "Walk")
+				if sprintAnim then 
+					sprintAnim:Stop(transitionSpeed) 
+					self:RemoveActiveAnimation(character, "Sprint")
+				end
+			end
+		end
+
+		local runningConnection = actualHumanoid.Running:Connect(updateMovement)
+		
+		-- Store connection for cleanup
+		if not self.CharacterConnections[character] then
+			self.CharacterConnections[character] = {}
+		end
+		table.insert(self.CharacterConnections[character], runningConnection)
+	end
+end
+
+function AnimationController:AddActiveAnimation(character, animationName, track)
+	if not self.ActiveAnimations[character] then
+		self.ActiveAnimations[character] = {}
+	end
+	self.ActiveAnimations[character][animationName] = track
+end
+
+function AnimationController:RemoveActiveAnimation(character, animationName)
+	if self.ActiveAnimations[character] then
+		self.ActiveAnimations[character][animationName] = nil
+	end
+end
+
+-- Remote event handlers
+Events.RemoteEvents.PlayAnimation.OnClientEvent:Connect(function(animation, character, delay)
+	if not AnimationController.Enabled then return end
+	if not character or not character.Parent then return end
+	if workspace:GetAttribute("AnimDesyncEnabled") == true then task.wait(workspace:GetAttribute("AnimDesync")) end
+
+	if character and (not Players:GetPlayerFromCharacter(character) or Players:GetPlayerFromCharacter(character) == Players.LocalPlayer) then
+		local humanoid = AnimationController:GetHumanoid(character)
+		if not humanoid then return end
+
+		local animator = humanoid:FindFirstChildOfClass("Animator") or Instance.new("Animator", humanoid)
+		for _, track in animator:GetPlayingAnimationTracks() do
+			if track.Name == animation.Name then
+				track:Play()
+				return
+			end
+		end
+		animator:LoadAnimation(animation):Play(delay or 0.1)
+	end
+end)
+
+Events.RemoteEvents.StopAnimation.OnClientEvent:Connect(function(animation, character)
+	if not character or not character.Parent then return end
+	if workspace:GetAttribute("AnimDesyncEnabled") == true then task.wait(workspace:GetAttribute("AnimDesync")) end
+
+	local humanoid = AnimationController:GetHumanoid(character)
+	if not humanoid then return end
+
+	local animator = humanoid:FindFirstChildOfClass("Animator") or Instance.new("Animator", humanoid)
+	for _, track in animator:GetPlayingAnimationTracks() do
+		if track.Name == animation.Name then
+			track:Stop()
+			return
+		end
+	end
+end)
+
+function AnimationController:SetupDefaultCharacter(character)
+	if not self.Enabled then return end
+	if not character or not character.Parent then return end
+	if not character:FindFirstChild("Humanoid") then return end
+
+	local civilian = ReplicatedStorage:FindFirstChild("Characters") and 
+					ReplicatedStorage.Characters.Survivor:FindFirstChild("Civilian")
+	local defaultAnimations = civilian and civilian:FindFirstChild("Animations")
+
+	if defaultAnimations then
+		-- Remove existing animations folder
+		local existingAnimations = character:FindFirstChild("Animations")
+		if existingAnimations then
+			existingAnimations:Destroy()
+		end
+
+		-- Clone new animations
+		local newAnimations = defaultAnimations:Clone()
+		newAnimations.Parent = character
+
+		if character:FindFirstChild("HumanoidRootPart") then
+			character.PrimaryPart = character:WaitForChild("HumanoidRootPart")
+		end
+
+		-- Load animations from the new folder
+		self:LoadCharacterAnimations(character)
+		character:SetAttribute("WalkSpeed", 10)
+		character:SetAttribute("SprintSpeed", 26)
+	end
+end
+
+-- Update initial state
+AnimationController.Enabled = workspace:GetAttribute("AnimationsEnabled")
+
+-- Player character handling
+local localPlayer = Players.LocalPlayer
+
+localPlayer.CharacterAdded:Connect(function(character)
+	task.wait(1)
+	if AnimationController.Enabled then
+		if character:FindFirstChild("Animations") then
+			AnimationController:LoadCharacterAnimations(character)
+		else
+			AnimationController:SetupDefaultCharacter(character)
+		end
+	end
+end)
+
+localPlayer.CharacterRemoving:Connect(function(character)
+	AnimationController:CleanupCharacter(character)
+end)
+
+task.spawn(function()
+	if AnimationController.Enabled and localPlayer.Character then
+		AnimationController:SetupDefaultCharacter(localPlayer.Character)
+	end
+end)
+
+-- NPC handling
+local teamsFolder = workspace:WaitForChild("GameAssets"):WaitForChild("Teams")
+local otherTeam = teamsFolder:WaitForChild("Other")
+
+otherTeam.ChildAdded:Connect(function(npc)
+	if not AnimationController.Enabled then return end
+	if not npc:FindFirstChild("Humanoid") then return end
+	if not npc:FindFirstChild("Animations") then return end
+
+	local humanoid = npc:FindFirstChild("Humanoid")
+	if humanoid then
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics, false)
+		AnimationController:LoadCharacterAnimations(npc)
+	end
+end)
+
+-- Clean up when NPCs are removed
+otherTeam.ChildRemoved:Connect(function(npc)
+	AnimationController:CleanupCharacter(npc)
+end)
+
+
+-- Periodic cleanup of invalid characters
+game:GetService("RunService").Heartbeat:Connect(function()
+	for character, _ in pairs(AnimationController.CharacterAnimators) do
+		if not character or not character.Parent or not character:IsDescendantOf(workspace) then
+			AnimationController:CleanupCharacter(character)
+		end
+	end
+end)]]
+if workspace:GetAttribute("AnimationsEnabled") == nil and LocalPlayer.PlayerScripts:FindFirstChild("ClientAnimations") then
+LocalPlayer.PlayerScripts.ClientAnimations:Destroy()
+task.wait()
+loadstring(AnimationsModule)()
 end
 end)
 
-function SetStaminaProperty(property, value)
-if property == "MaxStamina" then
-Char:SetAttribute("MaxStamina", value)
-elseif property == "Stamina" then
-if StaminaModule then
-StaminaModule.Stamina = value
-end
-elseif property == "Fatigue" then
-Char:SetAttribute("Fatigue", value)
-elseif property == "WalkSpeed" then
-Hum.WalkSpeed = value
-elseif property == "SprintSpeed" then
-Char:SetAttribute("SprintSpeed", value)
-elseif property == "WalkSpeed" then
-Char:SetAttribute("WalkSpeed", value)
-elseif property == "DisableSprint" then
-Char:SetAttribute("DisableSprint", value)
-elseif property == "PauseRegen" then
-Char:SetAttribute("PauseRegen", value)
-elseif property == "CanJump" then
-if value == true then Hum.JumpPower = 50 else Hum.JumpPower = 0 end
-end
-end
+
+
+
+
+
+
 
 local Tab_1 = Window:CreateTab("Stamina",0)
-
 Tab_1:CreateParagraph({Title = "Stamina", Content = "You can change your stamina properties here."})
-
 Tab_1:CreateSection("Fast Functions")
 
 Tab_1:CreateButton({Name = "Infinite Stamina"; Callback = function()
-SetStaminaProperty("MaxStamina", (1/0))
-SetStaminaProperty("Stamina", (1/0))
+Char:SetAttribute("MaxStamina", (1/0))
+StaminaModule.Stamina = (1/0)
 end; })
 
 Tab_1:CreateButton({Name = "Become Fast"; Callback = function()
-Humanoid.WalkSpeed = 50
-SetStaminaProperty("SprintSpeed", 70)
+Char:SetAttribute("WalkSpeed", 40)
+Char:SetAttribute("SprintSpeed", 60)
 end; })
 
 Tab_1:CreateButton({Name = "Enable/Disable Jump"; Callback = function()
 if Hum.JumpPower == 0 then
-SetStaminaProperty("CanJump", true)
+Hum.JumpPower = 50
 else
-SetStaminaProperty("CanJump", false)
+Hum.JumpPower = 0
 end
 end; })
 
-local ChoosenNoStamLossMethod = LoadConfig("Tab_1", "NoStaminaLossMethod")
 local lastusedmethod = ""
+local ChoosenNoStamLossMethod = "require"
 Tab_1:CreateDropdown({Name = "Choosen No Stamina Loss Method"; Options = {"require","scriptbreak (toggle while running)"}; CurrentOption = ChoosenNoStamLossMethod; MultiSelection = false; Callback = function(Value)
-ChoosenNoStamLossMethod = ((ConvertDropdownValue(Value)=="scriptbreak (toggle while running)" and "scriptbreak") or "require")
-SaveConfig("Tab_1", ChoosenNoStamLossMethod, "NoStaminaLossMethod")
+ChoosenNoStamLossMethod = ((Rayfield:GetDropdownValue(Value)=="scriptbreak (toggle while running)" and "scriptbreak") or "require")
 end; })
 
-local NoStaminaLoss = LoadConfig("Tab_1", "NoStaminaLoss")
-local NoStaminaLossToggle = Tab_1:CreateToggle({Name = "No Stamina Loss"; CurrentValue = false; Callback = function(Value)
+local NoStaminaLoss = false
+Tab_1:CreateToggle({Name = "No Stamina Loss"; CurrentValue = false; Callback = function(Value)
 if lastusedmethod == "require" then
 NoStaminaLoss = false
 lastusedmethod = ""
 return
 elseif lastusedmethod == "scriptbreak" then
-SetStaminaProperty("Fatigue", 0)
+Char:SetAttribute("Fatigue", 0)
 lastusedmethod = ""
 return
 end
-SaveConfig("Tab_1", Value, "NoStaminaLoss")
 if Value == true then
 if ChoosenNoStamLossMethod == "require" then
 NoStaminaLoss = true
 lastusedmethod = "require"
 task.spawn(function()
-repeat task.wait(0.003)
-if Character and Character:GetAttribute("MaxStamina") then
-SetStaminaProperty("Stamina", Character:GetAttribute("MaxStamina"))
+Heartbeat.LoopNoStaminaLoss = function() if Char~=nil and Char:GetAttribute("MaxStamina")~=nil then Char:SetAttribute("Stamina", Char:GetAttribute("MaxStamina")) end end
+repeat task.wait(0.003) until NoStaminaLoss == false
+if Heartbeat.LoopNoStaminaLoss~=nil then
+Heartbeat.LoopNoStaminaLoss = nil
 end
-until NoStaminaLoss == false
 end)
 elseif ChoosenNoStamLossMethod == "scriptbreak" then
 lastusedmethod = "scriptbreak"
-SetStaminaProperty("Fatigue", true)
+Char:SetAttribute("Fatigue", true)
 end
 end
 end; })
-NoStaminaLossToggle:Set(NoStaminaLoss)
 
-local NoFatigue = LoadConfig("Tab_1", "NoFatigue")
-local NoFatigueToggle = Tab_1:CreateToggle({Name = "No Fatigue"; CurrentValue = false; Callback = function(Value)
+local NoFatigue = false
+Tab_1:CreateToggle({Name = "No Fatigue"; CurrentValue = NoFatigue; Callback = function(Value)
 NoFatigue = Value
-SaveConfig("Tab_1", Value, "NoFatigue")
-if NoFatigue ~= true then return end
-repeat task.wait(0.003)
-if Character and Character:GetAttribute("Fatigue") and Character:GetAttribute("Fatigue") == 1 then
-SetStaminaProperty("Fatigue", 0)
+if Value == true then
+task.spawn(function()
+Heartbeat.LoopNoFatigue = function() if Char~=nil and Char:GetAttribute("Fatigue")~=nil and Char:GetAttribute("Fatigue") == 1 then Char:SetAttribute("Fatigue", 0) end end
+repeat task.wait(0.003) until NoFatigue == false
+if Heartbeat.LoopNoFatigue~=nil then
+Heartbeat.LoopNoFatigue = nil
 end
-until NoFatigue == false
+end)
+end
 end; })
---NoFatigueToggle:Set(NoFatigue)
 
 Tab_1:CreateSection("Advanced")
 
 Tab_1:CreateInput({Name = "Max Stamina"; PlaceholderText = "Type Here!"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = true; Callback = function(Value)
-SetStaminaProperty("MaxStamina", tonumber(Value))
+Char:SetAttribute("MaxStamina", tonumber(Value))
 end; })
 
 Tab_1:CreateInput({Name = "Stamina"; PlaceholderText = "Type Here!"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = true; Callback = function(Value)
-SetStaminaProperty("Stamina", tonumber(Value))
+Char:SetAttribute("Stamina", tonumber(Value))
 end; })
 
 Tab_1:CreateInput({Name = "Walk Speed"; PlaceholderText = "Type Here!"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = true; Callback = function(Value)
-SetStaminaProperty("WalkSpeed", tonumber(Value))
+Char:SetAttribute("WalkSpeed", tonumber(Value))
 end; })
 
 Tab_1:CreateInput({Name = "Sprint Speed"; PlaceholderText = "Type Here!"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = true; Callback = function(Value)
-SetStaminaProperty("SprintSpeed", tonumber(Value))
+Char:SetAttribute("SprintSpeed", tonumber(Value))
 end; })
 
 Tab_1:CreateToggle({Name = "Fatigue"; CurrentValue = false; Callback = function(Value)
-SetStaminaProperty("Fatigue", ((Value==true and 1) or 0))
+Char:SetAttribute("Fatigue", ((Value==true and 1) or 0))
 end; })
 
 Tab_1:CreateToggle({Name = "Stamina Regen Paused"; CurrentValue = false; Callback = function(Value)
-SetStaminaProperty("PauseRegen", ((Value==true and 1) or 0))
+Char:SetAttribute("PauseRegen", ((Value==true and 1) or 0))
 end; })
 
 Tab_1:CreateToggle({Name = "Sprint Disabled"; CurrentValue = false; Callback = function(Value)
-SetStaminaProperty("DisableSprint", Value)
+Char:SetAttribute("DisableSprint", Value)
 end; })
 
 --[[
@@ -917,16 +1017,16 @@ task.wait()
 if AutoInjectStamina == true then
 task.wait(21.5)
 pcall(function()
-SetStaminaProperty("MaxStamina", AI_MaxStamina)
+Char:SetAttribute("MaxStamina", AI_MaxStamina)
 end)
 pcall(function()
-SetStaminaProperty("Stamina", AI_MaxStamina)
+Char:SetAttribute("Stamina", AI_MaxStamina)
 end)
 pcall(function()
-SetStaminaProperty("WalkSpeed", AI_WalkSpeed)
+Char:SetAttribute("WalkSpeed", AI_WalkSpeed)
 end)
 pcall(function()
-SetStaminaProperty("SprintSpeed", AI_SprintSpeed)
+Char:SetAttribute("SprintSpeed", AI_SprintSpeed)
 end)
 end
 end)]]
@@ -1396,7 +1496,7 @@ SaveConfig("Tab_3", InputBind, "Bind")
 end; })
 local ChoosenAbility = LoadConfig("Tab_3", "FastFunctions", "ChoosenAbility")
 Tab_3:CreateDropdown({Name = "Choose Ability"; Options = AbilityNames; CurrentOption = ChoosenAbility; MultiSelection = false; Callback = function(Value)
-ChoosenAbility = ConvertDropdownValue(Value)
+ChoosenAbility = Rayfield:GetDropdownValue(Value)
 SaveConfig("Tab_3", ChoosenAbility, "FastFunctions", "ChoosenAbility")
 end; })
 Tab_3:CreateButton({Name = "Get Choosen Ability"; Callback = function()
@@ -1769,31 +1869,31 @@ local CardSettings = {
 }
 Tab_3:CreateLabel("First Card Settings")
 Tab_3:CreateDropdown({Name = "First Ability"; Options = AbilityNames; CurrentOption = CardSettings[1][1]; MultiSelection = false; Callback = function(Value)
-CardSettings[1][1] = ConvertDropdownValue(Value)
+CardSettings[1][1] = Rayfield:GetDropdownValue(Value)
 SaveConfig("Tab_3", CardSettings[1][1], "Cards", "FirstCard", 1)
 end; })
 Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOption = CardSettings[1][2]; MultiSelection = false; Callback = function(Value)
-CardSettings[1][2] = ConvertDropdownValue(Value)
+CardSettings[1][2] = Rayfield:GetDropdownValue(Value)
 SaveConfig("Tab_3", CardSettings[1][2], "Cards", "FirstCard", 2)
 end; })
 
 Tab_3:CreateLabel("Second Card Settings")
 Tab_3:CreateDropdown({Name = "First Ability"; Options = AbilityNames; CurrentOption = CardSettings[2][1]; MultiSelection = false; Callback = function(Value)
-CardSettings[2][1] = ConvertDropdownValue(Value)
+CardSettings[2][1] = Rayfield:GetDropdownValue(Value)
 SaveConfig("Tab_3", CardSettings[2][1], "Cards", "SecondCard", 1)
 end; })
 Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOption = CardSettings[2][2]; MultiSelection = false; Callback = function(Value)
-CardSettings[2][2] = ConvertDropdownValue(Value)
+CardSettings[2][2] = Rayfield:GetDropdownValue(Value)
 SaveConfig("Tab_3", CardSettings[2][2], "Cards", "SecondCard", 2)
 end; })
 
 Tab_3:CreateLabel("Third Card Settings")
 Tab_3:CreateDropdown({Name = "First Ability"; Options = AbilityNames; CurrentOption = CardSettings[3][1]; MultiSelection = false; Callback = function(Value)
-CardSettings[3][1] = ConvertDropdownValue(Value)
+CardSettings[3][1] = Rayfield:GetDropdownValue(Value)
 SaveConfig("Tab_3", CardSettings[3][1], "Cards", "ThirdCard", 1)
 end; })
 Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOption = CardSettings[3][2]; MultiSelection = false; Callback = function(Value)
-CardSettings[3][2] = ConvertDropdownValue(Value)
+CardSettings[3][2] = Rayfield:GetDropdownValue(Value)
 SaveConfig("Tab_3", CardSettings[3][2], "Cards", "ThirdCard", 2)
 end; })
 
@@ -2922,7 +3022,7 @@ Tab_4:CreateSection("Intro / Special Round Starter")
 
 killerintro = "Pursuer"
 Tab_4:CreateDropdown({Name = "Killer Intro"; Options = {"Pursuer","Artful","Badware","Killdroid","Harken"}; CurrentOption = "Pursuer"; MultiSelection = false; Callback = function(Value)
-killerintro = ConvertDropdownValue(Value)
+killerintro = Rayfield:GetDropdownValue(Value)
 end; })
 
 Tab_4:CreateButton({Name = "Start Intro"; Callback = function()
@@ -2933,7 +3033,7 @@ end; })
 
 specialroundevent = "Double Trouble"
 Tab_4:CreateDropdown({Name = "Special Round Event"; Options = {"Double Trouble","Evil Scary","One Bounce","Gunslinger","Dienation"}; CurrentOption = "Double Trouble"; MultiSelection = false; Callback = function(Value)
-specialroundevent = ConvertDropdownValue(Value)
+specialroundevent = Rayfield:GetDropdownValue(Value)
 end; })
 
 Tab_4:CreateButton({Name = "Start Special Round Event"; Callback = function()
@@ -3612,7 +3712,7 @@ table.insert(temp_table, e.Name)
 end; end
 local Hi = v:WaitForChild("Default")
 Tab_6:CreateDropdown({Name = "Choose "..v.Name.." animations"; Options = temp_table; CurrentOption = "Default"; MultiSelection = false; Callback = function(Value)
-Hi = v:WaitForChild(ConvertDropdownValue(Value))
+Hi = v:WaitForChild(Rayfield:GetDropdownValue(Value))
 end; })
 
 Tab_6:CreateButton({Name = "Apply "..v.Name.." animations"; Callback = function()
@@ -3725,19 +3825,19 @@ end
 
 local ChoosenRunAnim = LoadConfig("Tab_6", "CustomAnimations", "Run")
 Tab_6:CreateDropdown({Name = "Run Animation"; Options = GetAllRunNames(); CurrentOption = ChoosenRunAnim; MultiSelection = false; Callback = function(Value)
-ChoosenRunAnim = tostring(ConvertDropdownValue(Value))
+ChoosenRunAnim = tostring(Rayfield:GetDropdownValue(Value))
 SaveConfig("Tab_6", ChoosenRunAnim, "CustomAnimations", "Run")
 end; })
 
 local ChoosenWalkAnim = LoadConfig("Tab_6", "CustomAnimations", "Walk")
 Tab_6:CreateDropdown({Name = "Walk Animation"; Options = GetAllWalkNames(); CurrentOption = ChoosenWalkAnim; MultiSelection = false; Callback = function(Value)
-ChoosenWalkAnim = tostring(ConvertDropdownValue(Value))
+ChoosenWalkAnim = tostring(Rayfield:GetDropdownValue(Value))
 SaveConfig("Tab_6", ChoosenWalkAnim, "CustomAnimations", "Walk")
 end; })
 
 local ChoosenIdleAnim = LoadConfig("Tab_6", "CustomAnimations", "Idle")
 Tab_6:CreateDropdown({Name = "Idle Animation"; Options = GetAllIdleNames(); CurrentOption = ChoosenIdleAnim; MultiSelection = false; Callback = function(Value)
-ChoosenIdleAnim = tostring(ConvertDropdownValue(Value))
+ChoosenIdleAnim = tostring(Rayfield:GetDropdownValue(Value))
 SaveConfig("Tab_6", ChoosenIdleAnim, "CustomAnimations", "Idle")
 end; })
 
@@ -3779,13 +3879,13 @@ local AbilityAnimNames = {"Punch","Adrenaline","AdrenalineEnd","Caretaker","Cloa
 
 local ReplaceWhatAbil = LoadConfig("Tab_6", "Swap", "What")
 Tab_6:CreateDropdown({Name = "Replace what"; Options = AbilityAnimNames; CurrentOption = ReplaceWhatAbil; MultiSelection = false; Callback = function(Value)
-ReplaceWhatAbil = ConvertDropdownValue(Value)
+ReplaceWhatAbil = Rayfield:GetDropdownValue(Value)
 SaveConfig("Tab_6", ReplaceWhatAbil, "Swap", "What")
 end; })
 
 local ReplaceWithWhatAbil = LoadConfig("Tab_6", "Swap", "WithWhat")
 Tab_6:CreateDropdown({Name = "Replace with what"; Options = AbilityAnimNames; CurrentOption = ReplaceWithWhatAbil; MultiSelection = false; Callback = function(Value)
-ReplaceWithWhatAbil = ConvertDropdownValue(Value)
+ReplaceWithWhatAbil = Rayfield:GetDropdownValue(Value)
 SaveConfig("Tab_6", ReplaceWithWhatAbil, "Swap", "What")
 end; })
 
@@ -3808,7 +3908,7 @@ end
 
 local SelectedAbility = LoadConfig("Tab_6","ToEdit")
 Tab_6:CreateDropdown({Name = "Select Ability"; Options = abilityList; CurrentOption = SelectedAbility; MultiSelection = false; Callback = function(v)
-SelectedAbility = ConvertDropdownValue(v)
+SelectedAbility = Rayfield:GetDropdownValue(v)
 SaveConfig("Tab_6",SelectedAbility,"ToEdit")
 end
 });
@@ -4218,7 +4318,7 @@ AimRange = Value
 end; })
 
 Tab_7:CreateDropdown({Name = "Aim Target"; Options = {"Everyone","Civilians","Killers"}; CurrentOption = "Everyone"; MultiSelection = false; Callback = function(Value)
-AimTarget = ConvertDropdownValue(Value)
+AimTarget = Rayfield:GetDropdownValue(Value)
 end; })
 
 Tab_7:CreateLabel("Aims Character to a closest player")
@@ -4319,7 +4419,7 @@ end; })
 
 local modeldservice, modeldname = "Workspace", "Type Here!"
 Tab_7:CreateDropdown({Name = "Model Service"; Options = {"Workspace","ReplicatedStorage"}; CurrentOption = "Workspace"; MultiSelection = false; Callback = function(Value)
-modeldservice = ConvertDropdownValue(Value)
+modeldservice = Rayfield:GetDropdownValue(Value)
 end; })
 
 Tab_7:CreateInput({Name = "Model Name"; PlaceholderText = "Type Here!"; NumbersOnly = false; OnEnter = false; RemoveTextAfterFocusLost = false; Callback = function(Value)
@@ -4645,7 +4745,7 @@ ChoosenKillerTarget = nil
 ChoosenSurvivorTarget = nil
 ChoosenGhostTarget = nil
 local TeleportToKillerDropdown = Tab_12:CreateDropdown({Name = "Target Killer"; Options = GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer")); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
-ChoosenKillerTarget = ConvertDropdownValue(Value)
+ChoosenKillerTarget = Rayfield:GetDropdownValue(Value)
 end; })
 Tab_12:CreateButton({Name = "Teleport to Killer"; Callback = function()
 if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChildOfClass("Model") then
@@ -4670,7 +4770,7 @@ end)
 end)
 
 local TeleportToSurvivorDropdown = Tab_12:CreateDropdown({Name = "Target Survivor"; Options = GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor")); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
-ChoosenSurvivorTarget = ConvertDropdownValue(Value)
+ChoosenSurvivorTarget = Rayfield:GetDropdownValue(Value)
 end; })
 Tab_12:CreateButton({Name = "Teleport to Survivor"; Callback = function()
 if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor"):FindFirstChildOfClass("Model") then
@@ -4695,7 +4795,7 @@ end)
 end)
 
 local TeleportToGhostDropdown = Tab_12:CreateDropdown({Name = "Target Ghost"; Options = GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost")); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
-ChoosenGhostTarget = ConvertDropdownValue(Value)
+ChoosenGhostTarget = Rayfield:GetDropdownValue(Value)
 end; })
 Tab_12:CreateButton({Name = "Teleport to Ghost"; Callback = function()
 if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost"):FindFirstChildOfClass("Model") then
@@ -4802,7 +4902,7 @@ Tab_10:CreateParagraph({Title = "Audio", Content = "Audio Management ( Mostly LM
 Tab_10:CreateSection("Custom LMS")
 local choosen_lms = ""
 local LMS_Audios = Tab_10:CreateDropdown({Name = "LMS Audios"; Options = loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))(); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
-choosen_lms = ConvertDropdownValue(Value)
+choosen_lms = Rayfield:GetDropdownValue(Value)
 end; })
 Tab_10:CreateButton({Name = "Reload LMS Audios"; Callback = function()
 LMS_Audios:Refresh(loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))())
@@ -4854,7 +4954,7 @@ Tab_10:CreateSection("Custom LMS ( settings )")
 local lms_file_name = "Type Here!"
 Tab_10:CreateParagraph({Title = "How to add your own music?", Content = "Find your executor's folder in your phone's explorer, then find the ''workspace'' folder, and inside it you must find ''NexerHub'' folder, now go inside it, then click ''Assets'' and ''LMS''. And now, in this folder, input your mp3 music."})
 Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here! ( WRITE ONLY NAME, WITHOUT ''.mp3'' )"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-lms_file_name = ConvertDropdownValue(Value)
+lms_file_name = Rayfield:GetDropdownValue(Value)
 end; })
 Tab_10:CreateButton({Name = "Add File"; Callback = function()
 if not IsFile("NexerHub/DieOfDeath/Assets/LMS/"..lms_file_name..".mp3") then
@@ -4886,7 +4986,7 @@ Tab_10:CreateSection("")
 Tab_10:CreateSection("Custom Chase Themes")
 local choosen_chase = ""
 local Chases_Audios = Tab_10:CreateDropdown({Name = "Chase Themes"; Options = loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))(); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
-choosen_chase = ConvertDropdownValue(Value)
+choosen_chase = Rayfield:GetDropdownValue(Value)
 end; })
 Tab_10:CreateButton({Name = "Reload Chase Themes"; Callback = function()
 Chases_Audios:Refresh(loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))())
@@ -4930,7 +5030,7 @@ Tab_10:CreateSection("Custom Chase Themes ( settings )")
 local chase_file_name = "Type Here!"
 Tab_10:CreateParagraph({Title = "How to add your own music?", Content = "Find your executor's folder in your phone's explorer, then find the ''workspace'' folder, and inside it you must find ''NexerHub'' folder, now go inside it, then click ''Assets'' and ''Chases''. And now, in this folder, input your mp3 music."})
 Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here! ( WRITE ONLY NAME, WITHOUT ''.mp3'' )"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-chase_file_name = ConvertDropdownValue(Value)
+chase_file_name = Rayfield:GetDropdownValue(Value)
 end; })
 Tab_10:CreateButton({Name = "Add File"; Callback = function()
 if not IsFile("NexerHub/DieOfDeath/Assets/Chases/"..chase_file_name..".mp3") then
@@ -5243,7 +5343,7 @@ Tab_8:CreateLabel("Experimental Features")
 
 local KillerAppearance = "MISO"
 Tab_8:CreateInput({Name = "Custom Appearance ( put any killer skin name here )"; PlaceholderText = "MISO"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-KillerAppearance = ConvertDropdownValue(Value)
+KillerAppearance = Rayfield:GetDropdownValue(Value)
 end; })
 Tab_8:CreateButton({Name = "Change your appearance"; Callback = function()
 if GetKillerModelByName(KillerAppearance) == nil then
@@ -5503,7 +5603,7 @@ end; })
 local Tab_9 = Window:CreateTab("Other",0)
 Tab_9:CreateParagraph({Title = "Other", Content = "Other random thingiez"})
 Tab_9:CreateDropdown({Name = "Gui Theme"; Options = {"Amethyst","Default","AmberGlow","Bloom","DarkBlue","Green","Light","Ocean","Serenity"}; CurrentOption = RayfieldGuiTheme; MultiSelection = false; Callback = function(Value)
-RayfieldGuiTheme = ConvertDropdownValue(Value)
+RayfieldGuiTheme = Rayfield:GetDropdownValue(Value)
 Window.ModifyTheme(RayfieldGuiTheme)
 SaveConfig("Tab_9", RayfieldGuiTheme, "GuiTheme")
 end; })
@@ -5523,6 +5623,3 @@ end; })
 Tab_9:CreateButton({Name = "Close Hub"; Callback = function()
 DestroyRayfield()
 end; })
-
-
-
