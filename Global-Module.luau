@@ -348,7 +348,28 @@ end)
 end
 
 function module:GetData(a,b)
-if a=="AbilityData" then
+if a=="AbilityAnimations" then
+return {
+["Punch"] = "rbxassetid://124781750889573", -- Civilian Animations Punch
+["Adrenaline"] = "rbxassetid://77399794134778", -- Civilian Animations Adrenaline
+["AdrenalineEnd"] = "rbxassetid://92333601998082", -- Civilian Animations AdrenalineEnd
+["Caretaker"] = "rbxassetid://128767098320893", -- Civilian Animations Caretaker
+["CloakStart"] = "rbxassetid://133960698072483", -- Civilian Animations CloakStart
+["BlockStart"] = "rbxassetid://134233326423882", -- Civilian Animations BlockStart
+["Dash"] = "rbxassetid://78278813483757", -- Civilian Animations Dash
+["PadBuild"] = "rbxassetid://79104831518074", -- Civilian Animations PadBuild
+["Hotdog"] = "rbxassetid://78595119178919", -- Civilian Animations Hotdog
+["Revolver"] = "rbxassetid://74108653904830", -- Civilian Animations Revolver
+["Taunt"] = "rbxassetid://113732291990231", -- Civilian Animations Taunt
+["RevolverReload"] = "rbxassetid://79026181033717", -- Civilian Animations RevolverReload
+["CloakEnd"] = "rbxassetid://120142279051418", -- Civilian Animations CloakEnd
+["DynamiteWindup"] = "rbxassetid://133960279206605", -- Civilian Animations DynamiteWindup
+["DynamiteThrow"] = "rbxassetid://99551865645121", -- Civilian Animations DynamiteThrow
+["DynamiteHold"] = "rbxassetid://137091713941325", -- Civilian Animations DynamiteHold
+["Banana"] = "rbxassetid://95775571866935", -- Civilian Animations Banana
+["BlockLand"] = "rbxassetid://94027412516651" -- Civilian Animations BlockLand
+}
+elseif a=="AbilityData" then
 return {
     ["Adrenaline"] = {Name = "Adrenaline",InputShown = "",Tip = "Get a massive speed boost for 6 seconds, once the 6 seconds are over you will be given Exhaust and stunned briefly while also revealing your location to teammates for the duration.",Cooldown = 35,Icon = "rbxassetid://116399911657417",DisplayName = "Adrenaline",Noise = "Causes 3 noise upon the first use, and 2 noise once the ability ends."};
     ["Punch"] = {Name = "Punch",InputShown = "",Tip = "Take a moment to swing forward and stun the killer for 3 seconds if landed, dealing 25 damage. Missing will result with heavy end-lag.",Cooldown = 40,Icon = "rbxassetid://97428323453639",DisplayName = "Punch",Noise = "Causes 2 noise upon use, and 3 noise if landed."};
