@@ -202,6 +202,7 @@ if chr:FindFirstChild("HumanoidRootPart")==nil or chr.HumanoidRootPart:FindFirst
 local AB_UA = game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteFunctions"):WaitForChild("UseAbility")
 local chrp = chr.Parent
 local chrn = chr.Name
+if workspace.GameAssets.Teams.Killer:FindFirstChild(chrn)==nil then return end
 local function IsFacingTowards()
 if CheckIfFacesTowardsPlayer~=true then return true end
 local unit = ((HumanoidRootPart.Position - chr.HumanoidRootPart.Position) * Vector3.new(1,0,1)).Unit
@@ -219,22 +220,22 @@ return false
 end
 local AB_US = function() if CheckRequirements()==true and AutoBlockEnabled==true then AB_UA:InvokeServer("Block") end end
 local a = chr.HumanoidRootPart.Swing.Played:Connect(AB_US)
-repeat task.wait() until chrp:FindFirstChild(chrn) == nil or UnhookEverything == true
+repeat task.wait() until workspace.GameAssets.Teams.Killer:FindFirstChild(chrn)==nil or UnhookEverything == true
 a:Disconnect()
 end
 for i,v in next, workspace.GameAssets.Teams.Killer:GetChildren() do
 if v then
-HookOnto(v)
+task.spawn(HookOnto, v)
 end
 end
 workspace.GameAssets.Teams.Killer.ChildAdded:Connect(function(v)
-HookOnto(v)
+task.spawn(HookOnto, v)
 end)
 end
 
 function module:AutoBlockUnhookAll()
 UnhookEverything = true
-task.wait(); task.wait()
+task.wait(.05); task.wait(.05)
 UnhookEverything = false
 end
 
