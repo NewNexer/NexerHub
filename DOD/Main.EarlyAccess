@@ -5,8 +5,11 @@ Loading Variables
 
 
 --[[ File Checks ]]--
-if not isfolder("NexerHub") then makefolder("NexerHub") repeat task.wait() until isfolder("NexerHub") end
-if not isfolder("NexerHub/Core") then makefolder("NexerHub/Core") repeat task.wait() until isfolder("NexerHub/Core") end
+function CreateFolder(f)
+if not isfolder(f) then makefolder(f) repeat task.wait() until isfolder(f) end
+end
+CreateFolder("NexerHub")
+CreateFolder("NexerHub/Core")
 local GUID = tostring(game:GetService("HttpService"):GenerateGUID())
 if not isfile("NexerHub/Core/PreloadData.luau") then
 writefile("NexerHub/Core/PreloadData.luau", [[return {
@@ -144,7 +147,7 @@ msg.Text = "Loading API Module... (0/1)"
 local loadmoduleattempt = 0
 repeat task.wait()
 local lodsuc, loderr = pcall(function()
-Module = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/Global-Module.luau"))()
+Module = loadstring(game:HttpGet(_G.global_module))()
 end)
 if not lodsuc then
 loadmoduleattempt += 1
@@ -1464,6 +1467,7 @@ if v and v.Name == "EvilScary" then
 Module:ClearTouchable(v)
 end
 end
+end
 end; })
 game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable").ChildAdded:Connect(function(child)
 if child and child.Name == "EvilScary" and AntiEvilScary1 == true then
@@ -1508,9 +1512,6 @@ for i,v in next, workspace.GameAssets:GetDescendants() do
 if v.Name == "FallDamage" and v:IsA("BasePart") then
 child.CanCollide = not AntiFallRagdoll
 child.CanTouch = not AntiFallRagdoll
-pcall(function()
-child.CanQuery = not AntiFallRagdoll
-end)
 end
 end
 end; })
@@ -1519,9 +1520,6 @@ if AntiFallRagdoll ~= true then return end
 if child.Name == "FallDamage" and child:IsA("BasePart") then
 child.CanCollide = false
 child.CanTouch = false
-pcall(function()
-child.CanQuery = false
-end)
 end
 end)
 
@@ -1536,7 +1534,6 @@ end)
 
 local Tab_5 = Window:CreateTab("Killer",0)
 Tab_5:CreateParagraph({Title = "Abilities Editor", Content = "Ability Editor and giver"})
-
 Tab_5:CreateSection("Universal ( except for killdroid ☹ )")
 Tab_5:CreateButton({Name = "Get Faster Swing"; Callback = function(Value)
 AbilityModule.CreateAbility({Client = true,ClientFunction = function() game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Swing") end,Name = "Whack_NH",InputShown = "M2",Tip = "Swing but faster.",Cooldown = 0.01, Icon = "rbxassetid://13771861804",DisplayName = "Whack"})
@@ -1593,11 +1590,9 @@ AbilityModule.CreateAbility({Client = true,ClientFunction = lunge_abil,Name = "L
 end; })
 
 Tab_5:CreateSection("Pursuer")
-local PursuerConfig = LoadConfig("Tab_5", "PursuerConfig")
-local PursuerCleaveBoost = PursuerConfig.CleaveBoost
+local PursuerCleaveBoost = 6
 Tab_5:CreateInput({Name = "Cleave Boost"; PlaceholderText = PursuerCleaveBoost; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 PursuerCleaveBoost = Value
-SaveConfig("Tab_5", PursuerCleaveBoost, "PursuerConfig", "CleaveBoost")
 end; })
 --------------------------------------------------------------------------------------
 local PursuerConfigEffects = nil
@@ -1623,11 +1618,9 @@ Rayfield:Notification("Success!", "Applied configurations.", 3, true)
 end; })
 
 Tab_5:CreateSection("Badware")
-local BadwareConfig = LoadConfig("Tab_5", "BadwareConfig")
-local BadwareHipHeight = BadwareConfig.HipHeight
+local BadwareHipHeight = 5
 Tab_5:CreateInput({Name = "Hip Height when placing computers"; PlaceholderText = BadwareHipHeight; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 BadwareHipHeight = Value
-SaveConfig("Tab_5", BadwareHipHeight, "BadwareConfig", "HipHeight")
 end; })
 --------------------------------------------------------------------------------------
 local BadwareConfigEffects = nil
@@ -1653,11 +1646,9 @@ Rayfield:Notification("Success!", "Applied configurations.", 3, true)
 end; })
 
 Tab_5:CreateSection("Artful")
-local ArtfulConfig = LoadConfig("Tab_5", "ArtfulConfig")
-local ArtfulHipHeight = ArtfulConfig.HipHeight
+local ArtfulHipHeight = 5
 Tab_5:CreateInput({Name = "Hip Height when placing walls/music box"; PlaceholderText = ArtfulHipHeight; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 ArtfulHipHeight = Value
-SaveConfig("Tab_5", ArtfulHipHeight, "ArtfulConfig", "HipHeight")
 end; })
 --------------------------------------------------------------------------------------
 local ArtfulConfigEffects = nil
@@ -1686,19 +1677,16 @@ Tab_5:CreateSection("Harken")
 Tab_5:CreateLabel("Nothing Yet...")
 
 Tab_5:CreateSection("Killdroid")
-local KilldroidConfig = LoadConfig("Tab_5", "KilldroidConfig")
-local KilldroidPower = KilldroidConfig.Power
+local KilldroidPower = 1250
 Tab_5:CreateInput({Name = "Power"; PlaceholderText = KilldroidPower; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 KilldroidPower = tonumber(Value)
-SaveConfig("Tab_5", KilldroidPower, "KilldroidConfig", "Power")
 end; })
-local KilldroidMaxForce = KilldroidConfig.MaxForce
+local KilldroidMaxForce = 1000000
 Tab_5:CreateInput({Name = "Max Force"; PlaceholderText = KilldroidMaxForce; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 KilldroidMaxForce = tonumber(Value)
-SaveConfig("Tab_5", KilldroidMaxForce, "KilldroidConfig", "MaxForce")
 end; })
-local KilldroidDD = KilldroidConfig["Don'tDescendDuringTheFlight"]
-Tab_5:CreateToggle({Name = "Dont Descend During the Flight"; CurrentValue = KilldroidDD; Callback = function(Value)
+local KilldroidDD = false
+Tab_5:CreateToggle({Name = "Infinite Flight"; CurrentValue = KilldroidDD; Callback = function(Value)
 KilldroidDD = Value
 SaveConfig("Tab_5", KilldroidDD, "KilldroidConfig", "Don'tDescendDuringTheFlight")
 end; })
@@ -1754,19 +1742,14 @@ Tab_5:CreateButton({Name = "Apply Killdroid Configurations"; Callback = function
 ApplyKilldroidConfigurations()
 Rayfield:Notification("Success!", "Applied configurations.", 3, true)
 end; })
-
-
 Tab_5:CreateSection("")
 Tab_5:CreateSection("")
-
 Tab_5:CreateParagraph({Title = "Immunities / Buffs", Content = "Immunities and buffs for workspace side"})
-
 Tab_5:CreateSection("Workspace Side")
-
 local BackupEffect = game:GetService("ReplicatedStorage").Events.RemoteEvents.TauntEffect:Clone()
 BackupEffect.Parent = game.LogService
-local AntiTaunt = LoadConfig("Tab_5", "IB", "AntiTaunt")
-local AntiTauntToggle = Tab_5:CreateToggle({Name = "Anti Taunt"; CurrentValue = false; Callback = function(Value)
+local AntiTaunt = false
+Tab_5:CreateToggle({Name = "Anti Taunt"; CurrentValue = AntiTaunt; Callback = function(Value)
 AntiTaunt = Value
 if AntiTaunt == true then
 LocalPlayer.PlayerGui.MainGui.RoundUI.TauntTemplate:Destroy()
@@ -1776,7 +1759,6 @@ local a = BackupEffect:Clone()
 a.Parent = LocalPlayer.PlayerGui.MainGui.RoundUI
 end
 end
-SaveConfig("Tab_5", AntiTaunt, "IB", "AntiTaunt")
 end; })
 LocalPlayer.PlayerGui.MainGui.RoundUI.ChildAdded:Connect(function(child)
 if child.Name == "TauntTemplate" and AntiTaunt == true then
@@ -1789,70 +1771,27 @@ Character:SetAttribute("WalkSpeedModifier", 0)
 end
 end
 end)
-AntiTauntToggle:Set(AntiTaunt)
-
 Tab_5:CreateButton({Name = "Remove Destroyable Objects"; Callback = function(Value)
 pcall(function()
 workspace.GameAssets.Map.Build.Destroyable:Destroy()
 end)
 end; })
-
-local AntiEvilScary2 = LoadConfig("Tab_5", "IB", "AntiEvilScary")
-local AntiEvilScary2Toggle = Tab_5:CreateToggle({Name = "Anti Evil Scary"; CurrentValue = false; Callback = function(Value)
+local AntiEvilScary2 = false
+Tab_5:CreateToggle({Name = "Anti Evil Scary"; CurrentValue = AntiEvilScary2; Callback = function(Value)
 AntiEvilScary2 = Value
 if AntiEvilScary2 == true then
 for i,v in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable"):GetChildren()) do
 if v and v.Name == "EvilScary" then
-for _,trans in pairs(v:GetChildren()) do
-if trans and trans:IsA("TouchTransmitter") then
-trans:Destroy()
-end
-end
-for _,part in pairs(v:GetChildren()) do
-if part and part:IsA("BasePart") then
-part.CanCollide = false
-part.CanTouch = false
-pcall(function()
-part.CanQuery = false
-end)
-end
-end
-v.CanCollide = false
-v.CanTouch = false
-pcall(function()
-v.CanQuery = false
-end)
+Module:ClearTouchable(v)
 end
 end
 end
-SaveConfig("Tab_5", AntiEvilScary2, "IB", "AntiEvilScary")
 end; })
 game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable").ChildAdded:Connect(function(child)
 if child and child.Name == "EvilScary" and AntiEvilScary2 == true then
-for _,trans in pairs(child:GetChildren()) do
-if trans and trans:IsA("TouchTransmitter") then
-trans:Destroy()
-end
-end
-for _,part in pairs(child:GetChildren()) do
-if part and part:IsA("BasePart") then
-part.CanCollide = false
-part.CanTouch = false
-pcall(function()
-part.CanQuery = false
-end)
-end
-end
-child.CanCollide = false
-child.CanTouch = false
-pcall(function()
-child.CanQuery = false
-end)
+Module:ClearTouchable(child)
 end
 end)
-AntiEvilScary2Toggle:Set(AntiEvilScary2)
-
-
 local AntiBarriers2 = false
 local AntiBarriers2_con = nil
 local AntiBarriers2_toggle = nil
@@ -1888,14 +1827,6 @@ end)
 
 
 
-----------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------
-
-
-
-
-
 
 
 
@@ -1906,13 +1837,10 @@ if not game:GetService("CoreGui"):FindFirstChild("DOD_ESP_HANDLER") then
 Instance.new("Folder", game:GetService("CoreGui")).Name = "DOD_ESP_HANDLER"
 task.wait()
 end
-
-_G.ESPenabledHandler = LoadConfig("Tab_4", "ESP", "Enabled")
-_G.ESPtransHandler = LoadConfig("Tab_4", "ESP", "Transparency")
-_G.ESPshowusers = LoadConfig("Tab_4", "ESP", "ShowUsernames")
-_G.ESPshowhealth = LoadConfig("Tab_4", "ESP", "ShowHealth")
-
-
+_G.ESPenabledHandler = false
+_G.ESPtransHandler = 0.3
+_G.ESPshowusers = true
+_G.ESPshowhealth = true
 function CreateHighlight(plr)
 task.spawn(function()
 for i,v in pairs(game:GetService("CoreGui"):FindFirstChild("DOD_ESP_HANDLER"):GetChildren()) do
@@ -1923,8 +1851,7 @@ end
 repeat task.wait() until game:GetService("CoreGui"):WaitForChild("DOD_ESP_HANDLER"):FindFirstChild("sillyfolder_"..plr.Name) == nil
 local esp_folder = Instance.new("Folder")
 esp_folder.Name = "sillyfolder_"..plr.Name
-esp_folder.Parent = game:GetService("CoreGui"):FindFirstChild("DOD_ESP_HANDLER")
-      
+esp_folder.Parent = game:GetService("CoreGui"):FindFirstChild("DOD_ESP_HANDLER")    
 repeat task.wait() until plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChildOfClass("Humanoid")
 local plr_char = plr.Character or plr.CharacterAdded:Wait()
 for i,v in pairs(plr_char:GetChildren()) do
@@ -1964,10 +1891,8 @@ end
 end)
 end)
 end
-
 end
-end
-      
+end    
 local char_connection, team_connection, dstr_connection
 char_connection = plr.CharacterAdded:Connect(function()
 if game:GetService("CoreGui"):WaitForChild("DOD_ESP_HANDLER"):FindFirstChild("sillyfolder_"..plr.Name) then
@@ -1979,7 +1904,6 @@ repeat task.wait(1.25) until plr.Character and plr.Character:FindFirstChild("Hum
 CreateHighlight(plr)
 char_connection:Disconnect()
 end)
-
 team_connection = plr:GetPropertyChangedSignal("TeamColor"):Connect(function()
 if game:GetService("CoreGui"):WaitForChild("DOD_ESP_HANDLER"):FindFirstChild("sillyfolder_"..plr.Name) then
 game:GetService("CoreGui"):WaitForChild("DOD_ESP_HANDLER"):FindFirstChild("sillyfolder_"..plr.Name):Destroy()
@@ -1990,7 +1914,6 @@ repeat task.wait(1.25) until plr.Character and plr.Character:FindFirstChild("Hum
 CreateHighlight(plr)
 team_connection:Disconnect()
 end)
-
 dstr_connection = game:GetService("CoreGui").ChildRemoved:Connect(function(child)
 if child.Name == "DOD_ESP_HANDLER" then
 Instance.new("Folder", game:GetService("CoreGui")).Name = "DOD_ESP_HANDLER"
@@ -1999,10 +1922,8 @@ char_connection:Disconnect()
 dstr_connection:Disconnect()
 end      
 end)
-
 end)
 end
-
 function ChangeTransparency(trans)
 for i,v in pairs(game:GetService("CoreGui"):FindFirstChild("DOD_ESP_HANDLER"):GetDescendants()) do
 if v and v:IsA("BoxHandleAdornment") then
@@ -2010,31 +1931,22 @@ v.Transparency = trans
 end
 end
 end
-
 local Tab_4 = Window:CreateTab("Visual",0)
-
 Tab_4:CreateParagraph({Title = "Visual", Content = "You can change some of the visual parts of the game here."})
 Tab_4:CreateSection("ESP")
-
 Tab_4:CreateSlider({Name = "ESP Transparency (in %)"; Range = {0, 100}; Increment = 5; Suffix = "%"; CurrentValue = (_G.ESPtransHandler*100); Callback = function(Value)
 _G.ESPtransHandler = (tonumber(Value) / 100)
 ChangeTransparency(tonumber(_G.ESPtransHandler))
-SaveConfig("Tab_4", _G.ESPtransHandler, "ESP", "Transparency")
 end; })
-
 Tab_4:CreateToggle({Name = "Show Username"; CurrentValue = _G.ESPshowusers; Callback = function(Value)
 _G.ESPshowusers = Value
-SaveConfig("Tab_4", _G.ESPshowusers, "ESP", "ShowUsernames")
 end; })
-
 Tab_4:CreateToggle({Name = "Show Health"; CurrentValue = _G.ESPshowhealth; Callback = function(Value)
 _G.ESPshowhealth = Value
-SaveConfig("Tab_4", _G.ESPshowhealth, "ESP", "ShowHealth")
 end; })
-
 plradded_esp = nil
 plrremoved_esp = nil
-local ESPenabledToggle = Tab_4:CreateToggle({Name = "Turn On/Off ESP"; CurrentValue = false; Callback = function(Value)
+Tab_4:CreateToggle({Name = "Turn On/Off ESP"; CurrentValue = false; Callback = function(Value)
 _G.ESPenabledHandler = Value
 if _G.ESPenabledHandler == true then
 if not game:GetService("CoreGui"):FindFirstChild("DOD_ESP_HANDLER") then
@@ -2065,20 +1977,12 @@ plrremoved_esp:Disconnect()
 plrremoved_esp = nil
 end
 end
-SaveConfig("Tab_4", _G.ESPenabledHandler, "ESP", "Enabled")
 end; })
-ESPenabledToggle:Set(_G.ESPenabledHandler)
-
 Tab_4:CreateSection("Gui Management ε=( o｀ω′)ノ")
-
 Tab_4:CreateButton({Name = "Open Shop"; Callback = function()
 UIModule.OpenShop()
 end; })
 Tab_4:CreateToggle({Name = "Teammate Death Effect Enabled"; CurrentValue = true; Callback = function(Value)
-if TestRequire() ~= true then
-ErrorRequire()
-return nil
-end
 DeathEffectEnabled = Value
 if DeathEffectEnabled == true then
 UIModule["TeamateDeathEffect"] = function()
@@ -2105,7 +2009,6 @@ UIModule["TeamateDeathEffect"] = function() return nil end
 Rayfield:Notification("Success!", "Disabled!", 3, true)
 end
 end; })
-
 function AwardPoints(points, reason)
 	local Template = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("UI"):WaitForChild("PlayerPoints"):Clone()
 	Template.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui").PlayerPoints
@@ -2139,27 +2042,19 @@ function AwardPoints(points, reason)
 		end
 	end)
 end
-MoneyToGet = LoadConfig("Tab_4", "Money", "Amount")
-ReasonForMoney = LoadConfig("Tab_4", "Money", "Reason")
-
+local MoneyToGet = "10"
+local ReasonForMoney = "for surviving for atleast 60 seconds."
 Tab_4:CreateSection("Money Giver ( Visual )")
-
 Tab_4:CreateInput({Name = "Money amount"; PlaceholderText = MoneyToGet; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 MoneyToGet = Value
-SaveConfig("Tab_4", MoneyToGet, "Money", "Amount")
 end; })
-
 Tab_4:CreateInput({Name = "Reason for getting money"; PlaceholderText = ReasonForMoney; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 ReasonForMoney = tostring(Value)
-SaveConfig("Tab_4", ReasonForMoney, "Money", "Reason")
 end; })
-
 Tab_4:CreateButton({Name = "Give money"; Callback = function()
 AwardPoints(MoneyToGet, ReasonForMoney)
 end; })
-
 Tab_4:CreateSection("Custom Skins")
-
 -- i am sorry this was made by ai because i dont know accessory things
 function weldAttachments(attach1, attach2)
   local weld = Instance.new("Weld")
@@ -2304,7 +2199,6 @@ c["Left Leg"].Transparency = 0
 end
 
 local function ArtfulLORSetUp(c)
-
 local function Ability()
 local a = Humanoid:LoadAnimation(game:GetService("ReplicatedStorage").Characters.Killer.Harken.Default.Animations.Throw)
 repeat task.wait() until a.Length > 0
@@ -2352,7 +2246,6 @@ task.spawn(Ability)
 repeat task.wait() until Character:GetAttribute("SprintSpeed") > 13
 a:Stop()
 end
-
 
 if c:FindFirstChild("CloneTool") then
 c:FindFirstChild("CloneTool"):Destroy()
@@ -2418,7 +2311,6 @@ task.wait()
 a.Parent = game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Abilities.Folder
 end
 
-
 Tab_4:CreateButton({Name = "Forsaken Artful ( Noliful Variant )"; Callback = function()
 Rayfield:Notification("Success!", "Loading new skin... Please wait!", 5, true)
 if not _G.mp3_conversion_module then
@@ -2464,27 +2356,19 @@ MainModule:ModifySkin("Builder", temp_table)
 Rayfield:Notification("Success!", "Loaded new skin!", 5, true)
 end)
 end; })
-
-
-
 Tab_4:CreateSection("Intro / Special Round Starter")
-
 killerintro = "Pursuer"
 Tab_4:CreateDropdown({Name = "Killer Intro"; Options = {"Pursuer","Artful","Badware","Killdroid","Harken"}; CurrentOption = "Pursuer"; MultiSelection = false; Callback = function(Value)
 killerintro = Rayfield:GetDropdownValue(Value)
 end; })
-
 Tab_4:CreateButton({Name = "Start Intro"; Callback = function()
 if not firesignal then return end
 firesignal(game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("KillerIntro").OnClientEvent, game:GetService("Players").LocalPlayer,killerintro,killerintro,"Default",1)
 end; })
-
-
 specialroundevent = "Double Trouble"
 Tab_4:CreateDropdown({Name = "Special Round Event"; Options = {"Double Trouble","Evil Scary","One Bounce","Gunslinger","Dienation"}; CurrentOption = "Double Trouble"; MultiSelection = false; Callback = function(Value)
 specialroundevent = Rayfield:GetDropdownValue(Value)
 end; })
-
 Tab_4:CreateButton({Name = "Start Special Round Event"; Callback = function()
 if not firesignal then return end
 firesignal(game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("GamemodeUI").OnClientEvent, specialroundevent)
@@ -2501,515 +2385,6 @@ end; })
 
 
 
-----------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-local AnimationsModule = [[task.spawn(function()
-pcall(function()
-local stopper = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") or game.Players.LocalPlayer.Character:FindFirstChildOfClass("AnimationController")
-for i,v in next, stopper:GetPlayingAnimationTracks() do
-v:Stop()
-end
-end)
-end)
-
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Events = ReplicatedStorage:WaitForChild("Events")
-local RunService = game:GetService("RunService")
-
--- Animation control system
-local AnimationController = {}
-AnimationController.Enabled = true
-AnimationController.ActiveAnimations = {}
-AnimationController.CharacterConnections = {}
-AnimationController.CharacterAnimators = {}
-AnimationController.LoadedTracks = {}
-
--- Initialize workspace attribute if not exists
-if workspace:GetAttribute("AnimationsEnabled") == nil then
-	workspace:SetAttribute("AnimationsEnabled", true)
-end
--- and also init this anim desync lolz
-if workspace:GetAttribute("AnimDesyncEnabled") == nil then
-	workspace:SetAttribute("AnimDesyncEnabled", false)
-end
-if workspace:GetAttribute("AnimDesync") == nil then
-	workspace:SetAttribute("AnimDesync", 1)
-end
-
-
--- Listen for attribute changes
-workspace:GetAttributeChangedSignal("AnimationsEnabled"):Connect(function()
-	AnimationController.Enabled = workspace:GetAttribute("AnimationsEnabled")
-	if not AnimationController.Enabled then
-		AnimationController:UnloadAllAnimations()
-	else
-		-- Reload animations for all valid characters
-		for character, _ in pairs(AnimationController.CharacterAnimators) do
-			if character and character.Parent and character:IsDescendantOf(workspace) then
-				if character:FindFirstChild("Humanoid") and character:FindFirstChild("Animations") then
-					task.spawn(function()
-						AnimationController:LoadCharacterAnimations(character)
-					end)
-				end
-			else
-				-- Clean up invalid characters
-				AnimationController.CharacterAnimators[character] = nil
-			end
-		end
-	end
-end)
-
-function AnimationController:UnloadAllAnimations()
-	-- Stop and remove all animation tracks
-	for character, tracks in pairs(self.LoadedTracks) do
-		for trackName, track in pairs(tracks) do
-			if track and track.IsPlaying then
-				track:Stop()
-			end
-		end
-	end
-	self.LoadedTracks = {}
-	
-	-- Stop active animations
-	self:StopAllAnimations()
-end
-
-function AnimationController:StopAllAnimations()
-	for character, animations in pairs(self.ActiveAnimations) do
-		for animName, track in pairs(animations) do
-			if track and track.IsPlaying then
-				track:Stop()
-			end
-		end
-	end
-	self.ActiveAnimations = {}
-end
-
-function AnimationController:CleanupCharacter(character)
-	-- Clean up loaded tracks
-	if self.LoadedTracks[character] then
-		for trackName, track in pairs(self.LoadedTracks[character]) do
-			if track and track.IsPlaying then
-				track:Stop()
-			end
-		end
-		self.LoadedTracks[character] = nil
-	end
-	
-	-- Clean up active animations
-	if self.ActiveAnimations[character] then
-		for animName, track in pairs(self.ActiveAnimations[character]) do
-			if track and track.IsPlaying then
-				track:Stop()
-			end
-		end
-		self.ActiveAnimations[character] = nil
-	end
-
-	-- Clean up connections
-	if self.CharacterConnections[character] then
-		for _, connection in ipairs(self.CharacterConnections[character]) do
-			connection:Disconnect()
-		end
-		self.CharacterConnections[character] = nil
-	end
-
-	self.CharacterAnimators[character] = nil
-end
-
-function AnimationController:LoadAnimationTrack(character, animationName, animationId)
-	if not self.Enabled then return nil end
-	if not character or not character.Parent then return nil end
-	
-	local humanoid, renderHumanoid = self:GetHumanoid(character)
-	local actualHumanoid = renderHumanoid or humanoid
-	if not actualHumanoid then return nil end
-
-	local animator = actualHumanoid:FindFirstChildOfClass("Animator")
-	if not animator then
-		animator = Instance.new("Animator")
-		animator.Parent = actualHumanoid
-	end
-
-	-- Create animation instance
-	local animation = Instance.new("Animation")
-	animation.AnimationId = animationId
-	
-	-- Load animation track
-	local track = animator:LoadAnimation(animation)
-	
-	-- Store in loaded tracks
-	if not self.LoadedTracks[character] then
-		self.LoadedTracks[character] = {}
-	end
-	self.LoadedTracks[character][animationName] = track
-	
-	return track
-end
-
-function AnimationController:GetHumanoid(character)
-	if not self.Enabled then return nil end
-
-	local humanoid = character:FindFirstChildWhichIsA("Humanoid")
-	local renderHumanoid = nil
-	if character:GetAttribute("MROB") and RunService:IsClient() then
-		pcall(function()
-			local renderUI = character:FindFirstChild("RenderUIPath")
-			if renderUI and renderUI.Value then
-				local viewport = renderUI.Value
-				if viewport then
-					renderHumanoid = viewport.ViewportFrame.WorldModel.RenderModel:FindFirstChildWhichIsA("Humanoid")
-				end
-			end
-		end)
-	end
-	return humanoid, renderHumanoid
-end
-
-function AnimationController:LoadCharacterAnimations(character)
-	if not self.Enabled then return end
-	if not character or not character.Parent then return end
-	if not character:FindFirstChild("Humanoid") then return end
-	if not character:FindFirstChild("Animations") then return end
-
-	local animationsFolder = character:FindFirstChild("Animations")
-	if not animationsFolder then return end
-
-	-- Clean up existing animations for this character
-	self:CleanupCharacter(character)
-
-	-- Load all animations from the folder
-	local loadedTracks = {}
-	
-	for _, animationObject in ipairs(animationsFolder:GetChildren()) do
-		if animationObject:IsA("Animation") then
-			local track = self:LoadAnimationTrack(character, animationObject.Name, animationObject.AnimationId)
-			if track then
-				loadedTracks[animationObject.Name] = track
-			end
-		end
-	end
-
-	-- Store animator reference
-	local humanoid, renderHumanoid = self:GetHumanoid(character)
-	local actualHumanoid = renderHumanoid or humanoid
-	if actualHumanoid then
-		local animator = actualHumanoid:FindFirstChildOfClass("Animator")
-		if animator then
-			self.CharacterAnimators[character] = animator
-		end
-	end
-
-	-- Start animation system if we have the required animations
-	if loadedTracks["Idle"] then
-		self:StartCharacterAnimationSystem(character, loadedTracks)
-	end
-end
-
-function AnimationController:StartCharacterAnimationSystem(character, loadedTracks)
-	if not self.Enabled then return end
-	if not character or not character.Parent then return end
-	if not character:FindFirstChild("HumanoidRootPart") then return end
-
-	local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-	local humanoid, renderHumanoid = self:GetHumanoid(character)
-	local actualHumanoid = renderHumanoid or humanoid
-	if not actualHumanoid then return end
-
-	local animations = character:FindFirstChild("Animations")
-	if not animations then return end
-
-	local player = Players:GetPlayerFromCharacter(character)
-	if player and player ~= Players.LocalPlayer then return end
-
-	local transitionSpeed = animations:GetAttribute("TransitionSpeed") or 0.25
-
-	-- Start with idle animation
-	if loadedTracks["Idle"] then
-		loadedTracks["Idle"]:Play()
-		self:AddActiveAnimation(character, "Idle", loadedTracks["Idle"])
-	end
-
-	-- Play passive animation if exists
-	if loadedTracks["PassiveAnimation"] then
-		loadedTracks["PassiveAnimation"]:Play()
-		self:AddActiveAnimation(character, "PassiveAnimation", loadedTracks["PassiveAnimation"])
-	end
-
-	-- Jump animation handling
-	if loadedTracks["Jump"] then
-		local stateConnection = actualHumanoid.StateChanged:Connect(function(oldState, newState)
-			if not self.Enabled then return end
-			if not character or not character.Parent then return end
-			
-			-- Jump and fall handling
-			if newState == Enum.HumanoidStateType.Jumping or newState == Enum.HumanoidStateType.Freefall then
-				loadedTracks["Jump"]:Play(0)
-				self:AddActiveAnimation(character, "Jump", loadedTracks["Jump"])
-				if ReplicatedStorage:FindFirstChild("Sounds") and ReplicatedStorage.Sounds:FindFirstChild("SFX") then if character.PrimaryPart:FindFirstChild("Jump") then return end local jumpSound = ReplicatedStorage.Sounds.SFX.Jump:Clone() jumpSound.Parent = character.PrimaryPart jumpSound:Play() jumpSound.Ended:Once(function() jumpSound:Destroy() end) end
-			else
-				loadedTracks["Jump"]:Stop(0.2)
-				self:RemoveActiveAnimation(character, "Jump")
-			end
-		end)
-		
-		-- Store connection for cleanup
-		if not self.CharacterConnections[character] then
-			self.CharacterConnections[character] = {}
-		end
-		table.insert(self.CharacterConnections[character], stateConnection)
-	end
-
-	-- Movement animations with speed attributes (from original script)
-	if loadedTracks["Walk"] then
-		local walkAnim = loadedTracks["Walk"]
-		local sprintAnim = loadedTracks["Sprint"]
-		
-		if loadedTracks["Idle"] then
-			loadedTracks["Idle"].Priority = Enum.AnimationPriority.Core
-		end
-		walkAnim.Priority = Enum.AnimationPriority.Idle
-		if sprintAnim then
-			sprintAnim.Priority = Enum.AnimationPriority.Movement
-		end
-
-		-- Get speed attributes from character (like original script)
-		local baseWalkSpeed = (character:GetAttribute("WalkSpeed") or 6) + (character:GetAttribute("WalkSpeedModifier") or 0)
-		local baseSprintSpeed = (character:GetAttribute("SprintSpeed") or 23) + (character:GetAttribute("WalkSpeedModifier") or 0)
-		
-		-- Adjust animation speeds based on current walk speed (like original script)
-		local function adjustAnimationSpeeds()
-			if not self.Enabled then return end
-			if not character or not character.Parent then return end
-			
-			local currentWalkSpeed = actualHumanoid.WalkSpeed
-			local walkSpeedRatio = currentWalkSpeed / (character:GetAttribute("WalkSpeed") or 6)
-			local sprintSpeedRatio = currentWalkSpeed / (character:GetAttribute("SprintSpeed") or 23)
-			
-			walkAnim:AdjustSpeed(walkSpeedRatio < 0 and 0.1 or walkSpeedRatio)
-			if sprintAnim then
-				sprintAnim:AdjustSpeed(sprintSpeedRatio < 0 and 0.1 or sprintSpeedRatio)
-			end
-		end
-
-		-- Connect to WalkSpeed changes (like original script)
-		local speedConnection = actualHumanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(adjustAnimationSpeeds)
-		if not self.CharacterConnections[character] then
-			self.CharacterConnections[character] = {}
-		end
-		table.insert(self.CharacterConnections[character], speedConnection)
-
-		-- Initial speed adjustment
-		adjustAnimationSpeeds()
-
-		local function updateMovement(speed)
-			if not self.Enabled then return end
-			if not character or not character.Parent then return end
-			if not humanoidRootPart or not actualHumanoid then return end
-
-			if speed >= 0.25 and not humanoidRootPart.Anchored then
-				-- Use speed thresholds from attributes (like original script)
-				if sprintAnim and speed >= (baseSprintSpeed - baseWalkSpeed) then
-					if not sprintAnim.IsPlaying then 
-						sprintAnim:Play(transitionSpeed) 
-						self:AddActiveAnimation(character, "Sprint", sprintAnim)
-					end
-					walkAnim:Stop(transitionSpeed)
-					self:RemoveActiveAnimation(character, "Walk")
-					if loadedTracks["Idle"] then
-						loadedTracks["Idle"]:Stop(transitionSpeed)
-					end
-				else
-					if not walkAnim.IsPlaying then 
-						walkAnim:Play(transitionSpeed) 
-						self:AddActiveAnimation(character, "Walk", walkAnim)
-					end
-					if sprintAnim then 
-						sprintAnim:Stop(transitionSpeed) 
-						self:RemoveActiveAnimation(character, "Sprint")
-					end
-					if loadedTracks["Idle"] then
-						loadedTracks["Idle"]:Stop(transitionSpeed)
-					end
-				end
-			else
-				if loadedTracks["Idle"] and not loadedTracks["Idle"].IsPlaying then 
-					loadedTracks["Idle"]:Play(transitionSpeed) 
-					self:AddActiveAnimation(character, "Idle", loadedTracks["Idle"])
-				end
-				walkAnim:Stop(transitionSpeed)
-				self:RemoveActiveAnimation(character, "Walk")
-				if sprintAnim then 
-					sprintAnim:Stop(transitionSpeed) 
-					self:RemoveActiveAnimation(character, "Sprint")
-				end
-			end
-		end
-
-		local runningConnection = actualHumanoid.Running:Connect(updateMovement)
-		
-		-- Store connection for cleanup
-		if not self.CharacterConnections[character] then
-			self.CharacterConnections[character] = {}
-		end
-		table.insert(self.CharacterConnections[character], runningConnection)
-	end
-end
-
-function AnimationController:AddActiveAnimation(character, animationName, track)
-	if not self.ActiveAnimations[character] then
-		self.ActiveAnimations[character] = {}
-	end
-	self.ActiveAnimations[character][animationName] = track
-end
-
-function AnimationController:RemoveActiveAnimation(character, animationName)
-	if self.ActiveAnimations[character] then
-		self.ActiveAnimations[character][animationName] = nil
-	end
-end
-
--- Remote event handlers
-Events.RemoteEvents.PlayAnimation.OnClientEvent:Connect(function(animation, character, delay)
-	if not AnimationController.Enabled then return end
-	if not character or not character.Parent then return end
-	if workspace:GetAttribute("AnimDesyncEnabled") == true then task.wait(workspace:GetAttribute("AnimDesync")) end
-
-	if character and (not Players:GetPlayerFromCharacter(character) or Players:GetPlayerFromCharacter(character) == Players.LocalPlayer) then
-		local humanoid = AnimationController:GetHumanoid(character)
-		if not humanoid then return end
-
-		local animator = humanoid:FindFirstChildOfClass("Animator") or Instance.new("Animator", humanoid)
-		for _, track in animator:GetPlayingAnimationTracks() do
-			if track.Name == animation.Name then
-				track:Play()
-				return
-			end
-		end
-		animator:LoadAnimation(animation):Play(delay or 0.1)
-	end
-end)
-
-Events.RemoteEvents.StopAnimation.OnClientEvent:Connect(function(animation, character)
-	if not character or not character.Parent then return end
-	if workspace:GetAttribute("AnimDesyncEnabled") == true then task.wait(workspace:GetAttribute("AnimDesync")) end
-
-	local humanoid = AnimationController:GetHumanoid(character)
-	if not humanoid then return end
-
-	local animator = humanoid:FindFirstChildOfClass("Animator") or Instance.new("Animator", humanoid)
-	for _, track in animator:GetPlayingAnimationTracks() do
-		if track.Name == animation.Name then
-			track:Stop()
-			return
-		end
-	end
-end)
-
-function AnimationController:SetupDefaultCharacter(character)
-	if not self.Enabled then return end
-	if not character or not character.Parent then return end
-	if not character:FindFirstChild("Humanoid") then return end
-
-	local civilian = ReplicatedStorage:FindFirstChild("Characters") and 
-					ReplicatedStorage.Characters.Survivor:FindFirstChild("Civilian")
-	local defaultAnimations = civilian and civilian:FindFirstChild("Animations")
-
-	if defaultAnimations then
-		-- Remove existing animations folder
-		local existingAnimations = character:FindFirstChild("Animations")
-		if existingAnimations then
-			existingAnimations:Destroy()
-		end
-
-		-- Clone new animations
-		local newAnimations = defaultAnimations:Clone()
-		newAnimations.Parent = character
-
-		if character:FindFirstChild("HumanoidRootPart") then
-			character.PrimaryPart = character:WaitForChild("HumanoidRootPart")
-		end
-
-		-- Load animations from the new folder
-		self:LoadCharacterAnimations(character)
-		character:SetAttribute("WalkSpeed", 10)
-		character:SetAttribute("SprintSpeed", 26)
-	end
-end
-
--- Update initial state
-AnimationController.Enabled = workspace:GetAttribute("AnimationsEnabled")
-
--- Player character handling
-local localPlayer = Players.LocalPlayer
-
-localPlayer.CharacterAdded:Connect(function(character)
-	task.wait(1)
-	if AnimationController.Enabled then
-		if character:FindFirstChild("Animations") then
-			AnimationController:LoadCharacterAnimations(character)
-		else
-			AnimationController:SetupDefaultCharacter(character)
-		end
-	end
-end)
-
-localPlayer.CharacterRemoving:Connect(function(character)
-	AnimationController:CleanupCharacter(character)
-end)
-
-task.spawn(function()
-	if AnimationController.Enabled and localPlayer.Character then
-		AnimationController:SetupDefaultCharacter(localPlayer.Character)
-	end
-end)
-
--- NPC handling
-local teamsFolder = workspace:WaitForChild("GameAssets"):WaitForChild("Teams")
-local otherTeam = teamsFolder:WaitForChild("Other")
-
-otherTeam.ChildAdded:Connect(function(npc)
-	if not AnimationController.Enabled then return end
-	if not npc:FindFirstChild("Humanoid") then return end
-	if not npc:FindFirstChild("Animations") then return end
-
-	local humanoid = npc:FindFirstChild("Humanoid")
-	if humanoid then
-		humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
-		humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics, false)
-		AnimationController:LoadCharacterAnimations(npc)
-	end
-end)
-
--- Clean up when NPCs are removed
-otherTeam.ChildRemoved:Connect(function(npc)
-	AnimationController:CleanupCharacter(npc)
-end)
-
-
--- Periodic cleanup of invalid characters
-game:GetService("RunService").Heartbeat:Connect(function()
-	for character, _ in pairs(AnimationController.CharacterAnimators) do
-		if not character or not character.Parent or not character:IsDescendantOf(workspace) then
-			AnimationController:CleanupCharacter(character)
-		end
-	end
-end)]]
-if workspace:GetAttribute("AnimationsEnabled") == nil and game:GetService("Players").LocalPlayer.PlayerScripts:FindFirstChild("ClientAnimations") then
-game:GetService("Players").LocalPlayer.PlayerScripts.ClientAnimations:Destroy()
-task.wait()
-loadstring(AnimationsModule)()
-end
-
 
 
 
@@ -3019,9 +2394,7 @@ return Character:WaitForChild("Animations")
 end
 return nil
 end
-
 local Tab_6 = Window:CreateTab("Animations",0)
-
 function SetRunAnim(run)
 pcall(function()
 local stopper = Humanoid or Character:FindFirstChildOfClass("AnimationController")
@@ -3051,7 +2424,6 @@ AnimationFolder:FindFirstChild("Sprint").AnimationId = run
 end
 end)
 end
-
 function SetWalkAnim(walk)
 pcall(function()
 local stopper = Humanoid or Character:FindFirstChildOfClass("AnimationController")
@@ -3071,7 +2443,6 @@ AnimationFolder:FindFirstChild("OldWalk").AnimationId = walk
 end
 end)
 end
-
 function SetIdleAnim(idle)
 pcall(function()
 local stopper = Humanoid or Character:FindFirstChildOfClass("AnimationController")
@@ -3091,7 +2462,6 @@ AnimationFolder:FindFirstChild("OldIdle").AnimationId = idle
 end
 end)
 end
-
 function ApplyNewAnimations()
 pcall(function()
 workspace:SetAttribute("AnimationsEnabled", false)
@@ -3099,9 +2469,6 @@ task.wait()
 workspace:SetAttribute("AnimationsEnabled", true)
 end)
 end
-
-
-
 task.wait()
 if workspace:GetAttribute("AnimationsEnabled") == nil then
 Tab_6:CreateParagraph({Title = "Not Supported", Content = "clientscript not found"})
@@ -3136,7 +2503,6 @@ ApplyNewAnimations()
 end)
 Rayfield:Notification("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
 end; })
-
 Tab_6:CreateLabel("Ghost Animations")
 Tab_6:CreateButton({Name = "Apply Ghost animations"; Callback = function()
 local RunAnim = "rbxassetid://124260679864309"
@@ -3151,7 +2517,6 @@ ApplyNewAnimations()
 end)
 Rayfield:Notification("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
 end; })
-
 pcall(function()
 for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
 Tab_6:CreateLabel(v.Name.." Animations")
@@ -3163,7 +2528,6 @@ local Hi = v:WaitForChild("Default")
 Tab_6:CreateDropdown({Name = "Choose "..v.Name.." animations"; Options = temp_table; CurrentOption = "Default"; MultiSelection = false; Callback = function(Value)
 Hi = v:WaitForChild(Rayfield:GetDropdownValue(Value))
 end; })
-
 Tab_6:CreateButton({Name = "Apply "..v.Name.." animations"; Callback = function()
 local RunAnim = Hi:WaitForChild("Animations"):WaitForChild("Sprint").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("OldSprint").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("NormalSprint").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("HurtSprint").AnimationId
 local WalkAnim = Hi:WaitForChild("Animations"):WaitForChild("Walk").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("OldWalk").AnimationId
@@ -3177,14 +2541,9 @@ ApplyNewAnimations()
 end)
 Rayfield:Notification("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
 end; })
-
 end; end
 end)
-
-
 Tab_6:CreateSection("Advanced")
-
-
 function GetAllRunAnims()
 local temp_table = {}
 temp_table["Civilian Run"] = "rbxassetid://137375023685630"
@@ -3199,7 +2558,6 @@ end; end
 end; end
 return temp_table
 end
-
 function GetAllWalkAnims()
 local temp_table = {}
 temp_table["Civilian Walk"] = "rbxassetid://84388941697203"
@@ -3214,7 +2572,6 @@ end; end
 end; end
 return temp_table
 end
-
 function GetAllIdleAnims()
 local temp_table = {}
 temp_table["Civilian Idle"] = "rbxassetid://100930402371608"
@@ -3229,7 +2586,6 @@ end; end
 end; end
 return temp_table
 end
-
 function GetAllRunNames()
 local temp_table = {}
 table.insert(temp_table, "Civilian Run")
@@ -3243,7 +2599,6 @@ end; end
 end; end
 return temp_table
 end
-
 function GetAllWalkNames()
 local temp_table = {}
 table.insert(temp_table, "Civilian Walk")
@@ -3257,7 +2612,6 @@ end; end
 end; end
 return temp_table
 end
-
 function GetAllIdleNames()
 local temp_table = {}
 table.insert(temp_table, "Civilian Idle")
@@ -3271,25 +2625,18 @@ end; end
 end; end
 return temp_table
 end
-
-local ChoosenRunAnim = LoadConfig("Tab_6", "CustomAnimations", "Run")
+local ChoosenRunAnim = "Civilian Run"
 Tab_6:CreateDropdown({Name = "Run Animation"; Options = GetAllRunNames(); CurrentOption = ChoosenRunAnim; MultiSelection = false; Callback = function(Value)
 ChoosenRunAnim = tostring(Rayfield:GetDropdownValue(Value))
-SaveConfig("Tab_6", ChoosenRunAnim, "CustomAnimations", "Run")
 end; })
-
-local ChoosenWalkAnim = LoadConfig("Tab_6", "CustomAnimations", "Walk")
+local ChoosenWalkAnim = "Civilian Walk"
 Tab_6:CreateDropdown({Name = "Walk Animation"; Options = GetAllWalkNames(); CurrentOption = ChoosenWalkAnim; MultiSelection = false; Callback = function(Value)
 ChoosenWalkAnim = tostring(Rayfield:GetDropdownValue(Value))
-SaveConfig("Tab_6", ChoosenWalkAnim, "CustomAnimations", "Walk")
 end; })
-
-local ChoosenIdleAnim = LoadConfig("Tab_6", "CustomAnimations", "Idle")
+local ChoosenIdleAnim = "Civilian Idle"
 Tab_6:CreateDropdown({Name = "Idle Animation"; Options = GetAllIdleNames(); CurrentOption = ChoosenIdleAnim; MultiSelection = false; Callback = function(Value)
 ChoosenIdleAnim = tostring(Rayfield:GetDropdownValue(Value))
-SaveConfig("Tab_6", ChoosenIdleAnim, "CustomAnimations", "Idle")
 end; })
-
 Tab_6:CreateButton({Name = "Apply Animations"; Callback = function()
 task.spawn(function()
 SetRunAnim(GetAllRunAnims()[ChoosenRunAnim])
@@ -3300,44 +2647,17 @@ ApplyNewAnimations()
 end)
 Rayfield:Notification("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
 end; })
-
 Tab_6:CreateSection("Ability Changer")
-
-local AbilityAnimData = {
-["Punch"] = "rbxassetid://124781750889573", -- Civilian Animations Punch
-["Adrenaline"] = "rbxassetid://77399794134778", -- Civilian Animations Adrenaline
-["AdrenalineEnd"] = "rbxassetid://92333601998082", -- Civilian Animations AdrenalineEnd
-["Caretaker"] = "rbxassetid://128767098320893", -- Civilian Animations Caretaker
-["CloakStart"] = "rbxassetid://133960698072483", -- Civilian Animations CloakStart
-["BlockStart"] = "rbxassetid://134233326423882", -- Civilian Animations BlockStart
-["Dash"] = "rbxassetid://78278813483757", -- Civilian Animations Dash
-["PadBuild"] = "rbxassetid://79104831518074", -- Civilian Animations PadBuild
-["Hotdog"] = "rbxassetid://78595119178919", -- Civilian Animations Hotdog
-["Revolver"] = "rbxassetid://74108653904830", -- Civilian Animations Revolver
-["Taunt"] = "rbxassetid://113732291990231", -- Civilian Animations Taunt
-["RevolverReload"] = "rbxassetid://79026181033717", -- Civilian Animations RevolverReload
-["CloakEnd"] = "rbxassetid://120142279051418", -- Civilian Animations CloakEnd
-["DynamiteWindup"] = "rbxassetid://133960279206605", -- Civilian Animations DynamiteWindup
-["DynamiteThrow"] = "rbxassetid://99551865645121", -- Civilian Animations DynamiteThrow
-["DynamiteHold"] = "rbxassetid://137091713941325", -- Civilian Animations DynamiteHold
-["Banana"] = "rbxassetid://95775571866935", -- Civilian Animations Banana
-["BlockLand"] = "rbxassetid://94027412516651" -- Civilian Animations BlockLand
-}
-
+local AbilityAnimData = Module:GetData("AbilityAnimations")
 local AbilityAnimNames = {"Punch","Adrenaline","AdrenalineEnd","Caretaker","CloakStart","BlockStart","Dash","PadBuild","Hotdog","Revolver","Taunt","RevolverReload","CloakEnd","DynamiteWindup","DynamiteThrow","DynamiteHold","Banana","BlockLand"}
-
-local ReplaceWhatAbil = LoadConfig("Tab_6", "Swap", "What")
+local ReplaceWhatAbil = "Punch"
 Tab_6:CreateDropdown({Name = "Replace what"; Options = AbilityAnimNames; CurrentOption = ReplaceWhatAbil; MultiSelection = false; Callback = function(Value)
 ReplaceWhatAbil = Rayfield:GetDropdownValue(Value)
-SaveConfig("Tab_6", ReplaceWhatAbil, "Swap", "What")
 end; })
-
-local ReplaceWithWhatAbil = LoadConfig("Tab_6", "Swap", "WithWhat")
+local ReplaceWithWhatAbil = "BlockStart"
 Tab_6:CreateDropdown({Name = "Replace with what"; Options = AbilityAnimNames; CurrentOption = ReplaceWithWhatAbil; MultiSelection = false; Callback = function(Value)
 ReplaceWithWhatAbil = Rayfield:GetDropdownValue(Value)
-SaveConfig("Tab_6", ReplaceWithWhatAbil, "Swap", "What")
 end; })
-
 Tab_6:CreateButton({Name = "Replace animation"; Callback = function()
 task.spawn(function()
 Character.Animations.Abilities[ReplaceWhatAbil].AnimationId = tostring(AbilityAnimData[ReplaceWithWhatAbil])
@@ -3346,28 +2666,19 @@ ApplyNewAnimations()
 end)
 Rayfield:Notification("Success!", "Applying replacion, it may take up to 10 seconds.", 3, true)
 end; })
-
-
 Tab_6:CreateSection("Custom Ability Animation Changer")
-
 local abilityList = {}
 for name,_ in pairs(AbilityAnimData) do
 	table.insert(abilityList,name)
 end
-
-local SelectedAbility = LoadConfig("Tab_6","ToEdit")
+local SelectedAbility = "Adrenaline"
 Tab_6:CreateDropdown({Name = "Select Ability"; Options = abilityList; CurrentOption = SelectedAbility; MultiSelection = false; Callback = function(v)
 SelectedAbility = Rayfield:GetDropdownValue(v)
-SaveConfig("Tab_6",SelectedAbility,"ToEdit")
-end
-});
-
-local CustomAnimID = LoadConfig("Tab_6","CustomID")
+end});
+local CustomAnimID = "0"
 Tab_6:CreateInput({Name = "Animation ID"; PlaceholderText = tostring(CustomAnimID); NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(v)
 CustomAnimID = tostring(v)
-SaveConfig("Tab_6",CustomAnimID,"CustomID")
 end});
-
 Tab_6:CreateButton({Name = "Apply Animation"; Callback = function()
 local idexists = not pcall(function() game:GetService("ContentProvider"):PreloadAsync({tonumber(id)}) end)
 AbilityAnimData[SelectedAbility] = ((idexists == true and "rbxassetid://"..CustomAnimID) or CustomAnimID)
@@ -3375,30 +2686,20 @@ Character.Animations.Abilities[SelectedAbility].AnimationId = AbilityAnimData[Se
 ApplyNewAnimations()
 Rayfield:Notification("Success!", "Changed Ability Animation.", 3, true)
 end});
-
-
 Tab_6:CreateSection("Miscellaneous")
-
-local DesyncInSeconds = LoadConfig("Tab_6", "Misc", "Desync")
+local DesyncInSeconds = 1
 Tab_6:CreateInput({Name = "Desync in seconds"; PlaceholderText = tostring(DesyncInSeconds); NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 workspace:SetAttribute("AnimDesync", tonumber(Value))
-SaveConfig("Tab_6", tonumber(Value), "Misc", "Desync")
 end; })
-workspace:SetAttribute("AnimDesync", DesyncInSeconds)
-
-local DesyncEnabled = LoadConfig("Tab_6", "Misc", "DesyncEnabled")
-local DesyncEnabledToggle = Tab_6:CreateToggle({Name = "Animations Desync"; CurrentValue = false; Callback = function(Value)
+local DesyncEnabled = false
+Tab_6:CreateToggle({Name = "Animations Desync"; CurrentValue = false; Callback = function(Value)
 workspace:SetAttribute("AnimDesyncEnabled", Value)
-SaveConfig("Tab_6", Value, "Misc", "DesyncEnabled")
 end; })
-DesyncEnabledToggle:Set(DesyncEnabled)
-
 Tab_6:CreateButton({Name = "No animations [ Apply any animation to revert! ]"; Callback = function()
 pcall(function()
 workspace:SetAttribute("AnimationsEnabled", false)
 end)
 end; })
-
 Tab_6:CreateButton({Name = "Fast animations [ THIS CANNOT BE REVERTED! ]"; Callback = function()
 pcall(function()
 while task.wait() do
