@@ -964,7 +964,7 @@ if ChoosenNoStamLossMethod == "require" then
 NoStaminaLoss = true
 lastusedmethod = "require"
 task.spawn(function()
-Heartbeat.LoopNoStaminaLoss = function() if Char~=nil and Char:GetAttribute("MaxStamina")~=nil then Char:SetAttribute("Stamina", Char:GetAttribute("MaxStamina")) end end
+Heartbeat.LoopNoStaminaLoss = function() if Char~=nil and Char:GetAttribute("MaxStamina")~=nil then StaminaModule.Stamina = tonumber(Char:GetAttribute("MaxStamina")) end end
 repeat task.wait(0.003) until NoStaminaLoss == false
 if Heartbeat.LoopNoStaminaLoss~=nil then
 Heartbeat.LoopNoStaminaLoss = nil
