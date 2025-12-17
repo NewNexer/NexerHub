@@ -601,6 +601,12 @@ return nil
 end
 end
 
+function module:GetAssetPrice(assetid)
+local Id = tonumber(assetid)
+local MarketplaceService = game:GetService("MarketplaceService")
+return (MarketplaceService:GetProductInfo(Id,Enum.InfoType.Asset).PriceInRobux)
+end
+
 function module:Browse(link)
 local url = tostring(link)
 local suc, err = pcall(function() setclipboard(url) game:GetService("GuiService"):BroadcastNotification(game:GetService("HttpService"):JSONEncode({["title"] = "Browser", ["presentationStyle"] = 2, ["visible"] = true, ["url"] = url}), 20) end) if not suc then setclipboard(url) end
