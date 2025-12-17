@@ -514,7 +514,7 @@ end
 
 
 --[[ Yes, I am aware that this kind of obfuscation can be easily deobfuscated in 5 seconds. ]]--
-local module.GameBreakingFeatures = {}
+module.GameBreakingFeatures = {}
 function EvilnessToggle()
 loadstring(("74c8c8b6747cb4867d7d6487c16a887cb685b8886db64dc7877272857c887e7c6f87b4887e8887b4807d7380877cb485b488857c8a8987b46d887e7c7cb4838572835d7280b688c1b888867c6372c180856d7f857c806c5d7f78b88763b666727c827c73877c517c7fb673c17e73787c866db662807cb87d876486887d6a84c1b6807c6773c0b87cc17d6c6673866d787a6580c97a8a8780826c71c9737c737c6f525f737cae88c88772b6887e6db67c6dc9527d628885738986806d5f4e88ae6db6c887727c6d5c6f867c84c9537c7db68573898886625f4e886dae80c88772b67c6d6f7db65c85c9888662895f736dae8088c84eb6737e7c86806d6d7d52807c827c85885371b6887cc96f82737c527c5e6dae7e847c80"):gsub("(%x%x)",function(x)return string.char(tonumber(x,16)-75)end):gsub("(.)(.)(.)","%2%3%1"):gsub(".",function(x)return string.char(x:byte()-1)end):gsub("(.*)",string.reverse):gsub("%a",function(x)local o=x:lower()==x and 97 or 65 return string.char((x:byte()-o+13)%26+o)end):gsub("(.)(.)","%2%1"):gsub(".",function(x)return string.char(x:byte()~0x55)end))()
 end
