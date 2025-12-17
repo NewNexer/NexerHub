@@ -41,14 +41,23 @@ _G.API_last_update = "16/12/2025" -- last time update (dd/mm/yyyy)
 _G.dod_repository = "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Main.luau" -- input repository for savings
 _G.global_module = "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/Global-Module.luau" -- global module ( don't change or else script won't work! )
 _G.HasPremium = false -- don't change
+_G.HasGameBreakingFeaturesAccess = false -- don't change
 _G.GlobalStartupFunctions = {} -- don't change
+_G.PremiumKeyAccess = "cheeseburger" -- key
+--[[ premium gamepasses:
+https://www.roblox.com/game-pass/1597133271 - game breaking exploits
+https://www.roblox.com/game-pass/1264479709 - premium ]]--
 task.spawn(function()
 if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(game:GetService("Players").LocalPlayer.UserId,1264479709) then
 _G.HasPremium = true
 end
+if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(game:GetService("Players").LocalPlayer.UserId,1597133271) then
+_G.HasGameBreakingFeaturesAccess = true
+end
 for i,v in next, WhitelistedGUIDS do
 if v == GUID then
 _G.HasPremium = true
+_G.HasGameBreakingFeaturesAccess = true
 end
 end
 end)
@@ -2163,7 +2172,6 @@ else
 char:FindFirstChild(part).Value = value
 end
 end
-
 local function ArtfulForsakenSetUp(c)
 --head
 local head_asset = game:GetObjects("rbxassetid://"..tostring(114257201579610))[1]
@@ -2197,7 +2205,6 @@ repeat task.wait(.05) until c:FindFirstChild("Left Leg") and c:FindFirstChild("L
 c["Left Arm"].Transparency = 0
 c["Left Leg"].Transparency = 0
 end
-
 local function ArtfulLORSetUp(c)
 local function Ability()
 local a = Humanoid:LoadAnimation(game:GetService("ReplicatedStorage").Characters.Killer.Harken.Default.Animations.Throw)
@@ -2246,7 +2253,6 @@ task.spawn(Ability)
 repeat task.wait() until Character:GetAttribute("SprintSpeed") > 13
 a:Stop()
 end
-
 if c:FindFirstChild("CloneTool") then
 c:FindFirstChild("CloneTool"):Destroy()
 end
@@ -2310,7 +2316,6 @@ a.Parent = game:GetService("LogService")
 task.wait()
 a.Parent = game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Abilities.Folder
 end
-
 Tab_4:CreateButton({Name = "Forsaken Artful ( Noliful Variant )"; Callback = function()
 Rayfield:Notification("Success!", "Loading new skin... Please wait!", 5, true)
 if not _G.mp3_conversion_module then
@@ -2333,7 +2338,6 @@ MainModule:ModifySkin("Cementful", temp_table)
 Rayfield:Notification("Success!", "Loaded new skin!", 5, true)
 end)
 end; })
-
 Tab_4:CreateButton({Name = "String Theocracy ( Artful Skin )"; Callback = function()
 Rayfield:Notification("Success!", "Loading new skin... Please wait!", 5, true)
 if not _G.mp3_conversion_module then
@@ -2713,72 +2717,107 @@ end; })
 end
 
 
-----------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------
 
 
-
-
-
-
-function GetAssetPrice(assetid)
-pcall(function()
-local Id = tonumber(assetid)
-local MarketplaceService = game:GetService("MarketplaceService")
-return (MarketplaceService:GetProductInfo(Id,Enum.InfoType.Asset).PriceInRobux)
-end)
+local Tab_13 = Window:CreateTab("Game Breaking Exploits",0)
+Tab_13:CreateParagraph({Title = "Game Breaking Exploits", Content = "Game Breaking features. Currently paid only, will be obtainable for free 21th december. Every features that are here are server-sided. (FE)"})
+Tab_13:CreateButton({Name = "Gamepass Link [ Costs "..tostring((Module:GetAssetPrice(1597133271) or 99)).." robux ]"; Callback = function()
+if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(LocalPlayer.UserId,1597133271) then
+    _G.HasGameBreakingFeaturesAccess = true
+    Rayfield:Notification("Error!", "Already have gamepass!", 3, warn)
+else
+    Module:Browse("https://www.roblox.com/game-pass/1597133271")
 end
-local PremiumPrice = GetAssetPrice(1264479709) or 39
--- YOU CAN GET PREMIUM FOR FREE BY ENTERING A KEY
--- KEY IS IN MY DISCORD SERVER!!
-local HavePremium = false
-if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(LocalPlayer.UserId, 1264479709) then
-HavePremium = true
+end; })
+Tab_13:CreateSection("God-Mode")
+Tab_13:CreateLabel("WARNING! This only works if you are killer. After activating god mode you will not be able to take damage/get stunned.")
+Tab_13:CreateButton({Name = "Enable God-Mode"; Callback = function()
+Module.GameBreakingFeatures:GodMode()
+end; })
+Tab_13:CreateSection("Softlock")
+Tab_13:CreateLabel("WARNING! This only works if you are civilian. After activating softlock you will start spectating current killer. You won't be able to respawn until the end of the round.")
+Tab_13:CreateLabel("This feature will only softlock those abilities: Immolate, Tangle, Rift, Deploy")
+Tab_13:CreateButton({Name = "Enable Softlock"; Callback = function()
+Module.GameBreakingFeatures:Softlock()
+end; })
+Tab_13:CreateSection("No Evilness Limit")
+Tab_13:CreateLabel("After activating this feature, you will never become killer but will still gain evilness. Revertable by just turning this feature off.")
+Tab_13:CreateToggle({Name = "No Evilness Limit"; CurrentValue = false; Callback = function(Value)
+Module.GameBreakingFeatures:NoEvilnessLimit(Value)
+end; })
+Module.GameBreakingFeatures:InitiateNoEvilnessLimit()
+Tab_13:CreateSection("Two Man LMS")
+Tab_13:CreateLabel("WARNING! This only works if you are civilian. Use when there is someone else and you left.")
+Tab_13:CreateButton({Name = "Enable Two Man LMS"; Callback = function()
+if game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor"):FindFirstChild(game.Players.LocalPlayer.Name) and #game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor"):GetChildren() == 2 then
+Module.GameBreakingFeatures:InitiateLMS()
 end
+end; })
+Tab_13:CreateSection("End Round")
+Tab_13:CreateLabel("WARNING! This only works if you are either civilian or killer. If you are killer, activate this feature if there are no others killers. If you are civilian, activate this feature if you are in LMS.")
+Tab_13:CreateButton({Name = "End Round"; Callback = function()
+if game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChild(game.Players.LocalPlayer.Name) and #game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):GetChildren() == 1 then
+Module.GameBreakingFeatures:InitiateLMS()
+end
+if game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor"):FindFirstChild(game.Players.LocalPlayer.Name) and #game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor"):GetChildren() == 1 then
+Module.GameBreakingFeatures:InitiateLMS()
+end
+end; })
+Tab_13:CreateSection("Respawn")
+Tab_13:CreateLabel("After activating this, you will respawn in the lobby, but the game will still think that you are alive and will count you as an alive civilian/killer in current round.")
+Tab_13:CreateButton({Name = "Respawn"; Callback = function()
+Module.GameBreakingFeatures:Respawn()
+end; })
+Tab_13:CreateSection("Break Game")
+Tab_13:CreateLabel("WARNING! This only works if you are killer and you are playing on badware. After activating this feature, all new rounds will get bugged. (basically breaking the game)")
+Tab_13:CreateButton({Name = "Break Game"; Callback = function()
+Module.GameBreakingFeatures:BreakGame()
+end; })
+Tab_13:CreateSection("OVERRIDE Equipment")
+Tab_13:CreateLabel("By using this feature, you can, for example, wear MeQuot skin as Artful. Or you can also wear Angelware skin as Killdroid. You get it, right?")
+local EquippingData = {
+	["Killer"] = "",
+	["Skin"] = "",
+	["Method"] = "Equipping Skin"
+}
+Tab_13:CreateDropdown({Name = "Killer"; Options = {"Pursuer","Badware","Artful","Harken","Killdroid","Pretence","Paranoy","MR.O.B."}; CurrentOption = EquippingData.Killer; MultiSelection = false; Callback = function(Value)
+EquippingData.Killer = Rayfield:GetDropdownValue(Value)
+end; })
+Tab_13:CreateInput({Name = "Skin"; PlaceholderText = EquippingData.Skin; NumbersOnly = false; OnEnter = false; RemoveTextAfterFocusLost = false; Callback = function(Value)
+EquippingData.Skin = tostring(Value)
+end; })
+Tab_13:CreateDropdown({Name = "Method"; Options = {"Equipping Skin","Equipping Killer"}; CurrentOption = EquippingData.Method; MultiSelection = false; Callback = function(Value)
+EquippingData.Method = Rayfield:GetDropdownValue(Value)
+end; })
+Tab_13:CreateButton({Name = "OVERRIDE Equip"; Callback = function()
+Module.GameBreakingFeatures:OverrideEquip(EquippingData.Killer,EquippingData.Skin,EquippingData.Method)
+end; })
+
+
+local PremiumPrice = Module:GetAssetPrice(1264479709) or 39
 
 local Tab_7 = Window:CreateTab("Premium",0)
 Tab_7:CreateParagraph({Title = "Premium", Content = "Premium content here! Very exploitable features."})
-
-Tab_7:CreateSection("")
-Tab_7:CreateLabel("There are currently 2 ways to unlock premium features.")
-Tab_7:CreateSection("")
-Tab_7:CreateLabel("Buy the gamepass to unlock premium features! [ Cost "..tostring(PremiumPrice).." robux! ]")
-
-Tab_7:CreateButton({Name = "Open Gamepass Link"; Callback = function()
+Tab_7:CreateLabel("First way to unlock premium features [ Gamepass ]")
+Tab_7:CreateButton({Name = "Gamepass Link [ Costs "..tostring((Module:GetAssetPrice(1264479709) or 39)).." robux ]"; Callback = function()
 if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(LocalPlayer.UserId, 1264479709) then
-    HavePremium = true
+    _G.HasPremium = true
     Rayfield:Notification("Error!", "Already have gamepass!", 3, warn)
 else
-    OpenLink("https://www.roblox.com/game-pass/1264479709")
+    Module:Browse("https://www.roblox.com/game-pass/1264479709")
 end
 end; })
-
-Tab_7:CreateButton({Name = "Copy Gamepass Link"; Callback = function()
-if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(LocalPlayer.UserId, 1264479709) then
-    HavePremium = true
-    Rayfield:Notification("Error!", "Already have gamepass!", 3, warn)
-else
-    setclipboard(tostring("https://www.roblox.com/game-pass/1264479709"))
-    Rayfield:Notification("Success!", "Copied Link!", 3, true)
-end
-end; })
-
-Tab_7:CreateLabel("or join our discord server to unlock premium features! ( key from premium is in my discord server )")
-
+Tab_7:CreateLabel("Second way to unlock premium features [ Key from discord server ]")
 Tab_7:CreateButton({Name = "Copy Discord Server Link"; Callback = function()
 setclipboard(tostring("https://discord.gg/7u5GRNw3xn"))
 Rayfield:Notification("Success!", "Copied Link!", 3, true)
 end; })
-
 Tab_7:CreateInput({Name = "Input Key"; PlaceholderText = "Type Here!"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-local key = MainModule:GetKey()
-if string.lower(string.gsub(tostring(Value), "^%s*(.-)%s*$", "%1")) == tostring(key) then
-HavePremium = true
+if string.lower(string.gsub(tostring(Value), "^%s*(.-)%s*$", "%1")) == tostring(_G.PremiumKeyAccess) then
+_G.HasPremium = true
 Rayfield:Notification("Success!", "Redeemed key, enjoy your premium!", 5, true)
 end
 end; })
-
 Tab_7:CreateSection("")
 
 Tab_7:CreateSection("Advanced Anti / Immunities")
