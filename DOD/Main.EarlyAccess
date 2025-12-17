@@ -225,7 +225,6 @@ pcall(function()
 local Announcements = Window:CreateTab("Announce",0)
 Announcements:CreateParagraph({Title = "W.I.P.", Content = "A lot of stuff haven't been added yet. Work is in progress. I have a lot of studies which is why it takes a lot of time."})
 Announcements:CreateParagraph({Title = "Discord suggestions", Content = "They'll be added soon! I will be updating everyday i can."})
-Announcements:CreateParagraph({Title = "Configuration", Content = "At this moment, configurations aren't being saving due to multiple bugs. The premium tab will be re-ordered soon."})
 Announcements:CreateButton({Name = "Copy Discord Server Link"; Callback = function()
 setclipboard(tostring("https://discord.gg/7u5GRNw3xn"))
 Rayfield:Notification("Success!", "Copied Link!", 3, true)
@@ -1072,10 +1071,9 @@ local InputBind = "None"
 Tab_3:CreateInput({Name = "Ability Keybind"; PlaceholderText = "None"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 InputBind = string.upper(tostring(Value))
 end; })
-local ChoosenAbility = LoadConfig("Tab_3", "FastFunctions", "ChoosenAbility")
+local ChoosenAbility = "Block"
 Tab_3:CreateDropdown({Name = "Choose Ability"; Options = AbilityNames; CurrentOption = ChoosenAbility; MultiSelection = false; Callback = function(Value)
 ChoosenAbility = Rayfield:GetDropdownValue(Value)
-SaveConfig("Tab_3", ChoosenAbility, "FastFunctions", "ChoosenAbility")
 end; })
 Tab_3:CreateButton({Name = "Get Choosen Ability"; Callback = function()
 local temp_table = table.clone(AbilityDatas[ChoosenAbility])
@@ -1697,7 +1695,6 @@ end; })
 local KilldroidDD = false
 Tab_5:CreateToggle({Name = "Infinite Flight"; CurrentValue = KilldroidDD; Callback = function(Value)
 KilldroidDD = Value
-SaveConfig("Tab_5", KilldroidDD, "KilldroidConfig", "Don'tDescendDuringTheFlight")
 end; })
 --------------------------------------------------------------------------------------
 local KilldroidConfigEffects = nil
