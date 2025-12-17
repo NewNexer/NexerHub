@@ -2822,8 +2822,8 @@ Tab_7:CreateToggle({Name = "Anti-Stun",CurrentValue = false,Callback = function(
 if not _G.HasPremium then Rayfield:Notification("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
 antiStun = Value
 if antiStun then
-if character:GetAttribute("WalkSpeedModifier") == nil then
-character:SetAttribute("WalkSpeedModifier", 0)
+if Character:GetAttribute("WalkSpeedModifier") == nil then
+Character:SetAttribute("WalkSpeedModifier", 0)
 end
 Heartbeat.AntiStun = function() if Character and Character:GetAttribute("WalkSpeedModifier")~=nil and tonumber(Character:GetAttribute("WalkSpeedModifier")) < 0 then Character:SetAttribute("WalkSpeedModifier", 0) end end
 Rayfield:Notification("Success!", "Anti-Stun is now enabled!", 2, true)
