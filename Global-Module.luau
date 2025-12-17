@@ -150,6 +150,34 @@ task.wait()
 end
 
 
+local LocalPlayer, LP = game:GetService("Players").LocalPlayer, game:GetService("Players").LocalPlayer
+local Character, Char = nil, nil
+local HumanoidRootPart, HRP = nil, nil
+local Humanoid, Hum = nil, nil
+pcall(function()
+Character, Char = LocalPlayer.Character, LocalPlayer.Character
+end)
+pcall(function()
+HumanoidRootPart, HRP = Character.HumanoidRootPart, Character.HumanoidRootPart
+end)
+pcall(function()
+Humanoid, Hum = Character.Humanoid, Character.Humanoid
+end)
+LocalPlayer.CharacterAdded:Connect(function(char)
+pcall(function()
+Character, Char = nil, nil
+HumanoidRootPart, HRP = nil, nil
+Humanoid, Hum = nil, nil
+task.wait()
+Character, Char = char, char
+repeat task.wait() until char:FindFirstChild("HumanoidRootPart")
+HumanoidRootPart, HRP = char.HumanoidRootPart, char.HumanoidRootPart
+repeat task.wait() until Character:FindFirstChild("Humanoid")
+Humanoid, Hum = char.Humanoid, char.Humanoid
+end)
+end)
+
+
 function module.IsWorking()
 return (module~=nil)
 end
@@ -184,8 +212,8 @@ local function GetMagnitudeDifference()
 return (chr.HumanoidRootPart.Position - HumanoidRootPart.Position).Magnitude or (1/0)
 end
 local function CheckRequirements()
-local b = (GetMagnitudeDifference(chr) < tonumber(AutoBlockRange))
-local c = IsFacingTowards(chr)
+local b = (GetMagnitudeDifference() < tonumber(AutoBlockRange))
+local c = IsFacingTowards()
 if b == true and c == true then return true end
 return false
 end
