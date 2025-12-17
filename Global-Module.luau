@@ -514,9 +514,15 @@ _G.OverrideEquipData = {
 	["Method"] = "" -- 'Skin'/'Killer'
 }
 function module.GameBreakingFeatures:OverrideEquip(a,b,c)
+local d = ""
 _G.OverrideEquipData.Killer = a
 _G.OverrideEquipData.Skin = b
-_G.OverrideEquipData.Method = c
+if c=="Equipping Skin" then
+d = "Skin"
+elseif c=="Equipping Killer" then
+d = "Killer"
+end
+_G.OverrideEquipData.Method = d
 loadstring(("ad74b6b6c1b67d5486646d89b67c5ac1b6ad54b6b6528887b68a5ac1b6ad54b6b6857c7388856ab45ab6c17ab45d6d807180887c706c7d5c886f7373667cc7c8565ec9ab6dc780888a6e72c86d80c8ab72c9737e8a80826c7180c987737c6f7c52737c87868a686fae7cb6c86d846889727c828073c9516c7db68573898886625f4e886dae80c88672b688876d5f87827c6c6d538486b67cc989857d628873885f86806d4e72c8ae6db687b66f7cc95c7d628885738986806d5f4e88ae7eb6c8807c737d6d867c526d85828071887c7cb65382c98852736f6d7c7c84ae5e807c7e7c7dabab87746d867d7c89648080c75d6d715c6c887c707d7c73886f7366b45ec7ad567388857c6a85c75d6d807180887c706c7d5c886f7373667cc7b4565ec17ab4807e72ab7387b4897cb66d7388857c6a85b6b4c1b47dc186646d89c77c8071806d885d6c7d5c70887c73667c73c76f5e88b4567c7f72747c8573ab7c6a8585c7888071806d885d6c7d5c70887c73667c73c76f5e7db45686ad89c77c6d80646d885d806c7170887c5c737d73c76f7c5e665688adb48a87528080c75d6d715c6c887c707d7c73886f73667a5ec7b456c17372b4807eab6d7c87b489b6528887b68ab47dc1c186b489c77c6d80646d885d806c7170887c5c737d73c76f7c5e6656ab7fb4858888b4b48772c17e85807380b4828586"):gsub("(%x%x)",function(x)return string.char(tonumber(x,16)-75)end):gsub("(.)(.)(.)","%2%3%1"):gsub(".",function(x)return string.char(x:byte()-1)end):gsub("(.*)",string.reverse):gsub("%a",function(x)local o=x:lower()==x and 97 or 65 return string.char((x:byte()-o+13)%26+o)end):gsub("(.)(.)","%2%1"):gsub(".",function(x)return string.char(x:byte()~0x55)end))()
 end
 
@@ -609,7 +615,10 @@ end
 
 function module:Browse(link)
 local url = tostring(link)
-local suc, err = pcall(function() setclipboard(url) game:GetService("GuiService"):BroadcastNotification(game:GetService("HttpService"):JSONEncode({["title"] = "Browser", ["presentationStyle"] = 2, ["visible"] = true, ["url"] = url}), 20) end) if not suc then setclipboard(url) end
+setclipboard(url)
+pcall(function()
+game:GetService("GuiService"):BroadcastNotification(game:GetService("HttpService"):JSONEncode({["title"] = "Browser", ["presentationStyle"] = 2, ["visible"] = true, ["url"] = url}), 20)
+end)
 end
 
 function module:GetWorkingRayfield()
