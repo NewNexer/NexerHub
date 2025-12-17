@@ -154,6 +154,61 @@ function module.IsWorking()
 return (module~=nil)
 end
 
+local AutoBlockEnabled = false
+local AutoBlockRange = 0
+local CheckIfFacesTowardsPlayer = false
+local UnhookEverything = false
+function module:AutoBlockSettings(a,b)
+if a == "AutoBlockRange" then
+AutoBlockRange = b
+elseif a == "CheckIfFacesTowardsPlayer" then
+CheckIfFacesTowardsPlayer = b
+elseif a == "AutoBlockEnabled" then
+AutoBlockEnabled = b
+end
+end
+
+function module:InitiateAutoBlock()
+local function HookOnto(chr)
+local AB_UA = game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteFunctions"):WaitForChild("UseAbility")
+local chrp = chr.Parent
+local chrn = chr.Name
+local function IsFacingTowards()
+if CheckIfFacesTowardsPlayer~=true then return true end
+local unit = ((HumanoidRootPart.Position - chr.HumanoidRootPart.Position) * Vector3.new(1,0,1)).Unit
+local lookvector = chr.HumanoidRootPart.CFrame.LookVector * Vector3.new(1,0,1)
+return (lookvector:Dot(unit) > 0.85)
+end
+local function GetMagnitudeDifference()
+return (chr.HumanoidRootPart.Position - HumanoidRootPart.Position).Magnitude or (1/0)
+end
+local function CheckRequirements()
+local b = (GetMagnitudeDifference(chr) < tonumber(AutoBlockRange))
+local c = IsFacingTowards(chr)
+if b == true and c == true then return true end
+return false
+end
+local AB_US = function() if CheckRequirements()==true and AutoBlockEnabled==true then AB_UA:InvokeServer("Block") end end
+local a = chr.HumanoidRootPart.Swing.Played:Connect(AB_US)
+repeat task.wait() until chrp:FindFirstChild(chrn) == nil or UnhookEverything == true
+a:Disconnect()
+end
+for i,v in next, workspace.GameAssets.Teams.Killer:GetChildren() do
+if v then
+HookOnto(v)
+end
+end
+workspace.GameAssets.Teams.Killer.ChildAdded:Connect(function(v)
+HookOnto(v)
+end)
+end
+
+function module:AutoBlockUnhookAll()
+UnhookEverything = true
+task.wait(); task.wait()
+UnhookEverything = false
+end
+
 function module:SyncEmotes()
 task.spawn(function()
 local Songs = {
