@@ -170,6 +170,7 @@ end
 
 function module:InitiateAutoBlock()
 local function HookOnto(chr)
+if chr:FindFirstChild("HumanoidRootPart")==nil or chr.HumanoidRootPart:FindFirstChild("Swing")==nil then return end
 local AB_UA = game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteFunctions"):WaitForChild("UseAbility")
 local chrp = chr.Parent
 local chrn = chr.Name
