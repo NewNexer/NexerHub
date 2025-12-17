@@ -2719,15 +2719,15 @@ end
 
 
 local Tab_13 = Window:CreateTab("Game Breaking Exploits",0)
-Tab_13:CreateParagraph({Title = "Game Breaking Exploits", Content = "Game Breaking features. Currently paid only, will be obtainable for free 21th december. Every features that are here are server-sided. (FE)"})
-Tab_13:CreateButton({Name = "Gamepass Link [ Costs "..tostring((Module:GetAssetPrice(1597133271) or 99)).." robux ]"; Callback = function()
+Tab_13:CreateParagraph({Title = "Game Breaking Exploits", Content = "Game Breaking features. Currently free, but may get paid starting from 21th december. Every feature that is here is server-sided. (FE)"})
+--[[Tab_13:CreateButton({Name = "Gamepass Link [ Costs "..tostring((Module:GetAssetPrice(1597133271) or 99)).." robux ]"; Callback = function()
 if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(LocalPlayer.UserId,1597133271) then
     _G.HasGameBreakingFeaturesAccess = true
     Rayfield:Notification("Error!", "Already have gamepass!", 3, warn)
 else
     Module:Browse("https://www.roblox.com/game-pass/1597133271")
 end
-end; })
+end; })]]
 Tab_13:CreateSection("God-Mode")
 Tab_13:CreateLabel("WARNING! This only works if you are killer. After activating god mode you will not be able to take damage/get stunned.")
 Tab_13:CreateButton({Name = "Enable God-Mode"; Callback = function()
