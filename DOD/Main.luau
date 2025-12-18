@@ -48,10 +48,10 @@ _G.PremiumKeyAccess = "cheeseburger" -- key
 https://www.roblox.com/game-pass/1597133271 - game breaking exploits
 https://www.roblox.com/game-pass/1264479709 - premium ]]--
 task.spawn(function()
-if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(game:GetService("Players").LocalPlayer.UserId,1264479709) then
+if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(game:GetService("Players").LocalPlayer.UserId,21120147) then
 _G.HasPremium = true
 end
-if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(game:GetService("Players").LocalPlayer.UserId,1597133271) then
+if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(game:GetService("Players").LocalPlayer.UserId,21120147) then
 _G.HasGameBreakingFeaturesAccess = true
 end
 for i,v in next, WhitelistedGUIDS do
