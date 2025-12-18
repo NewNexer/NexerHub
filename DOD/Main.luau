@@ -39,7 +39,8 @@ _G.dod_developer_key = "Nexer" -- my name yaa
 _G.dod_name = "Die Of Death" -- name of the game that we will surely need
 _G.API_last_update = "16/12/2025" -- last time update (dd/mm/yyyy)
 _G.dod_repository = "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Main.luau" -- input repository for savings
-_G.global_module = "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/Global-Module.luau" -- global module ( don't change or else script won't work! )
+_G.global_module_main = "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/Global-Module.luau"
+_G.global_module_backup = "https://pastebin.com/raw/0yUmgPTd"
 _G.HasPremium = false -- don't change
 _G.HasGameBreakingFeaturesAccess = false -- don't change
 _G.GlobalStartupFunctions = {} -- don't change
@@ -154,11 +155,17 @@ end)
 local msg = CreateMessage()
 msg.Text = "Loading API Module... (0/1)"
 local loadmoduleattempt = 0
+local tryingmodule = 0
 repeat task.wait()
 local lodsuc, loderr = pcall(function()
-Module = loadstring(game:HttpGet(_G.global_module))()
+if tryingmodule == 0 then
+Module = loadstring(game:HttpGet(_G.global_module_main))()
+else
+Module = loadstring(game:HttpGet(_G.global_module_backup))()
+end
 end)
 if not lodsuc then
+if tryingmodule == 0 then tryingmodule = 1 else tryingmodule = 0 end
 loadmoduleattempt += 1
 warn(loderr)
 msg.Text = "Failed loading API Module, re-trying... ( Attempt "..tostring(loadmoduleattempt).." )"
@@ -167,6 +174,7 @@ elseif lodsuc and Module.IsWorking ~= nil then
 msg.Text = "Loading API Module... (1/1)"
 task.wait(1)
 else
+if tryingmodule == 0 then tryingmodule = 1 else tryingmodule = 0 end
 loadmoduleattempt += 1
 warn("error not defined")
 msg.Text = "Failed loading API Module, re-trying... ( Attempt "..tostring(loadmoduleattempt).." )"
