@@ -925,8 +925,8 @@ Tab_1:CreateParagraph({Title = "Stamina", Content = "You can change your stamina
 Tab_1:CreateSection("Fast Functions")
 
 Tab_1:CreateButton({Name = "Infinite Stamina"; Callback = function()
-Char:SetAttribute("MaxStamina", (1/0))
-StaminaModule.Stamina = (1/0)
+Character:SetAttribute("MaxStamina", math.huge)
+StaminaModule.Stamina = math.huge
 end; })
 
 Tab_1:CreateButton({Name = "Become Fast"; Callback = function()
