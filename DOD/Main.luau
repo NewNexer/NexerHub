@@ -3452,7 +3452,7 @@ end
 end; })]]
 Tab_10:CreateSection("Custom LMS ( settings )")
 local lms_file_name = "Type Here!"
-Tab_10:CreateParagraph({Title = "How to add your own music?", Content = "Find your executor's folder in your phone's explorer, then find the ''workspace'' folder, and inside it you must find ''NexerHub'' folder, now go inside it, then click ''Assets'' and ''LMS''. And now, in this folder, input your mp3 music."})
+Tab_10:CreateParagraph({Title = "How to add your own music?", Content = "Find your executor's folder in your phone's explorer, then find the ''workspace'' folder, and inside it you must find ''NexerHub'' folder, now go inside it, then click ''DieOfDeath'', ''Assets'' and ''LMS''. And now, in this folder, input your mp3 music."})
 Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here! ( WRITE ONLY NAME, WITHOUT ''.mp3'' )"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 lms_file_name = Rayfield:GetDropdownValue(Value)
 end; })
@@ -3513,7 +3513,7 @@ Rayfield:Notification("Success!","Set ''"..choosen_chase.."'' as new custom chas
 end; })
 Tab_10:CreateSection("Custom Chase Themes ( settings )")
 local chase_file_name = "Type Here!"
-Tab_10:CreateParagraph({Title = "How to add your own music?", Content = "Find your executor's folder in your phone's explorer, then find the ''workspace'' folder, and inside it you must find ''NexerHub'' folder, now go inside it, then click ''Assets'' and ''Chases''. And now, in this folder, input your mp3 music."})
+Tab_10:CreateParagraph({Title = "How to add your own music?", Content = "Find your executor's folder in your phone's explorer, then find the ''workspace'' folder, and inside it you must find ''NexerHub'' folder, now go inside it, then click ''DieOfDeath'', ''Assets'' and ''Chases''. And now, in this folder, input your mp3 music."})
 Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here! ( WRITE ONLY NAME, WITHOUT ''.mp3'' )"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 chase_file_name = Rayfield:GetDropdownValue(Value)
 end; })
