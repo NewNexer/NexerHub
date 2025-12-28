@@ -8,25 +8,30 @@ Loading Variables
 function CreateFolder(f)
 if not isfolder(f) then makefolder(f) repeat task.wait() until isfolder(f) end
 end
+function CreateFile(f,d)
+if not isfile(f) then writefile(f,d) repeat task.wait() until isfile(f) end
+end
 CreateFolder("NexerHub")
 CreateFolder("NexerHub/Core")
+CreateFolder("NexerHub/DieOfDeath")
+CreateFolder("NexerHub/DieOfDeath/Assets")
+CreateFolder("NexerHub/DieOfDeath/Assets/LMS")
+CreateFolder("NexerHub/DieOfDeath/Assets/Chases")
+CreateFile("NexerHub/DieOfDeath/Assets/LMS/data.luau", "return {}")
+CreateFile("NexerHub/DieOfDeath/Assets/Chases/data.luau", "return {}")
 local GUID = tostring(game:GetService("HttpService"):GenerateGUID())
-if not isfile("NexerHub/Core/PreloadData.luau") then
-writefile("NexerHub/Core/PreloadData.luau", [[return {
+CreateFile("NexerHub/Core/PreloadData.luau", [[return {
     ["LoadConfig"] = true,
     ["GUID"] = "]]..GUID..[[",
     ["CoreVersion"] = 1,
     ["LoadAssets"] = true
 }]])
-repeat task.wait() until isfile("NexerHub/Core/PreloadData.luau")
-elseif isfile("NexerHub/Core/PreloadData.luau") then
 pcall(function()
 local a = loadstring(readfile("NexerHub/Core/PreloadData.luau"))()
 if a and a.GUID~=nil then
 GUID = a.GUID
 end
 end)
-end
 local WhitelistedGUIDS = {
     "{4c50eba2-d2ed-4d79-bec1-02a967f49c58}",
     "{00000000-0000-0000-0000-000000000000}"
@@ -357,6 +362,7 @@ function AbilitySystem.AbilityTween(AbilityButton)
 end
 
 function AbilitySystem.PutOnCooldown(AbilityButton, CooldownTime)
+    task.spawn(function()
     if AbilityButton.Cooldown.Visible then return end
     
     AbilityButton.Input.Visible = false
@@ -385,15 +391,13 @@ function AbilitySystem.PutOnCooldown(AbilityButton, CooldownTime)
         AbilityButton.CooldownLabel.Visible = false
         AbilityButton.Icon.ImageColor3 = Color3.fromRGB(255, 255, 255)
     end
+    end)
 end
 
 function AbilitySystem.UseAbility(AbilityData, AbilityButton)
     if AbilityButton.Cooldown.Visible then return end
 	task.spawn(AbilitySystem.AbilityTween, AbilityButton)
-	if AbilityData.Client == true then
-	task.spawn(function() AbilitySystem.PutOnCooldown(AbilityButton, Cooldown or AbilityData.Cooldown) end)
-    end
-
+	AbilitySystem.PutOnCooldown(AbilityButton, Cooldown or AbilityData.Cooldown)
     local Success, Cooldown = Events.RemoteFunctions.UseAbility:InvokeServer(AbilityData.Name)
     if Success or AbilityData.Client == true then
         if AbilityData.Client == true then
