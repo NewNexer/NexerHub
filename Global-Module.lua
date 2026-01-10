@@ -2339,9 +2339,11 @@ function RayfieldLibrary:CreateWindow(Settings)
 		end
 	end
 
+	pcall(function()
 	if isfolder and not isfolder(RayfieldFolder) then
 		makefolder(RayfieldFolder)
 	end
+	end)
 
 	-- Attempt to report an event to analytics
 	if not requestsDisabled then
