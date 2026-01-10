@@ -154,100 +154,6 @@ end)
 --upconnections: stepped, renderstepped, postsimulation, while task
 
 
-
-
---[[ Loading my module ]]--
-local msg = CreateMessage()
-msg.Text = "Loading API Module... (0/1)"
-local loadmoduleattempt = 0
-local tryingmodule = 0
-repeat task.wait()
-local lodsuc, loderr = pcall(function()
-if tryingmodule == 0 then
-Module = loadstring(game:HttpGet(_G.global_module_main))()
-else
-Module = loadstring(game:HttpGet(_G.global_module_backup))()
-end
-end)
-if not lodsuc then
-if tryingmodule == 0 then tryingmodule = 1 else tryingmodule = 0 end
-loadmoduleattempt += 1
-warn(loderr)
-msg.Text = "Failed loading API Module, re-trying... ( Attempt "..tostring(loadmoduleattempt).." )"
-task.wait(1)
-elseif lodsuc and Module.IsWorking ~= nil then
-msg.Text = "Loading API Module... (1/1)"
-task.wait(1)
-else
-if tryingmodule == 0 then tryingmodule = 1 else tryingmodule = 0 end
-loadmoduleattempt += 1
-warn("error not defined")
-msg.Text = "Failed loading API Module, re-trying... ( Attempt "..tostring(loadmoduleattempt).." )"
-task.wait(1)
-end
-until msg.Text == "Loading API Module... (1/1)"
-task.wait(1)
-msg.Text = "Launching Rayfield..."
---[[ Loading rayfield here ]] --
-local Rayfield = Module:GetWorkingRayfield()
-task.delay(2,function()
-msg:Destroy()
-end)
-
-
-
---[[ Re-writing global variables ( btw i am writing this to myself, don't mind those comments i do ) ]]--
-_G.dod_developer_key = ""..((_G.dod_developer_key ~= nil and _G.dod_developer_key) or "Unknown")..""
-_G.dod_name = ""..((_G.dod_name ~= nil and _G.dod_name) or "Unknown")..""
-
-
-
---[[ Creating Window ]]--
-local Window = Rayfield:CreateWindow({
-   Name = "".._G.dod_developer_key.." Hub : ".._G.dod_name.."",
-   Icon = 0,    
-   LoadingTitle = ""..string.sub(_G.dod_developer_key,1,1).."H:".._G.dod_name:gsub("(%S)%S+","%1"):gsub("%s+","").."",
-   LoadingSubtitle = "By ".._G.dod_developer_key.."",
-   ShowText = "".._G.dod_developer_key.." Hub",
-   Theme = "AmberGlow",
-   DisableRayfieldPrompts = true,
-   DisableBuildWarnings = true,
-   ConfigurationSaving = {
-      Enabled = false,
-      FolderName = "",
-      FileName = ""
-   },
-   Discord = {
-      Enabled = false,
-      Invite = "noinvitelink",
-      RememberJoins = true
-   },
-   KeySystem = false,
-   KeySettings = {
-      Title = "Verify yourself firstly!",
-      Subtitle = "Key Needed!",
-      Note = "The key is ''cheese''",
-      FileName = "Key",
-      SaveKey = true,
-      GrabKeyFromSite = false,
-      Key = {"cheese"}
-   }
-})
-
-
-
---[[ Announcements ]] --
-pcall(function()
-local Announcements = Window:CreateTab("Announce",0)
-Announcements:CreateParagraph({Title = "W.I.P.", Content = "A lot of stuff haven't been added yet. Work is in progress. I have a lot of studies which is why it takes a lot of time."})
-Announcements:CreateParagraph({Title = "Discord suggestions", Content = "They'll be added soon! I will be updating everyday i can."})
-Announcements:CreateButton({Name = "Copy Discord Server Link"; Callback = function()
-setclipboard(tostring("https://discord.gg/7u5GRNw3xn"))
-Rayfield:Notification("Success!", "Copied Link!", 3, true)
-end; })
-end)
-
-
 --[[ Loading All Modules ]]--
 -- upvalues: StaminaModule, AbilityModule, UIModule, AnimationsModule
 pcall(function()
@@ -925,6 +831,99 @@ task.wait()
 loadstring(AnimationsModule)()
 end
 end)
+
+
+--[[ Loading my module ]]--
+local msg = CreateMessage()
+msg.Text = "Loading API Module... (0/1)"
+local loadmoduleattempt = 0
+local tryingmodule = 0
+repeat task.wait()
+local lodsuc, loderr = pcall(function()
+if tryingmodule == 0 then
+Module = loadstring(game:HttpGet(_G.global_module_main))()
+else
+Module = loadstring(game:HttpGet(_G.global_module_backup))()
+end
+end)
+if not lodsuc then
+if tryingmodule == 0 then tryingmodule = 1 else tryingmodule = 0 end
+loadmoduleattempt += 1
+warn(loderr)
+msg.Text = "Failed loading API Module, re-trying... ( Attempt "..tostring(loadmoduleattempt).." )"
+task.wait(1)
+elseif lodsuc and Module.IsWorking ~= nil then
+msg.Text = "Loading API Module... (1/1)"
+task.wait(1)
+else
+if tryingmodule == 0 then tryingmodule = 1 else tryingmodule = 0 end
+loadmoduleattempt += 1
+warn("error not defined")
+msg.Text = "Failed loading API Module, re-trying... ( Attempt "..tostring(loadmoduleattempt).." )"
+task.wait(1)
+end
+until msg.Text == "Loading API Module... (1/1)"
+task.wait(1)
+msg.Text = "Launching Rayfield..."
+--[[ Loading rayfield here ]] --
+local Rayfield = Module:GetWorkingRayfield()
+task.delay(2,function()
+msg:Destroy()
+end)
+
+
+
+--[[ Re-writing global variables ( btw i am writing this to myself, don't mind those comments i do ) ]]--
+_G.dod_developer_key = ""..((_G.dod_developer_key ~= nil and _G.dod_developer_key) or "Unknown")..""
+_G.dod_name = ""..((_G.dod_name ~= nil and _G.dod_name) or "Unknown")..""
+
+
+
+--[[ Creating Window ]]--
+local Window = Rayfield:CreateWindow({
+   Name = "".._G.dod_developer_key.." Hub : ".._G.dod_name.."",
+   Icon = 0,    
+   LoadingTitle = ""..string.sub(_G.dod_developer_key,1,1).."H:".._G.dod_name:gsub("(%S)%S+","%1"):gsub("%s+","").."",
+   LoadingSubtitle = "By ".._G.dod_developer_key.."",
+   ShowText = "".._G.dod_developer_key.." Hub",
+   Theme = "AmberGlow",
+   DisableRayfieldPrompts = true,
+   DisableBuildWarnings = true,
+   ConfigurationSaving = {
+      Enabled = false,
+      FolderName = "",
+      FileName = ""
+   },
+   Discord = {
+      Enabled = false,
+      Invite = "noinvitelink",
+      RememberJoins = true
+   },
+   KeySystem = false,
+   KeySettings = {
+      Title = "Verify yourself firstly!",
+      Subtitle = "Key Needed!",
+      Note = "The key is ''cheese''",
+      FileName = "Key",
+      SaveKey = true,
+      GrabKeyFromSite = false,
+      Key = {"cheese"}
+   }
+})
+
+
+
+--[[ Announcements ]] --
+pcall(function()
+local Announcements = Window:CreateTab("Announce",0)
+Announcements:CreateParagraph({Title = "W.I.P.", Content = "A lot of stuff haven't been added yet. Work is in progress. I have a lot of studies which is why it takes a lot of time."})
+Announcements:CreateParagraph({Title = "Discord suggestions", Content = "They'll be added soon! I will be updating everyday i can."})
+Announcements:CreateButton({Name = "Copy Discord Server Link"; Callback = function()
+setclipboard(tostring("https://discord.gg/7u5GRNw3xn"))
+Rayfield:Notification("Success!", "Copied Link!", 3, true)
+end; })
+end)
+
 
 
 
