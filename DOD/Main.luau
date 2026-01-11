@@ -976,10 +976,10 @@ if ChoosenNoStamLossMethod == "require" then
 NoStaminaLoss = true
 lastusedmethod = "require"
 task.spawn(function()
-Heartbeat.LoopNoStaminaLoss = function() if Char~=nil and Char:GetAttribute("MaxStamina")~=nil then StaminaModule.Stamina = tonumber(Char:GetAttribute("MaxStamina")) end end
+TaskTick.LoopNoStaminaLoss = function() if Char~=nil and Char:GetAttribute("MaxStamina")~=nil then StaminaModule.Stamina = tonumber(Char:GetAttribute("MaxStamina")) end end
 repeat task.wait(0.003) until NoStaminaLoss == false
-if Heartbeat.LoopNoStaminaLoss~=nil then
-Heartbeat.LoopNoStaminaLoss = nil
+if TaskTick.LoopNoStaminaLoss~=nil then
+TaskTick.LoopNoStaminaLoss = nil
 end
 end)
 elseif ChoosenNoStamLossMethod == "scriptbreak" then
