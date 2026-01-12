@@ -8,25 +8,30 @@ Loading Variables
 function CreateFolder(f)
 if not isfolder(f) then makefolder(f) repeat task.wait() until isfolder(f) end
 end
+function CreateFile(f,d)
+if not isfile(f) then writefile(f,d) repeat task.wait() until isfile(f) end
+end
 CreateFolder("NexerHub")
 CreateFolder("NexerHub/Core")
+CreateFolder("NexerHub/DieOfDeath")
+CreateFolder("NexerHub/DieOfDeath/Assets")
+CreateFolder("NexerHub/DieOfDeath/Assets/LMS")
+CreateFolder("NexerHub/DieOfDeath/Assets/Chases")
+CreateFile("NexerHub/DieOfDeath/Assets/LMS/data.luau", "return {}")
+CreateFile("NexerHub/DieOfDeath/Assets/Chases/data.luau", "return {}")
 local GUID = tostring(game:GetService("HttpService"):GenerateGUID())
-if not isfile("NexerHub/Core/PreloadData.luau") then
-writefile("NexerHub/Core/PreloadData.luau", [[return {
+CreateFile("NexerHub/Core/PreloadData.luau", [[return {
     ["LoadConfig"] = true,
     ["GUID"] = "]]..GUID..[[",
     ["CoreVersion"] = 1,
     ["LoadAssets"] = true
 }]])
-repeat task.wait() until isfile("NexerHub/Core/PreloadData.luau")
-elseif isfile("NexerHub/Core/PreloadData.luau") then
 pcall(function()
 local a = loadstring(readfile("NexerHub/Core/PreloadData.luau"))()
 if a and a.GUID~=nil then
 GUID = a.GUID
 end
 end)
-end
 local WhitelistedGUIDS = {
     "{4c50eba2-d2ed-4d79-bec1-02a967f49c58}",
     "{00000000-0000-0000-0000-000000000000}"
@@ -37,7 +42,7 @@ local WhitelistedGUIDS = {
 --[[ Global Variables ]]--
 _G.dod_developer_key = "Nexer" -- my name yaa
 _G.dod_name = "Die Of Death" -- name of the game that we will surely need
-_G.API_last_update = "16/12/2025" -- last time update (dd/mm/yyyy)
+_G.API_last_update = "1/1/2026" -- last time update (dd/mm/yyyy)
 _G.dod_repository = "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Main.luau" -- input repository for savings
 _G.global_module_main = "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/Global-Module.luau"
 _G.global_module_backup = "https://pastebin.com/raw/0yUmgPTd"
@@ -147,99 +152,6 @@ end
 end
 end)
 --upconnections: stepped, renderstepped, postsimulation, while task
-
-
-
-
---[[ Loading my module ]]--
-local msg = CreateMessage()
-msg.Text = "Loading API Module... (0/1)"
-local loadmoduleattempt = 0
-local tryingmodule = 0
-repeat task.wait()
-local lodsuc, loderr = pcall(function()
-if tryingmodule == 0 then
-Module = loadstring(game:HttpGet(_G.global_module_main))()
-else
-Module = loadstring(game:HttpGet(_G.global_module_backup))()
-end
-end)
-if not lodsuc then
-if tryingmodule == 0 then tryingmodule = 1 else tryingmodule = 0 end
-loadmoduleattempt += 1
-warn(loderr)
-msg.Text = "Failed loading API Module, re-trying... ( Attempt "..tostring(loadmoduleattempt).." )"
-task.wait(1)
-elseif lodsuc and Module.IsWorking ~= nil then
-msg.Text = "Loading API Module... (1/1)"
-task.wait(1)
-else
-if tryingmodule == 0 then tryingmodule = 1 else tryingmodule = 0 end
-loadmoduleattempt += 1
-warn("error not defined")
-msg.Text = "Failed loading API Module, re-trying... ( Attempt "..tostring(loadmoduleattempt).." )"
-task.wait(1)
-end
-until msg.Text == "Loading API Module... (1/1)"
-task.wait(1)
-msg.Text = "Launching Rayfield..."
---[[ Loading rayfield here ]] --
-local Rayfield = Module:GetWorkingRayfield()
-task.delay(2,function()
-msg:Destroy()
-end)
-
-
-
---[[ Re-writing global variables ( btw i am writing this to myself, don't mind those comments i do ) ]]--
-_G.dod_developer_key = ""..((_G.dod_developer_key ~= nil and _G.dod_developer_key) or "Unknown")..""
-_G.dod_name = ""..((_G.dod_name ~= nil and _G.dod_name) or "Unknown")..""
-
-
-
---[[ Creating Window ]]--
-local Window = Rayfield:CreateWindow({
-   Name = "".._G.dod_developer_key.." Hub : ".._G.dod_name.."",
-   Icon = 0,    
-   LoadingTitle = ""..string.sub(_G.dod_developer_key,1,1).."H:".._G.dod_name:gsub("(%S)%S+","%1"):gsub("%s+","").."",
-   LoadingSubtitle = "By ".._G.dod_developer_key.."",
-   Theme = "AmberGlow",
-   DisableRayfieldPrompts = true,
-   DisableBuildWarnings = true,
-   ConfigurationSaving = {
-      Enabled = false,
-      FolderName = "",
-      FileName = ""
-   },
-   Discord = {
-      Enabled = false,
-      Invite = "noinvitelink",
-      RememberJoins = true
-   },
-   KeySystem = false,
-   KeySettings = {
-      Title = "Verify yourself firstly!",
-      Subtitle = "Key Needed!",
-      Note = "The key is ''cheese''",
-      FileName = "Key",
-      SaveKey = true,
-      GrabKeyFromSite = false,
-      Key = {"cheese"}
-   }
-})
-
-
-
---[[ Announcements ]] --
-pcall(function()
-local Announcements = Window:CreateTab("Announce",0)
-Announcements:CreateParagraph({Title = "W.I.P.", Content = "A lot of stuff haven't been added yet. Work is in progress. I have a lot of studies which is why it takes a lot of time."})
-Announcements:CreateParagraph({Title = "Discord suggestions", Content = "They'll be added soon! I will be updating everyday i can."})
-Announcements:CreateButton({Name = "Copy Discord Server Link"; Callback = function()
-setclipboard(tostring("https://discord.gg/7u5GRNw3xn"))
-Rayfield:Notification("Success!", "Copied Link!", 3, true)
-end; })
-end)
 
 
 --[[ Loading All Modules ]]--
@@ -357,6 +269,7 @@ function AbilitySystem.AbilityTween(AbilityButton)
 end
 
 function AbilitySystem.PutOnCooldown(AbilityButton, CooldownTime)
+    task.spawn(function()
     if AbilityButton.Cooldown.Visible then return end
     
     AbilityButton.Input.Visible = false
@@ -385,15 +298,13 @@ function AbilitySystem.PutOnCooldown(AbilityButton, CooldownTime)
         AbilityButton.CooldownLabel.Visible = false
         AbilityButton.Icon.ImageColor3 = Color3.fromRGB(255, 255, 255)
     end
+    end)
 end
 
 function AbilitySystem.UseAbility(AbilityData, AbilityButton)
     if AbilityButton.Cooldown.Visible then return end
 	task.spawn(AbilitySystem.AbilityTween, AbilityButton)
-	if AbilityData.Client == true then
-	task.spawn(function() AbilitySystem.PutOnCooldown(AbilityButton, Cooldown or AbilityData.Cooldown) end)
-    end
-
+	AbilitySystem.PutOnCooldown(AbilityButton, Cooldown or AbilityData.Cooldown)
     local Success, Cooldown = Events.RemoteFunctions.UseAbility:InvokeServer(AbilityData.Name)
     if Success or AbilityData.Client == true then
         if AbilityData.Client == true then
@@ -922,6 +833,99 @@ end
 end)
 
 
+--[[ Loading my module ]]--
+local msg = CreateMessage()
+msg.Text = "Loading API Module... (0/1)"
+local loadmoduleattempt = 0
+local tryingmodule = 0
+repeat task.wait()
+local lodsuc, loderr = pcall(function()
+if tryingmodule == 0 then
+Module = loadstring(game:HttpGet(_G.global_module_main))()
+else
+Module = loadstring(game:HttpGet(_G.global_module_backup))()
+end
+end)
+if not lodsuc then
+if tryingmodule == 0 then tryingmodule = 1 else tryingmodule = 0 end
+loadmoduleattempt += 1
+warn(loderr)
+msg.Text = "Failed loading API Module, re-trying... ( Attempt "..tostring(loadmoduleattempt).." )"
+task.wait(1)
+elseif lodsuc and Module.IsWorking ~= nil then
+msg.Text = "Loading API Module... (1/1)"
+task.wait(1)
+else
+if tryingmodule == 0 then tryingmodule = 1 else tryingmodule = 0 end
+loadmoduleattempt += 1
+warn("error not defined")
+msg.Text = "Failed loading API Module, re-trying... ( Attempt "..tostring(loadmoduleattempt).." )"
+task.wait(1)
+end
+until msg.Text == "Loading API Module... (1/1)"
+task.wait(1)
+msg.Text = "Launching Rayfield..."
+--[[ Loading rayfield here ]] --
+local Rayfield = Module:GetWorkingRayfield()
+task.delay(2,function()
+msg:Destroy()
+end)
+
+
+
+--[[ Re-writing global variables ( btw i am writing this to myself, don't mind those comments i do ) ]]--
+_G.dod_developer_key = ""..((_G.dod_developer_key ~= nil and _G.dod_developer_key) or "Unknown")..""
+_G.dod_name = ""..((_G.dod_name ~= nil and _G.dod_name) or "Unknown")..""
+
+
+
+--[[ Creating Window ]]--
+local Window = Rayfield:CreateWindow({
+   Name = "".._G.dod_developer_key.." Hub : ".._G.dod_name.."",
+   Icon = 0,    
+   LoadingTitle = ""..string.sub(_G.dod_developer_key,1,1).."H:".._G.dod_name:gsub("(%S)%S+","%1"):gsub("%s+","").."",
+   LoadingSubtitle = "By ".._G.dod_developer_key.."",
+   ShowText = "".._G.dod_developer_key.." Hub",
+   Theme = "AmberGlow",
+   DisableRayfieldPrompts = true,
+   DisableBuildWarnings = true,
+   ConfigurationSaving = {
+      Enabled = false,
+      FolderName = "",
+      FileName = ""
+   },
+   Discord = {
+      Enabled = false,
+      Invite = "noinvitelink",
+      RememberJoins = true
+   },
+   KeySystem = false,
+   KeySettings = {
+      Title = "Verify yourself firstly!",
+      Subtitle = "Key Needed!",
+      Note = "The key is ''cheese''",
+      FileName = "Key",
+      SaveKey = true,
+      GrabKeyFromSite = false,
+      Key = {"cheese"}
+   }
+})
+
+
+
+--[[ Announcements ]] --
+pcall(function()
+local Announcements = Window:CreateTab("Announce",0)
+Announcements:CreateParagraph({Title = "W.I.P.", Content = "A lot of stuff haven't been added yet. Work is in progress. I have a lot of studies which is why it takes a lot of time."})
+Announcements:CreateParagraph({Title = "Discord suggestions", Content = "They'll be added soon! I will be updating everyday i can."})
+Announcements:CreateButton({Name = "Copy Discord Server Link"; Callback = function()
+setclipboard(tostring("https://discord.gg/7u5GRNw3xn"))
+Rayfield:Notification("Success!", "Copied Link!", 3, true)
+end; })
+end)
+
+
+
 
 
 
@@ -972,10 +976,10 @@ if ChoosenNoStamLossMethod == "require" then
 NoStaminaLoss = true
 lastusedmethod = "require"
 task.spawn(function()
-Heartbeat.LoopNoStaminaLoss = function() if Char~=nil and Char:GetAttribute("MaxStamina")~=nil then StaminaModule.Stamina = tonumber(Char:GetAttribute("MaxStamina")) end end
+TaskTick.LoopNoStaminaLoss = function() if Char~=nil and Char:GetAttribute("MaxStamina")~=nil then StaminaModule.Stamina = tonumber(Char:GetAttribute("MaxStamina")) end end
 repeat task.wait(0.003) until NoStaminaLoss == false
-if Heartbeat.LoopNoStaminaLoss~=nil then
-Heartbeat.LoopNoStaminaLoss = nil
+if TaskTick.LoopNoStaminaLoss~=nil then
+TaskTick.LoopNoStaminaLoss = nil
 end
 end)
 elseif ChoosenNoStamLossMethod == "scriptbreak" then
@@ -1062,13 +1066,212 @@ Tab_2:CreateButton({Name = "Use Rainbow Waves (CLIENT VFX/SFX)"; Callback = func
 Module:RainbowWaves()
 end; })
 
+Tab_2:CreateLabel("Custom Emote")
+
+local ANIM = "75513960644342"
+Tab_2:CreateInput({Name = "Animation"; PlaceholderText = ANIM; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+ANIM = Value
+end; })
+
+local VOL = "1.5"
+Tab_2:CreateInput({Name = "Sound/Music Volume"; PlaceholderText = VOL; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+VOL = Value
+end; })
+
+local LOOP = true
+Tab_2:CreateToggle({Name = "Loop Sound/Music"; CurrentValue = LOOP; Callback = function(Value)
+LOOP = Value
+end; })
+
+local SOUND = "137048834753046"
+Tab_2:CreateInput({Name = "Sound/Music"; PlaceholderText = SOUND; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+SOUND = Value
+end; })
+
+Tab_2:CreateButton({Name = "Start"; Callback = function()
+local anim = Instance.new("Animation")
+anim.AnimationId = "rbxassetid://" .. ANIM
+local planim = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(anim)
+planim:Play()
+local song = Instance.new("Sound")
+song.Volume = VOL
+song.Looped = LOOP
+song.SoundId = "rbxassetid://" .. SOUND
+song.Parent = game.Players.LocalPlayer.Character.HumanoidRootPart
+song:Play()
+local TooLate2 = false
+game.Players.LocalPlayer.CharacterAdded:Once(function()
+	if TooLate2 then return end
+	TooLate2 = true
+	song:Destroy()
+planim:Stop()
+	anim:Destroy()
+end)
+game.Players.LocalPlayer.Character.Humanoid.Running:Once(function()
+	if TooLate2 then return end
+	TooLate2 = true
+	song:Destroy()
+planim:Stop()
+	anim:Destroy()
+end)
+end; })
 
 
 
 
+local Tab_14 = Window:CreateTab("Point & Malice Farm",0)
+Tab_14:CreateParagraph({Title = "Point & Malice Farm", Content = "Point & Malice farm using abilities and other methods."})
 
+function GetAwardFromAbility(abilitynaem)
+local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
+local oldcf = rootpart.CFrame
+local killerrootpart = workspace.GameAssets.Teams.Killer:FindFirstChildOfClass("Model").HumanoidRootPart
+local anoclip_connection = nil
+local acamera_connection = nil
+function invisappwithnoclip(bool)
+if bool == false then
+task.spawn(function()
+for i,v in next, rootpart.Parent.Humanoid:GetPlayingAnimationTracks() do
+v.Priority = Enum.AnimationPriority.Core
+v:AdjustSpeed(tonumber(0))
+v:Stop(tonumber(0))
+end
+end)
+if anoclip_connection then
+anoclip_connection:Disconnect()
+anoclip_connection = nil
+end
+if rootpart then
+rootpart.CanCollide = true
+end
+if acamera_connection then
+acamera_connection:Disconnect()
+acamera_connection = nil
+pcall(function()
+workspace.CurrentCamera.CameraSubject = rootpart.Parent.Humanoid
+end)
+end
+elseif bool == true then
+local function nocollision()
+for i,v in pairs(rootpart.Parent:GetDescendants()) do
+if v and v:IsA("BasePart") and v.CanCollide == true and v.Name ~= "HumanoidRootPart" then
+v.CanCollide = false
+end
+end
+if rootpart then
+rootpart.CanCollide = false
+end
+end
+anoclip_connection = game:GetService("RunService").Stepped:Connect(nocollision)
+acamera_connection = workspace.CurrentCamera:GetPropertyChangedSignal("CameraSubject"):Connect(function()
+workspace.CurrentCamera.CameraSubject = killerrootpart
+end)
+workspace.CurrentCamera.CameraSubject = killerrootpart
+game.Players.LocalPlayer.CharacterAdded:Once(function()
+if acamera_connection then
+acamera_connection:Disconnect()
+acamera_connection = nil
+end
+if anoclip_connection then
+anoclip_connection:Disconnect()
+anoclip_connection = nil
+end
+end)
+local Anim = Instance.new("Animation")
+Anim.AnimationId = "rbxassetid://90444351114401"
+local loadedanim = rootpart.Parent.Humanoid:LoadAnimation(Anim)
+loadedanim.Priority = Enum.AnimationPriority.Action4
+repeat task.wait() until loadedanim.Length > 0	
+loadedanim:Play()
+repeat task.wait() until loadedanim.IsPlaying
+loadedanim:AdjustSpeed(tonumber(0))
+loadedanim.TimePosition = 2.2
+end
+end
+local function looptpto(part, cframemod, time)
+local start = tick()
+while tick() - start < time and task.wait() do
+rootpart.CFrame = part.CFrame * cframemod
+for i,v in pairs(rootpart.Parent:GetDescendants()) do
+if v and v:IsA("BasePart") then
+v.Velocity = Vector3.new(0,0,0)
+v.RotVelocity = Vector3.new(0,0,0)
+end
+end
+end
+end
+local function looptpto2(cframe, mod, time)
+local start = tick()
+while tick() - start < time and task.wait() do
+rootpart.CFrame = cframe
+for i,v in pairs(rootpart.Parent:GetDescendants()) do
+if v and v:IsA("BasePart") then
+v.Velocity = Vector3.new(0,0,0)
+v.RotVelocity = Vector3.new(0,0,0)
+end
+end
+end
+end
+if (Character:GetAttribute(""..abilitynaem.."Cooldown") and Character:GetAttribute(""..abilitynaem.."Cooldown")~=nil) and Character:GetAttribute(""..abilitynaem.."Cooldown")==true then Rayfield:Notification("Error!", "Your choosen ability is on cooldown!", 3, false) end
+if abilitynaem=="Adrenaline" then
+invisappwithnoclip(true)
+task.delay(1, function() game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Adrenaline") end)
+looptpto(killerrootpart, CFrame.new(0,-8,0), 3)
+looptpto2(CFrame.new(0,-490,0), true, 5)
+task.delay(0.5, function() invisappwithnoclip(false) end)
+looptpto2(oldcf, CFrame.new(0,0,0), 2)
+elseif abilitynaem=="Cloak" then
+invisappwithnoclip(true)
+task.delay(1.5, function() game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Cloak") end)
+looptpto(killerrootpart, CFrame.new(0,0,8), 3)
+looptpto2(CFrame.new(0,-490,0), true, 7)
+task.delay(0.5, function() invisappwithnoclip(false) end)
+looptpto2(oldcf, CFrame.new(0,0,0), 2)
+elseif abilitynaem=="Taunt" then
+invisappwithnoclip(true)
+game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Taunt")
+task.wait(1)
+looptpto(killerrootpart, CFrame.new(0,0,-2), 0.2)
+looptpto(killerrootpart, CFrame.new(0,0,-1), 0.2)
+looptpto(killerrootpart, CFrame.new(0,0,0), 0.2)
+looptpto(killerrootpart, CFrame.new(0,0,1), 0.2)
+looptpto(killerrootpart, CFrame.new(0,0,2), 0.2)
+task.delay(0.5, function() invisappwithnoclip(false) end)
+looptpto2(oldcf, CFrame.new(0,0,0), 2)
+elseif abilitynaem=="Punch" then
+invisappwithnoclip(true)
+game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Punch")
+looptpto(killerrootpart, CFrame.new(0,0,-2), 0.22)
+looptpto(killerrootpart, CFrame.new(0,0,-1), 0.22)
+looptpto(killerrootpart, CFrame.new(0,0,0), 0.22)
+looptpto(killerrootpart, CFrame.new(0,0,1), 0.22)
+looptpto(killerrootpart, CFrame.new(0,0,2), 0.22)
+task.delay(0.5, function() invisappwithnoclip(false) end)
+looptpto2(oldcf, CFrame.new(0,0,0), 2)
+elseif abilitynaem=="Revolver" then
+invisappwithnoclip(true)
+task.delay(1, function() game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Revolver") end)
+looptpto(killerrootpart, CFrame.new(0,-2,-1), 3)
+task.delay(0.5, function() invisappwithnoclip(false) end)
+looptpto2(oldcf, CFrame.new(0,0,0), 2)
+elseif abilitynaem=="Banana" then
+invisappwithnoclip(true)
+task.delay(1, function() game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Banana") end)
+looptpto(killerrootpart, CFrame.new(0,0,2), 3)
+task.delay(0.5, function() invisappwithnoclip(false) end)
+looptpto2(oldcf, CFrame.new(0,0,0), 2)
+end
+end
 
-
+Tab_14:CreateSection("Farm using ability")
+local ChoosenAbilityAW = "Adrenaline"
+Tab_14:CreateLabel("Stunning/ragdolling abilities have risks of causing your death ( killer may kill you, but you will still be invisible )")
+Tab_14:CreateDropdown({Name = "Ability"; Options = {"Adrenaline","Cloak","Taunt","Revolver","Punch","Banana"}; CurrentOption = "Adrenaline"; MultiSelection = false; Callback = function(Value)
+ChoosenAbilityAW = Rayfield:GetDropdownValue(Value)
+end; })
+Tab_14:CreateButton({Name = "Get Award for choosen ability"; Callback = function()
+GetAwardFromAbility(ChoosenAbilityAW)
+end)
 
 
 local AbilityNames = Module:GetData("AbilityNames")
@@ -1491,6 +1694,13 @@ if child and child.Name == "EvilScary" and AntiEvilScary1 == true then
 Module:ClearTouchable(child)
 end
 end)
+Tab_3:CreateButton({Name = "Remove EvilScary Jumpscare"; Callback = function()
+if game.Players.LocalPlayer.PlayerGui.MainGui.EvilScary then
+game.Players.LocalPlayer.PlayerGui.MainGui.EvilScary:Destroy()
+else
+Rayfield:Notification("Error!", "Already Removed!", 3, false)
+end
+end; })
 local AntiBarriers1 = false
 local AntiBarriers1_con = nil
 local AntiBarriers1_toggle = nil
@@ -1540,6 +1750,95 @@ child.CanTouch = false
 end
 end)
 
+local path = {"GameAssets", "Map", "Config", "KillerOnly"}
+
+local function getFolder()
+local f = workspace
+for _, v in ipairs(path) do
+	if not f then return nil end
+	f = f:FindFirstChild(v)
+	if not f then return nil end
+end
+return f
+end
+
+local ogState = {}
+local conns = {}
+
+local function setNoCollide(v, state)
+if not v or not v:IsA("BasePart") then return end
+if state then
+if ogState[v] == nil then
+ogState[v] = v.CanCollide
+end
+v.CanCollide = false
+else
+if ogState[v] ~= nil then
+if v.Parent then
+v.CanCollide = ogState[v]
+end
+ogState[v] = nil
+end
+end
+end
+
+local function enable()
+local gameAssets = workspace:FindFirstChild("GameAssets")
+local map = gameAssets and gameAssets:FindFirstChild("Map")
+
+if not map then
+	Rayfield:Notification("Error!", "Round Haven't Started Yet!", 3, false)
+	return
+end
+
+local f = getFolder()
+if not f then
+	Rayfield:Notification("Error!", "Map Doesn't Support Killer Door!", 3, warn)
+	return
+end
+
+local hasPart = false
+for _, v in ipairs(f:GetDescendants()) do
+	if v:IsA("BasePart") then
+		hasPart = true
+		setNoCollide(v, true)
+	end
+end
+
+if not hasPart then
+	Rayfield:Notification("Error!", "Map Doesn't Have Any Killer Door!", 3, warn)
+	return
+end
+
+local c = f.DescendantAdded:Connect(function(v)
+setNoCollide(v, true)
+end)
+table.insert(conns, c)
+
+Rayfield:Notification("Success!", "You can now enter through Killer Door!", 3, true)
+end
+
+local function disable()
+for v in pairs(ogState) do
+	setNoCollide(v, false)
+end
+table.clear(ogState)
+
+for _, c in ipairs(conns) do
+if c.Connected then
+c:Disconnect()
+end
+end
+table.clear(conns)
+end
+
+Tab_3:CreateToggle({Name = "Enter Killer Door"; CurrentValue = false; Callback = function(Value)
+if Value then
+enable()
+else
+disable()
+end
+end; })
 
 
 
@@ -1762,6 +2061,7 @@ Tab_5:CreateSection("")
 Tab_5:CreateSection("")
 Tab_5:CreateParagraph({Title = "Immunities / Buffs", Content = "Immunities and buffs for workspace side"})
 Tab_5:CreateSection("Workspace Side")
+
 local BackupEffect = game:GetService("ReplicatedStorage").Events.RemoteEvents.TauntEffect:Clone()
 BackupEffect.Parent = game.LogService
 local AntiTaunt = false
@@ -1792,6 +2092,8 @@ pcall(function()
 workspace.GameAssets.Map.Build.Destroyable:Destroy()
 end)
 end; })
+
+
 local AntiEvilScary2 = false
 Tab_5:CreateToggle({Name = "Anti Evil Scary"; CurrentValue = AntiEvilScary2; Callback = function(Value)
 AntiEvilScary2 = Value
@@ -1808,6 +2110,9 @@ if child and child.Name == "EvilScary" and AntiEvilScary2 == true then
 Module:ClearTouchable(child)
 end
 end)
+
+
+
 local AntiBarriers2 = false
 local AntiBarriers2_con = nil
 local AntiBarriers2_toggle = nil
@@ -1962,7 +2267,7 @@ _G.ESPshowhealth = Value
 end; })
 plradded_esp = nil
 plrremoved_esp = nil
-Tab_4:CreateToggle({Name = "Turn On/Off ESP"; CurrentValue = false; Callback = function(Value)
+Tab_4:CreateToggle({Name = "Turn On/Off Player ESP"; CurrentValue = false; Callback = function(Value)
 _G.ESPenabledHandler = Value
 if _G.ESPenabledHandler == true then
 if not game:GetService("CoreGui"):FindFirstChild("DOD_ESP_HANDLER") then
@@ -1994,6 +2299,139 @@ plrremoved_esp = nil
 end
 end
 end; })
+
+
+-- Path bla bla
+local CoreGui = game:GetService("CoreGui") -- i know CoreGui is already exist but it gonna get bug again if this not exist
+local CLEAN = workspace.GameAssets.Debris.Cleanable
+
+-- gLobAL of course.
+_G.ESPenabledHandler = false
+_G.ESPtransHandler = 0.3 -- DONT REMOVE THAT BECAUSE IT GONNA BROKE THE SCRIPT
+
+local CAREPAD_COLOR = Color3.fromRGB(100, 255, 57)
+local PADCONNECT = nil
+
+-- if folder dont exist then create folder if folder exist then it wont create multiple folder
+local function ISFOLDERNOTEXIST()
+if not CoreGui:FindFirstChild("DOD_PADESP_HANDLER") then
+	Instance.new("Folder", CoreGui).Name = "DOD_PADESP_HANDLER"
+end
+end
+
+-- create esp for other pad
+local function CreatePadESP(model)
+ISFOLDERNOTEXIST()
+
+-- if folder is already exist then duplicates wont be happend
+if CoreGui.DOD_PADESP_HANDLER:FindFirstChild(model:GetDebugId()) then
+	return
+end
+
+local pad = model:FindFirstChild("Pad", true)
+if not (pad and pad:IsA("BasePart")) then return end
+
+local espFolder = Instance.new("Folder")
+espFolder.Name = model:GetDebugId()
+espFolder.Parent = CoreGui.DOD_PADESP_HANDLER
+
+-- BOX HIGHLIGHT
+local box = Instance.new("BoxHandleAdornment")
+box.Adornee = pad
+box.AlwaysOnTop = true
+box.Size = pad.Size
+box.Transparency = _G.ESPtransHandler
+box.ZIndex = 10
+box.Color = (pad.Color == CAREPAD_COLOR)
+and BrickColor.new("Bright green") -- lazy to put Number 😔 
+or BrickColor.new("Bright blue")
+box.Parent = espFolder
+
+-- BILLBOARD
+local bb = Instance.new("BillboardGui")
+bb.Adornee = pad
+bb.Size = UDim2.new(0, 120, 0, 30)
+bb.StudsOffset = Vector3.new(0, 2.5, 0)
+bb.AlwaysOnTop = true
+bb.Parent = espFolder
+
+local tl = Instance.new("TextLabel")
+tl.Size = UDim2.fromScale(1, 1)
+tl.BackgroundTransparency = 1
+tl.TextColor3 = Color3.new(1, 1, 1)
+tl.TextStrokeTransparency = 0
+tl.Font = Enum.Font.SourceSansSemibold
+tl.TextScaled = true
+tl.Parent = bb
+
+-- updating Alway updating
+task.spawn(function()
+while _G.ESPenabledHandler
+and pad.Parent
+and pad:FindFirstChild("GuiAttachment")
+and pad.GuiAttachment:FindFirstChild("Gui")
+and pad.GuiAttachment.Gui:FindFirstChild("Label") do
+
+local timer = pad.GuiAttachment.Gui.Label.Text
+local CarePadDETECTION = (pad.Color == CAREPAD_COLOR)
+
+tl.Text = timer
+box.Color = CarePadDETECTION
+and BrickColor.new("Bright green")
+or BrickColor.new("Bright blue")
+
+task.wait(0.05)
+end
+
+if espFolder.Parent then
+		espFolder:Destroy()
+	end
+end)
+end
+
+local function UpdatePadESP()
+if not _G.ESPenabledHandler then return end
+ISFOLDERNOTEXIST()
+
+for _, model in ipairs(CLEAN:GetChildren()) do
+if model:IsA("Model") and model.Name == "BonusPad" then
+CreatePadESP(model)
+end
+end
+end
+
+
+
+
+Tab_4:CreateToggle({Name = "Turn On/Off Pad Esp"; CurrentValue = false; Callback = function(Value)
+_G.ESPenabledHandler = Value
+
+if Value then
+UpdatePadESP()
+
+if not PADCONNECT then
+PADCONNECT = CLEAN.ChildAdded:Connect(function(child)
+if _G.ESPenabledHandler
+		and child:IsA("Model")
+		and child.Name == "BonusPad" then
+		CreatePadESP(child)
+	end
+end)
+end
+else
+if PADCONNECT then
+	PADCONNECT:Disconnect()
+	PADCONNECT = nil
+end
+
+if CoreGui:FindFirstChild("DOD_PADESP_HANDLER") then
+	CoreGui.DOD_PADESP_HANDLER:Destroy()
+end
+end
+end; })
+
+
+
 Tab_4:CreateSection("Gui Management ε=( o｀ω′)ノ")
 Tab_4:CreateButton({Name = "Open Shop"; Callback = function()
 UIModule.OpenShop()
@@ -2369,15 +2807,26 @@ end)
 end; })
 Tab_4:CreateSection("Intro / Special Round Starter")
 killerintro = "Pursuer"
-Tab_4:CreateDropdown({Name = "Killer Intro"; Options = {"Pursuer","Artful","Badware","Killdroid","Harken"}; CurrentOption = "Pursuer"; MultiSelection = false; Callback = function(Value)
+Tab_4:CreateDropdown({Name = "Killer Intro"; Options = {"Pursuer","Artful","Badware","Killdroid","Harken","Paranoy","MR.O.B."}; CurrentOption = "Pursuer"; MultiSelection = false; Callback = function(Value)
 killerintro = Rayfield:GetDropdownValue(Value)
+end; })
+KillerUsername = LocalPlayer.Name
+Tab_4:CreateInput({Name = "Type Any Username (or type anything)"; PlaceholderText = LocalPlayer.Name; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+if typeof(Value) == "string" and Value ~= "" then
+KillerUsername = Value
+else
+KillerUsername = LocalPlayer.Name
+end
 end; })
 Tab_4:CreateButton({Name = "Start Intro"; Callback = function()
 if not firesignal then return end
-firesignal(game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("KillerIntro").OnClientEvent, game:GetService("Players").LocalPlayer,killerintro,killerintro,"Default",1)
+firesignal(game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("KillerIntro").OnClientEvent, KillerUsername,killerintro,killerintro,"Default",1)
 end; })
+
+Tab_4:CreateSection("")
+
 specialroundevent = "Double Trouble"
-Tab_4:CreateDropdown({Name = "Special Round Event"; Options = {"Double Trouble","Evil Scary","One Bounce","Gunslinger","Dienation"}; CurrentOption = "Double Trouble"; MultiSelection = false; Callback = function(Value)
+Tab_4:CreateDropdown({Name = "Special Round Event"; Options = {"Double Trouble","Evil Scary","One Bounce","Gunslinger","Dienation","Mini Brawl"}; CurrentOption = "Double Trouble"; MultiSelection = false; Callback = function(Value)
 specialroundevent = Rayfield:GetDropdownValue(Value)
 end; })
 Tab_4:CreateButton({Name = "Start Special Round Event"; Callback = function()
@@ -2385,9 +2834,57 @@ if not firesignal then return end
 firesignal(game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("GamemodeUI").OnClientEvent, specialroundevent)
 end; })
 
+Tab_4:CreateSection("Killer Skin Intro Starter")
+
+
+-- this is almost familiar to your BIAST script (killer abilities tab)
+local SkinSelect = "Devesto"
+local Skin = {
+    "Devesto",
+    "Noliful",
+    "Cesus",
+    "MeQuot",
+    "Thec",
+    "Aeroware",
+    "Jetdroid"
+}
+function GETSKINSELECTED()
+task.spawn(function()
+if not firesignal then return end
+if SkinSelect == "Noliful" then
+firesignal(game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("KillerIntro").OnClientEvent, SkinUsername,"Artful","Artful","Noliful",1)
+elseif SkinSelect == "Cesus" then
+firesignal(game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("KillerIntro").OnClientEvent, SkinUsername,"Harken","Harken","Cesus",1)
+elseif SkinSelect == "MeQuot" then
+firesignal(game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("KillerIntro").OnClientEvent, SkinUsername,"Pursuer","Pursuer","MeQuot",1)
+elseif SkinSelect == "Thec" then
+firesignal(game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("KillerIntro").OnClientEvent, SkinUsername,"Pursuer","Pursuer","Thec",1)
+elseif SkinSelect == "Aeroware" then
+firesignal(game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("KillerIntro").OnClientEvent, SkinUsername,"Badware","Badware","Aeroware",1)
+elseif SkinSelect == "Jetdroid" then
+firesignal(game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("KillerIntro").OnClientEvent, SkinUsername,"Killdroid","Killdroid","Jetdroid",1)
+else
+firesignal(game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("KillerIntro").OnClientEvent, SkinUsername,"Artful","Artful","Devesto",1)
+end
+end)
+end
 
 
 
+Tab_4:CreateDropdown({Name = "Killer Skin Intro"; Options = Skin; CurrentOption = SkinSelect; MultiSelection = false; Callback = function(Value)
+SkinSelect = Rayfield:GetDropdownValue(Value)
+end; })
+SkinUsername = LocalPlayer.Name
+Tab_4:CreateInput({Name = "Type Any Username (or type anything)"; PlaceholderText = LocalPlayer.Name; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+if typeof(Value) == "string" and Value ~= "" then
+SkinUsername = Value
+else
+SkinUsername = LocalPlayer.Name
+end
+end; })
+Tab_4:CreateButton({Name = "Start Intro"; Callback = function()
+GETSKINSELECTED()
+end; })
 
 
 
@@ -3360,6 +3857,26 @@ return nil
 end
 SafeTeleport(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable"):WaitForChild("BonusPad"):WaitForChild("Pad"))
 end; })
+
+-- short model/part name
+-- m > model
+-- p > Part
+
+local PADCOLOR = Color3.fromRGB(100, 255, 57)
+Tab_12:CreateButton({Name = "Teleport to CarePad"; Callback = function()
+for _, m in ipairs(workspace.GameAssets.Debris.Cleanable:GetChildren()) do
+		if m.Name == "BonusPad" then
+			local p = m:FindFirstChild("Pad", true)
+			if p and p.Color == PADCOLOR then
+				SafeTeleport(m:GetBoundingBox()) -- ignore why i use (m:GetBoundingBox()) instead of (m) because i think it gonna get error.
+				return
+			end
+		end
+	end
+Rayfield:Notification("Error!", "There are no CarePad!", 3)
+end; })
+
+
 Tab_12:CreateButton({Name = "Teleport to CarePad Survivor"; Callback = function()
 for _, v in pairs(workspace.GameAssets.Teams:FindFirstChild("Survivor"):GetChildren()) do
 if v:IsA("Model") and v:FindFirstChild("HumanoidRootPart") then
@@ -3398,7 +3915,15 @@ end
 end
 Tab_10:CreateParagraph({Title = "Audio", Content = "Audio Management ( Mostly LMS and chases )"})
 Tab_10:CreateSection("Custom LMS")
-local getlmsdata = function() return ((pcall(function() loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))() end)==true and loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))()) or {}) end
+local suclaoding, errloading = pcall(function()
+loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))()
+end)
+if not suclaoding then
+delfile("NexerHub/DieOfDeath/Assets/LMS/data.luau")
+task.wait(1)
+writefile("NexerHub/DieOfDeath/Assets/LMS/data.luau", "return {}")
+end
+local getlmsdata = function() return loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))() end
 local choosen_lms = ""
 local LMS_Audios = Tab_10:CreateDropdown({Name = "LMS Audios"; Options = getlmsdata(); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
 choosen_lms = Rayfield:GetDropdownValue(Value)
@@ -3448,7 +3973,7 @@ end
 end; })]]
 Tab_10:CreateSection("Custom LMS ( settings )")
 local lms_file_name = "Type Here!"
-Tab_10:CreateParagraph({Title = "How to add your own music?", Content = "Find your executor's folder in your phone's explorer, then find the ''workspace'' folder, and inside it you must find ''NexerHub'' folder, now go inside it, then click ''Assets'' and ''LMS''. And now, in this folder, input your mp3 music."})
+Tab_10:CreateParagraph({Title = "How to add your own music?", Content = "Find your executor's folder in your phone's explorer, then find the ''workspace'' folder, and inside it you must find ''NexerHub'' folder, now go inside it, then click ''DieOfDeath'', ''Assets'' and ''LMS''. And now, in this folder, input your mp3 music."})
 Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here! ( WRITE ONLY NAME, WITHOUT ''.mp3'' )"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 lms_file_name = Rayfield:GetDropdownValue(Value)
 end; })
@@ -3477,7 +4002,15 @@ end; })
 Tab_10:CreateSection("")
 Tab_10:CreateSection("")
 Tab_10:CreateSection("Custom Chase Themes")
-local getchasesdata = function() return ((pcall(function() loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))() end)==true and loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))()) or {}) end
+local suclaoding, errloading = pcall(function()
+loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))()
+end)
+if not suclaoding then
+delfile("NexerHub/DieOfDeath/Assets/Chases/data.luau")
+task.wait(1)
+writefile("NexerHub/DieOfDeath/Assets/Chases/data.luau", "return {}")
+end
+local getchasesdata = function() return loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))() end
 local choosen_chase = ""
 local Chases_Audios = Tab_10:CreateDropdown({Name = "Chase Themes"; Options = getchasesdata(); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
 choosen_chase = Rayfield:GetDropdownValue(Value)
@@ -3509,7 +4042,7 @@ Rayfield:Notification("Success!","Set ''"..choosen_chase.."'' as new custom chas
 end; })
 Tab_10:CreateSection("Custom Chase Themes ( settings )")
 local chase_file_name = "Type Here!"
-Tab_10:CreateParagraph({Title = "How to add your own music?", Content = "Find your executor's folder in your phone's explorer, then find the ''workspace'' folder, and inside it you must find ''NexerHub'' folder, now go inside it, then click ''Assets'' and ''Chases''. And now, in this folder, input your mp3 music."})
+Tab_10:CreateParagraph({Title = "How to add your own music?", Content = "Find your executor's folder in your phone's explorer, then find the ''workspace'' folder, and inside it you must find ''NexerHub'' folder, now go inside it, then click ''DieOfDeath'', ''Assets'' and ''Chases''. And now, in this folder, input your mp3 music."})
 Tab_10:CreateInput({Name = "File Name"; PlaceholderText = "Type Here! ( WRITE ONLY NAME, WITHOUT ''.mp3'' )"; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 chase_file_name = Rayfield:GetDropdownValue(Value)
 end; })
@@ -3681,7 +4214,7 @@ BodyVelocity.Parent = HumanoidRootPart
 game.Debris:AddItem(BodyVelocity, .3)
 EmitDash()
 end
-AbilityModule.CreateAbility({Client = true, ClientFunction = Dash, Name = "Dash_NH",InputShown = "",Tip = "Dash foward, and gain no cooldown.",Cooldown = .2, Icon = "rbxassetid://73777691791017",DisplayName = "Dash without cooldown"})
+AbilityModule.CreateAbility({Client = true, ClientFunction = Dash, Name = "Dash_NH",InputShown = "",Tip = "Dash foward, and gain no cooldown.",Cooldown = 0, Icon = "rbxassetid://73777691791017",DisplayName = "Dash without cooldown"})
 end; })
 -- Dont skid baka
 function ReplaceModel(Model1, Model2)
