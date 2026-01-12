@@ -1271,7 +1271,7 @@ ChoosenAbilityAW = Rayfield:GetDropdownValue(Value)
 end; })
 Tab_14:CreateButton({Name = "Get Award for choosen ability"; Callback = function()
 GetAwardFromAbility(ChoosenAbilityAW)
-end)
+end; })
 
 
 local AbilityNames = Module:GetData("AbilityNames")
