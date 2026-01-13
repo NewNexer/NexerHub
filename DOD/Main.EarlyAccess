@@ -1123,9 +1123,11 @@ local Tab_14 = Window:CreateTab("Point & Malice Farm",0)
 Tab_14:CreateParagraph({Title = "Point & Malice Farm", Content = "Point & Malice farm using abilities and other methods."})
 
 function GetAwardFromAbility(abilitynaem)
-local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
+local rootpart = HumanoidRootPart
 local oldcf = rootpart.CFrame
-local killerrootpart = workspace.GameAssets.Teams.Killer:FindFirstChildOfClass("Model").HumanoidRootPart
+local killermodl = workspace.GameAssets.Teams.Killer:FindFirstChildOfClass("Model")
+if not killermodl then return end
+local killerrootpart = killermodl.HumanoidRootPart
 local anoclip_connection = nil
 local acamera_connection = nil
 function invisappwithnoclip(bool)
@@ -1212,7 +1214,7 @@ end
 end
 end
 end
-if (Character:GetAttribute(""..abilitynaem.."Cooldown") and Character:GetAttribute(""..abilitynaem.."Cooldown")~=nil) and Character:GetAttribute(""..abilitynaem.."Cooldown")==true then Rayfield:Notification("Error!", "Your choosen ability is on cooldown!", 3, false) end
+if (Character:GetAttribute(""..abilitynaem.."Cooldown") and Character:GetAttribute(""..abilitynaem.."Cooldown")~=nil) and Character:GetAttribute(""..abilitynaem.."Cooldown")==true then Rayfield:Notification("Error!", "Your choosen ability is on cooldown!", 3, false) return end
 if abilitynaem=="Adrenaline" then
 invisappwithnoclip(true)
 task.delay(1, function() game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Adrenaline") end)
@@ -1260,6 +1262,10 @@ task.delay(1, function() game:GetService("ReplicatedStorage").Events.RemoteFunct
 looptpto(killerrootpart, CFrame.new(0,0,2), 3)
 task.delay(0.5, function() invisappwithnoclip(false) end)
 looptpto2(oldcf, CFrame.new(0,0,0), 2)
+elseif abilitynaem=="WinRound" then
+invisappwithnoclip(true)
+looptpto2(CFrame.new(500,-490,500), true, 2)
+Rayfield:Notification("Success!", "Now you have to wait until round ends.", 10, true)
 end
 end
 
@@ -1272,7 +1278,10 @@ end; })
 Tab_14:CreateButton({Name = "Get Award for choosen ability"; Callback = function()
 GetAwardFromAbility(ChoosenAbilityAW)
 end; })
-
+Tab_14:CreateSection("Other farm methods")
+Tab_14:CreateButton({Name = "Win Round ( as Survivor )"; Callback = function()
+GetAwardFromAbility("WinRound")
+end; })
 
 local AbilityNames = Module:GetData("AbilityNames")
 local AbilityDatas = Module:GetData("AbilityData")
