@@ -1119,8 +1119,8 @@ end; })
 
 
 
-local Tab_14 = Window:CreateTab("Point & Malice Farm",0)
-Tab_14:CreateParagraph({Title = "Point & Malice Farm", Content = "Point & Malice farm using abilities and other methods."})
+local Tab_14 = Window:CreateTab("Untitled",0)
+Tab_14:CreateParagraph({Title = "Untitled", Content = "Stuff that may or may not be useful. This tab will be deleted soon and everything that is here will get moved to other tabs or removed if too useless"})
 
 function GetAwardFromAbility(abilitynaem)
 local rootpart = HumanoidRootPart
@@ -1268,20 +1268,99 @@ looptpto2(CFrame.new(500,-490,500), true, 2)
 Rayfield:Notification("Success!", "Now you have to wait until round ends.", 10, true)
 end
 end
-
-Tab_14:CreateSection("Farm using ability")
-local ChoosenAbilityAW = "Adrenaline"
+function GetCurrentStaminaValues()
+local stamvalues = tostring(game.Players.LocalPlayer.PlayerGui.MainGui.RoundUI.PlayerUI.StaminaBar.Label.Text)
+local stam, maxstam = stamvalues:match("([%d%.inf]+)/([%d%.inf]+)")
+stam = stam == "inf" and math.huge or tonumber(stam)
+maxstam = maxstam == "inf" and math.huge or tonumber(maxstam)
+return stam, maxstam
+end
+Tab_14:CreateSection("Point & malice farm")
 Tab_14:CreateLabel("Stunning/ragdolling abilities have risks of causing your death ( killer may kill you, but you will still be invisible )")
+local ChoosenAbilityAW = "Adrenaline"
 Tab_14:CreateDropdown({Name = "Ability"; Options = {"Adrenaline","Cloak","Taunt","Revolver","Punch","Banana"}; CurrentOption = "Adrenaline"; MultiSelection = false; Callback = function(Value)
 ChoosenAbilityAW = Rayfield:GetDropdownValue(Value)
 end; })
 Tab_14:CreateButton({Name = "Get Award for choosen ability"; Callback = function()
 GetAwardFromAbility(ChoosenAbilityAW)
 end; })
-Tab_14:CreateSection("Other farm methods")
 Tab_14:CreateButton({Name = "Win Round ( as Survivor )"; Callback = function()
 GetAwardFromAbility("WinRound")
 end; })
+Tab_14:CreateSection("Bot")
+function GetTargetByCategory(cat)
+local targets = {
+	[1] = 0;
+	[2] = 0;
+	[3] = 0;
+}
+local lowesthealth = 155
+local lowestdistance = math.huge
+for i,v in next, workspace.GameAssets.Teams.Survivor:GetChildren() do
+if v and (v:FindFirstChild("Humanoid") and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Head")) then
+if v.Humanoid.Health<lowesthealth then
+lowesthealth = v.Humanoid.Health
+targets[1] = v
+end
+local Distance = (HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).Magnitude
+if Distance<lowestdistance then
+lowestdistance = Distance
+targets[2] = v
+end
+if (v:GetAttribute("Ability1") and v:GetAttribute("Ability1")=="Caretaker") or (v:GetAttribute("Ability2") and v:GetAttribute("Ability2")=="Caretaker") then
+targets[3] = v
+end
+end
+end
+return ((cat=="Most Damaged Player" and targets[1]) or (cat=="Closest Player" and targets[2]) or (cat=="Caretakers" and targets[3]))
+end
+Tab_14:CreateLabel("This works only for killers")
+local ChosenTargetCat = "Most Damaged Player"
+Tab_14:CreateDropdown({Name = "Target"; Options = {"Most Damaged Player","Closest Player","Caretakers"}; CurrentOption = "Most Damaged Player"; MultiSelection = false; Callback = function(Value)
+ChosenTargetCat = Rayfield:GetDropdownValue(Value)
+end; })
+local DistanceTrigger = 15
+Tab_14:CreateInput({Name = "M1 Distance Trigger"; PlaceholderText = "15"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+DistanceTrigger = tonumber(Value)
+end; })
+local BotToggle = false
+local TrueBotToggle = nil
+TrueBotToggle = Tab_14:CreateToggle({Name = "Bot Toggle"; CurrentValue = BotToggle; Callback = function(Value)
+BotToggle = Value
+if Character.Parent.Name~="Killer" then return end
+if BotToggle==true then
+local controlremote = game.ReplicatedStorage.Events.RemoteFunctions.UseAbility
+repeat task.wait()
+pcall(function()
+local target = GetTargetByCategory(ChosenTargetCat)
+if target==0 then TrueBotToggle:Set(false) Rayfield:Notification("Error!", "No targets with such requirement found.", 3, false) return end
+local newpath = PathService:CreatePath({
+	AgentRadius = 3,
+	AgentHeight = 6,
+	AgentCanJump = true,
+	AgentCanClimb = true,
+	WaypointSpacing = 8,
+})
+newpath:ComputeAsync(HumanoidRootPart.Position, target.HumanoidRootPart.Position)
+local waypoints, distance = newpath:GetWaypoints(), 9e9
+if waypoints ~= nil and waypoints[2] ~= nil then
+Humanoid:MoveTo(waypoints[2].Position)
+end
+distance = (HumanoidRootPart.Position - target.HumanoidRootPart.Position).Magnitude
+if distance<DistanceTrigger then
+local hitremote = LocalPlayer.Stats.EquippedKiller=="Killdroid" and "Eject" or "Swing"
+controlremote:InvokeServer(hitremote)
+end
+
+end)
+until workspace.GameAssets.Teams.Killer:FindFirstChild(LocalPlayer.Name)==nil or Humanoid.Health==0 or BotToggle==false
+if Humanoid~=nil and HumanoidRootPart~=nil then
+Humanoid:MoveTo(HumanoidRootPart.Position)
+end
+end
+end; })
+
+
 
 local AbilityNames = Module:GetData("AbilityNames")
 local AbilityDatas = Module:GetData("AbilityData")
@@ -2443,7 +2522,10 @@ end; })
 
 Tab_4:CreateSection("Gui Management ε=( o｀ω′)ノ")
 Tab_4:CreateButton({Name = "Open Shop"; Callback = function()
-UIModule.OpenShop()
+LocalPlayer.PlayerGui.MainGui.Shop.Visible = true
+end; })
+Tab_4:CreateButton({Name = "Open Side Tab"; Callback = function()
+LocalPlayer.PlayerGui.MainGui.SideTab.Visible = true
 end; })
 Tab_4:CreateToggle({Name = "Teammate Death Effect Enabled"; CurrentValue = true; Callback = function(Value)
 DeathEffectEnabled = Value
