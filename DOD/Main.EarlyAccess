@@ -1302,7 +1302,7 @@ if v.Humanoid.Health<lowesthealth then
 lowesthealth = v.Humanoid.Health
 targets[1] = v
 end
-local Distance = (HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).Magnitude
+local Distance = (HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
 if Distance<lowestdistance then
 lowestdistance = Distance
 targets[2] = v
@@ -1330,9 +1330,9 @@ BotToggle = Value
 if workspace.GameAssets.Teams.Killer:FindFirstChild(LocalPlayer.Name)==nil then return end
 if BotToggle==true then
 local controlremote = game.ReplicatedStorage.Events.RemoteFunctions.UseAbility
-local humanoids = workspace.GameAssets.Teams.Killer:FindFirstChild(LocalPlayer.Name).Humanoid
+local PathService = game:GetService("PathfindingService")
 repeat task.wait()
-pcall(function()
+local a,b = pcall(function()
 local target = GetTargetByCategory(ChosenTargetCat)
 if target==0 then TrueBotToggle:Set(false) Rayfield:Notification("Error!", "No targets with such requirement found.", 3, false) return end
 local newpath = PathService:CreatePath({
@@ -1345,9 +1345,13 @@ local newpath = PathService:CreatePath({
 newpath:ComputeAsync(HumanoidRootPart.Position, target.HumanoidRootPart.Position)
 local waypoints, distance = newpath:GetWaypoints(), 9e9
 if waypoints ~= nil and waypoints[2] ~= nil then
-humanoids:MoveTo(waypoints[2].Position)
+Humanoid:MoveTo(waypoints[2].Position)
 elseif waypoints ~= nil and waypoints[1] ~= nil then
-humanoids:MoveTo(waypoints[1].Position)
+Humanoid:MoveTo(waypoints[1].Position)
+end
+local cstamina, cmaxstamina = GetCurrentStaminaValues()
+if cstamina<5 then
+game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.LeftShift, false, game)
 end
 distance = (HumanoidRootPart.Position - target.HumanoidRootPart.Position).Magnitude
 if distance<DistanceTrigger then
@@ -1356,6 +1360,7 @@ controlremote:InvokeServer(hitremote)
 end
 
 end)
+if b~=nil then print(b) wait(10) end
 until workspace.GameAssets.Teams.Killer:FindFirstChild(LocalPlayer.Name)==nil or Humanoid.Health==0 or BotToggle==false
 if Humanoid~=nil and HumanoidRootPart~=nil then
 Humanoid:MoveTo(HumanoidRootPart.Position)
