@@ -1327,9 +1327,10 @@ local BotToggle = false
 local TrueBotToggle = nil
 TrueBotToggle = Tab_14:CreateToggle({Name = "Bot Toggle"; CurrentValue = BotToggle; Callback = function(Value)
 BotToggle = Value
-if Character.Parent.Name~="Killer" then return end
+if workspace.GameAssets.Teams.Killer:FindFirstChild(LocalPlayer.Name)==nil then return end
 if BotToggle==true then
 local controlremote = game.ReplicatedStorage.Events.RemoteFunctions.UseAbility
+local humanoids = workspace.GameAssets.Teams.Killer:FindFirstChild(LocalPlayer.Name).Humanoid
 repeat task.wait()
 pcall(function()
 local target = GetTargetByCategory(ChosenTargetCat)
@@ -1344,7 +1345,9 @@ local newpath = PathService:CreatePath({
 newpath:ComputeAsync(HumanoidRootPart.Position, target.HumanoidRootPart.Position)
 local waypoints, distance = newpath:GetWaypoints(), 9e9
 if waypoints ~= nil and waypoints[2] ~= nil then
-Humanoid:MoveTo(waypoints[2].Position)
+humanoids:MoveTo(waypoints[2].Position)
+elseif waypoints ~= nil and waypoints[1] ~= nil then
+humanoids:MoveTo(waypoints[1].Position)
 end
 distance = (HumanoidRootPart.Position - target.HumanoidRootPart.Position).Magnitude
 if distance<DistanceTrigger then
@@ -4477,7 +4480,7 @@ end; })
 
 local Tab_9 = Window:CreateTab("Other",0)
 Tab_9:CreateParagraph({Title = "Other", Content = "Other random thingiez"})
-local RayfieldGuiTheme = "AmberGlow"
+local RayfieldGuiTheme = "Amethyst"
 Tab_9:CreateDropdown({Name = "Gui Theme"; Options = {"Amethyst","Default","AmberGlow","Bloom","DarkBlue","Green","Light","Ocean","Serenity"}; CurrentOption = RayfieldGuiTheme; MultiSelection = false; Callback = function(Value)
 RayfieldGuiTheme = Rayfield:GetDropdownValue(Value)
 Window.ModifyTheme(RayfieldGuiTheme)
