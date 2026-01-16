@@ -886,7 +886,7 @@ local Window = Rayfield:CreateWindow({
    LoadingTitle = ""..string.sub(_G.dod_developer_key,1,1).."H:".._G.dod_name:gsub("(%S)%S+","%1"):gsub("%s+","").."",
    LoadingSubtitle = "By ".._G.dod_developer_key.."",
    ShowText = "".._G.dod_developer_key.." Hub",
-   Theme = "AmberGlow",
+   Theme = "Amethyst",
    DisableRayfieldPrompts = true,
    DisableBuildWarnings = true,
    ConfigurationSaving = {
@@ -1119,7 +1119,254 @@ end; })
 
 
 
+local Tab_14 = Window:CreateTab("Untitled",0)
+Tab_14:CreateParagraph({Title = "Untitled", Content = "Stuff that may or may not be useful. This tab will be deleted soon and everything that is here will get moved to other tabs or removed if too useless"})
 
+function GetAwardFromAbility(abilitynaem)
+local rootpart = HumanoidRootPart
+local oldcf = rootpart.CFrame
+local killermodl = workspace.GameAssets.Teams.Killer:FindFirstChildOfClass("Model")
+if not killermodl then return end
+local killerrootpart = killermodl.HumanoidRootPart
+local anoclip_connection = nil
+local acamera_connection = nil
+function invisappwithnoclip(bool)
+if bool == false then
+task.spawn(function()
+for i,v in next, rootpart.Parent.Humanoid:GetPlayingAnimationTracks() do
+v.Priority = Enum.AnimationPriority.Core
+v:AdjustSpeed(tonumber(0))
+v:Stop(tonumber(0))
+end
+end)
+if anoclip_connection then
+anoclip_connection:Disconnect()
+anoclip_connection = nil
+end
+if rootpart then
+rootpart.CanCollide = true
+end
+if acamera_connection then
+acamera_connection:Disconnect()
+acamera_connection = nil
+pcall(function()
+workspace.CurrentCamera.CameraSubject = rootpart.Parent.Humanoid
+end)
+end
+elseif bool == true then
+local function nocollision()
+for i,v in pairs(rootpart.Parent:GetDescendants()) do
+if v and v:IsA("BasePart") and v.CanCollide == true and v.Name ~= "HumanoidRootPart" then
+v.CanCollide = false
+end
+end
+if rootpart then
+rootpart.CanCollide = false
+end
+end
+anoclip_connection = game:GetService("RunService").Stepped:Connect(nocollision)
+acamera_connection = workspace.CurrentCamera:GetPropertyChangedSignal("CameraSubject"):Connect(function()
+workspace.CurrentCamera.CameraSubject = killerrootpart
+end)
+workspace.CurrentCamera.CameraSubject = killerrootpart
+game.Players.LocalPlayer.CharacterAdded:Once(function()
+if acamera_connection then
+acamera_connection:Disconnect()
+acamera_connection = nil
+end
+if anoclip_connection then
+anoclip_connection:Disconnect()
+anoclip_connection = nil
+end
+end)
+local Anim = Instance.new("Animation")
+Anim.AnimationId = "rbxassetid://90444351114401"
+local loadedanim = rootpart.Parent.Humanoid:LoadAnimation(Anim)
+loadedanim.Priority = Enum.AnimationPriority.Action4
+repeat task.wait() until loadedanim.Length > 0	
+loadedanim:Play()
+repeat task.wait() until loadedanim.IsPlaying
+loadedanim:AdjustSpeed(tonumber(0))
+loadedanim.TimePosition = 2.2
+end
+end
+local function looptpto(part, cframemod, time)
+local start = tick()
+while tick() - start < time and task.wait() do
+rootpart.CFrame = part.CFrame * cframemod
+for i,v in pairs(rootpart.Parent:GetDescendants()) do
+if v and v:IsA("BasePart") then
+v.Velocity = Vector3.new(0,0,0)
+v.RotVelocity = Vector3.new(0,0,0)
+end
+end
+end
+end
+local function looptpto2(cframe, mod, time)
+local start = tick()
+while tick() - start < time and task.wait() do
+rootpart.CFrame = cframe
+for i,v in pairs(rootpart.Parent:GetDescendants()) do
+if v and v:IsA("BasePart") then
+v.Velocity = Vector3.new(0,0,0)
+v.RotVelocity = Vector3.new(0,0,0)
+end
+end
+end
+end
+if (Character:GetAttribute(""..abilitynaem.."Cooldown") and Character:GetAttribute(""..abilitynaem.."Cooldown")~=nil) and Character:GetAttribute(""..abilitynaem.."Cooldown")==true then Rayfield:Notification("Error!", "Your choosen ability is on cooldown!", 3, false) return end
+if abilitynaem=="Adrenaline" then
+invisappwithnoclip(true)
+task.delay(1, function() game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Adrenaline") end)
+looptpto(killerrootpart, CFrame.new(0,-8,0), 3)
+looptpto2(CFrame.new(0,-490,0), true, 5)
+task.delay(0.5, function() invisappwithnoclip(false) end)
+looptpto2(oldcf, CFrame.new(0,0,0), 2)
+elseif abilitynaem=="Cloak" then
+invisappwithnoclip(true)
+task.delay(1.5, function() game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Cloak") end)
+looptpto(killerrootpart, CFrame.new(0,0,8), 3)
+looptpto2(CFrame.new(0,-490,0), true, 7)
+task.delay(0.5, function() invisappwithnoclip(false) end)
+looptpto2(oldcf, CFrame.new(0,0,0), 2)
+elseif abilitynaem=="Taunt" then
+invisappwithnoclip(true)
+game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Taunt")
+task.wait(1)
+looptpto(killerrootpart, CFrame.new(0,0,-2), 0.2)
+looptpto(killerrootpart, CFrame.new(0,0,-1), 0.2)
+looptpto(killerrootpart, CFrame.new(0,0,0), 0.2)
+looptpto(killerrootpart, CFrame.new(0,0,1), 0.2)
+looptpto(killerrootpart, CFrame.new(0,0,2), 0.2)
+task.delay(0.5, function() invisappwithnoclip(false) end)
+looptpto2(oldcf, CFrame.new(0,0,0), 2)
+elseif abilitynaem=="Punch" then
+invisappwithnoclip(true)
+game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Punch")
+looptpto(killerrootpart, CFrame.new(0,0,-2), 0.22)
+looptpto(killerrootpart, CFrame.new(0,0,-1), 0.22)
+looptpto(killerrootpart, CFrame.new(0,0,0), 0.22)
+looptpto(killerrootpart, CFrame.new(0,0,1), 0.22)
+looptpto(killerrootpart, CFrame.new(0,0,2), 0.22)
+task.delay(0.5, function() invisappwithnoclip(false) end)
+looptpto2(oldcf, CFrame.new(0,0,0), 2)
+elseif abilitynaem=="Revolver" then
+invisappwithnoclip(true)
+task.delay(1, function() game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Revolver") end)
+looptpto(killerrootpart, CFrame.new(0,-2,-1), 3)
+task.delay(0.5, function() invisappwithnoclip(false) end)
+looptpto2(oldcf, CFrame.new(0,0,0), 2)
+elseif abilitynaem=="Banana" then
+invisappwithnoclip(true)
+task.delay(1, function() game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Banana") end)
+looptpto(killerrootpart, CFrame.new(0,0,2), 3)
+task.delay(0.5, function() invisappwithnoclip(false) end)
+looptpto2(oldcf, CFrame.new(0,0,0), 2)
+elseif abilitynaem=="WinRound" then
+invisappwithnoclip(true)
+looptpto2(CFrame.new(500,-490,500), true, 2)
+Rayfield:Notification("Success!", "Now you have to wait until round ends.", 10, true)
+end
+end
+function GetCurrentStaminaValues()
+local stamvalues = tostring(game.Players.LocalPlayer.PlayerGui.MainGui.RoundUI.PlayerUI.StaminaBar.Label.Text)
+local stam, maxstam = stamvalues:match("([%d%.inf]+)/([%d%.inf]+)")
+stam = stam == "inf" and math.huge or tonumber(stam)
+maxstam = maxstam == "inf" and math.huge or tonumber(maxstam)
+return stam, maxstam
+end
+Tab_14:CreateSection("Point & malice farm")
+Tab_14:CreateLabel("Stunning/ragdolling abilities have risks of causing your death ( killer may kill you, but you will still be invisible )")
+local ChoosenAbilityAW = "Adrenaline"
+Tab_14:CreateDropdown({Name = "Ability"; Options = {"Adrenaline","Cloak","Taunt","Revolver","Punch","Banana"}; CurrentOption = "Adrenaline"; MultiSelection = false; Callback = function(Value)
+ChoosenAbilityAW = Rayfield:GetDropdownValue(Value)
+end; })
+Tab_14:CreateButton({Name = "Get Award for choosen ability"; Callback = function()
+GetAwardFromAbility(ChoosenAbilityAW)
+end; })
+Tab_14:CreateButton({Name = "Win Round ( as Survivor )"; Callback = function()
+GetAwardFromAbility("WinRound")
+end; })
+Tab_14:CreateSection("Bot")
+function GetTargetByCategory(cat)
+local targets = {
+	[1] = 0;
+	[2] = 0;
+	[3] = 0;
+}
+local lowesthealth = 155
+local lowestdistance = math.huge
+for i,v in next, workspace.GameAssets.Teams.Survivor:GetChildren() do
+if v and (v:FindFirstChild("Humanoid") and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Head")) then
+if v.Humanoid.Health<lowesthealth then
+lowesthealth = v.Humanoid.Health
+targets[1] = v
+end
+local Distance = (HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
+if Distance<lowestdistance then
+lowestdistance = Distance
+targets[2] = v
+end
+if (v:GetAttribute("Ability1") and v:GetAttribute("Ability1")=="Caretaker") or (v:GetAttribute("Ability2") and v:GetAttribute("Ability2")=="Caretaker") then
+targets[3] = v
+end
+end
+end
+return ((cat=="Most Damaged Player" and targets[1]) or (cat=="Closest Player" and targets[2]) or (cat=="Caretakers" and targets[3]))
+end
+Tab_14:CreateLabel("This works only for killers")
+local ChosenTargetCat = "Most Damaged Player"
+Tab_14:CreateDropdown({Name = "Target"; Options = {"Most Damaged Player","Closest Player","Caretakers"}; CurrentOption = "Most Damaged Player"; MultiSelection = false; Callback = function(Value)
+ChosenTargetCat = Rayfield:GetDropdownValue(Value)
+end; })
+local DistanceTrigger = 15
+Tab_14:CreateInput({Name = "M1 Distance Trigger"; PlaceholderText = "15"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+DistanceTrigger = tonumber(Value)
+end; })
+local BotToggle = false
+local TrueBotToggle = nil
+TrueBotToggle = Tab_14:CreateToggle({Name = "Bot Toggle"; CurrentValue = BotToggle; Callback = function(Value)
+BotToggle = Value
+if workspace.GameAssets.Teams.Killer:FindFirstChild(LocalPlayer.Name)==nil then return end
+if BotToggle==true then
+local controlremote = game.ReplicatedStorage.Events.RemoteFunctions.UseAbility
+local PathService = game:GetService("PathfindingService")
+repeat task.wait()
+local a,b = pcall(function()
+local target = GetTargetByCategory(ChosenTargetCat)
+if target==0 then TrueBotToggle:Set(false) Rayfield:Notification("Error!", "No targets with such requirement found.", 3, false) return end
+local newpath = PathService:CreatePath({
+	AgentRadius = 3,
+	AgentHeight = 6,
+	AgentCanJump = true,
+	AgentCanClimb = true,
+	WaypointSpacing = 8,
+})
+newpath:ComputeAsync(HumanoidRootPart.Position, target.HumanoidRootPart.Position)
+local waypoints, distance = newpath:GetWaypoints(), 9e9
+if waypoints ~= nil and waypoints[2] ~= nil then
+Humanoid:MoveTo(waypoints[2].Position)
+elseif waypoints ~= nil and waypoints[1] ~= nil then
+Humanoid:MoveTo(waypoints[1].Position)
+end
+local cstamina, cmaxstamina = GetCurrentStaminaValues()
+if cstamina<5 then
+game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.LeftShift, false, game)
+end
+distance = (HumanoidRootPart.Position - target.HumanoidRootPart.Position).Magnitude
+if distance<DistanceTrigger then
+local hitremote = LocalPlayer.Stats.EquippedKiller=="Killdroid" and "Eject" or "Swing"
+controlremote:InvokeServer(hitremote)
+end
+
+end)
+if b~=nil then print(b) wait(10) end
+until workspace.GameAssets.Teams.Killer:FindFirstChild(LocalPlayer.Name)==nil or Humanoid.Health==0 or BotToggle==false
+if Humanoid~=nil and HumanoidRootPart~=nil then
+Humanoid:MoveTo(HumanoidRootPart.Position)
+end
+end
+end; })
 
 
 
@@ -1484,7 +1731,7 @@ Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOp
 CardSettings[3][2] = Rayfield:GetDropdownValue(Value)
 end; })
 Tab_3:CreateButton({Name = "Summon Chosen Cards"; Callback = function()
-UIModule.AbilitySelection(unpack(CardSettings))
+UIModule.AbilitySelection(CardSettings[1], CardSettings[2], CardSettings[3])
 end; })
 
 Tab_3:CreateSection("")
@@ -2283,7 +2530,10 @@ end; })
 
 Tab_4:CreateSection("Gui Management ε=( o｀ω′)ノ")
 Tab_4:CreateButton({Name = "Open Shop"; Callback = function()
-UIModule.OpenShop()
+LocalPlayer.PlayerGui.MainGui.Shop.Visible = true
+end; })
+Tab_4:CreateButton({Name = "Open Side Tab"; Callback = function()
+LocalPlayer.PlayerGui.MainGui.SideTab.Visible = true
 end; })
 Tab_4:CreateToggle({Name = "Teammate Death Effect Enabled"; CurrentValue = true; Callback = function(Value)
 DeathEffectEnabled = Value
@@ -3764,7 +4014,15 @@ end
 end
 Tab_10:CreateParagraph({Title = "Audio", Content = "Audio Management ( Mostly LMS and chases )"})
 Tab_10:CreateSection("Custom LMS")
-local getlmsdata = function() return ((pcall(function() loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))() end)==true and loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))()) or {}) end
+local suclaoding, errloading = pcall(function()
+loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))()
+end)
+if not suclaoding then
+delfile("NexerHub/DieOfDeath/Assets/LMS/data.luau")
+task.wait(1)
+writefile("NexerHub/DieOfDeath/Assets/LMS/data.luau", "return {}")
+end
+local getlmsdata = function() return loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))() end
 local choosen_lms = ""
 local LMS_Audios = Tab_10:CreateDropdown({Name = "LMS Audios"; Options = getlmsdata(); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
 choosen_lms = Rayfield:GetDropdownValue(Value)
@@ -3843,7 +4101,15 @@ end; })
 Tab_10:CreateSection("")
 Tab_10:CreateSection("")
 Tab_10:CreateSection("Custom Chase Themes")
-local getchasesdata = function() return ((pcall(function() loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))() end)==true and loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))()) or {}) end
+local suclaoding, errloading = pcall(function()
+loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))()
+end)
+if not suclaoding then
+delfile("NexerHub/DieOfDeath/Assets/Chases/data.luau")
+task.wait(1)
+writefile("NexerHub/DieOfDeath/Assets/Chases/data.luau", "return {}")
+end
+local getchasesdata = function() return loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))() end
 local choosen_chase = ""
 local Chases_Audios = Tab_10:CreateDropdown({Name = "Chase Themes"; Options = getchasesdata(); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
 choosen_chase = Rayfield:GetDropdownValue(Value)
@@ -4047,7 +4313,7 @@ BodyVelocity.Parent = HumanoidRootPart
 game.Debris:AddItem(BodyVelocity, .3)
 EmitDash()
 end
-AbilityModule.CreateAbility({Client = true, ClientFunction = Dash, Name = "Dash_NH",InputShown = "",Tip = "Dash foward, and gain no cooldown.",Cooldown = .2, Icon = "rbxassetid://73777691791017",DisplayName = "Dash without cooldown"})
+AbilityModule.CreateAbility({Client = true, ClientFunction = Dash, Name = "Dash_NH",InputShown = "",Tip = "Dash foward, and gain no cooldown.",Cooldown = 0, Icon = "rbxassetid://73777691791017",DisplayName = "Dash without cooldown"})
 end; })
 -- Dont skid baka
 function ReplaceModel(Model1, Model2)
@@ -4219,7 +4485,7 @@ end; })
 
 local Tab_9 = Window:CreateTab("Other",0)
 Tab_9:CreateParagraph({Title = "Other", Content = "Other random thingiez"})
-local RayfieldGuiTheme = "AmberGlow"
+local RayfieldGuiTheme = "Amethyst"
 Tab_9:CreateDropdown({Name = "Gui Theme"; Options = {"Amethyst","Default","AmberGlow","Bloom","DarkBlue","Green","Light","Ocean","Serenity"}; CurrentOption = RayfieldGuiTheme; MultiSelection = false; Callback = function(Value)
 RayfieldGuiTheme = Rayfield:GetDropdownValue(Value)
 Window.ModifyTheme(RayfieldGuiTheme)
