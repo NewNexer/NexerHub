@@ -923,7 +923,14 @@ end)
 
 
 
-
+pcall(function()
+if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) or (string.find(identifyexecutor(), "Solara") or string.find(identifyexecutor(), "solara") or string.find(identifyexecutor(), "SOLARA")) or not Module.RequestModule then
+StaminaModule = {}
+StaminaModule.Stamina = 100
+else
+StaminaModule = Module:RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("Movement"))
+end
+end)
 local Tab_1 = Window:CreateTab("Stamina",0)
 Tab_1:CreateParagraph({Title = "Stamina", Content = "You can change your stamina properties here."})
 Tab_1:CreateSection("Fast Functions")
@@ -963,6 +970,8 @@ local InfStaminaenabled = false
 Tab_1:CreateToggle({Name = "Infinite Stamina"; CurrentValue = NoFatigue; Callback = function(Value)
 InfStaminaenabled = Value
 Character:SetAttribute("MaxStamina",(Value==true and 9e9 or GetLegitStamina()))
+task.wait(0)
+StaminaModule.Stamina = (Value==true and 9e9 or GetLegitStamina())
 end; })
 LocalPlayer.CharacterAdded:Connect(function(cac)
 cac:SetAttribute("MaxStamina",9e9)
@@ -1040,6 +1049,9 @@ end; })
 Tab_1:CreateSection("Advanced")
 Tab_1:CreateInput({Name = "Max Stamina"; PlaceholderText = "Type Here!"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = true; Callback = function(Value)
 Char:SetAttribute("MaxStamina", tonumber(Value))
+end; })
+Tab_1:CreateInput({Name = "Stamina"; PlaceholderText = "Type Here!"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = true; Callback = function(Value)
+StaminaModule.Stamina = tonumber(Value)
 end; })
 Tab_1:CreateInput({Name = "Walk Speed"; PlaceholderText = "Type Here!"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = true; Callback = function(Value)
 Char:SetAttribute("WalkSpeed", tonumber(Value))
