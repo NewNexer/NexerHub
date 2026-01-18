@@ -624,7 +624,7 @@ end
 function module:ConvertToTable(a)
 local b = TableToLuauString(a)
 task.wait(0)
-return b
+return "return "..b
 end
 
 function IsFollowedTo(userid)
