@@ -1,4 +1,4 @@
- --[[
+--[[
 Loading Variables
 ]]--
 
@@ -1772,7 +1772,7 @@ Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOp
 CardSettings[3][2] = Rayfield:GetDropdownValue(Value)
 end; })
 Tab_3:CreateButton({Name = "Summon Chosen Cards"; Callback = function()
-UIModule.AbilitySelection(CardSettings[1], CardSettings[2], CardSettings[3])
+UIModule.AbilitySelection(unpack(CardSettings))
 end; })
 
 Tab_3:CreateSection("")
