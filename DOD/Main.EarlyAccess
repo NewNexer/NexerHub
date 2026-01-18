@@ -157,14 +157,6 @@ end)
 --[[ Loading All Modules ]]--
 -- upvalues: StaminaModule, AbilityModule, UIModule, AnimationsModule
 pcall(function()
-if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) or (string.find(identifyexecutor(), "Solara") or string.find(identifyexecutor(), "solara") or string.find(identifyexecutor(), "SOLARA")) or not Module.RequestModule then
-StaminaModule = {}
-StaminaModule.Stamina = 100
-else
-StaminaModule = Module:RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("Movement"))
-end
-end)
-pcall(function()
 local temp_module = [[
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
@@ -931,15 +923,64 @@ end)
 
 
 
-
+pcall(function()
+if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) or (string.find(identifyexecutor(), "Solara") or string.find(identifyexecutor(), "solara") or string.find(identifyexecutor(), "SOLARA")) or not Module.RequestModule then
+StaminaModule = {}
+StaminaModule.Stamina = 100
+else
+StaminaModule = Module:RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("Movement"))
+end
+end)
 local Tab_1 = Window:CreateTab("Stamina",0)
 Tab_1:CreateParagraph({Title = "Stamina", Content = "You can change your stamina properties here."})
 Tab_1:CreateSection("Fast Functions")
 
-Tab_1:CreateButton({Name = "Infinite Stamina"; Callback = function()
-Character:SetAttribute("MaxStamina", math.huge)
-StaminaModule.Stamina = math.huge
+function GetLegitStamina()
+local function CalculateObesityTax()
+local obesity = tonumber(Character.Torso.Size.X)
+local tax = ((obesity/0.25)-8)*10
+return tax
+end
+local function GetLegitMaxStamina()
+local legitmaxstamina = 100
+if Character:GetAttribute("Killer") then
+if Character:GetAttribute("Killer")=="Pursuer" or Character:GetAttribute("Killer")=="Killdroid" then
+legitmaxstamina = 110
+elseif Character:GetAttribute("Killer")=="Harken" then
+legitmaxstamina = 114
+elseif Character:GetAttribute("Killer")=="Badware" then
+legitmaxstamina = 120
+elseif Character:GetAttribute("Killer")=="Artful" then
+legitmaxstamina = 90
+end
+end
+return legitmaxstamina
+end
+local function CalculateRevolverTax()
+local firstslot, secondslot = Character:GetAttribute("Ability1"), Character:GetAttribute("Ability2")
+local tax = 0
+if firstslot and secondslot and (firstslot=="Revolver" or secondslot=="Revolver") then
+tax = 10
+end
+return tax
+end
+return (GetLegitMaxStamina()-CalculateObesityTax()-CalculateRevolverTax())
+end
+local InfStaminaenabled = false
+Tab_1:CreateToggle({Name = "Infinite Stamina"; CurrentValue = NoFatigue; Callback = function(Value)
+InfStaminaenabled = Value
+Character:SetAttribute("MaxStamina",(Value==true and 9e9 or GetLegitStamina()))
+task.wait(0)
+StaminaModule.Stamina = (Value==true and 9e9 or GetLegitStamina())
 end; })
+LocalPlayer.CharacterAdded:Connect(function(cac)
+cac:SetAttribute("MaxStamina",9e9)
+local cacs = nil
+cacs = cac:GetAttributeChangedSignal("MaxStamina"):Connect(function()
+if InfStaminaenabled~=true then return end
+cac:SetAttribute("MaxStamina",9e9)
+end)
+end)
 
 Tab_1:CreateButton({Name = "Become Fast"; Callback = function()
 Char:SetAttribute("WalkSpeed", 40)
@@ -3396,11 +3437,13 @@ Tab_13:CreateButton({Name = "OVERRIDE Equip"; Callback = function()
 Module.GameBreakingFeatures:OverrideEquip(EquippingData.Killer,EquippingData.Skin,EquippingData.Method)
 end; })
 
-
+local doesgetassetpricework, errorrr = pcall(function()
+Module:GetAssetPrice(1264479709)
+end)
 local Tab_7 = Window:CreateTab("Premium",0)
 Tab_7:CreateParagraph({Title = "Premium", Content = "Premium content here! Very exploitable features."})
 Tab_7:CreateLabel("First way to unlock premium features [ Gamepass ]")
-Tab_7:CreateButton({Name = "Gamepass Link [ Costs "..tostring((Module:GetAssetPrice(1264479709) or 39)).." robux ]"; Callback = function()
+Tab_7:CreateButton({Name = "Gamepass Link [ Costs "..tostring((errorrr==nil and Module:GetAssetPrice(1264479709) or 39)).." robux ]"; Callback = function()
 if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(LocalPlayer.UserId, 1264479709) then
     _G.HasPremium = true
     Rayfield:Notification("Error!", "Already have gamepass!", 3, warn)
@@ -4018,8 +4061,6 @@ local suclaoding, errloading = pcall(function()
 loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))()
 end)
 if not suclaoding then
-delfile("NexerHub/DieOfDeath/Assets/LMS/data.luau")
-task.wait(1)
 writefile("NexerHub/DieOfDeath/Assets/LMS/data.luau", "return {}")
 end
 local getlmsdata = function() return loadstring(GetFile("NexerHub/DieOfDeath/Assets/LMS/data.luau","rf"))() end
@@ -4105,8 +4146,6 @@ local suclaoding, errloading = pcall(function()
 loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))()
 end)
 if not suclaoding then
-delfile("NexerHub/DieOfDeath/Assets/Chases/data.luau")
-task.wait(1)
 writefile("NexerHub/DieOfDeath/Assets/Chases/data.luau", "return {}")
 end
 local getchasesdata = function() return loadstring(GetFile("NexerHub/DieOfDeath/Assets/Chases/data.luau","rf"))() end
