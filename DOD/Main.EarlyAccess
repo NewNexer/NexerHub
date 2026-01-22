@@ -1,4 +1,4 @@
- --[[
+--[[
 Loading Variables
 ]]--
 
@@ -1357,7 +1357,7 @@ return ((cat=="Most Damaged Player" and targets[1]) or (cat=="Closest Player" an
 end
 Tab_14:CreateLabel("This works only for killers")
 local ChosenTargetCat = "Most Damaged Player"
-Tab_14:CreateDropdown({Name = "Target"; Options = {"Most Damaged Player","Closest Player","Caretakers"}; CurrentOption = "Most Damaged Player"; MultiSelection = false; Callback = function(Value)
+local ChosenTargetCatDropdown = Tab_14:CreateDropdown({Name = "Target"; Options = {"Most Damaged Player","Closest Player","Caretakers"}; CurrentOption = "Most Damaged Player"; MultiSelection = false; Callback = function(Value)
 ChosenTargetCat = Rayfield:GetDropdownValue(Value)
 end; })
 local DistanceTrigger = 15
@@ -1375,7 +1375,19 @@ local PathService = game:GetService("PathfindingService")
 repeat task.wait()
 local a,b = pcall(function()
 local target = GetTargetByCategory(ChosenTargetCat)
-if target==0 then TrueBotToggle:Set(false) Rayfield:Notification("Error!", "No targets with such requirement found.", 3, false) return end
+if target==0 and ChosenTargetCat=="Caretakers" then
+Rayfield:Notification("Error!", "No targets with such requirement found. Changing target mode from ''Caretakers'' to ''Most Damaged Player''...", 3, false)
+pcall(function()
+ChosenTargetCatDropdown:Set({"Caretakers"})
+end)
+pcall(function()
+ChosenTargetCatDropdown:Set("Caretakers")
+end)
+ChosenTargetCat = "Caretakers"
+elseif target==0 then
+TrueBotToggle:Set(false) Rayfield:Notification("Error!", "No targets with such requirement found.", 3, false) return
+end
+
 local newpath = PathService:CreatePath({
 	AgentRadius = 3,
 	AgentHeight = 6,
@@ -1772,7 +1784,7 @@ Tab_3:CreateDropdown({Name = "Second Ability"; Options = AbilityNames; CurrentOp
 CardSettings[3][2] = Rayfield:GetDropdownValue(Value)
 end; })
 Tab_3:CreateButton({Name = "Summon Chosen Cards"; Callback = function()
-UIModule.AbilitySelection(CardSettings[1], CardSettings[2], CardSettings[3])
+UIModule.AbilitySelection(unpack(CardSettings))
 end; })
 
 Tab_3:CreateSection("")
