@@ -314,16 +314,6 @@ return AbilitySystem]]
 AbilityModule = loadstring(temp_module)()
 end)
 pcall(function()
-if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) or (string.find(identifyexecutor(), "Solara") or string.find(identifyexecutor(), "solara") or string.find(identifyexecutor(), "SOLARA")) or not Module.RequestModule then
-UIModule = {}
-UIModule.AbilitySelection = function(...) Rayfield:Notification("Error!", "Couldn't use function ''AbilitySelection'', missing function ''require'' or ''decompile''!", 5, false) return end
-UIModule.OpenShop = function(...) Rayfield:Notification("Error!", "Couldn't use function ''OpenShop'', missing function ''require'' or ''decompile''!", 5, false) return end
-UIModule.TeamateDeathEffect = function(...) Rayfield:Notification("Error!", "Couldn't use function ''TeamateDeathEffect'', missing function ''require'' or ''decompile''!", 5, false) return end
-else
-UIModule = Module:RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("UI"))
-end
-end)
-pcall(function()
 AnimationsModule = [[task.spawn(function()
 pcall(function()
 local stopper = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") or game.Players.LocalPlayer.Character:FindFirstChildOfClass("AnimationController")
@@ -929,6 +919,16 @@ StaminaModule = {}
 StaminaModule.Stamina = 100
 else
 StaminaModule = Module:RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("Movement"))
+end
+end)
+pcall(function()
+if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) or (string.find(identifyexecutor(), "Solara") or string.find(identifyexecutor(), "solara") or string.find(identifyexecutor(), "SOLARA")) or not Module.RequestModule then
+UIModule = {}
+UIModule.AbilitySelection = function(...) Rayfield:Notification("Error!", "Couldn't use function ''AbilitySelection'', missing function ''require'' or ''decompile''!", 5, false) return end
+UIModule.OpenShop = function(...) Rayfield:Notification("Error!", "Couldn't use function ''OpenShop'', missing function ''require'' or ''decompile''!", 5, false) return end
+UIModule.TeamateDeathEffect = function(...) Rayfield:Notification("Error!", "Couldn't use function ''TeamateDeathEffect'', missing function ''require'' or ''decompile''!", 5, false) return end
+else
+UIModule = Module:RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("UI"))
 end
 end)
 local Tab_1 = Window:CreateTab("Stamina",0)
