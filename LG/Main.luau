@@ -83,7 +83,9 @@ task.wait(1)
 msg.Text = "Launching Rayfield..."
 --[[ Loading rayfield here ]] --
 local Rayfield = Module:GetWorkingRayfield()
-
+task.delay(2,function()
+msg:Destroy()
+end)
 
 --[[ Re-writing variables ]]--
 AuthorKey = ""..((AuthorKey ~= nil and AuthorKey) or "Unknown")..""
@@ -132,7 +134,7 @@ task.spawn(v)
 end
 end
 end)
---[[local TaskTick = {}
+local TaskTick = {}
 task.spawn(function()
 while task.wait() do
 for i,v in next, TaskTick do
@@ -141,8 +143,32 @@ task.spawn(v)
 end
 end
 end
-end)]]--
---upconnections: stepped, renderstepped, postsimulation
+end)
+local PropertyBeat = {}
+function PropertyBeatSet(name,method,ins,pa,func)
+if (method=="Add" or method=="Set" or method=="SetBeat" or method=="AddBeat") then
+PropertyBeat[name] = instance:GetPropertyChangedSignal(pa):Connect(function()
+task.spawn(func)
+end)
+end
+if (method=="Remove" or method=="Delete" or method=="DeleteBeat" or method=="RemoveBeat") and PropertyBeat[name]~=nil then
+PropertyBeat[name]:Disconnect()
+PropertyBeat[name] = nil
+end
+end
+local AttributeBeat = {}
+function AttributeBeatSet(name,method,ins,pa,func)
+if (method=="Add" or method=="Set" or method=="SetBeat" or method=="AddBeat") then
+AttributeBeat[name] = ins:GetAttributeChangedSignal(pa):Connect(function()
+task.spawn(func)
+end)
+end
+if (method=="Remove" or method=="Delete" or method=="DeleteBeat" or method=="RemoveBeat") and AttributeBeat[name]~=nil then
+AttributeBeat[name]:Disconnect()
+AttributeBeat[name] = nil
+end
+end
+--upconnections: heartbeat, propertybeat, attributebeat, tasktick
 
 
 
@@ -160,16 +186,10 @@ Announcements:CreateButton({Name = "Copy Discord Server Link"; Callback = functi
 setclipboard(tostring("https://discord.gg/7u5GRNw3xn"))
 Notification("Success!", "Copied Link!", 3, true)
 end; })
-
-
-
-local Tab1 = Window:CreateTab("Main",0)
-
 local ClosestHRP = nil
 local AutoTurn = false
 local AutoTracer = false
 local Range = 140
-
 Heartbeat.AutoTracer = function()
 if AutoTracer ~= true then return end
 pcall(function()
@@ -193,14 +213,12 @@ game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Velocity = vel
 end
 end)
 end
-
 function IsNormal(v)
 if v and v:FindFirstChild("Head") and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChildOfClass("Humanoid") then
 return true
 end
 return false
 end
-
 Heartbeat.ClosestPlayer = function()
 pcall(function()
 local ClosestDistance = math.huge
@@ -225,43 +243,182 @@ ClosestHRP = NewClosest
 end)
 end
 
-Tab1:CreateSection("Hitbox")
 
+
+local Tab1 = Window:CreateTab("Hitbox",0)
 Tab1:CreateParagraph({Title = "Hitbox", Content = "Hitbox manipulations and management."})
-
 Tab1:CreateLabel("Hitbox Auto Tracer")
-
 Tab1:CreateLabel("Warning!")
 Tab1:CreateLabel("For hitbox to hit, your character must be turned to position where closest player is! (or you can enable auto turn if you don't wanna do it manually)")
-
 Tab1:CreateSlider({Name = "Range"; Range = {1, 140}; Increment = 1; Suffix = " studs"; CurrentValue = 140; Callback = function(Value)
 Range = tonumber(Value)
 end; })
-
 Tab1:CreateToggle({Name = "Hitbox Auto Tracer"; CurrentValue = false; Callback = function(Value)
 AutoTracer = Value
 end; })
-
 Tab1:CreateToggle({Name = "Auto Turn"; CurrentValue = false; Callback = function(Value)
 AutoTurn = Value
 end; })
 
---[[
-Tab1:CreateDropdown({Name = "Dropdown"; Options = {"1","2"}; CurrentOption = "1"; MultiSelection = false; Callback = function(Value)
-local Value = Rayfield:GetDropdownValue(Value) -- returns string
-print(Value)
+
+
+
+local IdentitiesTab = Window:CreateTab("Identities Specials",0)
+IdentitiesTab:CreateParagraph({Title = "Identities Specials", Content = "Special Features for different identities."})
+function CreateHint()
+    local hint = Instance.new("Part")
+    hint.CanCollide = false
+    hint.CanTouch = false
+    hint.Size = HumanoidRootPart.Size
+    hint.Material = Enum.Material.Neon
+    hint.Color = Color3.fromRGB(0, 255, 0)
+    hint.Transparency = 0.85
+    hint.Parent = workspace.Ignore
+    hint.Anchored = true
+    return hint
+end
+function CreateTimekillingTimeDashHints()
+local hrp = HumanoidRootPart
+local camera = workspace.CurrentCamera
+local connections = {}
+local parts = {}
+local offsets = {
+    Vector3.new(0, 0, 27),
+    Vector3.new(0, 0, -27),
+    Vector3.new(27, 0, 0),
+    Vector3.new(-27, 0, 0)
+}
+for i = 1,4 do
+    local hint = CreateHint()
+    parts[i] = hint
+    connections[i] = game:GetService("RunService").Heartbeat:Connect(function()
+        local hrppos = hrp.Position
+        local cf
+        local shiftlockenabled = game:GetService("UserInputService").MouseBehavior == Enum.MouseBehavior.LockCenter
+        if shiftlockenabled then
+            local camerapos = camera.CFrame.Position
+            local targetpos = Vector3.new(camerapos.X, hrppos.Y, camerapos.Z)
+            cf = CFrame.new(hrppos, targetpos)
+        else
+            cf = hrp.CFrame
+        end
+        local worldpos = cf:PointToWorldSpace(offsets[i])
+        hint.Position = Vector3.new(worldpos.X, hrppos.Y, worldpos.Z)
+        hint.CFrame = CFrame.new(hint.Position) * cf.Rotation
+    end)
+end
+return connections,parts
+end
+local noclip_connection = nil
+local camera_connection = nil
+function ApplyInvisibility(bool)
+if bool == false then
+task.spawn(function()
+for i,v in next, Humanoid:GetPlayingAnimationTracks() do
+if v.Animation.AnimationId=="rbxassetid://71695001979420" then
+v.Priority = Enum.AnimationPriority.Core
+v:AdjustSpeed(tonumber(0))
+v:Stop(tonumber(0))
+end
+end
+end)
+if noclip_connection then
+noclip_connection:Disconnect()
+noclip_connection = nil
+end
+if camera_connection then
+camera_connection:Disconnect()
+camera_connection = nil
+pcall(function()
+workspace.CurrentCamera.CameraSubject = Humanoid
+end)
+end
+elseif bool == true then
+local function nocollision()
+for i,v in pairs(LP.Character:GetDescendants()) do
+if v and v:IsA("BasePart") and v.CanCollide == true and v.Name ~= "HumanoidRootPart" then
+v.CanCollide = false
+end
+end
+if LP.Character:FindFirstChild("HumanoidRootPart") then
+LP.Character:FindFirstChild("HumanoidRootPart").CanCollide = true
+end
+end
+noclip_connection = game:GetService("RunService").Stepped:Connect(nocollision)
+workspace.CurrentCamera.CameraSubject = HumanoidRootPart
+camera_connection = workspace.CurrentCamera:GetPropertyChangedSignal("CameraSubject"):Connect(function()
+workspace.CurrentCamera.CameraSubject = HumanoidRootPart
+end)
+local Anim = Instance.new("Animation")
+Anim.AnimationId = "rbxassetid://71695001979420" -- If you will use my invis, please credit me.
+local loadedanim = Humanoid:LoadAnimation(Anim)
+loadedanim.Priority = Enum.AnimationPriority.Action4
+repeat task.wait() until loadedanim.Length > 0	
+loadedanim:Play()
+repeat task.wait() until loadedanim.IsPlaying
+loadedanim:AdjustSpeed(tonumber(0))
+loadedanim.TimePosition = .65
+end
+end
+function GetFolderID(char)
+return game:GetService("ReplicatedStorage").src.Identities[tostring(char:GetAttribute("Character"))][tostring(char:GetAttribute("Identity"))]
+end
+
+IdentitiesTab:CreateSection("Universal")
+IdentitiesTab:CreateLabel("Invisibility")
+Tab_7:CreateToggle({Name = "Turn On/Off Invisibility"; CurrentValue = false; Callback = function(Value)
+ApplyInvisibility(Value)
+Rayfield:Notification("Success!", (Value==true and "Applied invisibility!" or "Disabled invisibility!"), 2, true)
 end; })
-]]--
+IdentitiesTab:CreateParagraph({Title = "S4 Abuse", Content = "Some of the merges: Using shield skill as evade skill will make it unbreakable evade. Using counter skill as coin skill will instantly use counter attack."})
+local S4Method = "Shield"
+IdentitiesTab:CreateDropdown({Name = "S4 Methods"; Options = {"Shield","Evade","Counter","Coin"}; CurrentOption = S4Method; MultiSelection = false; Callback = function(Value)
+S4Method = Rayfield:GetDropdownValue(Value)
+end; })
+IdentitiesTab:CreateKeybind({Name = "Use S4 using choosen method"; CurrentKeybind = "C"; HoldToInteract = false; Callback = function(Value)
+game:GetService("ReplicatedStorage"):WaitForChild("Net"):WaitForChild("Character"):WaitForChild("Combat"):FireServer(unpack({{Module = GetFolderID(Character).Moves.Base.S4,Char = Character,HRP = HumanoidRootPart,Attempt = ""..S4Method.."Skill"}}))
+end; })
+IdentitiesTab:CreateSection("Timekilling Time")
+local connections,parts
+local AcceleratedDashHintsToggle = IdentitiesTab:CreateToggle({Name = "Accelerated Dash Hints Enabled"; CurrentValue = false; Callback = function(Value)
+DashHints = Value
+if not Character:FindFirstChild("TR") then Rayfield:Notification("Error!", "You need to be timekilling time gregor!", 3, false) return end
+if DashHints==false then
+if connections and parts then
+for _,conn in pairs(connections) do conn:Disconnect() end
+for _,part in pairs(parts) do part:Destroy() end
+connections = nil
+parts = nil
+end
+return
+end
+Character.TR["Torso1"].GlitchEffect:GetPropertyChangedSignal("Enabled"):Connect(function()
+if Character.TR["Torso1"].GlitchEffect.Enabled==true and DashHints==true then
+connections,parts = CreateTimekillingTimeDashHints()
+elseif Character.TR["Torso1"].GlitchEffect.Enabled==false then
+if connections and parts then
+for _,conn in pairs(connections) do conn:Disconnect() end
+for _,part in pairs(parts) do part:Destroy() end
+connections = nil
+parts = nil
+end
+else end
+end)
+LocalPlayer.CharacterAdded:Once(function()
+if DashHints==true then
+task.spawn(function()
+AcceleratedDashHintsToggle:Set(false)
+end)
+end
+end)
+end; })
+
 
 local Tab2 = Window:CreateTab("Local Player",0)
-
-Tab2:CreateParagraph({Title = "Local Player", Content = "Local Player Management"})
-
+Tab2:CreateParagraph({Title = "Local Player", Content = "Local Player Management."})
 local WalkSpeed = 0
 local JumpPower = 0
-
 Tab2:CreateSection("WalkSpeed")
-
 local CurrentWalkSpeedLabel = Tab2:CreateLabel("Your current WalkSpeed is ???")
 Heartbeat.CurrentWalkSpeed = function()
 pcall(function()
@@ -270,27 +427,21 @@ CurrentWalkSpeedLabel:Set("Your current WalkSpeed is "..tostring(Humanoid.WalkSp
 end
 end)
 end
-
 Tab2:CreateInput({Name = "WalkSpeed"; PlaceholderText = "0"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 WalkSpeed = tonumber(Value)
 end; })
-
 Tab2:CreateButton({Name = "Set WalkSpeed"; Callback = function()
 Humanoid.WalkSpeed = WalkSpeed
 end; })
-
-Tab2:CreateToggle({Name = "Loop Set WalkSpeed"; CurrentValue = false; Callback = function(Value)
+local LoopWalkSpeedToggle = Tab2:CreateToggle({Name = "Loop Set WalkSpeed"; CurrentValue = false; Callback = function(Value)
 if Value == true then
-Heartbeat.LoopWalkSpeed = function() Humanoid.WalkSpeed = WalkSpeed end
+local CurrentHumanoid = Humanoid
+PropertyBeatSet("LoopWalkSpeed","AddBeat", Humanoid,"WalkSpeed",function() if Humanoid~=CurrentHumanoid then LoopWalkSpeedToggle:Set(false) end Humanoid.WalkSpeed = WalkSpeed end)
 elseif Value == false then
-if Heartbeat.LoopWalkSpeed~=nil then
-Heartbeat.LoopWalkSpeed = nil
-end
+PropertyBeatSet("LoopWalkSpeed","RemoveBeat")
 end
 end; })
-
 Tab2:CreateSection("JumpPower")
-
 local CurrentJumpPowerLabel = Tab2:CreateLabel("Your current JumpPower is ???")
 Heartbeat.CurrentJumpPower = function()
 pcall(function()
@@ -299,38 +450,32 @@ CurrentJumpPowerLabel:Set("Your current JumpPower is "..tostring(Humanoid.JumpPo
 end
 end)
 end
-
 Tab2:CreateInput({Name = "JumpPower"; PlaceholderText = "0"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 JumpPower = tonumber(Value)
 end; })
-
 Tab2:CreateButton({Name = "Set JumpPower"; Callback = function()
 Humanoid.JumpPower = JumpPower
 end; })
-
-Tab2:CreateToggle({Name = "Loop Set JumpPower"; CurrentValue = false; Callback = function(Value)
+local LoopJumpPowerToggle = Tab2:CreateToggle({Name = "Loop Set JumpPower"; CurrentValue = false; Callback = function(Value)
 if Value == true then
-Heartbeat.LoopJumpPower = function() Humanoid.JumpPower = JumpPower end
+local CurrentHumanoid = Humanoid
+PropertyBeatSet("LoopJumpPower","AddBeat", Humanoid,"WalkSpeed",function() if Humanoid~=CurrentHumanoid then LoopJumpPowerToggle:Set(false) end Humanoid.JumpBoost = JumpBoost end)
 elseif Value == false then
-if Heartbeat.LoopJumpPower~=nil then
-Heartbeat.LoopJumpPower = nil
-end
+PropertyBeatSet("LoopJumpPower","RemoveBeat")
 end
 end; })
-
 Tab2:CreateSection("Camera")
-
 Tab2:CreateSlider({Name = "FOV"; Range = {0,360}; Increment = 1; Suffix = ""; CurrentValue = workspace.CurrentCamera.FieldOfView; Callback = function(Value)
 workspace.CurrentCamera.FieldOfView = Value
 end; })
 
-msg:Destroy()
+
+
+
+
 
 local Tab3 = Window:CreateTab("Other",0)
-
-Tab3:CreateButton({Name = "EXTERMINATE THE CLOSEST PLAYER TO YOU."; Callback = function()
-
-
+Tab3:CreateButton({Name = "EXTERMINATE THE CLOSEST PLAYER TO YOU. [ Don't spam ]"; Callback = function()
 local spinning = true
 local a = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(game:GetService("ReplicatedStorage").src.Identities.Meursault["The Thumb East Capo IIII"].Animations.Base.Attack.Combo3)
 a:Play()
@@ -386,15 +531,7 @@ repeat task.wait()
 for i,v in next,game:GetService("ReplicatedStorage").src:GetDescendants() do
 if v and v:IsA("ModuleScript") and tonumber(v.Name)~=nil and (v.Parent.Name == "Coinss" or (v.Parent.Name == "Combos" and tonumber(v.Name)~=3)) then
 BodyVelocity.Position = ClosestHRP.Position
-local args = {
-    {
-        Module = v,
-        Humanoid = localPlayer.Character:WaitForChild("Humanoid"),
-        Attempt = "M1",
-        HRP = localPlayer.Character:WaitForChild("HumanoidRootPart"),
-        Char = localPlayer.Character
-    }
-}
+local args = {{Module = v,Humanoid = localPlayer.Character:WaitForChild("Humanoid"),Attempt = "M1",HRP = localPlayer.Character:WaitForChild("HumanoidRootPart"),Char = localPlayer.Character}}
 game:GetService("ReplicatedStorage"):WaitForChild("Net"):WaitForChild("Character"):WaitForChild("Combat"):FireServer(unpack(args))
 task.wait(.135)
 if not TargetHumanoid or TargetHumanoid.Health < 1 then
@@ -407,8 +544,8 @@ end
 until not TargetHumanoid or TargetHumanoid.Health < 1
 spinning = false
 BodyVelocity:Destroy()
-
 end; })
+
 
 Tab3:CreateButton({Name = "Close Hub"; Callback = function()
 for i,v in next, Heartbeat do
