@@ -350,7 +350,7 @@ camera_connection = workspace.CurrentCamera:GetPropertyChangedSignal("CameraSubj
 workspace.CurrentCamera.CameraSubject = HumanoidRootPart
 end)
 local Anim = Instance.new("Animation")
-Anim.AnimationId = "rbxassetid://71695001979420" -- If you will use my invis, please credit me.
+Anim.AnimationId = "rbxassetid://71695001979420" -- Hello probably limbus game developers. There are more animations that can make character quite invisible... It's just that I liked this variant more :)
 local loadedanim = Humanoid:LoadAnimation(Anim)
 loadedanim.Priority = Enum.AnimationPriority.Action4
 repeat task.wait() until loadedanim.Length > 0	
