@@ -432,8 +432,8 @@ end
 end; })
 MainTab:CreateSection("Stun Aura")
 MainTab:CreateToggle({Name = "Turn On/Off Stun Aura"; CurrentValue = false; Callback = function(Value)
-Module:StunAuraEnabled(Value)
 Rayfield:Notification("Success!", (Value==true and "Applied stun aura!" or "Disabled stun aura!"), 2, true)
+Module:StunAuraEnabled(Value)
 end; })
 
 
