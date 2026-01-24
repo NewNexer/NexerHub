@@ -242,6 +242,200 @@ end
 ClosestHRP = NewClosest
 end)
 end
+local noclip_connection = nil
+local camera_connection = nil
+function ApplyInvisibility(bool)
+if bool == false then
+task.spawn(function()
+for i,v in next, Humanoid:GetPlayingAnimationTracks() do
+if v.Animation.AnimationId=="rbxassetid://71695001979420" then
+v.Priority = Enum.AnimationPriority.Core
+v:AdjustSpeed(tonumber(0))
+v:Stop(tonumber(0))
+end
+end
+end)
+if noclip_connection then
+noclip_connection:Disconnect()
+noclip_connection = nil
+end
+if camera_connection then
+camera_connection:Disconnect()
+camera_connection = nil
+pcall(function()
+workspace.CurrentCamera.CameraSubject = Humanoid
+end)
+end
+elseif bool == true then
+local function nocollision()
+for i,v in pairs(LP.Character:GetDescendants()) do
+if v and v:IsA("BasePart") and v.CanCollide == true and v.Name ~= "HumanoidRootPart" then
+v.CanCollide = false
+end
+end
+if LP.Character:FindFirstChild("HumanoidRootPart") then
+LP.Character:FindFirstChild("HumanoidRootPart").CanCollide = true
+end
+end
+noclip_connection = game:GetService("RunService").Stepped:Connect(nocollision)
+workspace.CurrentCamera.CameraSubject = HumanoidRootPart
+camera_connection = workspace.CurrentCamera:GetPropertyChangedSignal("CameraSubject"):Connect(function()
+workspace.CurrentCamera.CameraSubject = HumanoidRootPart
+end)
+local Anim = Instance.new("Animation")
+Anim.AnimationId = "rbxassetid://71695001979420" -- Hello probably limbus game developers. There are more animations that can make character quite invisible... It's just that I liked this variant more :)
+local loadedanim = Humanoid:LoadAnimation(Anim)
+loadedanim.Priority = Enum.AnimationPriority.Action4
+repeat task.wait() until loadedanim.Length > 0	
+loadedanim:Play()
+repeat task.wait() until loadedanim.IsPlaying
+loadedanim:AdjustSpeed(tonumber(0))
+loadedanim.TimePosition = .65
+end
+end
+local MainTab = Window:CreateTab("Main",0)
+function GetFolderID(char)
+return game:GetService("ReplicatedStorage").src.Identities[tostring(char:GetAttribute("Character"))][tostring(char:GetAttribute("Identity"))]
+end
+MainTab:CreateSection("Invisibility")
+MainTab:CreateToggle({Name = "Turn On/Off Invisibility"; CurrentValue = false; Callback = function(Value)
+ApplyInvisibility(Value)
+Rayfield:Notification("Success!", (Value==true and "Applied invisibility!" or "Disabled invisibility!"), 2, true)
+end; })
+MainTab:CreateSection("S4 Abuse")
+MainTab:CreateParagraph({Title = "S4 Abuse", Content = "Some of the merges: Using shield skill as evade skill will make it unbreakable evade. Using counter skill as coin skill will instantly use counter attack."})
+local S4Method = "Shield"
+MainTab:CreateDropdown({Name = "S4 Methods"; Options = {"Shield","Evade","Counter","Coin"}; CurrentOption = S4Method; MultiSelection = false; Callback = function(Value)
+S4Method = Rayfield:GetDropdownValue(Value)
+end; })
+MainTab:CreateKeybind({Name = "Use S4 using choosen method"; CurrentKeybind = "C"; HoldToInteract = false; Callback = function(Value)
+game:GetService("ReplicatedStorage"):WaitForChild("Net"):WaitForChild("Character"):WaitForChild("Combat"):FireServer(unpack({{Module = GetFolderID(Character).Moves.Base.S4,Char = Character,HRP = HumanoidRootPart,Attempt = ""..S4Method.."Skill"}}))
+end; })
+MainTab:CreateSection("Counter Skill Abuse")
+MainTab:CreateParagraph({Title = "Counter Skill Abuse", Content = "You will be able to use your S1, S2 and S3 as counter skills"})
+MainTab:CreateKeybind({Name = "Use S1 as counter skill"; CurrentKeybind = "R"; HoldToInteract = false; Callback = function(Value)
+game:GetService("ReplicatedStorage"):WaitForChild("Net"):WaitForChild("Character"):WaitForChild("Combat"):FireServer(unpack({{Module = GetFolderID(Character).Moves.Base.S1,Char = Character,HRP = HumanoidRootPart,Attempt = "CounterSkill"}}))
+end; })
+MainTab:CreateKeybind({Name = "Use S2 as counter skill"; CurrentKeybind = "T"; HoldToInteract = false; Callback = function(Value)
+game:GetService("ReplicatedStorage"):WaitForChild("Net"):WaitForChild("Character"):WaitForChild("Combat"):FireServer(unpack({{Module = GetFolderID(Character).Moves.Base.S2,Char = Character,HRP = HumanoidRootPart,Attempt = "CounterSkill"}}))
+end; })
+MainTab:CreateKeybind({Name = "Use S3 as counter skill"; CurrentKeybind = "G"; HoldToInteract = false; Callback = function(Value)
+game:GetService("ReplicatedStorage"):WaitForChild("Net"):WaitForChild("Character"):WaitForChild("Combat"):FireServer(unpack({{Module = GetFolderID(Character).Moves.Base.S3,Char = Character,HRP = HumanoidRootPart,Attempt = "CounterSkill"}}))
+end; })
+MainTab:CreateLabel("Character Properties")
+MainTab:CreateButton({Name = "Infinite Light"; Callback = function(Value)
+Character:SetAttribute("Slot",0)
+Character:SetAttribute("MaxSlots",1500)
+end; })
+MainTab:CreateSection("God Mode")
+MainTab:CreateToggle({Name = "Turn On/Off God Mode"; CurrentValue = false; Callback = function(Value)
+if not Humanoid then Rayfield:Notification("Error!","No humanoid found.",3,false) return end
+if Value==true then
+Module:LG_GodModeToggle(true)
+Humanoid.Health = 0
+LocalPlayer.CharacterAdded:Once(function()
+task.wait(1)
+task.spawn(function()
+local Character = game.Players.LocalPlayer.Character
+local Humanoid = Character:WaitForChild("Humanoid")
+local RootPart = Character:WaitForChild("HumanoidRootPart")
+local Animator = Humanoid:WaitForChild("Animator")
+local currentAnim = ""
+local currentAnimTrack = nil
+local animationTable = {}
+local legacy_animations = {
+	idleAnimation = "http://www.roblox.com/asset/?id=180435571",
+	walkAnimation = "http://www.roblox.com/asset/?id=180426354",
+	jumpAnimation = "http://www.roblox.com/asset/?id=125750702",
+	fallAnimation = "http://www.roblox.com/asset/?id=180436148",
+	climbAnimation = "http://www.roblox.com/asset/?id=180436334",
+	sitAnimation = "http://www.roblox.com/asset/?id=178130996",
+}
+local idanims1 = game:GetService("ReplicatedStorage").src.Identities.Sinclair["The Middle Little Brother"].Animations
+local idanims2 = game:GetService("ReplicatedStorage").src.Identities.Gregor["Timekilling Time"].Animations
+local animations = {
+	idleAnimation = idanims2.Base.Normal.Idle.AnimationId,
+	walkAnimation = idanims1.Base.Normal.Walk.AnimationId,
+	jumpAnimation = "http://www.roblox.com/asset/?id=125750702",
+	fallAnimation = "http://www.roblox.com/asset/?id=180436148",
+	climbAnimation = "http://www.roblox.com/asset/?id=180436334",
+	sitAnimation = "http://www.roblox.com/asset/?id=178130996",
+}
+for animName, animId in pairs(animations) do
+	local anim = Instance.new("Animation")
+	anim.AnimationId = animId
+	animationTable[animName] = anim
+end
+local function StopAllAnimations()
+	if currentAnimTrack then
+		currentAnimTrack:Stop()
+		currentAnimTrack:Destroy()
+		currentAnimTrack = nil
+	end
+end
+local function PlayAnimation(animName)
+	if animName == currentAnim then return end
+	StopAllAnimations()
+	currentAnim = animName
+	currentAnimTrack = Animator:LoadAnimation(animationTable[animName])
+	currentAnimTrack:Play()
+end
+local function onSeated()
+	PlayAnimation("sitAnimation")
+end
+local function onJumping()
+	PlayAnimation("jumpAnimation")
+end
+local function onClimbing(speed)
+	if math.abs(speed) > 0.2 then
+		if currentAnim ~= "climbAnimation" then
+			PlayAnimation("climbAnimation")
+		elseif currentAnimTrack then
+			currentAnimTrack:AdjustSpeed(1)
+		end
+	else
+		if currentAnimTrack then
+			currentAnimTrack:AdjustSpeed(0)
+		end
+	end
+end
+local function onFalling()
+	PlayAnimation("fallAnimation")
+end
+local function onRunning(speed)
+	if speed > 0.2 then
+		PlayAnimation("walkAnimation")
+	else
+		PlayAnimation("idleAnimation")
+	end
+end
+Humanoid.Seated:Connect(function()
+	StopAllAnimations()
+	PlayAnimation("sitAnimation")
+end)
+Humanoid.Swimming:Connect(onRunning)
+Humanoid.Running:Connect(onRunning)
+Humanoid.FreeFalling:Connect(onFalling)
+Humanoid.Climbing:Connect(onClimbing)
+Humanoid.Jumping:Connect(onJumping)
+Humanoid.Died:Connect(function()
+	StopAllAnimations()
+	currentAnim = ""
+end)
+PlayAnimation("idleAnimation")
+end)
+end)
+elseif Value==false then
+Module:LG_GodModeToggle(false)
+Humanoid.Health = 0
+end
+end; })
+MainTab:CreateSection("Stun Aura")
+MainTab:CreateToggle({Name = "Turn On/Off Stun Aura"; CurrentValue = false; Callback = function(Value)
+Module:StunAuraEnabled(Value)
+Rayfield:Notification("Success!", (Value==true and "Applied stun aura!" or "Disabled stun aura!"), 2, true)
+end; })
+
 
 
 
@@ -309,90 +503,6 @@ for i = 1,4 do
 end
 return connections,parts
 end
-local noclip_connection = nil
-local camera_connection = nil
-function ApplyInvisibility(bool)
-if bool == false then
-task.spawn(function()
-for i,v in next, Humanoid:GetPlayingAnimationTracks() do
-if v.Animation.AnimationId=="rbxassetid://71695001979420" then
-v.Priority = Enum.AnimationPriority.Core
-v:AdjustSpeed(tonumber(0))
-v:Stop(tonumber(0))
-end
-end
-end)
-if noclip_connection then
-noclip_connection:Disconnect()
-noclip_connection = nil
-end
-if camera_connection then
-camera_connection:Disconnect()
-camera_connection = nil
-pcall(function()
-workspace.CurrentCamera.CameraSubject = Humanoid
-end)
-end
-elseif bool == true then
-local function nocollision()
-for i,v in pairs(LP.Character:GetDescendants()) do
-if v and v:IsA("BasePart") and v.CanCollide == true and v.Name ~= "HumanoidRootPart" then
-v.CanCollide = false
-end
-end
-if LP.Character:FindFirstChild("HumanoidRootPart") then
-LP.Character:FindFirstChild("HumanoidRootPart").CanCollide = true
-end
-end
-noclip_connection = game:GetService("RunService").Stepped:Connect(nocollision)
-workspace.CurrentCamera.CameraSubject = HumanoidRootPart
-camera_connection = workspace.CurrentCamera:GetPropertyChangedSignal("CameraSubject"):Connect(function()
-workspace.CurrentCamera.CameraSubject = HumanoidRootPart
-end)
-local Anim = Instance.new("Animation")
-Anim.AnimationId = "rbxassetid://71695001979420" -- Hello probably limbus game developers. There are more animations that can make character quite invisible... It's just that I liked this variant more :)
-local loadedanim = Humanoid:LoadAnimation(Anim)
-loadedanim.Priority = Enum.AnimationPriority.Action4
-repeat task.wait() until loadedanim.Length > 0	
-loadedanim:Play()
-repeat task.wait() until loadedanim.IsPlaying
-loadedanim:AdjustSpeed(tonumber(0))
-loadedanim.TimePosition = .65
-end
-end
-function GetFolderID(char)
-return game:GetService("ReplicatedStorage").src.Identities[tostring(char:GetAttribute("Character"))][tostring(char:GetAttribute("Identity"))]
-end
-
-IdentitiesTab:CreateSection("Universal")
-IdentitiesTab:CreateLabel("Invisibility")
-IdentitiesTab:CreateToggle({Name = "Turn On/Off Invisibility"; CurrentValue = false; Callback = function(Value)
-ApplyInvisibility(Value)
-Rayfield:Notification("Success!", (Value==true and "Applied invisibility!" or "Disabled invisibility!"), 2, true)
-end; })
-IdentitiesTab:CreateParagraph({Title = "S4 Abuse", Content = "Some of the merges: Using shield skill as evade skill will make it unbreakable evade. Using counter skill as coin skill will instantly use counter attack."})
-local S4Method = "Shield"
-IdentitiesTab:CreateDropdown({Name = "S4 Methods"; Options = {"Shield","Evade","Counter","Coin"}; CurrentOption = S4Method; MultiSelection = false; Callback = function(Value)
-S4Method = Rayfield:GetDropdownValue(Value)
-end; })
-IdentitiesTab:CreateKeybind({Name = "Use S4 using choosen method"; CurrentKeybind = "C"; HoldToInteract = false; Callback = function(Value)
-game:GetService("ReplicatedStorage"):WaitForChild("Net"):WaitForChild("Character"):WaitForChild("Combat"):FireServer(unpack({{Module = GetFolderID(Character).Moves.Base.S4,Char = Character,HRP = HumanoidRootPart,Attempt = ""..S4Method.."Skill"}}))
-end; })
-IdentitiesTab:CreateParagraph({Title = "Counter Skill Abuse", Content = "You will be able to use your S1, S2 and S3 as counter skills"})
-IdentitiesTab:CreateKeybind({Name = "Use S1 as counter skill"; CurrentKeybind = "R"; HoldToInteract = false; Callback = function(Value)
-game:GetService("ReplicatedStorage"):WaitForChild("Net"):WaitForChild("Character"):WaitForChild("Combat"):FireServer(unpack({{Module = GetFolderID(Character).Moves.Base.S1,Char = Character,HRP = HumanoidRootPart,Attempt = "CounterSkill"}}))
-end; })
-IdentitiesTab:CreateKeybind({Name = "Use S2 as counter skill"; CurrentKeybind = "T"; HoldToInteract = false; Callback = function(Value)
-game:GetService("ReplicatedStorage"):WaitForChild("Net"):WaitForChild("Character"):WaitForChild("Combat"):FireServer(unpack({{Module = GetFolderID(Character).Moves.Base.S2,Char = Character,HRP = HumanoidRootPart,Attempt = "CounterSkill"}}))
-end; })
-IdentitiesTab:CreateKeybind({Name = "Use S3 as counter skill"; CurrentKeybind = "G"; HoldToInteract = false; Callback = function(Value)
-game:GetService("ReplicatedStorage"):WaitForChild("Net"):WaitForChild("Character"):WaitForChild("Combat"):FireServer(unpack({{Module = GetFolderID(Character).Moves.Base.S3,Char = Character,HRP = HumanoidRootPart,Attempt = "CounterSkill"}}))
-end; })
-IdentitiesTab:CreateLabel("Character Properties")
-IdentitiesTab:CreateButton({Name = "Infinite Light"; Callback = function(Value)
-Character:SetAttribute("Slot",0)
-Character:SetAttribute("MaxSlots",1500)
-end; })
 IdentitiesTab:CreateSection("Timekilling Time")
 local connections,parts
 local AcceleratedDashHintsToggle = IdentitiesTab:CreateToggle({Name = "Accelerated Dash Hints Enabled"; CurrentValue = false; Callback = function(Value)
