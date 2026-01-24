@@ -366,7 +366,7 @@ end
 
 IdentitiesTab:CreateSection("Universal")
 IdentitiesTab:CreateLabel("Invisibility")
-Tab_7:CreateToggle({Name = "Turn On/Off Invisibility"; CurrentValue = false; Callback = function(Value)
+IdentitiesTab:CreateToggle({Name = "Turn On/Off Invisibility"; CurrentValue = false; Callback = function(Value)
 ApplyInvisibility(Value)
 Rayfield:Notification("Success!", (Value==true and "Applied invisibility!" or "Disabled invisibility!"), 2, true)
 end; })
