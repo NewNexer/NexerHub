@@ -194,7 +194,7 @@ function module:LG_GodModeToggle(val)
 if val==false then
 LG_GodMode("meursault kill that guy")
 elseif val==true then
-LG_GodMode("meursault spare that guy","LSb8ASF9k32iMFS73rtAJGAH3")
+LG_GodMode("meursault spare that guy","The Black Silence","The Red Gaze","The Red Mist")
 end
 end
 
