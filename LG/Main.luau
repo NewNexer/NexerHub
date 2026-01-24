@@ -397,7 +397,6 @@ IdentitiesTab:CreateSection("Timekilling Time")
 local connections,parts
 local AcceleratedDashHintsToggle = IdentitiesTab:CreateToggle({Name = "Accelerated Dash Hints Enabled"; CurrentValue = false; Callback = function(Value)
 DashHints = Value
-if not Character:FindFirstChild("TR") then Rayfield:Notification("Error!", "You need to be timekilling time gregor!", 3, false) return end
 if DashHints==false then
 if connections and parts then
 for _,conn in pairs(connections) do conn:Disconnect() end
@@ -407,25 +406,7 @@ parts = nil
 end
 return
 end
-Character.TR["Torso1"].GlitchEffect:GetPropertyChangedSignal("Enabled"):Connect(function()
-if Character.TR["Torso1"].GlitchEffect.Enabled==true and DashHints==true then
 connections,parts = CreateTimekillingTimeDashHints()
-elseif Character.TR["Torso1"].GlitchEffect.Enabled==false then
-if connections and parts then
-for _,conn in pairs(connections) do conn:Disconnect() end
-for _,part in pairs(parts) do part:Destroy() end
-connections = nil
-parts = nil
-end
-else end
-end)
-LocalPlayer.CharacterAdded:Once(function()
-if DashHints==true then
-task.spawn(function()
-AcceleratedDashHintsToggle:Set(false)
-end)
-end
-end)
 end; })
 
 
