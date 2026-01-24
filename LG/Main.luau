@@ -505,7 +505,7 @@ return connections,parts
 end
 IdentitiesTab:CreateSection("Timekilling Time")
 local connections,parts
-local AcceleratedDashHintsToggle = IdentitiesTab:CreateToggle({Name = "Accelerated Dash Hints Enabled"; CurrentValue = false; Callback = function(Value)
+IdentitiesTab:CreateToggle({Name = "Accelerated Dash Hints Enabled"; CurrentValue = false; Callback = function(Value)
 DashHints = Value
 if DashHints==false then
 if connections and parts then
@@ -518,6 +518,20 @@ return
 end
 connections,parts = CreateTimekillingTimeDashHints()
 end; })
+IdentitiesTab:CreateSection("Solemn Lament")
+IdentitiesTab:CreateToggle({Name = "Always Reloaded"; CurrentValue = false; Callback = function(Value)
+if Value==true then
+Heartbeat.AutoReloadSL = function() if Character then Character:SetAttribute("Reloaded",true) end end
+elseif Value==false then
+if Heartbeat.AutoReloadSL then
+Heartbeat.AutoReloadSL = nil
+end
+end
+end; })
+
+
+
+
 
 
 local Tab2 = Window:CreateTab("Local Player",0)
