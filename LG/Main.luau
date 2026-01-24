@@ -429,7 +429,8 @@ end; })
 Tab2:CreateButton({Name = "Set WalkSpeed"; Callback = function()
 Humanoid.WalkSpeed = WalkSpeed
 end; })
-local LoopWalkSpeedToggle = Tab2:CreateToggle({Name = "Loop Set WalkSpeed"; CurrentValue = false; Callback = function(Value)
+local LoopWalkSpeedToggle
+LoopWalkSpeedToggle = Tab2:CreateToggle({Name = "Loop Set WalkSpeed"; CurrentValue = false; Callback = function(Value)
 if Value == true then
 local CurrentHumanoid = Humanoid
 PropertyBeatSet("LoopWalkSpeed","AddBeat", Humanoid,"WalkSpeed",function() if Humanoid~=CurrentHumanoid then LoopWalkSpeedToggle:Set(false) end Humanoid.WalkSpeed = WalkSpeed end)
@@ -452,7 +453,8 @@ end; })
 Tab2:CreateButton({Name = "Set JumpPower"; Callback = function()
 Humanoid.JumpPower = JumpPower
 end; })
-local LoopJumpPowerToggle = Tab2:CreateToggle({Name = "Loop Set JumpPower"; CurrentValue = false; Callback = function(Value)
+local LoopJumpPowerToggle
+LoopJumpPowerToggle = Tab2:CreateToggle({Name = "Loop Set JumpPower"; CurrentValue = false; Callback = function(Value)
 if Value == true then
 local CurrentHumanoid = Humanoid
 PropertyBeatSet("LoopJumpPower","AddBeat", Humanoid,"WalkSpeed",function() if Humanoid~=CurrentHumanoid then LoopJumpPowerToggle:Set(false) end Humanoid.JumpBoost = JumpBoost end)
