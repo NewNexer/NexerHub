@@ -3544,13 +3544,8 @@ end
 Tab_7:CreateSection("Invisibility")
 Tab_7:CreateToggle({Name = "Turn On/Off Invisibility"; CurrentValue = false; Callback = function(Value)
 if not _G.HasPremium then Rayfield:Notification("Error!", "You need premium to unlock this feature!", 4, warn) setclipboard(tostring("https://discord.gg/7u5GRNw3xn")) return end
-if Value == false then
 ApplyInvisibility(Value)
-Rayfield:Notification("Success!", "Disabled invisibility!", 2, true)
-elseif Value == true then
-ApplyInvisibility(Value)
-Rayfield:Notification("Success!", "Applied invisibility!", 2, true)
-end
+Rayfield:Notification("Success!", (Value==true and "Applied invisibility!" or "Disabled invisibility!"), 2, true)
 end; })
 function InitInfCloak(d)
         local temp_humanoid = d:WaitForChild("Humanoid")
