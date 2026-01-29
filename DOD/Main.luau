@@ -967,7 +967,7 @@ end
 return (GetLegitMaxStamina()-CalculateObesityTax()-CalculateRevolverTax())
 end
 local InfStaminaenabled = false
-Tab_1:CreateToggle({Name = "Infinite Stamina"; CurrentValue = NoFatigue; Callback = function(Value)
+Tab_1:CreateToggle({Name = "Infinite Stamina"; CurrentValue = InfStaminaenabled; Callback = function(Value)
 InfStaminaenabled = Value
 Character:SetAttribute("MaxStamina",(Value==true and 9e9 or GetLegitStamina()))
 task.wait(0)
