@@ -597,6 +597,7 @@ end; })
 
 
 local Tab3 = Window:CreateTab("Other",0)
+--[[
 Tab3:CreateButton({Name = "EXTERMINATE THE CLOSEST PLAYER TO YOU. [ Don't spam ]"; Callback = function()
 local spinning = true
 local a = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(game:GetService("ReplicatedStorage").src.Identities.Meursault["The Thumb East Capo IIII"].Animations.Base.Attack.Combo3)
@@ -667,7 +668,7 @@ until not TargetHumanoid or TargetHumanoid.Health < 1
 spinning = false
 BodyVelocity:Destroy()
 end; })
-
+]]--
 
 Tab3:CreateButton({Name = "Close Hub"; Callback = function()
 for i,v in next, Heartbeat do
