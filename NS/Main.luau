@@ -154,8 +154,33 @@ end)]]--
 Tabs And Main Functions
 
 ]]--
-local Tab1 = Window:CreateTab("Main",0)
-Tab1:CreateParagraph({Title = "Main", Content = "Nothing there yet."})
+
+local Tab1 = Window:CreateTab("Gifts",0)
+Tab1:CreateParagraph({Title = "Gifts", Content = "Gifts pick-up aura and more"})
+Tab1:CreateSection("Normal Gifts")
+local NG_Distance, NG_Cooldown = 40, 0.12
+Tab1:CreateLabel("Warning! Changing to a faster speed or further distance *may* result in a ban ( anti-cheat )")
+Tab1:CreateSlider({Name = "Pick up speed"; Range = {0,0.5}; Increment = 0.02; Suffix = " seconds"; CurrentValue = 0.12; Callback = function(Value)
+NG_Cooldown = tonumber(Value)
+end; })
+Tab1:CreateSlider({Name = "Pick up distance"; Range = {0,50}; Increment = 1; Suffix = " studs"; CurrentValue = 40; Callback = function(Value)
+NG_Distance = tonumber(Value)
+end; })
+Tab1:CreateToggle({Name = "Enable pick-up aura"; CurrentValue = false; Callback = function(Value)
+
+end; })
+Tab1:CreateSection("Golden Gifts")
+local GG_Distance, GG_Cooldown = 40, 0.12
+Tab1:CreateLabel("Warning! Changing to a faster speed or further distance *may* result in a ban ( anti-cheat )")
+Tab1:CreateSlider({Name = "Pick up speed"; Range = {0,0.5}; Increment = 0.02; Suffix = " seconds"; CurrentValue = 0.12; Callback = function(Value)
+GG_Cooldown = tonumber(Value)
+end; })
+Tab1:CreateSlider({Name = "Pick up distance"; Range = {0,50}; Increment = 1; Suffix = " studs"; CurrentValue = 40; Callback = function(Value)
+GG_Distance = tonumber(Value)
+end; })
+Tab1:CreateToggle({Name = "Enable pick-up aura"; CurrentValue = false; Callback = function(Value)
+
+end; })
 
 
 
