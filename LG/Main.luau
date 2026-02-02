@@ -528,6 +528,11 @@ Heartbeat.AutoReloadSL = nil
 end
 end
 end; })
+IdentitiesTab:CreateSection("Lei Heng ( Thumbsault )")
+IdentitiesTab:CreateButton({Name = "Reload bullets and get shin"; Callback = function(Value)
+local args = {{Module = game:GetService("ReplicatedStorage").src.Others["Lei Heng"]["The Thumb East Capo IIII"].Moves.Base.M2.Combos["1"],Humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid"),Attempt = "M1",HRP = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart"),Char = game.Players.LocalPlayer.Character}}
+game:GetService("ReplicatedStorage"):WaitForChild("Net"):WaitForChild("Character"):WaitForChild("Combat"):FireServer(unpack(args))
+end; })
 
 
 
@@ -651,12 +656,12 @@ end)
 local TargetHumanoid = ClosestHRP.Parent:FindFirstChildOfClass("Humanoid")
 local localPlayer = game.Players.LocalPlayer
 repeat task.wait()
-for i,v in next,game:GetService("ReplicatedStorage").src:GetDescendants() do
+for i,v in next,game:GetService("ReplicatedStorage").src.Identities:GetDescendants() do
 if v and v:IsA("ModuleScript") and tonumber(v.Name)~=nil and (v.Parent.Name == "Coinss" or (v.Parent.Name == "Combos" and tonumber(v.Name)~=3)) then
 BodyVelocity.Position = ClosestHRP.Position
 local args = {{Module = v,Humanoid = localPlayer.Character:WaitForChild("Humanoid"),Attempt = "M1",HRP = localPlayer.Character:WaitForChild("HumanoidRootPart"),Char = localPlayer.Character}}
 game:GetService("ReplicatedStorage"):WaitForChild("Net"):WaitForChild("Character"):WaitForChild("Combat"):FireServer(unpack(args))
-task.wait(.135)
+task.wait(.65)
 if not TargetHumanoid or TargetHumanoid.Health < 1 then
 spinning = false
 BodyVelocity:Destroy()
