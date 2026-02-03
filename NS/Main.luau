@@ -219,6 +219,62 @@ GiftAura("Golden",Value,GG_Distance,GG_Cooldown)
 end; })
 
 
+function GetEnemies(a,b)
+for i,v in next, workspace.Enemies:GetChildren() do
+if v and v.Name==a then
+b(v)
+end
+end
+end
+local deleted_instances = {}
+function RemoveInstance(a)
+deleted_instances[a.Name] = {["Instance"]=a;["Parent"]=a.Parent;}
+a.Parent = nil
+end
+function RestoreInstance(a)
+if deleted_instances[a]~=nil then
+deleted_instances[a]["Instance"].Parent = deleted_instances[a]["Parent"]
+end
+end
+local Tab3 = Window:CreateTab("Enemies",0)
+Tab3:CreateParagraph({Title = "Enemies", Content = "Enemies configurations"})
+Tab3:CreateSection("Bell")
+Tab3:CreateButton({Name = "Destroy Bell"; Callback = function()
+pcall(function() GetEnemies("Bell",function(a) a:Destroy() end) end)
+end; })
+Tab3:CreateSection("Mart")
+Tab3:CreateButton({Name = "Destroy Mart"; Callback = function()
+pcall(function() GetEnemies("Mart",function(a) a:Destroy() end) end)
+end; })
+Tab3:CreateButton({Name = "Remove Mart Sounds"; Callback = function()
+pcall(function() GetEnemies("Mart",function(a) a.Mart:Destroy() end) end)
+end; })
+Tab3:CreateSection("Baby")
+Tab3:CreateButton({Name = "Destroy Baby"; Callback = function()
+pcall(function() GetEnemies("Baby",function(a) a:Destroy() end) end)
+end; })
+Tab3:CreateButton({Name = "Remove Baby Screams"; Callback = function()
+pcall(function() GetEnemies("Baby",function(a) a.Scream:Destroy() end) end)
+end; })
+Tab3:CreateSection("Flesh")
+Tab3:CreateButton({Name = "Destroy Flesh"; Callback = function()
+pcall(function() GetEnemies("Flesh",function(a) a:Destroy() end) end)
+end; })
+Tab3:CreateSection("Dozer")
+Tab3:CreateButton({Name = "Make Dozer Friendly"; Callback = function()
+pcall(function()
+if game.ReplicatedStorage.Events:FindFirstChild("ResetBindable") then
+RemoveInstance(game.ReplicatedStorage.Events:FindFirstChild("ResetBindable"))
+end
+if game.ReplicatedStorage.Events:FindFirstChild("DiedBindable") then
+RemoveInstance(game.ReplicatedStorage.Events:FindFirstChild("DiedBindable"))
+end
+game.Players.LocalPlayer.CharacterAdded:Once(function()
+RestoreInstance("ResetBindable")
+RestoreInstance("DiedBindable")
+end)
+end)
+end; })
 
 
 
