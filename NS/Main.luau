@@ -154,6 +154,9 @@ end)]]--
 Tabs And Main Functions
 
 ]]--
+
+
+
 --GiftAura("Normal",true,40,0.12)
 local NG_aura_enabled = false
 local GG_aura_enabled = false
@@ -193,6 +196,7 @@ end
 end
 local Tab1 = Window:CreateTab("Gifts",0)
 Tab1:CreateParagraph({Title = "Gifts", Content = "Gifts pick-up aura and more"})
+Tab1:CreateSection("Auto Farm")
 Tab1:CreateSection("Normal Gifts")
 local NG_Distance, NG_Cooldown = 40, 0.12
 Tab1:CreateLabel("Warning! Changing to a faster speed or further distance *may* result in a ban ( anti-cheat )")
@@ -343,6 +347,35 @@ if workspace.Gravity<110 then
 workspace.Gravity = 110
 end
 end)
+local AutoProtectTripmines = false
+if workspace:FindFirstChild("ProtectedTripmines") == nil then
+local a = Instance.new("Folder")
+a.Name = "ProtectedTripmines"
+a.Parent = workspace
+end
+function AutoProtectTripmines()
+task.spawn(function()
+while task.wait(.1) do
+if AutoProtectTripmines==false then wait(999999999) break end
+for i,v in next, workspace:WaitForChild("ItemPools", 9e9):WaitForChild("Tripmines", 9e9):GetChildren() do
+if HRP~=nil and v:GetAttribute("StartPosition")~=nil and workspace:FindFirstChild("ProtectedTripmines") and workspace.ProtectedTripmines:FindFirstChild(tostring(v))==nil then
+local sizeoffset = tonumber(v.Size.X) + 2
+local a = Instance.new("Part")
+a.Name = tostring(v)
+a.Position = v:GetAttribute("StartPosition")
+a.Size = Vector3.new(sizeoffset,sizeoffset,sizeoffset)
+a.Parent = workspace.ProtectedTripmines
+task.delay(1, function()
+workspace.CurrentRooms.ChildAdded:Once(function(c)
+if c:IsA("Model") then a:Destroy() end
+end)
+end)
+task.wait(.01)
+end
+end
+end
+end)
+end
 local Tab4 = Window:CreateTab("Immunities",0)
 Tab4:CreateParagraph({Title = "Immunities", Content = "Immunities management"})
 Tab4:CreateSection("Enemies")
@@ -376,6 +409,10 @@ Tab4:CreateToggle({Name = "Immunity to Void"; CurrentValue = false; Callback = f
 workspace.AntiVoid.CanTouch = Value
 workspace.AntiVoid.CanCollide = Value
 end; })
+Tab4:CreateToggle({Name = "Auto-Create Protection from Tripmines"; CurrentValue = false; Callback = function(Value)
+AutoProtectTripmines = Value
+if Value==true then AutoProtectTripmines() end
+end; })
 Tab4:CreateToggle({Name = "Auto-Remove Ice Tiles"; CurrentValue = false; Callback = function(Value)
 AutoRemoveIceTiles = Value
 for _,c in next, workspace.CurrentRooms:GetDescendants() do
@@ -390,7 +427,6 @@ if workspace.Gravity<110 and Value==true then
 workspace.Gravity = 110
 end
 end; })
-
 
 
 
