@@ -289,31 +289,29 @@ local Value = Rayfield:GetDropdownValue(Value) -- returns string
 print(Value)
 end; })
 ]]--
-local Tab2 = Window:CreateTab("Local Player",0)
-Tab2:CreateParagraph({Title = "Local Player", Content = "Local Player Management"})
-local WalkSpeed = 0
+local Tab2 = Window:CreateTab("Movement",0)
+Tab2:CreateParagraph({Title = "Movement", Content = "Movement Management"})
+local Gravity = 0
 local JumpPower = 0
-Tab2:CreateSection("WalkSpeed")
-local CurrentWalkSpeedLabel = Tab2:CreateLabel("Your current WalkSpeed is ???")
-Heartbeat.CurrentWalkSpeed = function()
+Tab2:CreateSection("Gravity")
+local CurrentGravityLabel = Tab2:CreateLabel("Your current Gravity is ???")
+Heartbeat.CurrentGravity = function()
 pcall(function()
-if Humanoid then
-CurrentWalkSpeedLabel:Set("Your current WalkSpeed is "..tostring(Humanoid.WalkSpeed).."")
-end
+CurrentGravityLabel:Set("Your current Gravity is "..tostring(workspace.Gravity).."")
 end)
 end
-Tab2:CreateInput({Name = "WalkSpeed"; PlaceholderText = "0"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-WalkSpeed = tonumber(Value)
+Tab2:CreateInput({Name = "Gravity"; PlaceholderText = "110"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+Gravity = tonumber(Value)
 end; })
-Tab2:CreateButton({Name = "Set WalkSpeed"; Callback = function()
-Humanoid.WalkSpeed = WalkSpeed
+Tab2:CreateButton({Name = "Set Gravity"; Callback = function()
+workspace.Gravity = Gravity
 end; })
-Tab2:CreateToggle({Name = "Loop Set WalkSpeed"; CurrentValue = false; Callback = function(Value)
+Tab2:CreateToggle({Name = "Loop Set Gravity"; CurrentValue = false; Callback = function(Value)
 if Value == true then
-Heartbeat.LoopWalkSpeed = function() Humanoid.WalkSpeed = WalkSpeed end
+Heartbeat.LoopGravity = function() workspace.Gravity = Gravity end
 elseif Value == false then
-if Heartbeat.LoopWalkSpeed~=nil then
-Heartbeat.LoopWalkSpeed = nil
+if Heartbeat.LoopGravity~=nil then
+Heartbeat.LoopGravity = nil
 end
 end
 end; })
