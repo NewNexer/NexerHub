@@ -260,8 +260,8 @@ Tab3:CreateSection("Flesh")
 Tab3:CreateButton({Name = "Destroy Flesh"; Callback = function()
 pcall(function() GetEnemies("Flesh",function(a) a:Destroy() end) end)
 end; })
-Tab3:CreateSection("Dozer")
-Tab3:CreateButton({Name = "Make Dozer Friendly"; Callback = function()
+Tab3:CreateSection("Dozer/Kookoo")
+Tab3:CreateButton({Name = "Make Dozer/Kookoo Friendly"; Callback = function()
 pcall(function()
 if game.ReplicatedStorage.Events:FindFirstChild("ResetBindable") then
 RemoveInstance(game.ReplicatedStorage.Events:FindFirstChild("ResetBindable"))
@@ -275,7 +275,11 @@ RestoreInstance("DiedBindable")
 end)
 end)
 end; })
-
+Tab3:CreateSection("Skinwalker")
+Tab3:CreateButton({Name = "Destroy Skinwalker"; Callback = function()
+pcall(function() GetEnemies("Skinwalker",function(a) a:Destroy() end) end)
+pcall(function() workspace.Skinwalkers:ClearAllChildren() end)
+end; })
 
 
 
