@@ -217,6 +217,16 @@ end; })
 Tab1:CreateToggle({Name = "Enable pick-up aura"; CurrentValue = false; Callback = function(Value)
 GiftAura("Golden",Value,GG_Distance,GG_Cooldown)
 end; })
+Tab1:CreateSection("Beam")
+Tab1:CreateButton({Name = "Escape into Beam"; Callback = function()
+local a = workspace.Beacon.CFrame
+workspace.Beacon.CFrame = HumanoidRootPart.CFrame
+task.wait(1)
+workspace.Beacon.CFrame = a
+end; })
+
+
+
 
 
 function GetEnemies(a,b)
@@ -283,6 +293,107 @@ end; })
 
 
 
+
+
+local 2DImmunity = false
+local SkilwalkerImmunity = false
+workspace.Enemies.ChildAdded:Connect(function(c)
+if 2DImmunity~=true then return end
+if c:IsA("BasePart") then
+c.CanTouch=false
+pcall(function() c.TouchInterest:Destroy() end)
+pcall(function() c:FindFirstChildOfClass("TouchTransmitter"):Destroy() end)
+end
+end)
+workspace.Skinwalkers.DescendantAdded:Connect(function(c)
+if SkilwalkerImmunity~=true then return end
+if c:IsA("BasePart") then
+c.CanTouch=false
+pcall(function() c.TouchInterest:Destroy() end)
+pcall(function() c:FindFirstChildOfClass("TouchTransmitter"):Destroy() end)
+end
+end)
+if workspace:FindFirstChild("AntiVoid")==nil then
+local a = workspace.KillVoid:Clone()
+a.Position = workspace.KillVoid.Position + Vector3.new(0,20,0)
+a.CanTouch = false
+pcall(function() a.TouchInterest:Destroy() end)
+pcall(function() a:FindFirstChildOfClass("TouchTransmitter"):Destroy() end)
+task.wait()
+a.CanCollide = false
+a.Transparency = 1
+a.Name = "AntiVoid"
+a.Parent = workspace
+a.Touched:Connect(function(h)
+if h:IsA("Part") and game.Players:GetPlayerFromCharacter(h.Parent) then
+game.Players:GetPlayerFromCharacter(h.Parent).Character.HumanoidRootPart.CFrame = workspace.Spawn.CFrame * CFrame.new(0,20,0)
+end
+end)
+end
+local AutoRemoveIceTiles = false
+workspace.CurrentRooms.DescendantAdded:Connect(function(c)
+if AutoRemoveIceTiles~=true then return end
+if c:IsA("BasePart") and c.Material==Enum.Material.Ice then
+c.Material=Enum.Material.Plastic
+end
+end)
+local AutoRemoveGravityDebuff = false
+workspace:GetPropertyChangedSignal("Gravity"):Connect(function()
+if workspace.Gravity<110 then
+workspace.Gravity = 110
+end
+end)
+local Tab4 = Window:CreateTab("Immunities",0)
+Tab4:CreateParagraph({Title = "Immunities", Content = "Immunities management"})
+Tab4:CreateSection("Enemies")
+Tab4:CreateLabel("2D enemies: Bell, Mart, Baby, Flesh and others. ( except dozer and kookoo )")
+Tab4:CreateToggle({Name = "Immunity to all 2D enemies"; CurrentValue = false; Callback = function(Value)
+2DImmunity = Value
+for _,c in next, workspace.Enemies:GetChildren() do
+if c:IsA("BasePart") then
+c.CanTouch = not Value
+if Value==true then
+pcall(function() c.TouchInterest:Destroy() end)
+pcall(function() c:FindFirstChildOfClass("TouchTransmitter"):Destroy() end)
+end
+end
+end
+end; })
+Tab4:CreateToggle({Name = "Immunity to all skinwalker types"; CurrentValue = false; Callback = function(Value)
+SkilwalkerImmunity = Value
+for _,c in next, workspace.Skinwalkers:GetDescendants() do
+if c:IsA("BasePart") then
+c.CanTouch = not Value
+if Value==true then
+pcall(function() c.TouchInterest:Destroy() end)
+pcall(function() c:FindFirstChildOfClass("TouchTransmitter"):Destroy() end)
+end
+end
+end
+end; })
+Tab4:CreateSection("Map")
+Tab4:CreateToggle({Name = "Immunity to Void"; CurrentValue = false; Callback = function(Value)
+workspace.AntiVoid.CanTouch = Value
+workspace.AntiVoid.CanCollide = Value
+end; })
+Tab4:CreateToggle({Name = "Auto-Remove Ice Tiles"; CurrentValue = false; Callback = function(Value)
+AutoRemoveIceTiles = Value
+for _,c in next, workspace.CurrentRooms:GetDescendants() do
+if c:IsA("BasePart") and c.Material==Enum.Material.Ice then
+c.Material=Enum.Material.Plastic
+end
+end
+end; })
+Tab4:CreateToggle({Name = "Auto-Remove Gravity Debuffs"; CurrentValue = false; Callback = function(Value)
+AutoRemoveGravityDebuff = Value
+if workspace.Gravity<110 and Value==true then
+workspace.Gravity = 110
+end
+end; })
+
+
+
+
 --[[
 Tab1:CreateDropdown({Name = "Dropdown"; Options = {"1","2"}; CurrentOption = "1"; MultiSelection = false; Callback = function(Value)
 local Value = Rayfield:GetDropdownValue(Value) -- returns string
@@ -342,4 +453,31 @@ end; })
 Tab2:CreateSection("Camera")
 Tab2:CreateSlider({Name = "FOV"; Range = {0,360}; Increment = 1; Suffix = ""; CurrentValue = workspace.CurrentCamera.FieldOfView; Callback = function(Value)
 workspace.CurrentCamera.FieldOfView = Value
+end; })
+
+
+
+
+local Other = Window:CreateTab("Other",0)
+Other:CreateParagraph({Title = "Other", Content = "Other things"})
+Other:CreateButton({Name = "Instant Respawn ( Void )"; Callback = function()
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Died"):FireServer("Void",false)
+end; })
+Other:CreateButton({Name = "Unlock Reset Button"; Callback = function()
+game.StarterGui:SetCore("ResetButtonCallback", true)
+end; })
+Other:CreateButton({Name = "Create Solo Server"; Callback = function()
+game:GetService("ReplicatedStorage"):WaitForChild("Servers"):WaitForChild("CreateLobby"):InvokeServer(unpack({2,true,1,0,false,false,true}))
+end; })
+Other:CreateButton({Name = "Create Solo Server"; Callback = function()
+game:GetService("ReplicatedStorage"):WaitForChild("Servers"):WaitForChild("CreateLobby"):InvokeServer(unpack({2,true,1,0,false,false,true}))
+end; })
+Tab3:CreateButton({Name = "Close Hub"; Callback = function()
+for i,v in next, Heartbeat do
+if i then
+Heartbeat[i] = nil
+end
+end
+rscon:Disconnect()
+Rayfield:Destroy()
 end; })
