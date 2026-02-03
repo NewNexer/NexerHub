@@ -164,7 +164,7 @@ NG_aura_enabled = b
 if b~=true then return end
 task.spawn(function()
 while task.wait(.1) do
-if NG_aura_enabled==true then wait(999999999) break end
+if NG_aura_enabled==false then wait(999999999) break end
 for i,v in next, workspace:WaitForChild("ItemPools", 9e9):WaitForChild("NormalGifts", 9e9):GetChildren() do
 if HRP~=nil and v:GetAttribute("StartPosition")~=nil and v:GetAttribute("Collected")==false and v:GetAttribute("ClientCollected")==false and (HRP.Position-v:GetAttribute("StartPosition")).magnitude<c then
 game:GetService("ReplicatedStorage"):WaitForChild("Events", 9e9):WaitForChild("GiftCollected", 9e9):FireServer(v)
@@ -179,7 +179,7 @@ GG_aura_enabled = b
 if b~=true then return end
 task.spawn(function()
 while task.wait(.1) do
-if GG_aura_enabled==true then wait(999999999) break end
+if GG_aura_enabled==false then wait(999999999) break end
 for i,v in next, workspace:WaitForChild("ItemPools", 9e9):WaitForChild("GoldenGifts", 9e9):GetChildren() do
 if HRP~=nil and v:GetAttribute("StartPosition")~=nil and v:GetAttribute("Collected")==false and v:GetAttribute("ClientCollected")==false and (HRP.Position-v:GetAttribute("StartPosition")).magnitude<c then
 game:GetService("ReplicatedStorage"):WaitForChild("Events", 9e9):WaitForChild("GiftCollected", 9e9):FireServer(v)
