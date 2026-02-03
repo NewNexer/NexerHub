@@ -154,7 +154,43 @@ end)]]--
 Tabs And Main Functions
 
 ]]--
-
+--GiftAura("Normal",true,40,0.12)
+local NG_aura_enabled = false
+local GG_aura_enabled = false
+function GiftAura(...)
+local a,b,c,d = ...
+if a=="Normal" then
+NG_aura_enabled = b
+if b~=true then return end
+task.spawn(function()
+while task.wait(.1) do
+if NG_aura_enabled==true then wait(999999999) break end
+for i,v in next, workspace:WaitForChild("ItemPools", 9e9):WaitForChild("NormalGifts", 9e9):GetChildren() do
+if HRP~=nil and v:GetAttribute("StartPosition")~=nil and v:GetAttribute("Collected")==false and v:GetAttribute("ClientCollected")==false and (HRP.Position-v:GetAttribute("StartPosition")).magnitude<c then
+game:GetService("ReplicatedStorage"):WaitForChild("Events", 9e9):WaitForChild("GiftCollected", 9e9):FireServer(v)
+v:SetAttribute("ClientCollected",true)
+task.wait(d)
+end
+end
+end
+end)
+elseif a=="Golden" then
+GG_aura_enabled = b
+if b~=true then return end
+task.spawn(function()
+while task.wait(.1) do
+if GG_aura_enabled==true then wait(999999999) break end
+for i,v in next, workspace:WaitForChild("ItemPools", 9e9):WaitForChild("GoldenGifts", 9e9):GetChildren() do
+if HRP~=nil and v:GetAttribute("StartPosition")~=nil and v:GetAttribute("Collected")==false and v:GetAttribute("ClientCollected")==false and (HRP.Position-v:GetAttribute("StartPosition")).magnitude<c then
+game:GetService("ReplicatedStorage"):WaitForChild("Events", 9e9):WaitForChild("GiftCollected", 9e9):FireServer(v)
+v:SetAttribute("ClientCollected",true)
+task.wait(d)
+end
+end
+end
+end)
+end
+end
 local Tab1 = Window:CreateTab("Gifts",0)
 Tab1:CreateParagraph({Title = "Gifts", Content = "Gifts pick-up aura and more"})
 Tab1:CreateSection("Normal Gifts")
@@ -167,7 +203,7 @@ Tab1:CreateSlider({Name = "Pick up distance"; Range = {0,50}; Increment = 1; Suf
 NG_Distance = tonumber(Value)
 end; })
 Tab1:CreateToggle({Name = "Enable pick-up aura"; CurrentValue = false; Callback = function(Value)
-
+GiftAura("Normal",Value,NG_Distance,NG_Cooldown)
 end; })
 Tab1:CreateSection("Golden Gifts")
 local GG_Distance, GG_Cooldown = 40, 0.12
@@ -179,7 +215,7 @@ Tab1:CreateSlider({Name = "Pick up distance"; Range = {0,50}; Increment = 1; Suf
 GG_Distance = tonumber(Value)
 end; })
 Tab1:CreateToggle({Name = "Enable pick-up aura"; CurrentValue = false; Callback = function(Value)
-
+GiftAura("Golden",Value,GG_Distance,GG_Cooldown)
 end; })
 
 
