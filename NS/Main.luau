@@ -295,10 +295,10 @@ end; })
 
 
 
-local 2DImmunity = false
+local Immunity_2D = false
 local SkilwalkerImmunity = false
 workspace.Enemies.ChildAdded:Connect(function(c)
-if 2DImmunity~=true then return end
+if Immunity_2D~=true then return end
 if c:IsA("BasePart") then
 c.CanTouch=false
 pcall(function() c.TouchInterest:Destroy() end)
@@ -348,7 +348,7 @@ Tab4:CreateParagraph({Title = "Immunities", Content = "Immunities management"})
 Tab4:CreateSection("Enemies")
 Tab4:CreateLabel("2D enemies: Bell, Mart, Baby, Flesh and others. ( except dozer and kookoo )")
 Tab4:CreateToggle({Name = "Immunity to all 2D enemies"; CurrentValue = false; Callback = function(Value)
-2DImmunity = Value
+Immunity_2D = Value
 for _,c in next, workspace.Enemies:GetChildren() do
 if c:IsA("BasePart") then
 c.CanTouch = not Value
