@@ -530,8 +530,7 @@ end
 end; })
 IdentitiesTab:CreateSection("Lei Heng ( Thumbsault )")
 IdentitiesTab:CreateButton({Name = "Reload bullets and get shin"; Callback = function(Value)
-local args = {{Module = game:GetService("ReplicatedStorage").src.Others["Lei Heng"]["The Thumb East Capo IIII"].Moves.Base.M2.Combos["1"],Humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid"),Attempt = "M1",HRP = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart"),Char = game.Players.LocalPlayer.Character}}
-game:GetService("ReplicatedStorage"):WaitForChild("Net"):WaitForChild("Character"):WaitForChild("Combat"):FireServer(unpack(args))
+game:GetService("ReplicatedStorage"):WaitForChild("Net"):WaitForChild("Character"):WaitForChild("Combat"):FireServer({Module = game:GetService("ReplicatedStorage").src.Others["Lei Heng"]["The Thumb East Capo IIII"].Moves.Base.M2.Combos["1"],Humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid"),Attempt = "M1",HRP = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart"),Char = game.Players.LocalPlayer.Character})
 end; })
 
 
