@@ -438,6 +438,11 @@ local a = Instance.new("Folder")
 a.Name = "ProtectedTripmines"
 a.Parent = workspace
 end
+workspace.CurrentRooms.ChildAdded:Once(function()
+for i,v in next, workspace.ProtectedTripmines:GetChildren() do
+if v then v:Destroy() end
+end
+end)
 function AutoProtectTripmines()
 task.spawn(function()
 while task.wait(.1) do
@@ -452,9 +457,6 @@ a.Position = v:GetAttribute("StartPosition")
 a.Size = Vector3.new(sizeoffset,sizeoffset,sizeoffset)
 a.Anchored = true
 a.Parent = workspace.ProtectedTripmines
-workspace.CurrentRooms.ChildAdded:Once(function(c)
-if c:IsA("Model") then a:Destroy() end
-end)
 v:GetPropertyChangedSignal("Transparency"):Once(function()
 a:Destroy()
 end)
