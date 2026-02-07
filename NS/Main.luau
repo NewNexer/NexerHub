@@ -427,19 +427,18 @@ if AutoProtectTripminess==false then break end
 for i,v in next, workspace:WaitForChild("ItemPools", 9e9):WaitForChild("Tripmines", 9e9):GetChildren() do
 if v and not v:GetAttribute("uuid") or v:GetAttribute("uuid")==nil then v:SetAttribute("uuid",tostring(game:GetService("HttpService"):GenerateGUID(false))) end
 if HRP~=nil and v and v:GetAttribute("StartPosition")~=nil and workspace:FindFirstChild("ProtectedTripmines") and workspace.ProtectedTripmines:FindFirstChild(v:GetAttribute("uuid"))==nil then
-task.delay(1, function()
 local sizeoffset = tonumber(v.Size.X) + 2.5
 local a = Instance.new("Part")
 a.Name = v:GetAttribute("uuid")
 a.Position = v:GetAttribute("StartPosition")
 a.Size = Vector3.new(sizeoffset,sizeoffset,sizeoffset)
+a.Anchored = true
 a.Parent = workspace.ProtectedTripmines
 workspace.CurrentRooms.ChildAdded:Once(function(c)
 if c:IsA("Model") then a:Destroy() end
 end)
 v:GetPropertyChangedSignal("Transparency"):Once(function()
 a:Destroy()
-end)
 end)
 task.wait(.01)
 end
