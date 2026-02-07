@@ -226,14 +226,16 @@ return AvailableGift
 end
 local G_Speed = 0.16
 local G_AutoFarmEnabled = false
+local G_CanEscape = true
 function GiftAutoFarm(a)
 G_AutoFarmEnabled = a
 if a~=true then return end
 task.spawn(function()
 while task.wait(.1) do
-if G_AutoFarmEnabled==false then break end
+if G_AutoFarmEnabled==false then workspace.Beacon.CanTouch = true task.wait(.1) break end
 local AvailableGift = GetAvailableGift("Closest")
 if AvailableGift.Name~="Spawn" then
+workspace.Beacon.CanTouch = G_CanEscape
 local GiftPosition = AvailableGift:GetAttribute("StartPosition")
 local Speed = ((GiftPosition-HumanoidRootPart.Position).magnitude<51 and G_Speed) or (G_Speed+1) 
 if Speed>1 then
@@ -246,6 +248,9 @@ repeat task.wait() until AvailableGift:GetAttribute("ClientCollected")==true or 
 if Tween~=nil then Tween:Cancel() Tween=nil end
 HumanoidRootPart.Anchored = false
 repeat task.wait() until AvailableGift:GetAttribute("Collected")==true or G_AutoFarmEnabled==false
+else
+workspace.Beacon.CanTouch = true
+task.wait(.1)
 end
 end
 end)
@@ -296,6 +301,9 @@ Tab1:CreateSection("Auto Farm")
 Tab1:CreateLabel("Warning! Changing to a faster speed result in a ban")
 Tab1:CreateSlider({Name = "Auto-Farm Pick Up Speed"; Range = {0,1}; Increment = 0.02; Suffix = " seconds per gift"; CurrentValue = 0.24; Callback = function(Value)
 G_Speed = tonumber(Value)
+end; })
+Tab1:CreateToggle({Name = "Can't Escape into Beam during Auto-Farm"; CurrentValue = false; Callback = function(Value)
+G_CanEscape = not Value
 end; })
 Tab1:CreateToggle({Name = "Enable Auto-Farm"; CurrentValue = false; Callback = function(Value)
 GiftAutoFarm(Value)
