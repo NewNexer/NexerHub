@@ -336,6 +336,7 @@ end
 return AvailableGift
 end
 local antivoidtpplace = "Center of the Map"
+local antivoiddebounce = false
 if workspace:FindFirstChild("AntiVoid")==nil then
 local a = workspace.KillVoid:Clone()
 a.Position = workspace.KillVoid.Position + Vector3.new(0,20,0)
@@ -348,46 +349,16 @@ a.Transparency = 1
 a.Name = "AntiVoid"
 a.Parent = workspace
 a.Touched:Connect(function(h)
+if antivoiddebounce==true then return end
 if h:IsA("Part") and game.Players:GetPlayerFromCharacter(h.Parent) then
 if antivoidtpplace == "Center of the Map" then
-task.spawn(function()
-for i = 1,10 do
-game.Players:GetPlayerFromCharacter(h.Parent).Character.HumanoidRootPart.CFrame = workspace.Spawn.CFrame * CFrame.new(0,20,0)
-end
-end)
-pcall(function()
-local time = tick()
-while tick() - time < 0.8 do
-for i,v in pairs(Character:GetDescendants()) do
-if v and v:IsA("BasePart") then
-v.Velocity = Vector3.new(0,0,0)
-v.RotVelocity = Vector3.new(0,0,0)
-end
-end
-task.wait()
-end
-end)
+game.Players:GetPlayerFromCharacter(h.Parent).Character.HumanoidRootPart.CFrame = workspace.Spawn.CFrame * CFrame.new(0,22,0)
 elseif antivoidtpplace == "Random Gift" then
 local AvailableGift = GetRandomAvailableGift()
-AvailableGift:SetAttribute("ClientConnected",true)
-task.spawn(function()
-for i = 1,10 do
-game.Players:GetPlayerFromCharacter(h.Parent).Character.HumanoidRootPart.Position = AvailableGift:GetAttribute("StartPosition") + Vector3.new(0,10,0)
+game.Players:GetPlayerFromCharacter(h.Parent).Character.HumanoidRootPart.Position = AvailableGift:GetAttribute("StartPosition") + Vector3.new(0,22,0)
 end
-end)
-pcall(function()
-local time = tick()
-while tick() - time < 0.8 do
-for i,v in pairs(Character:GetDescendants()) do
-if v and v:IsA("BasePart") then
-v.Velocity = Vector3.new(0,0,0)
-v.RotVelocity = Vector3.new(0,0,0)
-end
-end
-task.wait()
-end
-end)
-end
+antivoiddebounce = true
+task.delay(0.5, function() antivoiddebounce = false end)
 end
 end)
 end
