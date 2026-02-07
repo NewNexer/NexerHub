@@ -198,25 +198,25 @@ function GetAvailableGift(a)
 local AvailableGift = workspace.Spawn
 if a=="Any" then
 for i,v in next, workspace:WaitForChild("ItemPools", 9e9):WaitForChild("NormalGifts", 9e9):GetChildren() do
-if v and v:GetAttribute("StartPosition")~=nil and v:GetAttribute("Collected")==false and v:GetAttribute("ClientCollected")==false then
+if v and v:GetAttribute("StartPosition")~=nil and v:GetAttribute("Collected")==false and v:GetAttribute("ClientCollected")==false and v.Transparency~=1 and not (HRP.Position-v:GetAttribute("StartPosition")).magnitude>2000 then
 AvailableGift = v
 end
 end
 for i,v in next, workspace:WaitForChild("ItemPools", 9e9):WaitForChild("GoldenGifts", 9e9):GetChildren() do
-if v and v:GetAttribute("StartPosition")~=nil and v:GetAttribute("Collected")==false and v:GetAttribute("ClientCollected")==false then
+if v and v:GetAttribute("StartPosition")~=nil and v:GetAttribute("Collected")==false and v:GetAttribute("ClientCollected")==false and v.Transparency~=1 and not (HRP.Position-v:GetAttribute("StartPosition")).magnitude>2000 then
 AvailableGift = v
 end
 end
 elseif a=="Closest" then
 local ClosestDistance = math.huge
 for i,v in next, workspace:WaitForChild("ItemPools", 9e9):WaitForChild("NormalGifts", 9e9):GetChildren() do
-if HRP~=nil and v and v:GetAttribute("StartPosition")~=nil and v:GetAttribute("Collected")==false and v:GetAttribute("ClientCollected")==false and (HRP.Position-v:GetAttribute("StartPosition")).magnitude<ClosestDistance then
+if HRP~=nil and v and v:GetAttribute("StartPosition")~=nil and v:GetAttribute("Collected")==false and v:GetAttribute("ClientCollected")==false and not (HRP.Position-v:GetAttribute("StartPosition")).magnitude>2000 and (HRP.Position-v:GetAttribute("StartPosition")).magnitude<ClosestDistance and v.Transparency~=1 then
 ClosestDistance = (HRP.Position-v:GetAttribute("StartPosition")).magnitude
 AvailableGift = v
 end
 end
 for i,v in next, workspace:WaitForChild("ItemPools", 9e9):WaitForChild("GoldenGifts", 9e9):GetChildren() do
-if HRP~=nil and v and v:GetAttribute("StartPosition")~=nil and v:GetAttribute("Collected")==false and v:GetAttribute("ClientCollected")==false and (HRP.Position-v:GetAttribute("StartPosition")).magnitude<ClosestDistance then
+if HRP~=nil and v and v:GetAttribute("StartPosition")~=nil and v:GetAttribute("Collected")==false and v:GetAttribute("ClientCollected")==false and not (HRP.Position-v:GetAttribute("StartPosition")).magnitude>2000 and (HRP.Position-v:GetAttribute("StartPosition")).magnitude<ClosestDistance and v.Transparency~=1 then
 ClosestDistance = (HRP.Position-v:GetAttribute("StartPosition")).magnitude
 AvailableGift = v
 end
