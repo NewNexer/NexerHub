@@ -167,7 +167,7 @@ NG_aura_enabled = b
 if b~=true then return end
 task.spawn(function()
 while task.wait(.1) do
-if NG_aura_enabled==false then wait(999999999) break end
+if NG_aura_enabled==false then break end
 for i,v in next, workspace:WaitForChild("ItemPools", 9e9):WaitForChild("NormalGifts", 9e9):GetChildren() do
 if HRP~=nil and v:GetAttribute("StartPosition")~=nil and v:GetAttribute("Collected")==false and v:GetAttribute("ClientCollected")==false and (HRP.Position-v:GetAttribute("StartPosition")).magnitude<c then
 game:GetService("ReplicatedStorage"):WaitForChild("Events", 9e9):WaitForChild("GiftCollected", 9e9):FireServer(v)
@@ -182,7 +182,7 @@ GG_aura_enabled = b
 if b~=true then return end
 task.spawn(function()
 while task.wait(.1) do
-if GG_aura_enabled==false then wait(999999999) break end
+if GG_aura_enabled==false then break end
 for i,v in next, workspace:WaitForChild("ItemPools", 9e9):WaitForChild("GoldenGifts", 9e9):GetChildren() do
 if HRP~=nil and v:GetAttribute("StartPosition")~=nil and v:GetAttribute("Collected")==false and v:GetAttribute("ClientCollected")==false and (HRP.Position-v:GetAttribute("StartPosition")).magnitude<c then
 game:GetService("ReplicatedStorage"):WaitForChild("Events", 9e9):WaitForChild("GiftCollected", 9e9):FireServer(v)
@@ -356,18 +356,22 @@ end
 function AutoProtectTripmines()
 task.spawn(function()
 while task.wait(.1) do
-if AutoProtectTripminess==false then wait(999999999) break end
+if AutoProtectTripminess==false then break end
 for i,v in next, workspace:WaitForChild("ItemPools", 9e9):WaitForChild("Tripmines", 9e9):GetChildren() do
-if HRP~=nil and v:GetAttribute("StartPosition")~=nil and workspace:FindFirstChild("ProtectedTripmines") and workspace.ProtectedTripmines:FindFirstChild(tostring(v))==nil then
-local sizeoffset = tonumber(v.Size.X) + 2
+if v then v:SetAttribute("uuid",tostring(game:GetService("HttpService"):GenerateGUID(false))) end
+if HRP~=nil and v and v:GetAttribute("StartPosition")~=nil and workspace:FindFirstChild("ProtectedTripmines") and workspace.ProtectedTripmines:FindFirstChild(v:GetAttribute("uuid"))==nil then
+task.delay(1, function()
+local sizeoffset = tonumber(v.Size.X) + 2.5
 local a = Instance.new("Part")
-a.Name = tostring(v)
+a.Name = v:GetAttribute("uuid")
 a.Position = v:GetAttribute("StartPosition")
 a.Size = Vector3.new(sizeoffset,sizeoffset,sizeoffset)
 a.Parent = workspace.ProtectedTripmines
-task.delay(1, function()
 workspace.CurrentRooms.ChildAdded:Once(function(c)
 if c:IsA("Model") then a:Destroy() end
+end)
+v:GetPropertyChangedSignal("Transparency"):Once(function()
+a:Destroy()
 end)
 end)
 task.wait(.01)
@@ -412,6 +416,11 @@ end; })
 Tab4:CreateToggle({Name = "Auto-Create Protection from Tripmines"; CurrentValue = false; Callback = function(Value)
 AutoProtectTripminess = Value
 if Value==true then AutoProtectTripmines() end
+if Value==false then
+for i,v in next, workspace.ProtectedTripmines:GetChildren() do
+if v then v:Destroy() end
+end
+end
 end; })
 Tab4:CreateToggle({Name = "Auto-Remove Ice Tiles"; CurrentValue = false; Callback = function(Value)
 AutoRemoveIceTiles = Value
