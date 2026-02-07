@@ -194,12 +194,62 @@ end
 end)
 end
 end
+function GetAvailableGift(a)
+local AvailableGift = workspace.Spawn
+if a=="Any" then
+for i,v in next, workspace:WaitForChild("ItemPools", 9e9):WaitForChild("NormalGifts", 9e9):GetChildren() do
+if v and v:GetAttribute("StartPosition")~=nil and v:GetAttribute("Collected")==false and v:GetAttribute("ClientCollected")==false then
+AvailableGift = v
+end
+end
+for i,v in next, workspace:WaitForChild("ItemPools", 9e9):WaitForChild("GoldenGifts", 9e9):GetChildren() do
+if v and v:GetAttribute("StartPosition")~=nil and v:GetAttribute("Collected")==false and v:GetAttribute("ClientCollected")==false then
+AvailableGift = v
+end
+end
+elseif a=="Closest" then
+local ClosestDistance = math.huge
+for i,v in next, workspace:WaitForChild("ItemPools", 9e9):WaitForChild("NormalGifts", 9e9):GetChildren() do
+if HRP~=nil and v and v:GetAttribute("StartPosition")~=nil and v:GetAttribute("Collected")==false and v:GetAttribute("ClientCollected")==false and (HRP.Position-v:GetAttribute("StartPosition")).magnitude<ClosestDistance then
+ClosestDistance = (HRP.Position-v:GetAttribute("StartPosition")).magnitude
+AvailableGift = v
+end
+end
+for i,v in next, workspace:WaitForChild("ItemPools", 9e9):WaitForChild("GoldenGifts", 9e9):GetChildren() do
+if HRP~=nil and v and v:GetAttribute("StartPosition")~=nil and v:GetAttribute("Collected")==false and v:GetAttribute("ClientCollected")==false and (HRP.Position-v:GetAttribute("StartPosition")).magnitude<ClosestDistance then
+ClosestDistance = (HRP.Position-v:GetAttribute("StartPosition")).magnitude
+AvailableGift = v
+end
+end
+end
+return AvailableGift
+end
+local G_Speed = 0.16
+local G_AutoFarmEnabled = false
+function GiftAutoFarm(a)
+G_AutoFarmEnabled = a
+if a~=true then return end
+task.spawn(function()
+while task.wait(.1) do
+if G_AutoFarmEnabled==false then break end
+local AvailableGift = GetAvailableGift("Closest")
+local GiftPosition = AvailableGift:GetAttribute("StartPosition")
+HumanoidRootPart.Anchored = true
+--((GiftPosition-HumanoidRootPart.Position).Magnitude/G_Speed) Studs per second
+--0.15 Yea
+local Tween = game:GetService("TweenService"):Create(HumanoidRootPart,TweenInfo.new(G_Speed,Enum.EasingStyle.Quad,Enum.EasingDirection.InOut),{Position=GiftPosition}):Play()
+repeat task.wait() until AvailableGift:GetAttribute("ClientCollected")==true or (HumanoidRootPart.Position - GiftPosition).Magnitude < 4 or G_AutoFarmEnabled==false
+if Tween~=nil then Tween:Cancel() Tween=nil end
+HumanoidRootPart.Anchored = false
+repeat task.wait() until AvailableGift:GetAttribute("Collected")==true or G_AutoFarmEnabled==false
+end
+end)
+end
 local Tab1 = Window:CreateTab("Gifts",0)
 Tab1:CreateParagraph({Title = "Gifts", Content = "Gifts pick-up aura and more"})
-Tab1:CreateSection("Auto Farm")
-Tab1:CreateSection("Normal Gifts")
+Tab1:CreateSection("Auto Pick Up")
+Tab1:CreateParagraph({Title = "Normal Gifts", Content = "Warning! Changing to a faster speed or further distance *may* result in a ban ( anti-cheat )"})
 local NG_Distance, NG_Cooldown = 40, 0.12
-Tab1:CreateLabel("Warning! Changing to a faster speed or further distance *may* result in a ban ( anti-cheat )")
 Tab1:CreateSlider({Name = "Pick up speed"; Range = {0,0.5}; Increment = 0.02; Suffix = " seconds"; CurrentValue = 0.12; Callback = function(Value)
 NG_Cooldown = tonumber(Value)
 end; })
@@ -209,16 +259,15 @@ end; })
 Tab1:CreateToggle({Name = "Enable pick-up aura"; CurrentValue = false; Callback = function(Value)
 GiftAura("Normal",Value,NG_Distance,NG_Cooldown)
 end; })
-Tab1:CreateSection("Golden Gifts")
+Tab1:CreateParagraph({Title = "Golden Gifts", Content = "Warning! Changing to a faster speed or further distance *may* result in a ban ( anti-cheat )"})
 local GG_Distance, GG_Cooldown = 40, 0.12
-Tab1:CreateLabel("Warning! Changing to a faster speed or further distance *may* result in a ban ( anti-cheat )")
-Tab1:CreateSlider({Name = "Pick up speed"; Range = {0,0.5}; Increment = 0.02; Suffix = " seconds"; CurrentValue = 0.12; Callback = function(Value)
+Tab1:CreateSlider({Name = "Pick-Up Speed"; Range = {0,0.5}; Increment = 0.02; Suffix = " seconds"; CurrentValue = 0.12; Callback = function(Value)
 GG_Cooldown = tonumber(Value)
 end; })
-Tab1:CreateSlider({Name = "Pick up distance"; Range = {0,50}; Increment = 1; Suffix = " studs"; CurrentValue = 40; Callback = function(Value)
+Tab1:CreateSlider({Name = "Pick-Up Distance"; Range = {0,50}; Increment = 1; Suffix = " studs"; CurrentValue = 40; Callback = function(Value)
 GG_Distance = tonumber(Value)
 end; })
-Tab1:CreateToggle({Name = "Enable pick-up aura"; CurrentValue = false; Callback = function(Value)
+Tab1:CreateToggle({Name = "Enable Pick-Up Aura"; CurrentValue = false; Callback = function(Value)
 GiftAura("Golden",Value,GG_Distance,GG_Cooldown)
 end; })
 Tab1:CreateSection("Beam")
@@ -233,7 +282,14 @@ workspace.Beacon.CFrame = a
 task.wait(.1)
 CanEscapeintobeam = true
 end; })
-
+Tab1:CreateSection("Auto Farm")
+Tab1:CreateLabel("Warning! Changing to a faster speed result in a ban")
+Tab1:CreateSlider({Name = "Auto-Farm Pick Up Speed"; Range = {0,1}; Increment = 0.02; Suffix = " seconds per gift"; CurrentValue = 0.16; Callback = function(Value)
+G_Speed = tonumber(Value)
+end; })
+Tab1:CreateToggle({Name = "Enable Auto-Farm"; CurrentValue = false; Callback = function(Value)
+GiftAutoFarm(Value)
+end; })
 
 
 
@@ -321,20 +377,6 @@ pcall(function() c.TouchInterest:Destroy() end)
 pcall(function() c:FindFirstChildOfClass("TouchTransmitter"):Destroy() end)
 end
 end)
-function GetRandomAvailableGift()
-local AvailableGift = workspace.Spawn
-for i,v in next, workspace:WaitForChild("ItemPools", 9e9):WaitForChild("NormalGifts", 9e9):GetChildren() do
-if v and v:GetAttribute("StartPosition")~=nil and v:GetAttribute("Collected")==false and v:GetAttribute("ClientCollected")==false then
-AvailableGift = v
-end
-end
-for i,v in next, workspace:WaitForChild("ItemPools", 9e9):WaitForChild("GoldenGifts", 9e9):GetChildren() do
-if v and v:GetAttribute("StartPosition")~=nil and v:GetAttribute("Collected")==false and v:GetAttribute("ClientCollected")==false then
-AvailableGift = v
-end
-end
-return AvailableGift
-end
 local antivoidtpplace = "Center of the Map"
 if workspace:FindFirstChild("AntiVoid")==nil then
 local a = workspace.KillVoid:Clone()
@@ -352,7 +394,7 @@ if h:IsA("Part") and game.Players:GetPlayerFromCharacter(h.Parent) then
 if antivoidtpplace == "Center of the Map" then
 game.Players:GetPlayerFromCharacter(h.Parent).Character.HumanoidRootPart.CFrame = workspace.Spawn.CFrame * CFrame.new(0,22,0)
 elseif antivoidtpplace == "Random Gift" then
-local AvailableGift = GetRandomAvailableGift()
+local AvailableGift = GetAvailableGift("Any")
 local GiftPosition = AvailableGift:GetAttribute("StartPosition")
 game.Players:GetPlayerFromCharacter(h.Parent).Character.HumanoidRootPart.CFrame = CFrame.new(GiftPosition.X,(GiftPosition.Y+22),GiftPosition.Z)
 end
