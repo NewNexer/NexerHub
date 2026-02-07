@@ -345,10 +345,38 @@ a.Parent = workspace
 a.Touched:Connect(function(h)
 if h:IsA("Part") and game.Players:GetPlayerFromCharacter(h.Parent) then
 if antivoidtpplace == "Center of the Map" then
+pcall(function()
+local time = tick()
+while tick() - time < 1 do
+for i,v in pairs(Character:GetDescendants()) do
+if v and v:IsA("BasePart") then
+v.Velocity = Vector3.new(0,0,0)
+v.RotVelocity = Vector3.new(0,0,0)
+end
+end
+task.wait()
+end
+end)
+for i = 1,10 do
 game.Players:GetPlayerFromCharacter(h.Parent).Character.HumanoidRootPart.CFrame = workspace.Spawn.CFrame * CFrame.new(0,20,0)
+end
 elseif antivoidtpplace == "Random Gift" then
 local AvailableGift = GetRandomAvailableGift()
-game.Players:GetPlayerFromCharacter(h.Parent).Character.HumanoidRootPart.CFrame = AvailableGift.CFrame * CFrame.new(0,20,0)
+pcall(function()
+local time = tick()
+while tick() - time < 1 do
+for i,v in pairs(Character:GetDescendants()) do
+if v and v:IsA("BasePart") then
+v.Velocity = Vector3.new(0,0,0)
+v.RotVelocity = Vector3.new(0,0,0)
+end
+end
+task.wait()
+end
+end)
+for i = 1,10 do
+game.Players:GetPlayerFromCharacter(h.Parent).Character.HumanoidRootPart.CFrame = AvailableGift:GetAttribute("StartPosition") + Vector3.new(0,10,0)
+end
 end
 end
 end)
