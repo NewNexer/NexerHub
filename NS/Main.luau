@@ -347,7 +347,7 @@ if workspace.Gravity<110 then
 workspace.Gravity = 110
 end
 end)
-local AutoProtectTripmines = false
+local AutoProtectTripminess = false
 if workspace:FindFirstChild("ProtectedTripmines") == nil then
 local a = Instance.new("Folder")
 a.Name = "ProtectedTripmines"
@@ -356,7 +356,7 @@ end
 function AutoProtectTripmines()
 task.spawn(function()
 while task.wait(.1) do
-if AutoProtectTripmines==false then wait(999999999) break end
+if AutoProtectTripminess==false then wait(999999999) break end
 for i,v in next, workspace:WaitForChild("ItemPools", 9e9):WaitForChild("Tripmines", 9e9):GetChildren() do
 if HRP~=nil and v:GetAttribute("StartPosition")~=nil and workspace:FindFirstChild("ProtectedTripmines") and workspace.ProtectedTripmines:FindFirstChild(tostring(v))==nil then
 local sizeoffset = tonumber(v.Size.X) + 2
@@ -410,7 +410,7 @@ workspace.AntiVoid.CanTouch = Value
 workspace.AntiVoid.CanCollide = Value
 end; })
 Tab4:CreateToggle({Name = "Auto-Create Protection from Tripmines"; CurrentValue = false; Callback = function(Value)
-AutoProtectTripmines = Value
+AutoProtectTripminess = Value
 if Value==true then AutoProtectTripmines() end
 end; })
 Tab4:CreateToggle({Name = "Auto-Remove Ice Tiles"; CurrentValue = false; Callback = function(Value)
