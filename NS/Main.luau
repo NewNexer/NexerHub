@@ -222,13 +222,12 @@ Tab1:CreateToggle({Name = "Enable pick-up aura"; CurrentValue = false; Callback 
 GiftAura("Golden",Value,GG_Distance,GG_Cooldown)
 end; })
 Tab1:CreateSection("Beam")
-Tab1:CreateButton({Name = "Escape into Beam"; Callback = function()
+Tab1:CreateKeybind({Name = "Escape into Beam"; CurrentKeybind = "U"; HoldToInteract = false; Callback = function(Value)
 local a = workspace.Beacon.CFrame
 workspace.Beacon.CFrame = HumanoidRootPart.CFrame
 task.wait(1)
 workspace.Beacon.CFrame = a
 end; })
-
 
 
 
@@ -317,6 +316,21 @@ pcall(function() c.TouchInterest:Destroy() end)
 pcall(function() c:FindFirstChildOfClass("TouchTransmitter"):Destroy() end)
 end
 end)
+function GetRandomAvailableGift()
+local AvailableGift = workspace.Spawn
+for i,v in next, workspace:WaitForChild("ItemPools", 9e9):WaitForChild("NormalGifts", 9e9):GetChildren() do
+if v and v:GetAttribute("StartPosition")~=nil and v:GetAttribute("Collected")==false and v:GetAttribute("ClientCollected")==false then
+AvailableGift = v
+end
+end
+for i,v in next, workspace:WaitForChild("ItemPools", 9e9):WaitForChild("GoldenGifts", 9e9):GetChildren() do
+if v and v:GetAttribute("StartPosition")~=nil and v:GetAttribute("Collected")==false and v:GetAttribute("ClientCollected")==false then
+AvailableGift = v
+end
+end
+return AvailableGift
+end
+local antivoidtpplace = "Center of the Map"
 if workspace:FindFirstChild("AntiVoid")==nil then
 local a = workspace.KillVoid:Clone()
 a.Position = workspace.KillVoid.Position + Vector3.new(0,20,0)
@@ -330,7 +344,12 @@ a.Name = "AntiVoid"
 a.Parent = workspace
 a.Touched:Connect(function(h)
 if h:IsA("Part") and game.Players:GetPlayerFromCharacter(h.Parent) then
+if antivoidtpplace == "Center of the Map" then
 game.Players:GetPlayerFromCharacter(h.Parent).Character.HumanoidRootPart.CFrame = workspace.Spawn.CFrame * CFrame.new(0,20,0)
+elseif antivoidtpplace == "Random Gift" then
+local AvailableGift = GetRandomAvailableGift()
+game.Players:GetPlayerFromCharacter(h.Parent).Character.HumanoidRootPart.CFrame = AvailableGift.CFrame * CFrame.new(0,20,0)
+end
 end
 end)
 end
@@ -358,7 +377,7 @@ task.spawn(function()
 while task.wait(.1) do
 if AutoProtectTripminess==false then break end
 for i,v in next, workspace:WaitForChild("ItemPools", 9e9):WaitForChild("Tripmines", 9e9):GetChildren() do
-if v then v:SetAttribute("uuid",tostring(game:GetService("HttpService"):GenerateGUID(false))) end
+if v and not v:GetAttribute("uuid") or v:GetAttribute("uuid")==nil then v:SetAttribute("uuid",tostring(game:GetService("HttpService"):GenerateGUID(false))) end
 if HRP~=nil and v and v:GetAttribute("StartPosition")~=nil and workspace:FindFirstChild("ProtectedTripmines") and workspace.ProtectedTripmines:FindFirstChild(v:GetAttribute("uuid"))==nil then
 task.delay(1, function()
 local sizeoffset = tonumber(v.Size.X) + 2.5
@@ -409,6 +428,9 @@ end
 end
 end; })
 Tab4:CreateSection("Map")
+Tab4:CreateDropdown({Name = "Anti Void Teleport Place"; Options = {"Center of the Map","Random Gift"}; CurrentOption = "Center of the Map"; MultiSelection = false; Callback = function(Value)
+antivoidtpplace = Rayfield:GetDropdownValue(Value)
+end; })
 Tab4:CreateToggle({Name = "Immunity to Void"; CurrentValue = false; Callback = function(Value)
 workspace.AntiVoid.CanTouch = Value
 workspace.AntiVoid.CanCollide = Value
@@ -439,12 +461,8 @@ end; })
 
 
 
---[[
-Tab1:CreateDropdown({Name = "Dropdown"; Options = {"1","2"}; CurrentOption = "1"; MultiSelection = false; Callback = function(Value)
-local Value = Rayfield:GetDropdownValue(Value) -- returns string
-print(Value)
-end; })
-]]--
+
+
 local Tab2 = Window:CreateTab("Movement",0)
 Tab2:CreateParagraph({Title = "Movement", Content = "Movement Management"})
 local Gravity = 0
@@ -517,7 +535,7 @@ end; })
 Other:CreateButton({Name = "Create Solo Server"; Callback = function()
 game:GetService("ReplicatedStorage"):WaitForChild("Servers"):WaitForChild("CreateLobby"):InvokeServer(unpack({2,true,1,0,false,false,true}))
 end; })
-Tab3:CreateButton({Name = "Close Hub"; Callback = function()
+Other:CreateButton({Name = "Close Hub"; Callback = function()
 for i,v in next, Heartbeat do
 if i then
 Heartbeat[i] = nil
