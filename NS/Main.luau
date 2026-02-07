@@ -222,11 +222,16 @@ Tab1:CreateToggle({Name = "Enable pick-up aura"; CurrentValue = false; Callback 
 GiftAura("Golden",Value,GG_Distance,GG_Cooldown)
 end; })
 Tab1:CreateSection("Beam")
+local CanEscapeintobeam = true
 Tab1:CreateKeybind({Name = "Escape into Beam"; CurrentKeybind = "U"; HoldToInteract = false; Callback = function(Value)
+if CanEscapeintobeam~=true then return end
+CanEscapeintobeam = false
 local a = workspace.Beacon.CFrame
 workspace.Beacon.CFrame = HumanoidRootPart.CFrame
 task.wait(1)
 workspace.Beacon.CFrame = a
+task.wait(.1)
+CanEscapeintobeam = true
 end; })
 
 
