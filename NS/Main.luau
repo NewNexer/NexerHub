@@ -235,10 +235,13 @@ if G_AutoFarmEnabled==false then break end
 local AvailableGift = GetAvailableGift("Closest")
 if AvailableGift.Name~="Spawn" then
 local GiftPosition = AvailableGift:GetAttribute("StartPosition")
+local Speed = ((GiftPosition-HumanoidRootPart.Position).magnitude<51 and G_Speed) or (G_Speed+1) 
+if Speed>1 then
 HumanoidRootPart.Anchored = true
+end
 --((GiftPosition-HumanoidRootPart.Position).Magnitude/G_Speed) Studs per second
 --0.15 Yea
-local Tween = game:GetService("TweenService"):Create(HumanoidRootPart,TweenInfo.new(G_Speed,Enum.EasingStyle.Quad,Enum.EasingDirection.InOut),{Position=GiftPosition}):Play()
+local Tween = game:GetService("TweenService"):Create(HumanoidRootPart,TweenInfo.new(Speed,Enum.EasingStyle.Quad,Enum.EasingDirection.InOut),{Position=GiftPosition}):Play()
 repeat task.wait() until AvailableGift:GetAttribute("ClientCollected")==true or (HumanoidRootPart.Position - GiftPosition).Magnitude < 4 or G_AutoFarmEnabled==false
 if Tween~=nil then Tween:Cancel() Tween=nil end
 HumanoidRootPart.Anchored = false
