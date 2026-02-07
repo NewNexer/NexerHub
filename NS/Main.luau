@@ -1,6 +1,6 @@
 --[[
 
-Your Variables and global variables
+Hello either Nullscape Developers or some curious exploiters.
 
 ]]--
 
@@ -336,7 +336,6 @@ end
 return AvailableGift
 end
 local antivoidtpplace = "Center of the Map"
-local antivoiddebounce = false
 if workspace:FindFirstChild("AntiVoid")==nil then
 local a = workspace.KillVoid:Clone()
 a.Position = workspace.KillVoid.Position + Vector3.new(0,20,0)
@@ -349,16 +348,14 @@ a.Transparency = 1
 a.Name = "AntiVoid"
 a.Parent = workspace
 a.Touched:Connect(function(h)
-if antivoiddebounce==true then return end
 if h:IsA("Part") and game.Players:GetPlayerFromCharacter(h.Parent) then
 if antivoidtpplace == "Center of the Map" then
 game.Players:GetPlayerFromCharacter(h.Parent).Character.HumanoidRootPart.CFrame = workspace.Spawn.CFrame * CFrame.new(0,22,0)
 elseif antivoidtpplace == "Random Gift" then
 local AvailableGift = GetRandomAvailableGift()
-game.Players:GetPlayerFromCharacter(h.Parent).Character.HumanoidRootPart.Position = AvailableGift:GetAttribute("StartPosition") + Vector3.new(0,22,0)
+local GiftPosition = AvailableGift:GetAttribute("StartPosition")
+game.Players:GetPlayerFromCharacter(h.Parent).Character.HumanoidRootPart.CFrame = CFrame.new(GiftPosition.X,(GiftPosition.Y+22),GiftPosition.Z)
 end
-antivoiddebounce = true
-task.delay(0.5, function() antivoiddebounce = false end)
 end
 end)
 end
