@@ -233,6 +233,7 @@ task.spawn(function()
 while task.wait(.1) do
 if G_AutoFarmEnabled==false then break end
 local AvailableGift = GetAvailableGift("Closest")
+if AvailableGift.Name~="Spawn" then
 local GiftPosition = AvailableGift:GetAttribute("StartPosition")
 HumanoidRootPart.Anchored = true
 --((GiftPosition-HumanoidRootPart.Position).Magnitude/G_Speed) Studs per second
@@ -242,6 +243,7 @@ repeat task.wait() until AvailableGift:GetAttribute("ClientCollected")==true or 
 if Tween~=nil then Tween:Cancel() Tween=nil end
 HumanoidRootPart.Anchored = false
 repeat task.wait() until AvailableGift:GetAttribute("Collected")==true or G_AutoFarmEnabled==false
+end
 end
 end)
 end
