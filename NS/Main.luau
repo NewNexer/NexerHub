@@ -380,7 +380,10 @@ Tab3:CreateSection("Springer")
 Tab3:CreateButton({Name = "Remove shockwaves"; Callback = function()
 pcall(function() GetEnemies("Springer",function(a) a.ShockwaveEvent:Destroy() end) end)
 end; })
-
+Tab3:CreateSection("Voidbreaker")
+Tab3:CreateButton({Name = "Make friendly"; Callback = function()
+pcall(function() GetEnemies("Voidbreaker",function(a) a.AI:Destroy() end) end)
+end; })
 
 local Immunity_2D = false
 local SkilwalkerImmunity = false
@@ -499,8 +502,16 @@ end
 end
 end
 end; })
+local ImmunityToClientEnemies = false
+workspace.Enemies.ChildAdded:Connect(function()
+if ImmunityToClientEnemies~=true then return end
+pcall(function() GetEnemies("Dozer",function(a) a.AI:Destroy() end) end)
+pcall(function() GetEnemies("Voidbreaker",function(a) a.AI:Destroy() end) end)
+pcall(function() GetEnemies("KooKoo",function(a) a.AI:Destroy() end) end)
+end)
 Tab4:CreateLabel("Client enemies: Voidbreaker, Kookoo, Dozer, Void, Stalker and others.")
 Tab4:CreateToggle({Name = "Immunity to all client enemies"; CurrentValue = false; Callback = function(Value)
+ImmunityToClientEnemies = Value
 if Value==true and game.ReplicatedStorage.Events:FindFirstChild("DiedFunction") then
 RemoveInstance(game.ReplicatedStorage.Events:FindFirstChild("DiedFunction"))
 end
