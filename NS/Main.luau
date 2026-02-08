@@ -341,6 +341,10 @@ Tab3:CreateSection("Bell")
 Tab3:CreateButton({Name = "Destroy Bell"; Callback = function()
 pcall(function() GetEnemies("Bell",function(a) a:Destroy() end) end)
 end; })
+Tab3:CreateButton({Name = "Disable Ringing"; Callback = function()
+pcall(function() GetEnemies("Bell",function(a) a.ClientEvent:Destroy() end) end)
+pcall(function() GetEnemies("Bell",function(a) a.Ring:Destroy() end) end)
+end; })
 Tab3:CreateSection("Mart")
 Tab3:CreateButton({Name = "Destroy Mart"; Callback = function()
 pcall(function() GetEnemies("Mart",function(a) a:Destroy() end) end)
@@ -364,9 +368,18 @@ Tab3:CreateButton({Name = "Destroy Skinwalker"; Callback = function()
 pcall(function() GetEnemies("Skinwalker",function(a) a:Destroy() end) end)
 pcall(function() workspace.Skinwalkers:ClearAllChildren() end)
 end; })
-
-
-
+Tab3:CreateSection("Dozer")
+Tab3:CreateButton({Name = "Make friendly"; Callback = function()
+pcall(function() GetEnemies("Dozer",function(a) a.AI:Destroy() end) end)
+end; })
+Tab3:CreateSection("KooKoo")
+Tab3:CreateButton({Name = "Make friendly"; Callback = function()
+pcall(function() GetEnemies("KooKoo",function(a) a.AI:Destroy() end) end)
+end; })
+Tab3:CreateSection("Springer")
+Tab3:CreateButton({Name = "Remove shockwaves"; Callback = function()
+pcall(function() GetEnemies("Springer",function(a) a.ShockwaveEvent:Destroy() end) end)
+end; })
 
 
 local Immunity_2D = false
