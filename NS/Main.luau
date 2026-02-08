@@ -227,6 +227,7 @@ end
 local G_Speed = 0.16
 local G_AutoFarmEnabled = false
 local G_CanEscape = true
+local G_X, G_Y = 0, 0
 function GiftAutoFarm(a)
 G_AutoFarmEnabled = a
 if a~=true then return end
@@ -243,7 +244,7 @@ HumanoidRootPart.Anchored = true
 end
 --((GiftPosition-HumanoidRootPart.Position).Magnitude/G_Speed) Studs per second
 --0.15 Yea
-local Tween = game:GetService("TweenService"):Create(HumanoidRootPart,TweenInfo.new(Speed,Enum.EasingStyle.Quad,Enum.EasingDirection.InOut),{Position=GiftPosition}):Play()
+local Tween = game:GetService("TweenService"):Create(HumanoidRootPart,TweenInfo.new(Speed,Enum.EasingStyle.Quad,Enum.EasingDirection.InOut),{Position=(GiftPosition + Vector3.new(G_X,G_Y,0))}):Play()
 repeat task.wait() until AvailableGift:GetAttribute("ClientCollected")==true or (HumanoidRootPart.Position - GiftPosition).Magnitude < 4 or G_AutoFarmEnabled==false
 if Tween~=nil then Tween:Cancel() Tween=nil end
 HumanoidRootPart.Anchored = false
@@ -302,6 +303,12 @@ Tab1:CreateLabel("Warning! Changing to a faster speed result in a ban")
 Tab1:CreateSlider({Name = "Auto-Farm Pick Up Speed"; Range = {0,1}; Increment = 0.02; Suffix = " seconds per gift"; CurrentValue = 0.24; Callback = function(Value)
 G_Speed = tonumber(Value)
 end; })
+Tab1:CreateSlider({Name = "Tween Offset (X)"; Range = {0,10}; Increment = 1; Suffix = " studs"; CurrentValue = 0; Callback = function(Value)
+G_X = tonumber(Value)
+end; })
+Tab1:CreateSlider({Name = "Tween Offset (Y)"; Range = {0,10}; Increment = 1; Suffix = " studs"; CurrentValue = 0; Callback = function(Value)
+G_Y = tonumber(Value)
+end; })
 Tab1:CreateToggle({Name = "Can't Escape into Beam during Auto-Farm"; CurrentValue = false; Callback = function(Value)
 G_CanEscape = not Value
 end; })
@@ -351,21 +358,6 @@ end; })
 Tab3:CreateSection("Flesh")
 Tab3:CreateButton({Name = "Destroy Flesh"; Callback = function()
 pcall(function() GetEnemies("Flesh",function(a) a:Destroy() end) end)
-end; })
-Tab3:CreateSection("Dozer/Kookoo")
-Tab3:CreateButton({Name = "Make Dozer/Kookoo Friendly"; Callback = function()
-pcall(function()
-if game.ReplicatedStorage.Events:FindFirstChild("ResetBindable") then
-RemoveInstance(game.ReplicatedStorage.Events:FindFirstChild("ResetBindable"))
-end
-if game.ReplicatedStorage.Events:FindFirstChild("DiedBindable") then
-RemoveInstance(game.ReplicatedStorage.Events:FindFirstChild("DiedBindable"))
-end
-game.Players.LocalPlayer.CharacterAdded:Once(function()
-RestoreInstance("ResetBindable")
-RestoreInstance("DiedBindable")
-end)
-end)
 end; })
 Tab3:CreateSection("Skinwalker")
 Tab3:CreateButton({Name = "Destroy Skinwalker"; Callback = function()
@@ -469,7 +461,7 @@ end
 local Tab4 = Window:CreateTab("Immunities",0)
 Tab4:CreateParagraph({Title = "Immunities", Content = "Immunities management"})
 Tab4:CreateSection("Enemies")
-Tab4:CreateLabel("2D enemies: Bell, Mart, Baby, Flesh and others. ( except dozer and kookoo )")
+Tab4:CreateLabel("2D enemies: Bell, Mart, Baby, Flesh, Telefragger and others. ( except dozer and kookoo )")
 Tab4:CreateToggle({Name = "Immunity to all 2D enemies"; CurrentValue = false; Callback = function(Value)
 Immunity_2D = Value
 for _,c in next, workspace.Enemies:GetChildren() do
@@ -492,6 +484,15 @@ pcall(function() c.TouchInterest:Destroy() end)
 pcall(function() c:FindFirstChildOfClass("TouchTransmitter"):Destroy() end)
 end
 end
+end
+end; })
+Tab4:CreateLabel("Client enemies: Voidbreaker, Kookoo, Dozer, Void, Stalker and others.")
+Tab4:CreateToggle({Name = "Immunity to all client enemies"; CurrentValue = false; Callback = function(Value)
+if Value==true and game.ReplicatedStorage.Events:FindFirstChild("DiedFunction") then
+RemoveInstance(game.ReplicatedStorage.Events:FindFirstChild("DiedFunction"))
+end
+if Value==false and game.ReplicatedStorage.Events:FindFirstChild("DiedFunction")==nil then
+RestoreInstance("DiedFunction")
 end
 end; })
 Tab4:CreateSection("Map")
