@@ -1496,9 +1496,13 @@ local SelectedTheme = RayfieldLibrary.Theme.Default
 	local SIDEBAR_MAX_WIDTH = 150
 	local TOPBAR_HEIGHT = 45
 	local TAB_BUTTON_HEIGHT = 30
+	local TAB_SECTION_HEIGHT = 18
+	local TAB_SECTION_TEXT_SIZE = 11
 	local TABLIST_HORIZONTAL_PADDING = 8
 	local TABLIST_VERTICAL_PADDING = 8
 	local TabListCanvasConnection
+	local TabListOrderCounter = 0
+	local CurrentTabSectionName = nil
 
 	local function getSidebarWidth()
 		local absoluteWidth = Main and Main.AbsoluteSize and Main.AbsoluteSize.X or 0
@@ -1523,6 +1527,23 @@ local SelectedTheme = RayfieldLibrary.Theme.Default
 
 			TabList.CanvasSize = UDim2.new(0, 0, 0, contentHeight + TABLIST_VERTICAL_PADDING)
 		end)
+	end
+
+	local function styleTabSection(tabSection)
+		if not tabSection or not tabSection:IsA('TextLabel') then
+			return
+		end
+
+		tabSection.BackgroundTransparency = 1
+		tabSection.BorderSizePixel = 0
+		tabSection.TextXAlignment = Enum.TextXAlignment.Left
+		tabSection.TextYAlignment = Enum.TextYAlignment.Bottom
+		tabSection.Font = Enum.Font.GothamSemibold
+		tabSection.TextSize = TAB_SECTION_TEXT_SIZE
+		tabSection.TextTransparency = 0.38
+		tabSection.TextColor3 = SelectedTheme.TextColor
+		tabSection.RichText = false
+		tabSection.ZIndex = 4
 	end
 
 	local function applySidebarLayout()
@@ -1575,6 +1596,9 @@ local SelectedTheme = RayfieldLibrary.Theme.Default
 			for _, tabButton in ipairs(TabList:GetChildren()) do
 				if tabButton:IsA('Frame') and tabButton.Name ~= 'Placeholder' then
 					tabButton.Size = UDim2.new(1, -TABLIST_HORIZONTAL_PADDING, 0, TAB_BUTTON_HEIGHT)
+				elseif tabButton:IsA('TextLabel') and tabButton:GetAttribute('RayfieldTabSection') then
+					tabButton.Size = UDim2.new(1, -(TABLIST_HORIZONTAL_PADDING + 2), 0, TAB_SECTION_HEIGHT)
+					styleTabSection(tabButton)
 				end
 			end
 
@@ -1633,6 +1657,12 @@ local function ChangeTheme(Theme)
 				Element.BackgroundColor3 = SelectedTheme.ElementBackground
 				Element.UIStroke.Color = SelectedTheme.ElementStroke
 			end
+		end
+	end
+
+	for _, tabGui in ipairs(TabList:GetChildren()) do
+		if tabGui:IsA('TextLabel') and tabGui:GetAttribute('RayfieldTabSection') then
+			styleTabSection(tabGui)
 		end
 	end
 end
@@ -2834,12 +2864,52 @@ function RayfieldLibrary:CreateWindow(Settings)
 	-- Tab
 	local FirstTab = false
 	local Window = {}
+
+	function Window:CreateTabSection(SectionName)
+		TabListOrderCounter += 1
+		CurrentTabSectionName = SectionName
+
+		local SectionLabel = Instance.new('TextLabel')
+		SectionLabel.Name = 'TabSection_' .. tostring(SectionName)
+		SectionLabel.Text = '  ' .. string.upper(tostring(SectionName))
+		SectionLabel.LayoutOrder = TabListOrderCounter
+		SectionLabel.Parent = TabList
+		SectionLabel:SetAttribute('RayfieldTabSection', true)
+		styleTabSection(SectionLabel)
+		applySidebarLayout()
+
+		local SectionValue = {}
+		function SectionValue:Set(NewSectionName)
+			SectionName = NewSectionName
+			CurrentTabSectionName = NewSectionName
+			SectionLabel.Name = 'TabSection_' .. tostring(NewSectionName)
+			SectionLabel.Text = '  ' .. string.upper(tostring(NewSectionName))
+			updateTabListCanvas()
+		end
+
+		function SectionValue:Destroy()
+			if CurrentTabSectionName == SectionName then
+				CurrentTabSectionName = nil
+			end
+			SectionLabel:Destroy()
+			updateTabListCanvas()
+		end
+
+		return SectionValue
+	end
+
 	function Window:CreateTab(Name, Image, Ext)
 		local SDone = false
 		local TabButton = TabList.Template:Clone()
 		TabButton.Name = Name
 		TabButton.Title.Text = Name
+		TabListOrderCounter += 1
+		TabButton.LayoutOrder = TabListOrderCounter
 		TabButton.Parent = TabList
+		TabButton:SetAttribute('RayfieldTabButton', true)
+		if CurrentTabSectionName then
+			TabButton:SetAttribute('RayfieldTabSectionName', tostring(CurrentTabSectionName))
+		end
 		TabButton.Title.TextWrapped = false
 		TabButton.Title.TextTruncate = Enum.TextTruncate.AtEnd
 		TabButton.Title.TextSize = 13
@@ -4739,6 +4809,7 @@ if useStudio then
 	--	}
 	--})
 
+	--local CombatTabs = Window:CreateTabSection("Combat")
 	--local Tab = Window:CreateTab("Tab Example", 'key-round') -- Title, Image
 	--local Tab2 = Window:CreateTab("Tab Example 2", 4483362458) -- Title, Image
 
