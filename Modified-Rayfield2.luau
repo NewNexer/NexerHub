@@ -767,7 +767,7 @@ local WINDOW_HEIGHT = 475
 local WINDOW_WIDTH_MOBILE = 500
 local WINDOW_HEIGHT_MOBILE = 320
 local TOPBAR_HEIGHT = 45
-local SIDEBAR_WIDTH = 150
+local SIDEBAR_WIDTH = 135
 local SIDEBAR_PADDING = 10
 local CONTENT_PADDING = 10
 
@@ -842,6 +842,15 @@ local function applyModernSidebarLayout()
 	Elements.Position = UDim2.new(0, contentX, 0, TOPBAR_HEIGHT + SIDEBAR_PADDING)
 	Elements.Size = UDim2.new(1, contentWidthOffset, 1, -(TOPBAR_HEIGHT + SIDEBAR_PADDING * 2))
 	Elements.ClipsDescendants = true
+
+	for _, page in ipairs(Elements:GetChildren()) do
+		if page:IsA("ScrollingFrame") and page.Name ~= "Template" and page.Name ~= "Placeholder" then
+			page.Position = UDim2.new(0, 0, 0, 0)
+			page.Size = UDim2.new(1, 0, 1, 0)
+			page.CanvasSize = UDim2.new(0, 0, 0, 0)
+			page.AutomaticCanvasSize = Enum.AutomaticSize.Y
+		end
+	end
 
 	Main.Search.AnchorPoint = Vector2.new(0, 0)
 	Main.Search.Position = getSearchPosition(false)
@@ -2157,6 +2166,10 @@ function RayfieldLibrary:CreateWindow(Settings)
 		local TabPage = Elements.Template:Clone()
 		TabPage.Name = Name
 		TabPage.Visible = true
+		TabPage.Position = UDim2.new(0, 0, 0, 0)
+		TabPage.Size = UDim2.new(1, 0, 1, 0)
+		TabPage.CanvasSize = UDim2.new(0, 0, 0, 0)
+		TabPage.AutomaticCanvasSize = Enum.AutomaticSize.Y
 
 		TabPage.LayoutOrder = #Elements:GetChildren() or Ext and 10000
 
