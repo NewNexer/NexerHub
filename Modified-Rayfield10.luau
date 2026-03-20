@@ -1496,6 +1496,9 @@ local SelectedTheme = RayfieldLibrary.Theme.Default
 	local SIDEBAR_MAX_WIDTH = 150
 	local TOPBAR_HEIGHT = 45
 	local TAB_BUTTON_HEIGHT = 30
+	local TABLIST_HORIZONTAL_PADDING = 8
+	local TABLIST_VERTICAL_PADDING = 8
+	local TabListCanvasConnection
 
 	local function getSidebarWidth()
 		local absoluteWidth = Main and Main.AbsoluteSize and Main.AbsoluteSize.X or 0
@@ -1504,6 +1507,22 @@ local SelectedTheme = RayfieldLibrary.Theme.Default
 		end
 
 		return math.clamp(math.floor(absoluteWidth * 0.22), SIDEBAR_MIN_WIDTH, SIDEBAR_MAX_WIDTH)
+	end
+
+	local function updateTabListCanvas()
+		pcall(function()
+			if not TabList or not TabList:IsA('ScrollingFrame') then
+				return
+			end
+
+			local tabLayout = TabList:FindFirstChildWhichIsA('UIListLayout')
+			local contentHeight = 0
+			if tabLayout then
+				contentHeight = tabLayout.AbsoluteContentSize.Y
+			end
+
+			TabList.CanvasSize = UDim2.new(0, 0, 0, contentHeight + TABLIST_VERTICAL_PADDING)
+		end)
 	end
 
 	local function applySidebarLayout()
@@ -1518,6 +1537,15 @@ local SelectedTheme = RayfieldLibrary.Theme.Default
 			TabList.Size = UDim2.new(0, sidebarWidth, 1, -(TOPBAR_HEIGHT + 16))
 			TabList.BackgroundTransparency = 1
 
+			if TabList:IsA('ScrollingFrame') then
+				TabList.Active = true
+				TabList.ScrollingDirection = Enum.ScrollingDirection.Y
+				TabList.ScrollingEnabled = true
+				TabList.AutomaticCanvasSize = Enum.AutomaticSize.None
+				TabList.ScrollBarThickness = 4
+				TabList.CanvasPosition = Vector2.new(TabList.CanvasPosition.X, TabList.CanvasPosition.Y)
+			end
+
 			local tabLayout = TabList:FindFirstChildWhichIsA('UIListLayout')
 			if tabLayout then
 				tabLayout.FillDirection = Enum.FillDirection.Vertical
@@ -1525,6 +1553,10 @@ local SelectedTheme = RayfieldLibrary.Theme.Default
 				tabLayout.VerticalAlignment = Enum.VerticalAlignment.Top
 				tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
 				tabLayout.Padding = UDim.new(0, 5)
+
+				if not TabListCanvasConnection and TabList:IsA('ScrollingFrame') then
+					TabListCanvasConnection = tabLayout:GetPropertyChangedSignal('AbsoluteContentSize'):Connect(updateTabListCanvas)
+				end
 			end
 
 			Elements.AnchorPoint = Vector2.new(0, 0)
@@ -1542,7 +1574,7 @@ local SelectedTheme = RayfieldLibrary.Theme.Default
 
 			for _, tabButton in ipairs(TabList:GetChildren()) do
 				if tabButton:IsA('Frame') and tabButton.Name ~= 'Placeholder' then
-					tabButton.Size = UDim2.new(1, -8, 0, TAB_BUTTON_HEIGHT)
+					tabButton.Size = UDim2.new(1, -TABLIST_HORIZONTAL_PADDING, 0, TAB_BUTTON_HEIGHT)
 				end
 			end
 
@@ -1550,6 +1582,8 @@ local SelectedTheme = RayfieldLibrary.Theme.Default
 				Main.Search.Position = UDim2.new(0, sidebarWidth + 26, 0, TOPBAR_HEIGHT + 12)
 				Main.Search.Size = UDim2.new(1, -(sidebarWidth + 42), 0, 32)
 			end
+
+			updateTabListCanvas()
 		end)
 	end
 
