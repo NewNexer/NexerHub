@@ -3580,7 +3580,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 				TitleLabel.Size = UDim2.new(1, -24, 0, titleVisible and 18 or 0)
 				ContentLabel.Position = UDim2.new(0, 12, 0, contentTop)
 				ContentLabel.Size = UDim2.new(1, -24, 0, contentVisible and contentHeight or 0)
-				Paragraph.Size = UDim2.new(1, 0, 0, math.max(42, contentTop + contentHeight + 10))
+				local buttonSizee = Elements.Template.Button.Size
+				Paragraph.Size = UDim2.new(buttonSizee.X.Scale, buttonSizee.X.Offset, 0, math.max(42, contentTop + contentHeight + 10))
 				Paragraph.Name = titleText ~= '' and titleText or 'Paragraph'
 			end
 
