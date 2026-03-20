@@ -44,7 +44,7 @@ _G.dod_developer_key = "Nexer" -- my name yaa
 _G.dod_name = "Die Of Death" -- name of the game that we will surely need
 _G.API_last_update = "1/1/2026" -- last time update (dd/mm/yyyy)
 _G.dod_repository = "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Main.luau" -- input repository for savings
-_G.global_module_main = "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/Modified-Rayfield11.luau"
+_G.global_module_main = "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/Modified-Module1.luau"
 _G.global_module_backup = "https://pastebin.com/raw/0yUmgPTd"
 _G.HasPremium = false -- don't change
 _G.HasGameBreakingFeaturesAccess = false -- don't change
@@ -967,7 +967,7 @@ end
 return (GetLegitMaxStamina()-CalculateObesityTax()-CalculateRevolverTax())
 end
 local InfStaminaenabled = false
-Tab_1:CreateToggle({Name = "Infinite Stamina"; CurrentValue = NoFatigue; Callback = function(Value)
+Tab_1:CreateToggle({Name = "Infinite Stamina"; CurrentValue = InfStaminaenabled; Callback = function(Value)
 InfStaminaenabled = Value
 Character:SetAttribute("MaxStamina",(Value==true and 9e9 or GetLegitStamina()))
 task.wait(0)
@@ -1421,7 +1421,7 @@ end
 end
 end; })
 
-
+Window:CreateTabSection("Teams Features")
 
 local AbilityNames = Module:GetData("AbilityNames")
 local AbilityDatas = Module:GetData("AbilityData")
@@ -1886,8 +1886,8 @@ Tab_3:CreateToggle({Name = "Anti Fall Ragdoll"; CurrentValue = AntiFallRagdoll; 
 AntiFallRagdoll = Value
 for i,v in next, workspace.GameAssets:GetDescendants() do
 if v.Name == "FallDamage" and v:IsA("BasePart") then
-child.CanCollide = not AntiFallRagdoll
-child.CanTouch = not AntiFallRagdoll
+v.CanCollide = not AntiFallRagdoll
+v.CanTouch = not AntiFallRagdoll
 end
 end
 end; })
@@ -4220,8 +4220,8 @@ end
 
 
 
-
-
+Window:CreateTabSection("")
+Window:CreateTabSection("Miscellaneous")
 
 
 local Tab_8 = Window:CreateTab("Fun",0)
