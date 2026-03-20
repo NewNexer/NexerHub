@@ -742,6 +742,87 @@ local dragBar = Rayfield:FindFirstChild('Drag')
 local dragInteract = dragBar and dragBar.Interact or nil
 local dragBarCosmetic = dragBar and dragBar.Drag or nil
 
+
+	-- Safer sidebar layout: keep Rayfield's original window size, but explicitly remap
+	-- the tab column and content area so internal elements stay inside bounds.
+	local SIDEBAR_WIDTH = 140
+	local SIDEBAR_GAP = 10
+	local WINDOW_PADDING = 12
+	local TOPBAR_HEIGHT = 45
+	local TAB_HEIGHT = 36
+
+	local function styleTabButton(TabButton)
+		if not TabButton or TabButton == TabList.Template or not TabButton:IsA("Frame") then return end
+
+		TabButton.AutomaticSize = Enum.AutomaticSize.None
+		TabButton.Size = UDim2.new(1, 0, 0, TAB_HEIGHT)
+		TabButton.Position = UDim2.new(0, 0, 0, 0)
+		TabButton.ClipsDescendants = true
+
+		if TabButton:FindFirstChild("Interact") then
+			TabButton.Interact.Size = UDim2.new(1, 0, 1, 0)
+			TabButton.Interact.Position = UDim2.new(0, 0, 0, 0)
+		end
+
+		if TabButton:FindFirstChild("Title") then
+			TabButton.Title.AnchorPoint = Vector2.new(0, 0.5)
+			TabButton.Title.Position = UDim2.new(0, 38, 0.5, 0)
+			TabButton.Title.Size = UDim2.new(1, -46, 1, 0)
+			TabButton.Title.TextWrapped = false
+			TabButton.Title.TextScaled = false
+			TabButton.Title.TextXAlignment = Enum.TextXAlignment.Left
+			TabButton.Title.TextYAlignment = Enum.TextYAlignment.Center
+		end
+
+		if TabButton:FindFirstChild("Image") then
+			TabButton.Image.AnchorPoint = Vector2.new(0, 0.5)
+			TabButton.Image.Position = UDim2.new(0, 12, 0.5, 0)
+			TabButton.Image.Size = UDim2.new(0, 18, 0, 18)
+		end
+	end
+
+	local function applySidebarLayout()
+		Main.ClipsDescendants = true
+		Topbar.ClipsDescendants = true
+		TabList.ClipsDescendants = true
+		Elements.ClipsDescendants = true
+
+		if TabList:FindFirstChildOfClass("UIListLayout") then
+			local listLayout = TabList:FindFirstChildOfClass("UIListLayout")
+			listLayout.FillDirection = Enum.FillDirection.Vertical
+			listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+			listLayout.VerticalAlignment = Enum.VerticalAlignment.Top
+			listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+			listLayout.Padding = UDim.new(0, 6)
+		end
+
+		TabList.AnchorPoint = Vector2.new(0, 0)
+		TabList.Position = UDim2.new(0, WINDOW_PADDING, 0, TOPBAR_HEIGHT + WINDOW_PADDING)
+		TabList.Size = UDim2.new(0, SIDEBAR_WIDTH, 1, -(TOPBAR_HEIGHT + WINDOW_PADDING * 2))
+		TabList.AutomaticCanvasSize = Enum.AutomaticSize.Y
+		TabList.CanvasSize = UDim2.new(0, 0, 0, 0)
+		TabList.ScrollBarImageTransparency = 1
+
+		Elements.AnchorPoint = Vector2.new(0, 0)
+		Elements.Position = UDim2.new(0, WINDOW_PADDING + SIDEBAR_WIDTH + SIDEBAR_GAP, 0, TOPBAR_HEIGHT + WINDOW_PADDING)
+		Elements.Size = UDim2.new(1, -(WINDOW_PADDING * 2 + SIDEBAR_WIDTH + SIDEBAR_GAP), 1, -(TOPBAR_HEIGHT + WINDOW_PADDING * 2))
+		Elements.CanvasSize = UDim2.new(0, 0, 0, 0)
+
+		for _, TabPage in ipairs(Elements:GetChildren()) do
+			if TabPage:IsA("ScrollingFrame") and TabPage.Name ~= "Template" then
+				TabPage.Position = UDim2.new(0, 0, 0, 0)
+				TabPage.Size = UDim2.new(1, 0, 1, 0)
+				TabPage.AutomaticCanvasSize = Enum.AutomaticSize.Y
+				TabPage.ScrollBarImageTransparency = 1
+				TabPage.ClipsDescendants = true
+			end
+		end
+
+		for _, TabButton in ipairs(TabList:GetChildren()) do
+			styleTabButton(TabButton)
+		end
+	end
+
 local dragOffset = 255
 local dragOffsetMobile = 150
 
@@ -1163,17 +1244,17 @@ local function openSearch()
 
 	Main.Search.Input:CaptureFocus()
 	TweenService:Create(Main.Search.Shadow, TweenInfo.new(0.05, Enum.EasingStyle.Quint), {ImageTransparency = 0.95}):Play()
-	TweenService:Create(Main.Search, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Position = UDim2.new(0.5, 70, 0, 57), BackgroundTransparency = 0.9}):Play()
+	TweenService:Create(Main.Search, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Position = UDim2.new(0.5, 0, 0, 57), BackgroundTransparency = 0.9}):Play()
 	TweenService:Create(Main.Search.UIStroke, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Transparency = 0.8}):Play()
 	TweenService:Create(Main.Search.Input, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {TextTransparency = 0.2}):Play()
 	TweenService:Create(Main.Search.Search, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {ImageTransparency = 0.5}):Play()
-	TweenService:Create(Main.Search, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(1, -170, 0, 35)}):Play()
+	TweenService:Create(Main.Search, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(1, -35, 0, 35)}):Play()
 end
 
 local function closeSearch()
 	searchOpen = false
 
-	TweenService:Create(Main.Search, TweenInfo.new(0.35, Enum.EasingStyle.Quint), {BackgroundTransparency = 1, Size = UDim2.new(1, -170, 0, 30)}):Play()
+	TweenService:Create(Main.Search, TweenInfo.new(0.35, Enum.EasingStyle.Quint), {BackgroundTransparency = 1, Size = UDim2.new(1, -55, 0, 30)}):Play()
 	TweenService:Create(Main.Search.Search, TweenInfo.new(0.15, Enum.EasingStyle.Quint), {ImageTransparency = 1}):Play()
 	TweenService:Create(Main.Search.Shadow, TweenInfo.new(0.15, Enum.EasingStyle.Quint), {ImageTransparency = 1}):Play()
 	TweenService:Create(Main.Search.UIStroke, TweenInfo.new(0.15, Enum.EasingStyle.Quint), {Transparency = 1}):Play()
@@ -1295,7 +1376,6 @@ local function Maximise()
 	TweenService:Create(dragBarCosmetic, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundTransparency = 0.7}):Play()
 	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = useMobileSizing and UDim2.new(0, 500, 0, 275) or UDim2.new(0, 500, 0, 475)}):Play()
 	TweenService:Create(Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 500, 0, 45)}):Play()
-	applySidebarLayout()
 	TabList.Visible = true
 	task.wait(0.2)
 
@@ -1356,7 +1436,6 @@ local function Unhide()
 	Main.Visible = true
 	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = useMobileSizing and UDim2.new(0, 500, 0, 275) or UDim2.new(0, 500, 0, 475)}):Play()
 	TweenService:Create(Main.Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 500, 0, 45)}):Play()
-	applySidebarLayout()
 	TweenService:Create(Main.Shadow.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0.6}):Play()
 	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 	TweenService:Create(Main.Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
@@ -2004,62 +2083,6 @@ function RayfieldLibrary:CreateWindow(Settings)
 	Elements.UIPageLayout.FillDirection = Enum.FillDirection.Horizontal
 	TabList.Template.Visible = false
 
-	local SIDEBAR_WIDTH = 130
-	local CONTENT_PADDING = 10
-
-	local function updateSidebarCanvas()
-		local maxY = 0
-		for _, child in ipairs(TabList:GetChildren()) do
-			if child:IsA("Frame") and child.Name ~= "Template" and child.Name ~= "Placeholder" and child.Visible then
-				local bottom = child.Position.Y.Offset + child.Size.Y.Offset
-				if bottom > maxY then
-					maxY = bottom
-				end
-			end
-		end
-		if TabList:IsA("ScrollingFrame") then
-			TabList.CanvasSize = UDim2.new(0, 0, 0, maxY + 10)
-		end
-	end
-
-	local function applySidebarLayout()
-		Topbar.Size = UDim2.new(1, 0, 0, 45)
-		if Topbar:FindFirstChild("Divider") then
-			Topbar.Divider.Position = UDim2.new(0, 0, 1, -1)
-			Topbar.Divider.Size = UDim2.new(1, 0, 0, 1)
-		end
-
-		TabList.Position = UDim2.new(0, CONTENT_PADDING, 0, 55)
-		TabList.Size = UDim2.new(0, SIDEBAR_WIDTH, 1, -65)
-		TabList.ClipsDescendants = true
-		if TabList:IsA("ScrollingFrame") then
-			TabList.ScrollingDirection = Enum.ScrollingDirection.Y
-			TabList.ScrollBarThickness = 0
-			TabList.AutomaticCanvasSize = Enum.AutomaticSize.None
-		end
-
-		Elements.Position = UDim2.new(0, SIDEBAR_WIDTH + (CONTENT_PADDING * 2), 0, 55)
-		Elements.Size = UDim2.new(1, -(SIDEBAR_WIDTH + (CONTENT_PADDING * 3)), 1, -65)
-		Elements.ClipsDescendants = true
-
-		for _, existingPage in ipairs(Elements:GetChildren()) do
-			if existingPage:IsA("ScrollingFrame") and existingPage.Name ~= "Template" then
-				existingPage.Size = UDim2.new(1, 0, 1, 0)
-				existingPage.Position = UDim2.new(0, 0, 0, 0)
-				existingPage.CanvasSize = UDim2.new(0, 0, 0, 0)
-				existingPage.ScrollBarThickness = 0
-			end
-		end
-
-		Main.Search.AnchorPoint = Vector2.new(0.5, 0)
-		Main.Search.Position = UDim2.new(0.5, 70, 0, 57)
-		Main.Search.Size = UDim2.new(1, -170, 0, 35)
-
-		updateSidebarCanvas()
-	end
-
-	applySidebarLayout()
-
 	-- Tab
 	local FirstTab = false
 	local Window = {}
@@ -2070,16 +2093,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 		TabButton.Title.Text = Name
 		TabButton.Parent = TabList
 		TabButton.Title.TextWrapped = false
-		TabButton.AnchorPoint = Vector2.new(0, 0)
-		TabButton.Position = UDim2.new(0, 0, 0, math.max((#TabList:GetChildren() - 2), 0) * 34)
-		TabButton.Size = UDim2.new(1, 0, 0, 30)
-		TabButton.Title.Size = UDim2.new(1, -40, 1, 0)
-		TabButton.Title.AnchorPoint = Vector2.new(0, 0.5)
-		TabButton.Title.Position = UDim2.new(0, 35, 0.5, 0)
-		TabButton.Title.TextXAlignment = Enum.TextXAlignment.Left
-		TabButton.Image.Position = UDim2.new(0, 10, 0.5, 0)
-		TabButton.Image.AnchorPoint = Vector2.new(0, 0.5)
-		TabButton.Image.Size = UDim2.new(0, 16, 0, 16)
+		TabButton.Size = UDim2.new(0, TabButton.Title.TextBounds.X + 30, 0, 30)
 
 		if Image and Image ~= 0 then
 			if typeof(Image) == 'string' and Icons then
@@ -2092,7 +2106,11 @@ function RayfieldLibrary:CreateWindow(Settings)
 				TabButton.Image.Image = getAssetUri(Image)
 			end
 
+			TabButton.Title.AnchorPoint = Vector2.new(0, 0.5)
+			TabButton.Title.Position = UDim2.new(0, 37, 0.5, 0)
 			TabButton.Image.Visible = true
+			TabButton.Title.TextXAlignment = Enum.TextXAlignment.Left
+			TabButton.Size = UDim2.new(0, TabButton.Title.TextBounds.X + 52, 0, 30)
 		end
 
 
@@ -2103,15 +2121,11 @@ function RayfieldLibrary:CreateWindow(Settings)
 		TabButton.UIStroke.Transparency = 1
 
 		TabButton.Visible = not Ext or false
-		updateSidebarCanvas()
 
 		-- Create Elements Page
 		local TabPage = Elements.Template:Clone()
 		TabPage.Name = Name
 		TabPage.Visible = true
-		TabPage.Size = UDim2.new(1, 0, 1, 0)
-		TabPage.Position = UDim2.new(0, 0, 0, 0)
-		TabPage.ScrollBarThickness = 0
 
 		TabPage.LayoutOrder = #Elements:GetChildren() or Ext and 10000
 
@@ -2122,7 +2136,6 @@ function RayfieldLibrary:CreateWindow(Settings)
 		end
 
 		TabPage.Parent = Elements
-		applySidebarLayout()
 		if not FirstTab and not Ext then
 			Elements.UIPageLayout.Animated = false
 			Elements.UIPageLayout:JumpTo(TabPage)
