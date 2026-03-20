@@ -1,5 +1,9 @@
 local module = {}
 
+function module.IsWorking()
+return (module~=nil)
+end
+
 function module:GetWorkingRayfield()
 --[[
 
