@@ -758,9 +758,9 @@ local Notifications = Rayfield.Notifications
 
 local SelectedTheme = RayfieldLibrary.Theme.Default
 
-
 local WINDOW_WIDTH = 620
 local WINDOW_HEIGHT = 475
+local WINDOW_WIDTH_MOBILE = 500
 local WINDOW_HEIGHT_MOBILE = 320
 local TOPBAR_HEIGHT = 45
 local SIDEBAR_WIDTH = 150
@@ -768,11 +768,49 @@ local SIDEBAR_PADDING = 10
 local CONTENT_PADDING = 10
 
 local function getWindowSize()
-	return useMobileSizing and UDim2.new(0, 500, 0, WINDOW_HEIGHT_MOBILE) or UDim2.new(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT)
+	if useMobileSizing then
+		return UDim2.new(0, WINDOW_WIDTH_MOBILE, 0, WINDOW_HEIGHT_MOBILE)
+	end
+	return UDim2.new(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT)
 end
 
 local function getTopbarSize()
-	return useMobileSizing and UDim2.new(0, 500, 0, TOPBAR_HEIGHT) or UDim2.new(0, WINDOW_WIDTH, 0, TOPBAR_HEIGHT)
+	if useMobileSizing then
+		return UDim2.new(0, WINDOW_WIDTH_MOBILE, 0, TOPBAR_HEIGHT)
+	end
+	return UDim2.new(0, WINDOW_WIDTH, 0, TOPBAR_HEIGHT)
+end
+
+local function getHiddenSize()
+	if useMobileSizing then
+		return UDim2.new(0, WINDOW_WIDTH_MOBILE - 30, 0, 0)
+	end
+	return UDim2.new(0, WINDOW_WIDTH - 150, 0, 0)
+end
+
+local function getMinimisedSize()
+	if useMobileSizing then
+		return UDim2.new(0, WINDOW_WIDTH_MOBILE - 5, 0, TOPBAR_HEIGHT)
+	end
+	return UDim2.new(0, WINDOW_WIDTH - 125, 0, TOPBAR_HEIGHT)
+end
+
+local function getSearchClosedSize()
+	local contentX = SIDEBAR_PADDING + SIDEBAR_WIDTH + CONTENT_PADDING
+	return UDim2.new(1, -(contentX + CONTENT_PADDING), 0, 30)
+end
+
+local function getSearchOpenSize()
+	local contentX = SIDEBAR_PADDING + SIDEBAR_WIDTH + CONTENT_PADDING
+	return UDim2.new(1, -(contentX + CONTENT_PADDING), 0, 35)
+end
+
+local function getSearchPosition(openState)
+	local contentX = SIDEBAR_PADDING + SIDEBAR_WIDTH + CONTENT_PADDING
+	if openState then
+		return UDim2.new(0, contentX, 0, TOPBAR_HEIGHT + SIDEBAR_PADDING)
+	end
+	return UDim2.new(0, contentX, 0, TOPBAR_HEIGHT + SIDEBAR_PADDING)
 end
 
 local function applyModernSidebarLayout()
@@ -802,24 +840,20 @@ local function applyModernSidebarLayout()
 	Elements.ClipsDescendants = true
 
 	Main.Search.AnchorPoint = Vector2.new(0, 0)
-	Main.Search.Position = UDim2.new(0, contentX, 0, TOPBAR_HEIGHT + SIDEBAR_PADDING)
-	Main.Search.Size = UDim2.new(1, contentWidthOffset, 0, 35)
+	Main.Search.Position = getSearchPosition(false)
+	Main.Search.Size = getSearchClosedSize()
 
 	for _, tabbtn in ipairs(TabList:GetChildren()) do
 		if tabbtn:IsA("Frame") and tabbtn.Name ~= "Template" and tabbtn.Name ~= "Placeholder" then
 			tabbtn.Size = UDim2.new(1, -4, 0, 34)
 			tabbtn.Title.TextXAlignment = Enum.TextXAlignment.Left
-			tabbtn.Title.Position = UDim2.new(0, tabbtn.Image.Visible and 36 or 12, 0.5, 0)
 			tabbtn.Title.AnchorPoint = Vector2.new(0, 0.5)
+			tabbtn.Title.Position = UDim2.new(0, tabbtn.Image.Visible and 36 or 12, 0.5, 0)
 			if tabbtn:FindFirstChild("Image") then
-				tabbtn.Image.Position = UDim2.new(0, 10, 0.5, 0)
 				tabbtn.Image.AnchorPoint = Vector2.new(0, 0.5)
+				tabbtn.Image.Position = UDim2.new(0, 10, 0.5, 0)
 			end
 		end
-	end
-	
-	if Topbar:FindFirstChild("Divider") then
-		Topbar.Divider.Size = UDim2.new(1, 0, 0, 1)
 	end
 end
 
@@ -1205,8 +1239,8 @@ local function openSearch()
 	Main.Search.Input.TextTransparency = 1
 	Main.Search.Search.ImageTransparency = 1
 	Main.Search.UIStroke.Transparency = 1
-	Main.Search.Size = UDim2.new(1, -(SIDEBAR_PADDING + SIDEBAR_WIDTH + CONTENT_PADDING * 2), 0, 80)
-	Main.Search.Position = UDim2.new(0, SIDEBAR_PADDING + SIDEBAR_WIDTH + CONTENT_PADDING, 0, TOPBAR_HEIGHT + SIDEBAR_PADDING + 15)
+	Main.Search.Size = getSearchClosedSize()
+	Main.Search.Position = getSearchPosition(false)
 
 	Main.Search.Input.Interactable = true
 
@@ -1224,17 +1258,17 @@ local function openSearch()
 
 	Main.Search.Input:CaptureFocus()
 	TweenService:Create(Main.Search.Shadow, TweenInfo.new(0.05, Enum.EasingStyle.Quint), {ImageTransparency = 0.95}):Play()
-	TweenService:Create(Main.Search, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Position = UDim2.new(0, SIDEBAR_PADDING + SIDEBAR_WIDTH + CONTENT_PADDING, 0, TOPBAR_HEIGHT + SIDEBAR_PADDING), BackgroundTransparency = 0.9}):Play()
+	TweenService:Create(Main.Search, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Position = getSearchPosition(true), BackgroundTransparency = 0.9}):Play()
 	TweenService:Create(Main.Search.UIStroke, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Transparency = 0.8}):Play()
 	TweenService:Create(Main.Search.Input, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {TextTransparency = 0.2}):Play()
 	TweenService:Create(Main.Search.Search, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {ImageTransparency = 0.5}):Play()
-	TweenService:Create(Main.Search, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(1, -(SIDEBAR_PADDING + SIDEBAR_WIDTH + CONTENT_PADDING * 2), 0, 35)}):Play()
+	TweenService:Create(Main.Search, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = getSearchOpenSize()}):Play()
 end
 
 local function closeSearch()
 	searchOpen = false
 
-	TweenService:Create(Main.Search, TweenInfo.new(0.35, Enum.EasingStyle.Quint), {BackgroundTransparency = 1, Size = UDim2.new(1, -(SIDEBAR_PADDING + SIDEBAR_WIDTH + CONTENT_PADDING * 2 + 20), 0, 30)}):Play()
+	TweenService:Create(Main.Search, TweenInfo.new(0.35, Enum.EasingStyle.Quint), {BackgroundTransparency = 1, Size = getSearchClosedSize(), Position = getSearchPosition(false)}):Play()
 	TweenService:Create(Main.Search.Search, TweenInfo.new(0.15, Enum.EasingStyle.Quint), {ImageTransparency = 1}):Play()
 	TweenService:Create(Main.Search.Shadow, TweenInfo.new(0.15, Enum.EasingStyle.Quint), {ImageTransparency = 1}):Play()
 	TweenService:Create(Main.Search.UIStroke, TweenInfo.new(0.15, Enum.EasingStyle.Quint), {Transparency = 1}):Play()
@@ -1282,8 +1316,8 @@ local function Hide(notify: boolean?)
 		end
 	end
 
-	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, useMobileSizing and 470 or WINDOW_WIDTH - 30, 0, 0)}):Play()
-	TweenService:Create(Main.Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, useMobileSizing and 470 or WINDOW_WIDTH - 30, 0, TOPBAR_HEIGHT)}):Play()
+	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = getHiddenSize()}):Play()
+	TweenService:Create(Main.Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(getHiddenSize().X.Scale, getHiddenSize().X.Offset, 0, TOPBAR_HEIGHT)}):Play()
 	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
 	TweenService:Create(Main.Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
 	TweenService:Create(Main.Topbar.Divider, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
@@ -1415,7 +1449,7 @@ local function Unhide()
 	Main.Position = UDim2.new(0.5, 0, 0.5, 0)
 	Main.Visible = true
 	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = getWindowSize()}):Play()
-	TweenService:Create(Main.Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = getTopbarSize()}):Play()
+	TweenService:Create(Main.Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 500, 0, 45)}):Play()
 	TweenService:Create(Main.Shadow.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0.6}):Play()
 	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 	TweenService:Create(Main.Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
@@ -1547,8 +1581,8 @@ local function Minimise()
 	TweenService:Create(Main.Shadow.Image, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {ImageTransparency = 1}):Play()
 	TweenService:Create(Topbar.CornerRepair, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
 	TweenService:Create(Topbar.Divider, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
-	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, useMobileSizing and 495 or WINDOW_WIDTH - 5, 0, TOPBAR_HEIGHT)}):Play()
-	TweenService:Create(Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, useMobileSizing and 495 or WINDOW_WIDTH - 5, 0, TOPBAR_HEIGHT)}):Play()
+	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = getMinimisedSize()}):Play()
+	TweenService:Create(Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(getMinimisedSize().X.Scale, getMinimisedSize().X.Offset, 0, TOPBAR_HEIGHT)}):Play()
 
 	task.wait(0.3)
 
@@ -1701,7 +1735,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 	local Passthrough = false
 	Topbar.Title.Text = Settings.Name
 
-	Main.Size = UDim2.new(0, useMobileSizing and 420 or WINDOW_WIDTH - 40, 0, 100)
+	Main.Size = UDim2.new(0, WINDOW_WIDTH - 200, 0, 100)
 	Main.Visible = true
 	Main.BackgroundTransparency = 1
 	if Main:FindFirstChild('Notice') then Main.Notice.Visible = false end
@@ -1740,6 +1774,10 @@ function RayfieldLibrary:CreateWindow(Settings)
 			Topbar.Icon.Image = "rbxassetid://" .. 0
 		end
 	end
+
+	Main.Size = getWindowSize()
+	Topbar.Size = getTopbarSize()
+	applyModernSidebarLayout()
 
 	if dragBar then
 		dragBar.Visible = false
@@ -1804,7 +1842,13 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 	for _, TabButton in ipairs(TabList:GetChildren()) do
 		if TabButton.ClassName == "Frame" and TabButton.Name ~= "Placeholder" then
-			TabButton.BackgroundTransparency = 1
+			if not (Image and Image ~= 0) then
+			TabButton.Title.AnchorPoint = Vector2.new(0, 0.5)
+			TabButton.Title.Position = UDim2.new(0, 12, 0.5, 0)
+			TabButton.Title.TextXAlignment = Enum.TextXAlignment.Left
+		end
+
+		TabButton.BackgroundTransparency = 1
 			TabButton.Title.TextTransparency = 1
 			TabButton.Image.ImageTransparency = 1
 			TabButton.UIStroke.Transparency = 1
@@ -2087,9 +2131,11 @@ function RayfieldLibrary:CreateWindow(Settings)
 			end
 
 			TabButton.Title.AnchorPoint = Vector2.new(0, 0.5)
-			TabButton.Title.Position = UDim2.new(0, 37, 0.5, 0)
+			TabButton.Title.Position = UDim2.new(0, 36, 0.5, 0)
 			TabButton.Image.Visible = true
 			TabButton.Title.TextXAlignment = Enum.TextXAlignment.Left
+			TabButton.Image.AnchorPoint = Vector2.new(0, 0.5)
+			TabButton.Image.Position = UDim2.new(0, 10, 0.5, 0)
 			TabButton.Size = UDim2.new(1, -4, 0, 34)
 		end
 
@@ -2101,7 +2147,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 		TabButton.UIStroke.Transparency = 1
 
 		TabButton.Visible = not Ext or false
-		TabButton.Title.TextXAlignment = Enum.TextXAlignment.Left
+		applyModernSidebarLayout()
 
 		-- Create Elements Page
 		local TabPage = Elements.Template:Clone()
@@ -2183,8 +2229,6 @@ function RayfieldLibrary:CreateWindow(Settings)
 				Elements.UIPageLayout:JumpTo(TabPage)
 			end
 		end)
-
-		applyModernSidebarLayout()
 
 		local Tab = {}
 
@@ -2496,7 +2540,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 				TweenService:Create(ColorPicker, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
 			end)
 
-		Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
+			Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
 				for _, rgbinput in ipairs(ColorPicker.RGB:GetChildren()) do
 					if rgbinput:IsA("Frame") then
 						rgbinput.BackgroundColor3 = SelectedTheme.InputBackground
@@ -3588,7 +3632,6 @@ function RayfieldLibrary:CreateWindow(Settings)
 	end
 
 	Elements.Visible = true
-	applyModernSidebarLayout()
 
 
 	task.wait(1.1)
@@ -3598,7 +3641,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 	TweenService:Create(LoadingFrame.Subtitle, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
 	TweenService:Create(LoadingFrame.Version, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
 	task.wait(0.1)
-	TweenService:Create(Main, TweenInfo.new(0.6, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Size = getWindowSize()}):Play()
+	TweenService:Create(Main, TweenInfo.new(0.6, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Size = useMobileSizing and UDim2.new(0, 500, 0, 275) or UDim2.new(0, 500, 0, 475)}):Play()
 	TweenService:Create(Main.Shadow.Image, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {ImageTransparency = 0.6}):Play()
 
 	Topbar.BackgroundTransparency = 1
@@ -3652,6 +3695,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 	if not success then warn('Rayfield had an issue creating settings.') end
 
+	applyModernSidebarLayout()
 	return Window
 end
 
