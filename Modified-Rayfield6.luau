@@ -762,18 +762,30 @@ local Notifications = Rayfield.Notifications
 
 local SelectedTheme = RayfieldLibrary.Theme.Default
 
-	local SIDEBAR_WIDTH = 170
+	local SIDEBAR_MIN_WIDTH = 132
+	local SIDEBAR_MAX_WIDTH = 150
 	local TOPBAR_HEIGHT = 45
+	local TAB_BUTTON_HEIGHT = 30
+
+	local function getSidebarWidth()
+		local absoluteWidth = Main and Main.AbsoluteSize and Main.AbsoluteSize.X or 0
+		if absoluteWidth <= 0 then
+			return 140
+		end
+
+		return math.clamp(math.floor(absoluteWidth * 0.22), SIDEBAR_MIN_WIDTH, SIDEBAR_MAX_WIDTH)
+	end
 
 	local function applySidebarLayout()
 		pcall(function()
+			local sidebarWidth = getSidebarWidth()
 			Main.ClipsDescendants = true
 			TabList.ClipsDescendants = true
 			Elements.ClipsDescendants = true
 
 			TabList.AnchorPoint = Vector2.new(0, 0)
 			TabList.Position = UDim2.new(0, 8, 0, TOPBAR_HEIGHT + 8)
-			TabList.Size = UDim2.new(0, SIDEBAR_WIDTH, 1, -(TOPBAR_HEIGHT + 16))
+			TabList.Size = UDim2.new(0, sidebarWidth, 1, -(TOPBAR_HEIGHT + 16))
 			TabList.BackgroundTransparency = 1
 
 			local tabLayout = TabList:FindFirstChildWhichIsA('UIListLayout')
@@ -782,12 +794,12 @@ local SelectedTheme = RayfieldLibrary.Theme.Default
 				tabLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
 				tabLayout.VerticalAlignment = Enum.VerticalAlignment.Top
 				tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
-				tabLayout.Padding = UDim.new(0, 6)
+				tabLayout.Padding = UDim.new(0, 5)
 			end
 
 			Elements.AnchorPoint = Vector2.new(0, 0)
-			Elements.Position = UDim2.new(0, SIDEBAR_WIDTH + 16, 0, TOPBAR_HEIGHT + 8)
-			Elements.Size = UDim2.new(1, -(SIDEBAR_WIDTH + 24), 1, -(TOPBAR_HEIGHT + 16))
+			Elements.Position = UDim2.new(0, sidebarWidth + 16, 0, TOPBAR_HEIGHT + 8)
+			Elements.Size = UDim2.new(1, -(sidebarWidth + 24), 1, -(TOPBAR_HEIGHT + 16))
 			Elements.ClipsDescendants = true
 
 			for _, page in ipairs(Elements:GetChildren()) do
@@ -798,12 +810,22 @@ local SelectedTheme = RayfieldLibrary.Theme.Default
 				end
 			end
 
+			for _, tabButton in ipairs(TabList:GetChildren()) do
+				if tabButton:IsA('Frame') and tabButton.Name ~= 'Placeholder' then
+					tabButton.Size = UDim2.new(1, -8, 0, TAB_BUTTON_HEIGHT)
+				end
+			end
+
 			if Main:FindFirstChild('Search') then
-				Main.Search.Position = UDim2.new(0, SIDEBAR_WIDTH + 26, 0, TOPBAR_HEIGHT + 12)
-				Main.Search.Size = UDim2.new(1, -(SIDEBAR_WIDTH + 42), 0, 32)
+				Main.Search.Position = UDim2.new(0, sidebarWidth + 26, 0, TOPBAR_HEIGHT + 12)
+				Main.Search.Size = UDim2.new(1, -(sidebarWidth + 42), 0, 32)
 			end
 		end)
 	end
+
+	Main:GetPropertyChangedSignal('AbsoluteSize'):Connect(function()
+		applySidebarLayout()
+	end)
 
 local function ChangeTheme(Theme)
 	if typeof(Theme) == 'string' then
@@ -2055,13 +2077,16 @@ function RayfieldLibrary:CreateWindow(Settings)
 		TabButton.Title.Text = Name
 		TabButton.Parent = TabList
 		TabButton.Title.TextWrapped = false
-		TabButton.Size = UDim2.new(1, -8, 0, 34)
+		TabButton.Title.TextTruncate = Enum.TextTruncate.AtEnd
+		TabButton.Title.TextSize = 13
+		TabButton.Size = UDim2.new(1, -8, 0, TAB_BUTTON_HEIGHT)
 		TabButton.AnchorPoint = Vector2.new(0, 0)
 		TabButton.Position = UDim2.new(0, 4, 0, 0)
 		TabButton.ClipsDescendants = true
 		TabButton.Title.TextXAlignment = Enum.TextXAlignment.Left
 		TabButton.Title.AnchorPoint = Vector2.new(0, 0.5)
-		TabButton.Title.Position = UDim2.new(0, 14, 0.5, 0)
+		TabButton.Title.Position = UDim2.new(0, 12, 0.5, 0)
+		TabButton.Title.Size = UDim2.new(1, -24, 0, 14)
 
 		if Image and Image ~= 0 then
 			if typeof(Image) == 'string' and Icons then
@@ -2075,12 +2100,13 @@ function RayfieldLibrary:CreateWindow(Settings)
 			end
 
 			TabButton.Title.AnchorPoint = Vector2.new(0, 0.5)
-			TabButton.Title.Position = UDim2.new(0, 40, 0.5, 0)
+			TabButton.Title.Position = UDim2.new(0, 36, 0.5, 0)
+			TabButton.Title.Size = UDim2.new(1, -44, 0, 14)
 			TabButton.Image.Visible = true
 			TabButton.Image.AnchorPoint = Vector2.new(0, 0.5)
-			TabButton.Image.Position = UDim2.new(0, 14, 0.5, 0)
+			TabButton.Image.Position = UDim2.new(0, 12, 0.5, 0)
 			TabButton.Title.TextXAlignment = Enum.TextXAlignment.Left
-			TabButton.Size = UDim2.new(1, -8, 0, 34)
+			TabButton.Size = UDim2.new(1, -8, 0, TAB_BUTTON_HEIGHT)
 		end
 
 
@@ -2647,10 +2673,24 @@ function RayfieldLibrary:CreateWindow(Settings)
 		-- Paragraph
 		function Tab:CreateParagraph(ParagraphSettings)
 			local ParagraphValue = {}
+			ParagraphSettings = ParagraphSettings or {}
 
 			local Paragraph = Elements.Template.Paragraph:Clone()
-			Paragraph.Title.Text = ParagraphSettings.Title
-			Paragraph.Content.Text = ParagraphSettings.Content
+			local function updateParagraph(paragraphData)
+				paragraphData = paragraphData or {}
+				Paragraph.Title.Text = tostring(paragraphData.Title or paragraphData.Name or '')
+				Paragraph.Content.Text = tostring(paragraphData.Content or paragraphData.Text or paragraphData.Description or '')
+				Paragraph.Title.Visible = Paragraph.Title.Text ~= ''
+				Paragraph.Content.Visible = Paragraph.Content.Text ~= ''
+				Paragraph.Title.TextWrapped = true
+				Paragraph.Content.TextWrapped = true
+				Paragraph.Title.AutomaticSize = Enum.AutomaticSize.Y
+				Paragraph.Content.AutomaticSize = Enum.AutomaticSize.Y
+				Paragraph.AutomaticSize = Enum.AutomaticSize.Y
+				Paragraph.Size = UDim2.new(1, -8, 0, 0)
+			end
+
+			updateParagraph(ParagraphSettings)
 			Paragraph.Visible = true
 			Paragraph.Parent = TabPage
 
@@ -2668,8 +2708,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 			TweenService:Create(Paragraph.Content, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()	
 
 			function ParagraphValue:Set(NewParagraphSettings)
-				Paragraph.Title.Text = NewParagraphSettings.Title
-				Paragraph.Content.Text = NewParagraphSettings.Content
+				updateParagraph(NewParagraphSettings)
 			end
 
 			Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
