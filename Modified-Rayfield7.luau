@@ -2676,18 +2676,13 @@ function RayfieldLibrary:CreateWindow(Settings)
 			ParagraphSettings = ParagraphSettings or {}
 
 			local Paragraph = Elements.Template.Paragraph:Clone()
+
 			local function updateParagraph(paragraphData)
 				paragraphData = paragraphData or {}
 				Paragraph.Title.Text = tostring(paragraphData.Title or paragraphData.Name or '')
 				Paragraph.Content.Text = tostring(paragraphData.Content or paragraphData.Text or paragraphData.Description or '')
 				Paragraph.Title.Visible = Paragraph.Title.Text ~= ''
 				Paragraph.Content.Visible = Paragraph.Content.Text ~= ''
-				Paragraph.Title.TextWrapped = true
-				Paragraph.Content.TextWrapped = true
-				Paragraph.Title.AutomaticSize = Enum.AutomaticSize.Y
-				Paragraph.Content.AutomaticSize = Enum.AutomaticSize.Y
-				Paragraph.AutomaticSize = Enum.AutomaticSize.Y
-				Paragraph.Size = UDim2.new(1, -8, 0, 0)
 			end
 
 			updateParagraph(ParagraphSettings)
