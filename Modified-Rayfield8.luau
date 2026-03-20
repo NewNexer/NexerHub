@@ -117,6 +117,7 @@ end
 
 local HttpService = getService('HttpService')
 local RunService = getService('RunService')
+local TextService = getService('TextService')
 
 -- Environment Check
 local useStudio = RunService:IsStudio() or false
@@ -2676,39 +2677,104 @@ function RayfieldLibrary:CreateWindow(Settings)
 			ParagraphSettings = ParagraphSettings or {}
 
 			local Paragraph = Elements.Template.Paragraph:Clone()
-
-			local function updateParagraph(paragraphData)
-				paragraphData = paragraphData or {}
-				Paragraph.Title.Text = tostring(paragraphData.Title or paragraphData.Name or '')
-				Paragraph.Content.Text = tostring(paragraphData.Content or paragraphData.Text or paragraphData.Description or '')
-				Paragraph.Title.Visible = Paragraph.Title.Text ~= ''
-				Paragraph.Content.Visible = Paragraph.Content.Text ~= ''
-			end
-
-			updateParagraph(ParagraphSettings)
 			Paragraph.Visible = true
 			Paragraph.Parent = TabPage
-
+			Paragraph.ClipsDescendants = true
 			Paragraph.BackgroundTransparency = 1
 			Paragraph.UIStroke.Transparency = 1
-			Paragraph.Title.TextTransparency = 1
-			Paragraph.Content.TextTransparency = 1
-
 			Paragraph.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
 			Paragraph.UIStroke.Color = SelectedTheme.SecondaryElementStroke
 
+			local TitleLabel = Paragraph:FindFirstChild('Title')
+			if not TitleLabel or not TitleLabel:IsA('TextLabel') then
+				if TitleLabel then
+					TitleLabel:Destroy()
+				end
+				TitleLabel = Instance.new('TextLabel')
+				TitleLabel.Name = 'Title'
+				TitleLabel.Parent = Paragraph
+			end
+
+			local ContentLabel = Paragraph:FindFirstChild('Content')
+			if not ContentLabel or not ContentLabel:IsA('TextLabel') then
+				if ContentLabel then
+					ContentLabel:Destroy()
+				end
+				ContentLabel = Instance.new('TextLabel')
+				ContentLabel.Name = 'Content'
+				ContentLabel.Parent = Paragraph
+			end
+
+			TitleLabel.BackgroundTransparency = 1
+			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+			TitleLabel.TextYAlignment = Enum.TextYAlignment.Top
+			TitleLabel.TextWrapped = false
+			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
+			TitleLabel.Size = UDim2.new(1, -24, 0, 18)
+			TitleLabel.Position = UDim2.new(0, 12, 0, 10)
+			TitleLabel.ZIndex = math.max(Paragraph.ZIndex + 1, TitleLabel.ZIndex)
+
+			ContentLabel.BackgroundTransparency = 1
+			ContentLabel.TextXAlignment = Enum.TextXAlignment.Left
+			ContentLabel.TextYAlignment = Enum.TextYAlignment.Top
+			ContentLabel.TextWrapped = true
+			ContentLabel.TextTruncate = Enum.TextTruncate.None
+			ContentLabel.Position = UDim2.new(0, 12, 0, 32)
+			ContentLabel.Size = UDim2.new(1, -24, 0, 16)
+			ContentLabel.ZIndex = math.max(Paragraph.ZIndex + 1, ContentLabel.ZIndex)
+
+			local function updateParagraph(paragraphData)
+				paragraphData = paragraphData or {}
+				local titleText = tostring(paragraphData.Title or paragraphData.Name or '')
+				local contentText = tostring(paragraphData.Content or paragraphData.Text or paragraphData.Description or '')
+				local contentWidth = math.max(80, Paragraph.AbsoluteSize.X - 24)
+				local titleVisible = titleText ~= ''
+				local contentVisible = contentText ~= ''
+				local contentTop = titleVisible and 32 or 12
+				local contentHeight = 0
+
+				TitleLabel.Text = titleText
+				TitleLabel.Visible = titleVisible
+				ContentLabel.Text = contentText
+				ContentLabel.Visible = contentVisible
+
+				if contentVisible then
+					local measured = TextService:GetTextSize(contentText, ContentLabel.TextSize, ContentLabel.Font, Vector2.new(contentWidth, 10000))
+					contentHeight = math.max(16, measured.Y)
+				end
+
+				TitleLabel.Position = UDim2.new(0, 12, 0, 10)
+				TitleLabel.Size = UDim2.new(1, -24, 0, titleVisible and 18 or 0)
+				ContentLabel.Position = UDim2.new(0, 12, 0, contentTop)
+				ContentLabel.Size = UDim2.new(1, -24, 0, contentVisible and contentHeight or 0)
+				Paragraph.Size = UDim2.new(1, 0, 0, math.max(42, contentTop + contentHeight + 10))
+				Paragraph.Name = titleText ~= '' and titleText or 'Paragraph'
+			end
+
+			updateParagraph(ParagraphSettings)
+			TitleLabel.TextTransparency = 1
+			ContentLabel.TextTransparency = 1
+			TitleLabel.TextColor3 = SelectedTheme.TextColor
+			ContentLabel.TextColor3 = SelectedTheme.TextColor
+
 			TweenService:Create(Paragraph, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 			TweenService:Create(Paragraph.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
-			TweenService:Create(Paragraph.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()	
-			TweenService:Create(Paragraph.Content, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()	
+			TweenService:Create(TitleLabel, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()	
+			TweenService:Create(ContentLabel, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()	
+			task.defer(function()
+				updateParagraph(ParagraphSettings)
+			end)
 
 			function ParagraphValue:Set(NewParagraphSettings)
-				updateParagraph(NewParagraphSettings)
+				ParagraphSettings = NewParagraphSettings or ParagraphSettings
+				updateParagraph(ParagraphSettings)
 			end
 
 			Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
 				Paragraph.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
 				Paragraph.UIStroke.Color = SelectedTheme.SecondaryElementStroke
+				TitleLabel.TextColor3 = SelectedTheme.TextColor
+				ContentLabel.TextColor3 = SelectedTheme.TextColor
 			end)
 
 			return ParagraphValue
