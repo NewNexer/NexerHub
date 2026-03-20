@@ -931,6 +931,15 @@ else
 UIModule = Module:RequestModule(LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui"):WaitForChild("Client"):WaitForChild("Modules"):WaitForChild("UI"))
 end
 end)
+
+
+
+
+
+Window:CreateTabSection("General")
+
+
+
 local Tab_1 = Window:CreateTab("Stamina",0)
 Tab_1:CreateParagraph({Title = "Stamina", Content = "You can change your stamina properties here."})
 Tab_1:CreateSection("Fast Functions")
@@ -1159,267 +1168,530 @@ end; })
 
 
 
-
-local Tab_14 = Window:CreateTab("Untitled",0)
-Tab_14:CreateParagraph({Title = "Untitled", Content = "Stuff that may or may not be useful. This tab will be deleted soon and everything that is here will get moved to other tabs or removed if too useless"})
-
-function GetAwardFromAbility(abilitynaem)
-local rootpart = HumanoidRootPart
-local oldcf = rootpart.CFrame
-local killermodl = workspace.GameAssets.Teams.Killer:FindFirstChildOfClass("Model")
-if not killermodl then return end
-local killerrootpart = killermodl.HumanoidRootPart
-local anoclip_connection = nil
-local acamera_connection = nil
-function invisappwithnoclip(bool)
-if bool == false then
+local function ReturnAnimFolder()
+if Character:FindFirstChild("Animations") then
+return Character:WaitForChild("Animations")
+end
+return nil
+end
+local Tab_6 = Window:CreateTab("Animations",0)
+function SetRunAnim(run)
+pcall(function()
+local stopper = Humanoid or Character:FindFirstChildOfClass("AnimationController")
+for i,v in next, stopper:GetPlayingAnimationTracks() do
+v:Stop()
+end
+end)
+local AnimationFolder = ReturnAnimFolder()
+pcall(function()
+if AnimationFolder:FindFirstChild("HurtSprint") then
+AnimationFolder:FindFirstChild("HurtSprint").AnimationId = run
+end
+end)
+pcall(function()
+if AnimationFolder:FindFirstChild("NormalSprint") then
+AnimationFolder:FindFirstChild("NormalSprint").AnimationId = run
+end
+end)
+pcall(function()
+if AnimationFolder:FindFirstChild("OldSprint") then
+AnimationFolder:FindFirstChild("OldSprint").AnimationId = run
+end
+end)
+pcall(function()
+if AnimationFolder:FindFirstChild("Sprint") then
+AnimationFolder:FindFirstChild("Sprint").AnimationId = run
+end
+end)
+end
+function SetWalkAnim(walk)
+pcall(function()
+local stopper = Humanoid or Character:FindFirstChildOfClass("AnimationController")
+for i,v in next, stopper:GetPlayingAnimationTracks() do
+v:Stop()
+end
+end)
+local AnimationFolder = ReturnAnimFolder()
+pcall(function()
+if AnimationFolder:FindFirstChild("Walk") then
+AnimationFolder:FindFirstChild("Walk").AnimationId = walk
+end
+end)
+pcall(function()
+if AnimationFolder:FindFirstChild("OldWalk") then
+AnimationFolder:FindFirstChild("OldWalk").AnimationId = walk
+end
+end)
+end
+function SetIdleAnim(idle)
+pcall(function()
+local stopper = Humanoid or Character:FindFirstChildOfClass("AnimationController")
+for i,v in next, stopper:GetPlayingAnimationTracks() do
+v:Stop()
+end
+end)
+local AnimationFolder = ReturnAnimFolder()
+pcall(function()
+if AnimationFolder:FindFirstChild("Idle") then
+AnimationFolder:FindFirstChild("Idle").AnimationId = idle
+end
+end)
+pcall(function()
+if AnimationFolder:FindFirstChild("OldIdle") then
+AnimationFolder:FindFirstChild("OldIdle").AnimationId = idle
+end
+end)
+end
+function ApplyNewAnimations()
+pcall(function()
+workspace:SetAttribute("AnimationsEnabled", false)
+task.wait()
+workspace:SetAttribute("AnimationsEnabled", true)
+end)
+end
+task.wait()
+if workspace:GetAttribute("AnimationsEnabled") == nil then
+Tab_6:CreateParagraph({Title = "Not Supported", Content = "clientscript not found"})
+end
+if workspace:GetAttribute("AnimationsEnabled") ~= nil then
+Tab_6:CreateParagraph({Title = "Animations", Content = "You can change your anims here."})
+Tab_6:CreateSection("Pre-loaded animations")
+Tab_6:CreateLabel("Civilian animations")
+Tab_6:CreateButton({Name = "Apply New Civilian Animations"; Callback = function()
+local RunAnim = "rbxassetid://137375023685630"
+local WalkAnim = "rbxassetid://84388941697203"
+local IdleAnim = "rbxassetid://100930402371608"
 task.spawn(function()
-for i,v in next, rootpart.Parent.Humanoid:GetPlayingAnimationTracks() do
-v.Priority = Enum.AnimationPriority.Core
-v:AdjustSpeed(tonumber(0))
-v:Stop(tonumber(0))
-end
+SetRunAnim(RunAnim)
+SetWalkAnim(WalkAnim)
+SetIdleAnim(IdleAnim)
+task.wait()
+ApplyNewAnimations()
 end)
-if anoclip_connection then
-anoclip_connection:Disconnect()
-anoclip_connection = nil
-end
-if rootpart then
-rootpart.CanCollide = true
-end
-if acamera_connection then
-acamera_connection:Disconnect()
-acamera_connection = nil
+Rayfield:Notification("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
+end; })
+Tab_6:CreateButton({Name = "Apply Old Civilian animations"; Callback = function()
+local RunAnim = "rbxassetid://79488319304371"
+local WalkAnim = "rbxassetid://138161225743614"
+local IdleAnim = "rbxassetid://74309548749074"
+task.spawn(function()
+SetRunAnim(RunAnim)
+SetWalkAnim(WalkAnim)
+SetIdleAnim(IdleAnim)
+task.wait()
+ApplyNewAnimations()
+end)
+Rayfield:Notification("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
+end; })
+Tab_6:CreateLabel("Ghost Animations")
+Tab_6:CreateButton({Name = "Apply Ghost animations"; Callback = function()
+local RunAnim = "rbxassetid://124260679864309"
+local WalkAnim = "rbxassetid://124260679864309"
+local IdleAnim = "rbxassetid://110395159339100"
+task.spawn(function()
+SetRunAnim(RunAnim)
+SetWalkAnim(WalkAnim)
+SetIdleAnim(IdleAnim)
+task.wait()
+ApplyNewAnimations()
+end)
+Rayfield:Notification("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
+end; })
 pcall(function()
-workspace.CurrentCamera.CameraSubject = rootpart.Parent.Humanoid
+for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
+Tab_6:CreateLabel(v.Name.." Animations")
+local temp_table = {}
+for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
+table.insert(temp_table, e.Name)
+end; end
+local Hi = v:WaitForChild("Default")
+Tab_6:CreateDropdown({Name = "Choose "..v.Name.." animations"; Options = temp_table; CurrentOption = "Default"; MultiSelection = false; Callback = function(Value)
+Hi = v:WaitForChild(Rayfield:GetDropdownValue(Value))
+end; })
+Tab_6:CreateButton({Name = "Apply "..v.Name.." animations"; Callback = function()
+local RunAnim = Hi:WaitForChild("Animations"):WaitForChild("Sprint").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("OldSprint").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("NormalSprint").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("HurtSprint").AnimationId
+local WalkAnim = Hi:WaitForChild("Animations"):WaitForChild("Walk").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("OldWalk").AnimationId
+local IdleAnim = Hi:WaitForChild("Animations"):WaitForChild("Idle").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("OldIdle").AnimationId
+task.spawn(function()
+SetRunAnim(RunAnim)
+SetWalkAnim(WalkAnim)
+SetIdleAnim(IdleAnim)
+task.wait()
+ApplyNewAnimations()
 end)
-end
-elseif bool == true then
-local function nocollision()
-for i,v in pairs(rootpart.Parent:GetDescendants()) do
-if v and v:IsA("BasePart") and v.CanCollide == true and v.Name ~= "HumanoidRootPart" then
-v.CanCollide = false
-end
-end
-if rootpart then
-rootpart.CanCollide = false
-end
-end
-anoclip_connection = game:GetService("RunService").Stepped:Connect(nocollision)
-acamera_connection = workspace.CurrentCamera:GetPropertyChangedSignal("CameraSubject"):Connect(function()
-workspace.CurrentCamera.CameraSubject = killerrootpart
+Rayfield:Notification("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
+end; })
+end; end
 end)
-workspace.CurrentCamera.CameraSubject = killerrootpart
-game.Players.LocalPlayer.CharacterAdded:Once(function()
-if acamera_connection then
-acamera_connection:Disconnect()
-acamera_connection = nil
+Tab_6:CreateSection("Advanced")
+function GetAllRunAnims()
+local temp_table = {}
+temp_table["Civilian Run"] = "rbxassetid://137375023685630"
+temp_table["Old Civilian Run"] = "rbxassetid://79488319304371"
+temp_table["Ghost Run"] = "rbxassetid://124260679864309"
+for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
+for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
+local RunAnim = e:WaitForChild("Animations"):WaitForChild("Sprint").AnimationId or e:WaitForChild("Animations"):WaitForChild("OldSprint").AnimationId or e:WaitForChild("Animations"):WaitForChild("NormalSprint").AnimationId or e:WaitForChild("Animations"):WaitForChild("HurtSprint").AnimationId
+local AnimName = ""..e.Name.." "..v.Name.." Run"
+temp_table[AnimName] = RunAnim
+end; end
+end; end
+return temp_table
 end
-if anoclip_connection then
-anoclip_connection:Disconnect()
-anoclip_connection = nil
+function GetAllWalkAnims()
+local temp_table = {}
+temp_table["Civilian Walk"] = "rbxassetid://84388941697203"
+temp_table["Old Civilian Walk"] = "rbxassetid://138161225743614"
+temp_table["Ghost Walk"] = "rbxassetid://124260679864309"
+for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
+for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
+local WalkAnim = e:WaitForChild("Animations"):WaitForChild("Walk").AnimationId or e:WaitForChild("Animations"):WaitForChild("OldWalk").AnimationId
+local AnimName = ""..e.Name.." "..v.Name.." Walk"
+temp_table[AnimName] = WalkAnim
+end; end
+end; end
+return temp_table
+end
+function GetAllIdleAnims()
+local temp_table = {}
+temp_table["Civilian Idle"] = "rbxassetid://100930402371608"
+temp_table["Old Civilian Idle"] = "rbxassetid://74309548749074"
+temp_table["Ghost Idle"] = "rbxassetid://110395159339100"
+for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
+for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
+local IdleAnim = e:WaitForChild("Animations"):WaitForChild("Idle").AnimationId or e:WaitForChild("Animations"):WaitForChild("OldIdle").AnimationId
+local AnimName = ""..e.Name.." "..v.Name.." Idle"
+temp_table[AnimName] = IdleAnim
+end; end
+end; end
+return temp_table
+end
+function GetAllRunNames()
+local temp_table = {}
+table.insert(temp_table, "Civilian Run")
+table.insert(temp_table, "Old Civilian Run")
+table.insert(temp_table, "Ghost Run")
+for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
+for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
+local AnimName = ""..e.Name.." "..v.Name.." Run"
+table.insert(temp_table, AnimName)
+end; end
+end; end
+return temp_table
+end
+function GetAllWalkNames()
+local temp_table = {}
+table.insert(temp_table, "Civilian Walk")
+table.insert(temp_table, "Old Civilian Walk")
+table.insert(temp_table, "Ghost Walk")
+for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
+for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
+local AnimName = ""..e.Name.." "..v.Name.." Walk"
+table.insert(temp_table, AnimName)
+end; end
+end; end
+return temp_table
+end
+function GetAllIdleNames()
+local temp_table = {}
+table.insert(temp_table, "Civilian Idle")
+table.insert(temp_table, "Old Civilian Idle")
+table.insert(temp_table, "Ghost Idle")
+for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
+for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
+local AnimName = ""..e.Name.." "..v.Name.." Idle"
+table.insert(temp_table, AnimName)
+end; end
+end; end
+return temp_table
+end
+local ChoosenRunAnim = "Civilian Run"
+Tab_6:CreateDropdown({Name = "Run Animation"; Options = GetAllRunNames(); CurrentOption = ChoosenRunAnim; MultiSelection = false; Callback = function(Value)
+ChoosenRunAnim = tostring(Rayfield:GetDropdownValue(Value))
+end; })
+local ChoosenWalkAnim = "Civilian Walk"
+Tab_6:CreateDropdown({Name = "Walk Animation"; Options = GetAllWalkNames(); CurrentOption = ChoosenWalkAnim; MultiSelection = false; Callback = function(Value)
+ChoosenWalkAnim = tostring(Rayfield:GetDropdownValue(Value))
+end; })
+local ChoosenIdleAnim = "Civilian Idle"
+Tab_6:CreateDropdown({Name = "Idle Animation"; Options = GetAllIdleNames(); CurrentOption = ChoosenIdleAnim; MultiSelection = false; Callback = function(Value)
+ChoosenIdleAnim = tostring(Rayfield:GetDropdownValue(Value))
+end; })
+Tab_6:CreateButton({Name = "Apply Animations"; Callback = function()
+task.spawn(function()
+SetRunAnim(GetAllRunAnims()[ChoosenRunAnim])
+SetWalkAnim(GetAllWalkAnims()[ChoosenWalkAnim])
+SetIdleAnim(GetAllIdleAnims()[ChoosenIdleAnim])
+task.wait()
+ApplyNewAnimations()
+end)
+Rayfield:Notification("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
+end; })
+Tab_6:CreateSection("Ability Changer")
+local AbilityAnimData = Module:GetData("AbilityAnimations")
+local AbilityAnimNames = {"Punch","Adrenaline","AdrenalineEnd","Caretaker","CloakStart","BlockStart","Dash","PadBuild","Hotdog","Revolver","Taunt","RevolverReload","CloakEnd","DynamiteWindup","DynamiteThrow","DynamiteHold","Banana","BlockLand"}
+local ReplaceWhatAbil = "Punch"
+Tab_6:CreateDropdown({Name = "Replace what"; Options = AbilityAnimNames; CurrentOption = ReplaceWhatAbil; MultiSelection = false; Callback = function(Value)
+ReplaceWhatAbil = Rayfield:GetDropdownValue(Value)
+end; })
+local ReplaceWithWhatAbil = "BlockStart"
+Tab_6:CreateDropdown({Name = "Replace with what"; Options = AbilityAnimNames; CurrentOption = ReplaceWithWhatAbil; MultiSelection = false; Callback = function(Value)
+ReplaceWithWhatAbil = Rayfield:GetDropdownValue(Value)
+end; })
+Tab_6:CreateButton({Name = "Replace animation"; Callback = function()
+task.spawn(function()
+Character.Animations.Abilities[ReplaceWhatAbil].AnimationId = tostring(AbilityAnimData[ReplaceWithWhatAbil])
+task.wait()
+ApplyNewAnimations()
+end)
+Rayfield:Notification("Success!", "Applying replacion, it may take up to 10 seconds.", 3, true)
+end; })
+Tab_6:CreateSection("Custom Ability Animation Changer")
+local abilityList = {}
+for name,_ in pairs(AbilityAnimData) do
+	table.insert(abilityList,name)
+end
+local SelectedAbility = "Adrenaline"
+Tab_6:CreateDropdown({Name = "Select Ability"; Options = abilityList; CurrentOption = SelectedAbility; MultiSelection = false; Callback = function(v)
+SelectedAbility = Rayfield:GetDropdownValue(v)
+end});
+local CustomAnimID = "0"
+Tab_6:CreateInput({Name = "Animation ID"; PlaceholderText = tostring(CustomAnimID); NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(v)
+CustomAnimID = tostring(v)
+end});
+Tab_6:CreateButton({Name = "Apply Animation"; Callback = function()
+local idexists = not pcall(function() game:GetService("ContentProvider"):PreloadAsync({tonumber(id)}) end)
+AbilityAnimData[SelectedAbility] = ((idexists == true and "rbxassetid://"..CustomAnimID) or CustomAnimID)
+Character.Animations.Abilities[SelectedAbility].AnimationId = AbilityAnimData[SelectedAbility]
+ApplyNewAnimations()
+Rayfield:Notification("Success!", "Changed Ability Animation.", 3, true)
+end});
+Tab_6:CreateSection("Miscellaneous")
+local DesyncInSeconds = 1
+Tab_6:CreateInput({Name = "Desync in seconds"; PlaceholderText = tostring(DesyncInSeconds); NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+workspace:SetAttribute("AnimDesync", tonumber(Value))
+end; })
+local DesyncEnabled = false
+Tab_6:CreateToggle({Name = "Animations Desync"; CurrentValue = false; Callback = function(Value)
+workspace:SetAttribute("AnimDesyncEnabled", Value)
+end; })
+Tab_6:CreateButton({Name = "No animations [ Apply any animation to revert! ]"; Callback = function()
+pcall(function()
+workspace:SetAttribute("AnimationsEnabled", false)
+end)
+end; })
+Tab_6:CreateButton({Name = "Fast animations [ THIS CANNOT BE REVERTED! ]"; Callback = function()
+pcall(function()
+while task.wait() do
+local a = Humanoid or Character:FindFirstChildOfClass("AnimationController")
+for i,v in next, a:GetPlayingAnimationTracks() do
+v:AdjustSpeed(10)
+end
 end
 end)
-local Anim = Instance.new("Animation")
-Anim.AnimationId = "rbxassetid://90444351114401"
-local loadedanim = rootpart.Parent.Humanoid:LoadAnimation(Anim)
-loadedanim.Priority = Enum.AnimationPriority.Action4
-repeat task.wait() until loadedanim.Length > 0	
-loadedanim:Play()
-repeat task.wait() until loadedanim.IsPlaying
-loadedanim:AdjustSpeed(tonumber(0))
-loadedanim.TimePosition = 2.2
+end; })
 end
-end
-local function looptpto(part, cframemod, time)
-local start = tick()
-while tick() - start < time and task.wait() do
-rootpart.CFrame = part.CFrame * cframemod
-for i,v in pairs(rootpart.Parent:GetDescendants()) do
+
+
+
+
+local Tab_12 = Window:CreateTab("Teleport",0)
+Tab_12:CreateParagraph({Title = "Teleports", Content = "Teleport to killer / survivors and others."})
+function SafeTeleport(model)
+pcall(function()
+local time = tick()
+while tick() - time < 1 do
+for i,v in pairs(Character:GetDescendants()) do
 if v and v:IsA("BasePart") then
 v.Velocity = Vector3.new(0,0,0)
 v.RotVelocity = Vector3.new(0,0,0)
 end
 end
+HumanoidRootPart.CFrame = model.CFrame
+task.wait()
+end
+end)
+end
+function GetChildNames(model)
+local coolbalt = {}
+for i,v in pairs(model:GetChildren()) do
+if v then
+table.insert(coolbalt, tostring(v.Name))
 end
 end
-local function looptpto2(cframe, mod, time)
-local start = tick()
-while tick() - start < time and task.wait() do
-rootpart.CFrame = cframe
-for i,v in pairs(rootpart.Parent:GetDescendants()) do
-if v and v:IsA("BasePart") then
-v.Velocity = Vector3.new(0,0,0)
-v.RotVelocity = Vector3.new(0,0,0)
+return coolbalt
 end
-end
-end
-end
-if (Character:GetAttribute(""..abilitynaem.."Cooldown") and Character:GetAttribute(""..abilitynaem.."Cooldown")~=nil) and Character:GetAttribute(""..abilitynaem.."Cooldown")==true then Rayfield:Notification("Error!", "Your choosen ability is on cooldown!", 3, false) return end
-if abilitynaem=="Adrenaline" then
-invisappwithnoclip(true)
-task.delay(1, function() game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Adrenaline") end)
-looptpto(killerrootpart, CFrame.new(0,-8,0), 3)
-looptpto2(CFrame.new(0,-490,0), true, 5)
-task.delay(0.5, function() invisappwithnoclip(false) end)
-looptpto2(oldcf, CFrame.new(0,0,0), 2)
-elseif abilitynaem=="Cloak" then
-invisappwithnoclip(true)
-task.delay(1.5, function() game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Cloak") end)
-looptpto(killerrootpart, CFrame.new(0,0,8), 3)
-looptpto2(CFrame.new(0,-490,0), true, 7)
-task.delay(0.5, function() invisappwithnoclip(false) end)
-looptpto2(oldcf, CFrame.new(0,0,0), 2)
-elseif abilitynaem=="Taunt" then
-invisappwithnoclip(true)
-game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Taunt")
-task.wait(1)
-looptpto(killerrootpart, CFrame.new(0,0,-2), 0.2)
-looptpto(killerrootpart, CFrame.new(0,0,-1), 0.2)
-looptpto(killerrootpart, CFrame.new(0,0,0), 0.2)
-looptpto(killerrootpart, CFrame.new(0,0,1), 0.2)
-looptpto(killerrootpart, CFrame.new(0,0,2), 0.2)
-task.delay(0.5, function() invisappwithnoclip(false) end)
-looptpto2(oldcf, CFrame.new(0,0,0), 2)
-elseif abilitynaem=="Punch" then
-invisappwithnoclip(true)
-game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Punch")
-looptpto(killerrootpart, CFrame.new(0,0,-2), 0.22)
-looptpto(killerrootpart, CFrame.new(0,0,-1), 0.22)
-looptpto(killerrootpart, CFrame.new(0,0,0), 0.22)
-looptpto(killerrootpart, CFrame.new(0,0,1), 0.22)
-looptpto(killerrootpart, CFrame.new(0,0,2), 0.22)
-task.delay(0.5, function() invisappwithnoclip(false) end)
-looptpto2(oldcf, CFrame.new(0,0,0), 2)
-elseif abilitynaem=="Revolver" then
-invisappwithnoclip(true)
-task.delay(1, function() game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Revolver") end)
-looptpto(killerrootpart, CFrame.new(0,-2,-1), 3)
-task.delay(0.5, function() invisappwithnoclip(false) end)
-looptpto2(oldcf, CFrame.new(0,0,0), 2)
-elseif abilitynaem=="Banana" then
-invisappwithnoclip(true)
-task.delay(1, function() game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Banana") end)
-looptpto(killerrootpart, CFrame.new(0,0,2), 3)
-task.delay(0.5, function() invisappwithnoclip(false) end)
-looptpto2(oldcf, CFrame.new(0,0,0), 2)
-elseif abilitynaem=="WinRound" then
-invisappwithnoclip(true)
-looptpto2(CFrame.new(500,-490,500), true, 2)
-Rayfield:Notification("Success!", "Now you have to wait until round ends.", 10, true)
-end
-end
-function GetCurrentStaminaValues()
-local stamvalues = tostring(game.Players.LocalPlayer.PlayerGui.MainGui.RoundUI.PlayerUI.StaminaBar.Label.Text)
-local stam, maxstam = stamvalues:match("([%d%.inf]+)/([%d%.inf]+)")
-stam = stam == "inf" and math.huge or tonumber(stam)
-maxstam = maxstam == "inf" and math.huge or tonumber(maxstam)
-return stam, maxstam
-end
-Tab_14:CreateSection("Point & malice farm")
-Tab_14:CreateLabel("Stunning/ragdolling abilities have risks of causing your death ( killer may kill you, but you will still be invisible )")
-local ChoosenAbilityAW = "Adrenaline"
-Tab_14:CreateDropdown({Name = "Ability"; Options = {"Adrenaline","Cloak","Taunt","Revolver","Punch","Banana"}; CurrentOption = "Adrenaline"; MultiSelection = false; Callback = function(Value)
-ChoosenAbilityAW = Rayfield:GetDropdownValue(Value)
+Tab_12:CreateSection("Team Teleport")
+ChoosenKillerTarget = nil
+ChoosenSurvivorTarget = nil
+ChoosenGhostTarget = nil
+local TeleportToKillerDropdown = Tab_12:CreateDropdown({Name = "Target Killer"; Options = GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer")); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
+ChoosenKillerTarget = Rayfield:GetDropdownValue(Value)
 end; })
-Tab_14:CreateButton({Name = "Get Award for choosen ability"; Callback = function()
-GetAwardFromAbility(ChoosenAbilityAW)
+Tab_12:CreateButton({Name = "Teleport to Killer"; Callback = function()
+if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChildOfClass("Model") then
+Rayfield:Notification("Error!", "There are no killers!", 3, warn)
+return nil
+end
+if ChoosenKillerTarget == nil or ChoosenKillerTarget == "" or not ChoosenKillerTarget then
+Rayfield:Notification("Error!", "Choose your target!", 3, false)
+return nil
+end
+SafeTeleport(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChild(ChoosenKillerTarget):WaitForChild("HumanoidRootPart"))
 end; })
-Tab_14:CreateButton({Name = "Win Round ( as Survivor )"; Callback = function()
-GetAwardFromAbility("WinRound")
-end; })
-Tab_14:CreateSection("Bot")
-function GetTargetByCategory(cat)
-local targets = {
-	[1] = 0;
-	[2] = 0;
-	[3] = 0;
-}
-local lowesthealth = 155
-local lowestdistance = math.huge
-for i,v in next, workspace.GameAssets.Teams.Survivor:GetChildren() do
-if v and (v:FindFirstChild("Humanoid") and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Head")) then
-if v.Humanoid.Health<lowesthealth then
-lowesthealth = v.Humanoid.Health
-targets[1] = v
-end
-local Distance = (HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
-if Distance<lowestdistance then
-lowestdistance = Distance
-targets[2] = v
-end
-if (v:GetAttribute("Ability1") and v:GetAttribute("Ability1")=="Caretaker") or (v:GetAttribute("Ability2") and v:GetAttribute("Ability2")=="Caretaker") then
-targets[3] = v
-end
-end
-end
-return ((cat=="Most Damaged Player" and targets[1]) or (cat=="Closest Player" and targets[2]) or (cat=="Caretakers" and targets[3]))
-end
-Tab_14:CreateLabel("This works only for killers")
-local ChosenTargetCat = "Most Damaged Player"
-local ChosenTargetCatDropdown = Tab_14:CreateDropdown({Name = "Target"; Options = {"Most Damaged Player","Closest Player","Caretakers"}; CurrentOption = "Most Damaged Player"; MultiSelection = false; Callback = function(Value)
-ChosenTargetCat = Rayfield:GetDropdownValue(Value)
-end; })
-local DistanceTrigger = 15
-Tab_14:CreateInput({Name = "M1 Distance Trigger"; PlaceholderText = "15"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-DistanceTrigger = tonumber(Value)
-end; })
-local BotToggle = false
-local TrueBotToggle = nil
-TrueBotToggle = Tab_14:CreateToggle({Name = "Bot Toggle"; CurrentValue = BotToggle; Callback = function(Value)
-BotToggle = Value
-if workspace.GameAssets.Teams.Killer:FindFirstChild(LocalPlayer.Name)==nil then return end
-if BotToggle==true then
-local controlremote = game.ReplicatedStorage.Events.RemoteFunctions.UseAbility
-local PathService = game:GetService("PathfindingService")
-repeat task.wait()
-local a,b = pcall(function()
-local target = GetTargetByCategory(ChosenTargetCat)
-if target==0 and ChosenTargetCat=="Caretakers" then
-Rayfield:Notification("Error!", "No targets with such requirement found. Changing target mode from ''Caretakers'' to ''Most Damaged Player''...", 3, false)
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer").ChildAdded:Connect(function(child)
 pcall(function()
-ChosenTargetCatDropdown:Set({"Caretakers"})
+TeleportToKillerDropdown:Refresh(GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer")))
 end)
+end)
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer").ChildRemoved:Connect(function(child)
 pcall(function()
-ChosenTargetCatDropdown:Set("Caretakers")
+TeleportToKillerDropdown:Refresh(GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer")))
 end)
-ChosenTargetCat = "Caretakers"
-elseif target==0 then
-TrueBotToggle:Set(false) Rayfield:Notification("Error!", "No targets with such requirement found.", 3, false) return
-end
-
-local newpath = PathService:CreatePath({
-	AgentRadius = 3,
-	AgentHeight = 6,
-	AgentCanJump = true,
-	AgentCanClimb = true,
-	WaypointSpacing = 8,
-})
-newpath:ComputeAsync(HumanoidRootPart.Position, target.HumanoidRootPart.Position)
-local waypoints, distance = newpath:GetWaypoints(), 9e9
-if waypoints ~= nil and waypoints[2] ~= nil then
-Humanoid:MoveTo(waypoints[2].Position)
-elseif waypoints ~= nil and waypoints[1] ~= nil then
-Humanoid:MoveTo(waypoints[1].Position)
-end
-local cstamina, cmaxstamina = GetCurrentStaminaValues()
-if cstamina<5 then
-game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.LeftShift, false, game)
-end
-distance = (HumanoidRootPart.Position - target.HumanoidRootPart.Position).Magnitude
-if distance<DistanceTrigger then
-local hitremote = LocalPlayer.Stats.EquippedKiller=="Killdroid" and "Eject" or "Swing"
-controlremote:InvokeServer(hitremote)
-end
-
 end)
-if b~=nil then print(b) wait(10) end
-until workspace.GameAssets.Teams.Killer:FindFirstChild(LocalPlayer.Name)==nil or Humanoid.Health==0 or BotToggle==false
-if Humanoid~=nil and HumanoidRootPart~=nil then
-Humanoid:MoveTo(HumanoidRootPart.Position)
+local TeleportToSurvivorDropdown = Tab_12:CreateDropdown({Name = "Target Survivor"; Options = GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor")); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
+ChoosenSurvivorTarget = Rayfield:GetDropdownValue(Value)
+end; })
+Tab_12:CreateButton({Name = "Teleport to Survivor"; Callback = function()
+if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor"):FindFirstChildOfClass("Model") then
+Rayfield:Notification("Error!", "There are no survivors!", 3, false)
+return nil
+end
+if ChoosenSurvivorTarget == nil or ChoosenSurvivorTarget == "" or not ChoosenSurvivorTarget then
+Rayfield:Notification("Error!", "Choose your target!", 3, warn)
+return nil
+end
+SafeTeleport(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor"):FindFirstChild(ChoosenSurvivorTarget):WaitForChild("HumanoidRootPart"))
+end; })
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor").ChildAdded:Connect(function(child)
+pcall(function()
+TeleportToSurvivorDropdown:Refresh(GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor")))
+end)
+end)
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor").ChildRemoved:Connect(function(child)
+pcall(function()
+TeleportToSurvivorDropdown:Refresh(GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor")))
+end)
+end)
+local TeleportToGhostDropdown = Tab_12:CreateDropdown({Name = "Target Ghost"; Options = GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost")); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
+ChoosenGhostTarget = Rayfield:GetDropdownValue(Value)
+end; })
+Tab_12:CreateButton({Name = "Teleport to Ghost"; Callback = function()
+if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost"):FindFirstChildOfClass("Model") then
+Rayfield:Notification("Error!", "There are no ghosts!", 3, warn)
+return nil
+end
+if ChoosenGhostTarget == nil or ChoosenGhostTarget == "" or not ChoosenGhostTarget then
+Rayfield:Notification("Error!", "Choose your target!", 3, false)
+return nil
+end
+SafeTeleport(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost"):FindFirstChild(ChoosenGhostTarget):WaitForChild("HumanoidRootPart"))
+end; })
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost").ChildAdded:Connect(function(child)
+pcall(function()
+TeleportToGhostDropdown:Refresh(GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost")))
+end)
+end)
+game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost").ChildRemoved:Connect(function(child)
+pcall(function()
+TeleportToGhostDropdown:Refresh(GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost")))
+end)
+end)
+Tab_12:CreateSection("Specific Teleports")
+Tab_12:CreateButton({Name = "Teleport to Survivor with caretaker"; Callback = function()
+if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor"):FindFirstChildOfClass("Model") then
+Rayfield:Notification("Error!", "There are no caretakers!", 3, warn)
+return nil
+end
+local plrwithcaretaker = nil
+for i,v in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor"):GetChildren()) do
+if v and v.Parent and (v:WaitForChild("Vanities"):WaitForChild("Caretaker").Transparency ~= 1 or v:WaitForChild("Vanities"):WaitForChild("Aussie Slouch"):WaitForChild("Mesh").TextureId == "rbxassetid://130388665159057") then
+plrwithcaretaker = v
+end
+end
+if plrwithcaretaker then
+SafeTeleport(plrwithcaretaker:WaitForChild("HumanoidRootPart"))
+else
+Rayfield:Notification("Error!", "There are no caretakers!", 3, warn)
+end
+end; })
+Tab_12:CreateButton({Name = "Teleport to Injured survivor"; Callback = function()
+local injuredplr = nil
+for i,v in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor"):GetChildren()) do
+if v and v.Parent and (v:WaitForChild("Humanoid").Health < tonumber(v:WaitForChild("Humanoid").MaxHealth)) then
+injuredplr = v
+end
+end
+if injuredplr then
+SafeTeleport(injuredplr:WaitForChild("HumanoidRootPart"))
+else
+Rayfield:Notification("Error!", "There are no injured players!", 3, warn)
+end
+end; })
+Tab_12:CreateButton({Name = "Teleport to Bonus Pad"; Callback = function()
+if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable"):FindFirstChild("BonusPad") then
+Rayfield:Notification("Error!", "There are no bonus pads!", 3, warn)
+return nil
+end
+SafeTeleport(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable"):WaitForChild("BonusPad"):WaitForChild("Pad"))
+end; })
+
+-- short model/part name
+-- m > model
+-- p > Part
+
+local PADCOLOR = Color3.fromRGB(100, 255, 57)
+Tab_12:CreateButton({Name = "Teleport to CarePad"; Callback = function()
+for _, m in ipairs(workspace.GameAssets.Debris.Cleanable:GetChildren()) do
+		if m.Name == "BonusPad" then
+			local p = m:FindFirstChild("Pad", true)
+			if p and p.Color == PADCOLOR then
+				SafeTeleport(m:GetBoundingBox()) -- ignore why i use (m:GetBoundingBox()) instead of (m) because i think it gonna get error.
+				return
+			end
+		end
+	end
+Rayfield:Notification("Error!", "There are no CarePad!", 3)
+end; })
+
+
+Tab_12:CreateButton({Name = "Teleport to CarePad Survivor"; Callback = function()
+for _, v in pairs(workspace.GameAssets.Teams:FindFirstChild("Survivor"):GetChildren()) do
+if v:IsA("Model") and v:FindFirstChild("HumanoidRootPart") then
+	local a1 = v:GetAttribute("Ability1")
+	local a2 = v:GetAttribute("Ability2")
+	if (a1 == "Caretaker" and a2 == "BonusPad") or (a1 == "BonusPad" and a2 == "Caretaker") then
+		if v == Character then return end -- this ignore if you have CarePad so yeah -- Okay red 👌
+		SafeTeleport(v.HumanoidRootPart)
+		return
+	end
 end
 end
 end; })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Window:CreateTabSection("Team Features")
 
@@ -2306,510 +2578,8 @@ end)
 
 
 
-Window:CreateTabSection("General")
 
 
-
-local function ReturnAnimFolder()
-if Character:FindFirstChild("Animations") then
-return Character:WaitForChild("Animations")
-end
-return nil
-end
-local Tab_6 = Window:CreateTab("Animations",0)
-function SetRunAnim(run)
-pcall(function()
-local stopper = Humanoid or Character:FindFirstChildOfClass("AnimationController")
-for i,v in next, stopper:GetPlayingAnimationTracks() do
-v:Stop()
-end
-end)
-local AnimationFolder = ReturnAnimFolder()
-pcall(function()
-if AnimationFolder:FindFirstChild("HurtSprint") then
-AnimationFolder:FindFirstChild("HurtSprint").AnimationId = run
-end
-end)
-pcall(function()
-if AnimationFolder:FindFirstChild("NormalSprint") then
-AnimationFolder:FindFirstChild("NormalSprint").AnimationId = run
-end
-end)
-pcall(function()
-if AnimationFolder:FindFirstChild("OldSprint") then
-AnimationFolder:FindFirstChild("OldSprint").AnimationId = run
-end
-end)
-pcall(function()
-if AnimationFolder:FindFirstChild("Sprint") then
-AnimationFolder:FindFirstChild("Sprint").AnimationId = run
-end
-end)
-end
-function SetWalkAnim(walk)
-pcall(function()
-local stopper = Humanoid or Character:FindFirstChildOfClass("AnimationController")
-for i,v in next, stopper:GetPlayingAnimationTracks() do
-v:Stop()
-end
-end)
-local AnimationFolder = ReturnAnimFolder()
-pcall(function()
-if AnimationFolder:FindFirstChild("Walk") then
-AnimationFolder:FindFirstChild("Walk").AnimationId = walk
-end
-end)
-pcall(function()
-if AnimationFolder:FindFirstChild("OldWalk") then
-AnimationFolder:FindFirstChild("OldWalk").AnimationId = walk
-end
-end)
-end
-function SetIdleAnim(idle)
-pcall(function()
-local stopper = Humanoid or Character:FindFirstChildOfClass("AnimationController")
-for i,v in next, stopper:GetPlayingAnimationTracks() do
-v:Stop()
-end
-end)
-local AnimationFolder = ReturnAnimFolder()
-pcall(function()
-if AnimationFolder:FindFirstChild("Idle") then
-AnimationFolder:FindFirstChild("Idle").AnimationId = idle
-end
-end)
-pcall(function()
-if AnimationFolder:FindFirstChild("OldIdle") then
-AnimationFolder:FindFirstChild("OldIdle").AnimationId = idle
-end
-end)
-end
-function ApplyNewAnimations()
-pcall(function()
-workspace:SetAttribute("AnimationsEnabled", false)
-task.wait()
-workspace:SetAttribute("AnimationsEnabled", true)
-end)
-end
-task.wait()
-if workspace:GetAttribute("AnimationsEnabled") == nil then
-Tab_6:CreateParagraph({Title = "Not Supported", Content = "clientscript not found"})
-end
-if workspace:GetAttribute("AnimationsEnabled") ~= nil then
-Tab_6:CreateParagraph({Title = "Animations", Content = "You can change your anims here."})
-Tab_6:CreateSection("Pre-loaded animations")
-Tab_6:CreateLabel("Civilian animations")
-Tab_6:CreateButton({Name = "Apply New Civilian Animations"; Callback = function()
-local RunAnim = "rbxassetid://137375023685630"
-local WalkAnim = "rbxassetid://84388941697203"
-local IdleAnim = "rbxassetid://100930402371608"
-task.spawn(function()
-SetRunAnim(RunAnim)
-SetWalkAnim(WalkAnim)
-SetIdleAnim(IdleAnim)
-task.wait()
-ApplyNewAnimations()
-end)
-Rayfield:Notification("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
-end; })
-Tab_6:CreateButton({Name = "Apply Old Civilian animations"; Callback = function()
-local RunAnim = "rbxassetid://79488319304371"
-local WalkAnim = "rbxassetid://138161225743614"
-local IdleAnim = "rbxassetid://74309548749074"
-task.spawn(function()
-SetRunAnim(RunAnim)
-SetWalkAnim(WalkAnim)
-SetIdleAnim(IdleAnim)
-task.wait()
-ApplyNewAnimations()
-end)
-Rayfield:Notification("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
-end; })
-Tab_6:CreateLabel("Ghost Animations")
-Tab_6:CreateButton({Name = "Apply Ghost animations"; Callback = function()
-local RunAnim = "rbxassetid://124260679864309"
-local WalkAnim = "rbxassetid://124260679864309"
-local IdleAnim = "rbxassetid://110395159339100"
-task.spawn(function()
-SetRunAnim(RunAnim)
-SetWalkAnim(WalkAnim)
-SetIdleAnim(IdleAnim)
-task.wait()
-ApplyNewAnimations()
-end)
-Rayfield:Notification("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
-end; })
-pcall(function()
-for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
-Tab_6:CreateLabel(v.Name.." Animations")
-local temp_table = {}
-for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
-table.insert(temp_table, e.Name)
-end; end
-local Hi = v:WaitForChild("Default")
-Tab_6:CreateDropdown({Name = "Choose "..v.Name.." animations"; Options = temp_table; CurrentOption = "Default"; MultiSelection = false; Callback = function(Value)
-Hi = v:WaitForChild(Rayfield:GetDropdownValue(Value))
-end; })
-Tab_6:CreateButton({Name = "Apply "..v.Name.." animations"; Callback = function()
-local RunAnim = Hi:WaitForChild("Animations"):WaitForChild("Sprint").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("OldSprint").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("NormalSprint").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("HurtSprint").AnimationId
-local WalkAnim = Hi:WaitForChild("Animations"):WaitForChild("Walk").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("OldWalk").AnimationId
-local IdleAnim = Hi:WaitForChild("Animations"):WaitForChild("Idle").AnimationId or Hi:WaitForChild("Animations"):WaitForChild("OldIdle").AnimationId
-task.spawn(function()
-SetRunAnim(RunAnim)
-SetWalkAnim(WalkAnim)
-SetIdleAnim(IdleAnim)
-task.wait()
-ApplyNewAnimations()
-end)
-Rayfield:Notification("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
-end; })
-end; end
-end)
-Tab_6:CreateSection("Advanced")
-function GetAllRunAnims()
-local temp_table = {}
-temp_table["Civilian Run"] = "rbxassetid://137375023685630"
-temp_table["Old Civilian Run"] = "rbxassetid://79488319304371"
-temp_table["Ghost Run"] = "rbxassetid://124260679864309"
-for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
-for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
-local RunAnim = e:WaitForChild("Animations"):WaitForChild("Sprint").AnimationId or e:WaitForChild("Animations"):WaitForChild("OldSprint").AnimationId or e:WaitForChild("Animations"):WaitForChild("NormalSprint").AnimationId or e:WaitForChild("Animations"):WaitForChild("HurtSprint").AnimationId
-local AnimName = ""..e.Name.." "..v.Name.." Run"
-temp_table[AnimName] = RunAnim
-end; end
-end; end
-return temp_table
-end
-function GetAllWalkAnims()
-local temp_table = {}
-temp_table["Civilian Walk"] = "rbxassetid://84388941697203"
-temp_table["Old Civilian Walk"] = "rbxassetid://138161225743614"
-temp_table["Ghost Walk"] = "rbxassetid://124260679864309"
-for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
-for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
-local WalkAnim = e:WaitForChild("Animations"):WaitForChild("Walk").AnimationId or e:WaitForChild("Animations"):WaitForChild("OldWalk").AnimationId
-local AnimName = ""..e.Name.." "..v.Name.." Walk"
-temp_table[AnimName] = WalkAnim
-end; end
-end; end
-return temp_table
-end
-function GetAllIdleAnims()
-local temp_table = {}
-temp_table["Civilian Idle"] = "rbxassetid://100930402371608"
-temp_table["Old Civilian Idle"] = "rbxassetid://74309548749074"
-temp_table["Ghost Idle"] = "rbxassetid://110395159339100"
-for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
-for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
-local IdleAnim = e:WaitForChild("Animations"):WaitForChild("Idle").AnimationId or e:WaitForChild("Animations"):WaitForChild("OldIdle").AnimationId
-local AnimName = ""..e.Name.." "..v.Name.." Idle"
-temp_table[AnimName] = IdleAnim
-end; end
-end; end
-return temp_table
-end
-function GetAllRunNames()
-local temp_table = {}
-table.insert(temp_table, "Civilian Run")
-table.insert(temp_table, "Old Civilian Run")
-table.insert(temp_table, "Ghost Run")
-for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
-for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
-local AnimName = ""..e.Name.." "..v.Name.." Run"
-table.insert(temp_table, AnimName)
-end; end
-end; end
-return temp_table
-end
-function GetAllWalkNames()
-local temp_table = {}
-table.insert(temp_table, "Civilian Walk")
-table.insert(temp_table, "Old Civilian Walk")
-table.insert(temp_table, "Ghost Walk")
-for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
-for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
-local AnimName = ""..e.Name.." "..v.Name.." Walk"
-table.insert(temp_table, AnimName)
-end; end
-end; end
-return temp_table
-end
-function GetAllIdleNames()
-local temp_table = {}
-table.insert(temp_table, "Civilian Idle")
-table.insert(temp_table, "Old Civilian Idle")
-table.insert(temp_table, "Ghost Idle")
-for i,v in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Characters"):WaitForChild("Killer"):GetChildren()) do if v then
-for _,e in pairs(v:GetChildren()) do if e and e:FindFirstChild("Animations") then
-local AnimName = ""..e.Name.." "..v.Name.." Idle"
-table.insert(temp_table, AnimName)
-end; end
-end; end
-return temp_table
-end
-local ChoosenRunAnim = "Civilian Run"
-Tab_6:CreateDropdown({Name = "Run Animation"; Options = GetAllRunNames(); CurrentOption = ChoosenRunAnim; MultiSelection = false; Callback = function(Value)
-ChoosenRunAnim = tostring(Rayfield:GetDropdownValue(Value))
-end; })
-local ChoosenWalkAnim = "Civilian Walk"
-Tab_6:CreateDropdown({Name = "Walk Animation"; Options = GetAllWalkNames(); CurrentOption = ChoosenWalkAnim; MultiSelection = false; Callback = function(Value)
-ChoosenWalkAnim = tostring(Rayfield:GetDropdownValue(Value))
-end; })
-local ChoosenIdleAnim = "Civilian Idle"
-Tab_6:CreateDropdown({Name = "Idle Animation"; Options = GetAllIdleNames(); CurrentOption = ChoosenIdleAnim; MultiSelection = false; Callback = function(Value)
-ChoosenIdleAnim = tostring(Rayfield:GetDropdownValue(Value))
-end; })
-Tab_6:CreateButton({Name = "Apply Animations"; Callback = function()
-task.spawn(function()
-SetRunAnim(GetAllRunAnims()[ChoosenRunAnim])
-SetWalkAnim(GetAllWalkAnims()[ChoosenWalkAnim])
-SetIdleAnim(GetAllIdleAnims()[ChoosenIdleAnim])
-task.wait()
-ApplyNewAnimations()
-end)
-Rayfield:Notification("Success!", "Applying animations, it may take up to 10 seconds.", 3, true)
-end; })
-Tab_6:CreateSection("Ability Changer")
-local AbilityAnimData = Module:GetData("AbilityAnimations")
-local AbilityAnimNames = {"Punch","Adrenaline","AdrenalineEnd","Caretaker","CloakStart","BlockStart","Dash","PadBuild","Hotdog","Revolver","Taunt","RevolverReload","CloakEnd","DynamiteWindup","DynamiteThrow","DynamiteHold","Banana","BlockLand"}
-local ReplaceWhatAbil = "Punch"
-Tab_6:CreateDropdown({Name = "Replace what"; Options = AbilityAnimNames; CurrentOption = ReplaceWhatAbil; MultiSelection = false; Callback = function(Value)
-ReplaceWhatAbil = Rayfield:GetDropdownValue(Value)
-end; })
-local ReplaceWithWhatAbil = "BlockStart"
-Tab_6:CreateDropdown({Name = "Replace with what"; Options = AbilityAnimNames; CurrentOption = ReplaceWithWhatAbil; MultiSelection = false; Callback = function(Value)
-ReplaceWithWhatAbil = Rayfield:GetDropdownValue(Value)
-end; })
-Tab_6:CreateButton({Name = "Replace animation"; Callback = function()
-task.spawn(function()
-Character.Animations.Abilities[ReplaceWhatAbil].AnimationId = tostring(AbilityAnimData[ReplaceWithWhatAbil])
-task.wait()
-ApplyNewAnimations()
-end)
-Rayfield:Notification("Success!", "Applying replacion, it may take up to 10 seconds.", 3, true)
-end; })
-Tab_6:CreateSection("Custom Ability Animation Changer")
-local abilityList = {}
-for name,_ in pairs(AbilityAnimData) do
-	table.insert(abilityList,name)
-end
-local SelectedAbility = "Adrenaline"
-Tab_6:CreateDropdown({Name = "Select Ability"; Options = abilityList; CurrentOption = SelectedAbility; MultiSelection = false; Callback = function(v)
-SelectedAbility = Rayfield:GetDropdownValue(v)
-end});
-local CustomAnimID = "0"
-Tab_6:CreateInput({Name = "Animation ID"; PlaceholderText = tostring(CustomAnimID); NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(v)
-CustomAnimID = tostring(v)
-end});
-Tab_6:CreateButton({Name = "Apply Animation"; Callback = function()
-local idexists = not pcall(function() game:GetService("ContentProvider"):PreloadAsync({tonumber(id)}) end)
-AbilityAnimData[SelectedAbility] = ((idexists == true and "rbxassetid://"..CustomAnimID) or CustomAnimID)
-Character.Animations.Abilities[SelectedAbility].AnimationId = AbilityAnimData[SelectedAbility]
-ApplyNewAnimations()
-Rayfield:Notification("Success!", "Changed Ability Animation.", 3, true)
-end});
-Tab_6:CreateSection("Miscellaneous")
-local DesyncInSeconds = 1
-Tab_6:CreateInput({Name = "Desync in seconds"; PlaceholderText = tostring(DesyncInSeconds); NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-workspace:SetAttribute("AnimDesync", tonumber(Value))
-end; })
-local DesyncEnabled = false
-Tab_6:CreateToggle({Name = "Animations Desync"; CurrentValue = false; Callback = function(Value)
-workspace:SetAttribute("AnimDesyncEnabled", Value)
-end; })
-Tab_6:CreateButton({Name = "No animations [ Apply any animation to revert! ]"; Callback = function()
-pcall(function()
-workspace:SetAttribute("AnimationsEnabled", false)
-end)
-end; })
-Tab_6:CreateButton({Name = "Fast animations [ THIS CANNOT BE REVERTED! ]"; Callback = function()
-pcall(function()
-while task.wait() do
-local a = Humanoid or Character:FindFirstChildOfClass("AnimationController")
-for i,v in next, a:GetPlayingAnimationTracks() do
-v:AdjustSpeed(10)
-end
-end
-end)
-end; })
-end
-
-
-
-
-local Tab_12 = Window:CreateTab("Teleport",0)
-Tab_12:CreateParagraph({Title = "Teleports", Content = "Teleport to killer / survivors and others."})
-function SafeTeleport(model)
-pcall(function()
-local time = tick()
-while tick() - time < 1 do
-for i,v in pairs(Character:GetDescendants()) do
-if v and v:IsA("BasePart") then
-v.Velocity = Vector3.new(0,0,0)
-v.RotVelocity = Vector3.new(0,0,0)
-end
-end
-HumanoidRootPart.CFrame = model.CFrame
-task.wait()
-end
-end)
-end
-function GetChildNames(model)
-local coolbalt = {}
-for i,v in pairs(model:GetChildren()) do
-if v then
-table.insert(coolbalt, tostring(v.Name))
-end
-end
-return coolbalt
-end
-Tab_12:CreateSection("Team Teleport")
-ChoosenKillerTarget = nil
-ChoosenSurvivorTarget = nil
-ChoosenGhostTarget = nil
-local TeleportToKillerDropdown = Tab_12:CreateDropdown({Name = "Target Killer"; Options = GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer")); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
-ChoosenKillerTarget = Rayfield:GetDropdownValue(Value)
-end; })
-Tab_12:CreateButton({Name = "Teleport to Killer"; Callback = function()
-if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChildOfClass("Model") then
-Rayfield:Notification("Error!", "There are no killers!", 3, warn)
-return nil
-end
-if ChoosenKillerTarget == nil or ChoosenKillerTarget == "" or not ChoosenKillerTarget then
-Rayfield:Notification("Error!", "Choose your target!", 3, false)
-return nil
-end
-SafeTeleport(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer"):FindFirstChild(ChoosenKillerTarget):WaitForChild("HumanoidRootPart"))
-end; })
-game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer").ChildAdded:Connect(function(child)
-pcall(function()
-TeleportToKillerDropdown:Refresh(GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer")))
-end)
-end)
-game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer").ChildRemoved:Connect(function(child)
-pcall(function()
-TeleportToKillerDropdown:Refresh(GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Killer")))
-end)
-end)
-local TeleportToSurvivorDropdown = Tab_12:CreateDropdown({Name = "Target Survivor"; Options = GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor")); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
-ChoosenSurvivorTarget = Rayfield:GetDropdownValue(Value)
-end; })
-Tab_12:CreateButton({Name = "Teleport to Survivor"; Callback = function()
-if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor"):FindFirstChildOfClass("Model") then
-Rayfield:Notification("Error!", "There are no survivors!", 3, false)
-return nil
-end
-if ChoosenSurvivorTarget == nil or ChoosenSurvivorTarget == "" or not ChoosenSurvivorTarget then
-Rayfield:Notification("Error!", "Choose your target!", 3, warn)
-return nil
-end
-SafeTeleport(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor"):FindFirstChild(ChoosenSurvivorTarget):WaitForChild("HumanoidRootPart"))
-end; })
-game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor").ChildAdded:Connect(function(child)
-pcall(function()
-TeleportToSurvivorDropdown:Refresh(GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor")))
-end)
-end)
-game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor").ChildRemoved:Connect(function(child)
-pcall(function()
-TeleportToSurvivorDropdown:Refresh(GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor")))
-end)
-end)
-local TeleportToGhostDropdown = Tab_12:CreateDropdown({Name = "Target Ghost"; Options = GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost")); CurrentOption = ""; MultiSelection = false; Callback = function(Value)
-ChoosenGhostTarget = Rayfield:GetDropdownValue(Value)
-end; })
-Tab_12:CreateButton({Name = "Teleport to Ghost"; Callback = function()
-if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost"):FindFirstChildOfClass("Model") then
-Rayfield:Notification("Error!", "There are no ghosts!", 3, warn)
-return nil
-end
-if ChoosenGhostTarget == nil or ChoosenGhostTarget == "" or not ChoosenGhostTarget then
-Rayfield:Notification("Error!", "Choose your target!", 3, false)
-return nil
-end
-SafeTeleport(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost"):FindFirstChild(ChoosenGhostTarget):WaitForChild("HumanoidRootPart"))
-end; })
-game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost").ChildAdded:Connect(function(child)
-pcall(function()
-TeleportToGhostDropdown:Refresh(GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost")))
-end)
-end)
-game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost").ChildRemoved:Connect(function(child)
-pcall(function()
-TeleportToGhostDropdown:Refresh(GetChildNames(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Ghost")))
-end)
-end)
-Tab_12:CreateSection("Specific Teleports")
-Tab_12:CreateButton({Name = "Teleport to Survivor with caretaker"; Callback = function()
-if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor"):FindFirstChildOfClass("Model") then
-Rayfield:Notification("Error!", "There are no caretakers!", 3, warn)
-return nil
-end
-local plrwithcaretaker = nil
-for i,v in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor"):GetChildren()) do
-if v and v.Parent and (v:WaitForChild("Vanities"):WaitForChild("Caretaker").Transparency ~= 1 or v:WaitForChild("Vanities"):WaitForChild("Aussie Slouch"):WaitForChild("Mesh").TextureId == "rbxassetid://130388665159057") then
-plrwithcaretaker = v
-end
-end
-if plrwithcaretaker then
-SafeTeleport(plrwithcaretaker:WaitForChild("HumanoidRootPart"))
-else
-Rayfield:Notification("Error!", "There are no caretakers!", 3, warn)
-end
-end; })
-Tab_12:CreateButton({Name = "Teleport to Injured survivor"; Callback = function()
-local injuredplr = nil
-for i,v in pairs(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Teams"):WaitForChild("Survivor"):GetChildren()) do
-if v and v.Parent and (v:WaitForChild("Humanoid").Health < tonumber(v:WaitForChild("Humanoid").MaxHealth)) then
-injuredplr = v
-end
-end
-if injuredplr then
-SafeTeleport(injuredplr:WaitForChild("HumanoidRootPart"))
-else
-Rayfield:Notification("Error!", "There are no injured players!", 3, warn)
-end
-end; })
-Tab_12:CreateButton({Name = "Teleport to Bonus Pad"; Callback = function()
-if not game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable"):FindFirstChild("BonusPad") then
-Rayfield:Notification("Error!", "There are no bonus pads!", 3, warn)
-return nil
-end
-SafeTeleport(game:GetService("Workspace"):WaitForChild("GameAssets"):WaitForChild("Debris"):WaitForChild("Cleanable"):WaitForChild("BonusPad"):WaitForChild("Pad"))
-end; })
-
--- short model/part name
--- m > model
--- p > Part
-
-local PADCOLOR = Color3.fromRGB(100, 255, 57)
-Tab_12:CreateButton({Name = "Teleport to CarePad"; Callback = function()
-for _, m in ipairs(workspace.GameAssets.Debris.Cleanable:GetChildren()) do
-		if m.Name == "BonusPad" then
-			local p = m:FindFirstChild("Pad", true)
-			if p and p.Color == PADCOLOR then
-				SafeTeleport(m:GetBoundingBox()) -- ignore why i use (m:GetBoundingBox()) instead of (m) because i think it gonna get error.
-				return
-			end
-		end
-	end
-Rayfield:Notification("Error!", "There are no CarePad!", 3)
-end; })
-
-
-Tab_12:CreateButton({Name = "Teleport to CarePad Survivor"; Callback = function()
-for _, v in pairs(workspace.GameAssets.Teams:FindFirstChild("Survivor"):GetChildren()) do
-if v:IsA("Model") and v:FindFirstChild("HumanoidRootPart") then
-	local a1 = v:GetAttribute("Ability1")
-	local a2 = v:GetAttribute("Ability2")
-	if (a1 == "Caretaker" and a2 == "BonusPad") or (a1 == "BonusPad" and a2 == "Caretaker") then
-		if v == Character then return end -- this ignore if you have CarePad so yeah -- Okay red 👌
-		SafeTeleport(v.HumanoidRootPart)
-		return
-	end
-end
-end
-end; })
 
 
 
@@ -4231,6 +4001,68 @@ end
 
 
 
+
+
+
+Window:CreateTabSection("Workshop")
+local Tab_15 = Window:CreateTab("Workshop",0)
+Tab_15:CreateParagraph({Title = "Workshop", Content = "Custom created features by users."})
+
+
+
+Window:CreateTabSection("Workshop Creation")
+local Tab_17 = Window:CreateTab("Tutorial",0)
+Tab_17:CreateParagraph({Title = "Uploading scripts", Content = "For now tutorials can be viewed only on websites."})
+Tab_17:CreateButton({Name = "Tutorial on GitHub (MD)"; Callback = function()
+setclipboard(tostring("https://github.com/NewNexer/NexerHub/blob/main/DOD/tut.md"))
+Rayfield:Notification("Success!", "Copied Link!", 3, true)
+end; })
+Tab_17:CreateButton({Name = "Tutorial on Rentry (MD)"; Callback = function()
+setclipboard(tostring("https://rentry.co/"))
+Rayfield:Notification("Success!", "Copied Link!", 3, true)
+end; })
+
+
+
+local LastCode = ""
+local WorkshopAuthor = ""
+local WorkshopName = ""
+local WorkshopDescription = ""
+function UploadWorkOnQueue(a,b,c)
+end
+local Tab_16 = Window:CreateTab("Upload Work",0)
+Tab_16:CreateParagraph({Title = "Uploading scripts", Content = "You can upload your custom created feature(s) here. Paste your code in the input bar lower or write the file name including extension in the ''Workspace'' folder."})
+Tab_16:CreateParagraph({Title = "Script requirements", Content = "1. Script must be open-source.\n2. Script must not have any HTTP requests."})
+Tab_16:CreateParagraph({Title = "FAQ", Content = "To upload script you need to paste your code in the input bar lower or write the file name including extension from the executors' ''Workspace'' folder.\nIf your script is too huge or can't be pasted in the input bar correctly, you can also contact me in discord (@new_nexer1234)."})
+Tab_16:CreateInput({Name = "Paste Code Here ( Required )"; PlaceholderText = "..."; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+if isfile(tostring(Value)) then
+LastCode = readfile(tostring(Value))
+elseif not isfile(tostring(Value)) then
+LastCode = tostring(Value)
+end
+end; })
+Tab_16:CreateInput({Name = "Feature(s) Name ( Required )"; PlaceholderText = "..."; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+WorkshopName = tostring(Value)
+end; })
+Tab_16:CreateInput({Name = "Author Name ( Not Required )"; PlaceholderText = "..."; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+WorkshopAuthor = tostring(Value)
+end; })
+Tab_16:CreateButton({Name = "Upload work on queue"; Callback = function()
+UploadWorkOnQueue(WorkshopName,WorkshopAuthor,LastCode)
+end; })
+
+
+
+
+
+
+
+
+
+
+
+
+
 Window:CreateTabSection("Miscellaneous")
 
 
@@ -4531,6 +4363,270 @@ end
 end; })
 
 
+
+
+
+
+local Tab_14 = Window:CreateTab("Untitled",0)
+Tab_14:CreateParagraph({Title = "Untitled", Content = "Stuff that may or may not be useful. This tab will be deleted soon and everything that is here will get moved to other tabs or removed if too useless"})
+
+function GetAwardFromAbility(abilitynaem)
+local rootpart = HumanoidRootPart
+local oldcf = rootpart.CFrame
+local killermodl = workspace.GameAssets.Teams.Killer:FindFirstChildOfClass("Model")
+if not killermodl then return end
+local killerrootpart = killermodl.HumanoidRootPart
+local anoclip_connection = nil
+local acamera_connection = nil
+function invisappwithnoclip(bool)
+if bool == false then
+task.spawn(function()
+for i,v in next, rootpart.Parent.Humanoid:GetPlayingAnimationTracks() do
+v.Priority = Enum.AnimationPriority.Core
+v:AdjustSpeed(tonumber(0))
+v:Stop(tonumber(0))
+end
+end)
+if anoclip_connection then
+anoclip_connection:Disconnect()
+anoclip_connection = nil
+end
+if rootpart then
+rootpart.CanCollide = true
+end
+if acamera_connection then
+acamera_connection:Disconnect()
+acamera_connection = nil
+pcall(function()
+workspace.CurrentCamera.CameraSubject = rootpart.Parent.Humanoid
+end)
+end
+elseif bool == true then
+local function nocollision()
+for i,v in pairs(rootpart.Parent:GetDescendants()) do
+if v and v:IsA("BasePart") and v.CanCollide == true and v.Name ~= "HumanoidRootPart" then
+v.CanCollide = false
+end
+end
+if rootpart then
+rootpart.CanCollide = false
+end
+end
+anoclip_connection = game:GetService("RunService").Stepped:Connect(nocollision)
+acamera_connection = workspace.CurrentCamera:GetPropertyChangedSignal("CameraSubject"):Connect(function()
+workspace.CurrentCamera.CameraSubject = killerrootpart
+end)
+workspace.CurrentCamera.CameraSubject = killerrootpart
+game.Players.LocalPlayer.CharacterAdded:Once(function()
+if acamera_connection then
+acamera_connection:Disconnect()
+acamera_connection = nil
+end
+if anoclip_connection then
+anoclip_connection:Disconnect()
+anoclip_connection = nil
+end
+end)
+local Anim = Instance.new("Animation")
+Anim.AnimationId = "rbxassetid://90444351114401"
+local loadedanim = rootpart.Parent.Humanoid:LoadAnimation(Anim)
+loadedanim.Priority = Enum.AnimationPriority.Action4
+repeat task.wait() until loadedanim.Length > 0	
+loadedanim:Play()
+repeat task.wait() until loadedanim.IsPlaying
+loadedanim:AdjustSpeed(tonumber(0))
+loadedanim.TimePosition = 2.2
+end
+end
+local function looptpto(part, cframemod, time)
+local start = tick()
+while tick() - start < time and task.wait() do
+rootpart.CFrame = part.CFrame * cframemod
+for i,v in pairs(rootpart.Parent:GetDescendants()) do
+if v and v:IsA("BasePart") then
+v.Velocity = Vector3.new(0,0,0)
+v.RotVelocity = Vector3.new(0,0,0)
+end
+end
+end
+end
+local function looptpto2(cframe, mod, time)
+local start = tick()
+while tick() - start < time and task.wait() do
+rootpart.CFrame = cframe
+for i,v in pairs(rootpart.Parent:GetDescendants()) do
+if v and v:IsA("BasePart") then
+v.Velocity = Vector3.new(0,0,0)
+v.RotVelocity = Vector3.new(0,0,0)
+end
+end
+end
+end
+if (Character:GetAttribute(""..abilitynaem.."Cooldown") and Character:GetAttribute(""..abilitynaem.."Cooldown")~=nil) and Character:GetAttribute(""..abilitynaem.."Cooldown")==true then Rayfield:Notification("Error!", "Your choosen ability is on cooldown!", 3, false) return end
+if abilitynaem=="Adrenaline" then
+invisappwithnoclip(true)
+task.delay(1, function() game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Adrenaline") end)
+looptpto(killerrootpart, CFrame.new(0,-8,0), 3)
+looptpto2(CFrame.new(0,-490,0), true, 5)
+task.delay(0.5, function() invisappwithnoclip(false) end)
+looptpto2(oldcf, CFrame.new(0,0,0), 2)
+elseif abilitynaem=="Cloak" then
+invisappwithnoclip(true)
+task.delay(1.5, function() game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Cloak") end)
+looptpto(killerrootpart, CFrame.new(0,0,8), 3)
+looptpto2(CFrame.new(0,-490,0), true, 7)
+task.delay(0.5, function() invisappwithnoclip(false) end)
+looptpto2(oldcf, CFrame.new(0,0,0), 2)
+elseif abilitynaem=="Taunt" then
+invisappwithnoclip(true)
+game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Taunt")
+task.wait(1)
+looptpto(killerrootpart, CFrame.new(0,0,-2), 0.2)
+looptpto(killerrootpart, CFrame.new(0,0,-1), 0.2)
+looptpto(killerrootpart, CFrame.new(0,0,0), 0.2)
+looptpto(killerrootpart, CFrame.new(0,0,1), 0.2)
+looptpto(killerrootpart, CFrame.new(0,0,2), 0.2)
+task.delay(0.5, function() invisappwithnoclip(false) end)
+looptpto2(oldcf, CFrame.new(0,0,0), 2)
+elseif abilitynaem=="Punch" then
+invisappwithnoclip(true)
+game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Punch")
+looptpto(killerrootpart, CFrame.new(0,0,-2), 0.22)
+looptpto(killerrootpart, CFrame.new(0,0,-1), 0.22)
+looptpto(killerrootpart, CFrame.new(0,0,0), 0.22)
+looptpto(killerrootpart, CFrame.new(0,0,1), 0.22)
+looptpto(killerrootpart, CFrame.new(0,0,2), 0.22)
+task.delay(0.5, function() invisappwithnoclip(false) end)
+looptpto2(oldcf, CFrame.new(0,0,0), 2)
+elseif abilitynaem=="Revolver" then
+invisappwithnoclip(true)
+task.delay(1, function() game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Revolver") end)
+looptpto(killerrootpart, CFrame.new(0,-2,-1), 3)
+task.delay(0.5, function() invisappwithnoclip(false) end)
+looptpto2(oldcf, CFrame.new(0,0,0), 2)
+elseif abilitynaem=="Banana" then
+invisappwithnoclip(true)
+task.delay(1, function() game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Banana") end)
+looptpto(killerrootpart, CFrame.new(0,0,2), 3)
+task.delay(0.5, function() invisappwithnoclip(false) end)
+looptpto2(oldcf, CFrame.new(0,0,0), 2)
+elseif abilitynaem=="WinRound" then
+invisappwithnoclip(true)
+looptpto2(CFrame.new(500,-490,500), true, 2)
+Rayfield:Notification("Success!", "Now you have to wait until round ends.", 10, true)
+end
+end
+function GetCurrentStaminaValues()
+local stamvalues = tostring(game.Players.LocalPlayer.PlayerGui.MainGui.RoundUI.PlayerUI.StaminaBar.Label.Text)
+local stam, maxstam = stamvalues:match("([%d%.inf]+)/([%d%.inf]+)")
+stam = stam == "inf" and math.huge or tonumber(stam)
+maxstam = maxstam == "inf" and math.huge or tonumber(maxstam)
+return stam, maxstam
+end
+Tab_14:CreateSection("Point & malice farm")
+Tab_14:CreateLabel("Stunning/ragdolling abilities have risks of causing your death ( killer may kill you, but you will still be invisible )")
+local ChoosenAbilityAW = "Adrenaline"
+Tab_14:CreateDropdown({Name = "Ability"; Options = {"Adrenaline","Cloak","Taunt","Revolver","Punch","Banana"}; CurrentOption = "Adrenaline"; MultiSelection = false; Callback = function(Value)
+ChoosenAbilityAW = Rayfield:GetDropdownValue(Value)
+end; })
+Tab_14:CreateButton({Name = "Get Award for choosen ability"; Callback = function()
+GetAwardFromAbility(ChoosenAbilityAW)
+end; })
+Tab_14:CreateButton({Name = "Win Round ( as Survivor )"; Callback = function()
+GetAwardFromAbility("WinRound")
+end; })
+Tab_14:CreateSection("Bot")
+function GetTargetByCategory(cat)
+local targets = {
+	[1] = 0;
+	[2] = 0;
+	[3] = 0;
+}
+local lowesthealth = 155
+local lowestdistance = math.huge
+for i,v in next, workspace.GameAssets.Teams.Survivor:GetChildren() do
+if v and (v:FindFirstChild("Humanoid") and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Head")) then
+if v.Humanoid.Health<lowesthealth then
+lowesthealth = v.Humanoid.Health
+targets[1] = v
+end
+local Distance = (HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
+if Distance<lowestdistance then
+lowestdistance = Distance
+targets[2] = v
+end
+if (v:GetAttribute("Ability1") and v:GetAttribute("Ability1")=="Caretaker") or (v:GetAttribute("Ability2") and v:GetAttribute("Ability2")=="Caretaker") then
+targets[3] = v
+end
+end
+end
+return ((cat=="Most Damaged Player" and targets[1]) or (cat=="Closest Player" and targets[2]) or (cat=="Caretakers" and targets[3]))
+end
+Tab_14:CreateLabel("This works only for killers")
+local ChosenTargetCat = "Most Damaged Player"
+local ChosenTargetCatDropdown = Tab_14:CreateDropdown({Name = "Target"; Options = {"Most Damaged Player","Closest Player","Caretakers"}; CurrentOption = "Most Damaged Player"; MultiSelection = false; Callback = function(Value)
+ChosenTargetCat = Rayfield:GetDropdownValue(Value)
+end; })
+local DistanceTrigger = 15
+Tab_14:CreateInput({Name = "M1 Distance Trigger"; PlaceholderText = "15"; NumbersOnly = true; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+DistanceTrigger = tonumber(Value)
+end; })
+local BotToggle = false
+local TrueBotToggle = nil
+TrueBotToggle = Tab_14:CreateToggle({Name = "Bot Toggle"; CurrentValue = BotToggle; Callback = function(Value)
+BotToggle = Value
+if workspace.GameAssets.Teams.Killer:FindFirstChild(LocalPlayer.Name)==nil then return end
+if BotToggle==true then
+local controlremote = game.ReplicatedStorage.Events.RemoteFunctions.UseAbility
+local PathService = game:GetService("PathfindingService")
+repeat task.wait()
+local a,b = pcall(function()
+local target = GetTargetByCategory(ChosenTargetCat)
+if target==0 and ChosenTargetCat=="Caretakers" then
+Rayfield:Notification("Error!", "No targets with such requirement found. Changing target mode from ''Caretakers'' to ''Most Damaged Player''...", 3, false)
+pcall(function()
+ChosenTargetCatDropdown:Set({"Caretakers"})
+end)
+pcall(function()
+ChosenTargetCatDropdown:Set("Caretakers")
+end)
+ChosenTargetCat = "Caretakers"
+elseif target==0 then
+TrueBotToggle:Set(false) Rayfield:Notification("Error!", "No targets with such requirement found.", 3, false) return
+end
+
+local newpath = PathService:CreatePath({
+	AgentRadius = 3,
+	AgentHeight = 6,
+	AgentCanJump = true,
+	AgentCanClimb = true,
+	WaypointSpacing = 8,
+})
+newpath:ComputeAsync(HumanoidRootPart.Position, target.HumanoidRootPart.Position)
+local waypoints, distance = newpath:GetWaypoints(), 9e9
+if waypoints ~= nil and waypoints[2] ~= nil then
+Humanoid:MoveTo(waypoints[2].Position)
+elseif waypoints ~= nil and waypoints[1] ~= nil then
+Humanoid:MoveTo(waypoints[1].Position)
+end
+local cstamina, cmaxstamina = GetCurrentStaminaValues()
+if cstamina<5 then
+game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.LeftShift, false, game)
+end
+distance = (HumanoidRootPart.Position - target.HumanoidRootPart.Position).Magnitude
+if distance<DistanceTrigger then
+local hitremote = LocalPlayer.Stats.EquippedKiller=="Killdroid" and "Eject" or "Swing"
+controlremote:InvokeServer(hitremote)
+end
+
+end)
+if b~=nil then print(b) wait(10) end
+until workspace.GameAssets.Teams.Killer:FindFirstChild(LocalPlayer.Name)==nil or Humanoid.Health==0 or BotToggle==false
+if Humanoid~=nil and HumanoidRootPart~=nil then
+Humanoid:MoveTo(HumanoidRootPart.Position)
+end
+end
+end; })
 
 
 
