@@ -4013,6 +4013,28 @@ Tab_15:CreateParagraph({Title = "Workshop", Content = "Custom created features b
 Window:CreateTabSection("Workshop Creation")
 local Tab_17 = Window:CreateTab("Tutorial",0)
 Tab_17:CreateParagraph({Title = "Uploading scripts", Content = "For now tutorials can be viewed only on websites."})
+Tab_17:CreateMarkdown({Title = "Guide", Content = [[
+Test test test....
+Hello there!
+# Test
+## Test
+### Test
+#### Test
+---
+> Hi
+- Hi
+* Hi
++ Hi
+1. Test 1
+2. Test 2
+---
+```lua
+print("Hello")
+local a = true
+if a then
+print("True...")
+end
+```]])}
 Tab_17:CreateButton({Name = "Tutorial on GitHub (MD)"; Callback = function()
 setclipboard(tostring("https://github.com/NewNexer/NexerHub/blob/main/DOD/tut.md"))
 Rayfield:Notification("Success!", "Copied Link!", 3, true)
