@@ -2597,7 +2597,7 @@ end)
 Window:CreateTabSection("Advanced/Overpowered Features")
 
 local Tab_13 = Window:CreateTab("Game Breaks",0)
-Tab_13:CreateParagraph({Title = "Game Breaking Exploits", Content = "Game Breaking features. Currently free, but may get paid starting from 21th december. Every feature that is here is server-sided. (FE)"})
+Tab_13:CreateParagraph({Title = "Game Breaking Exploits", Content = "Game Breaking features. Currently free. Every feature that is here is server-sided. (FE)"})
 --[[Tab_13:CreateButton({Name = "Gamepass Link [ Costs "..tostring((Module:GetAssetPrice(1597133271) or 99)).." robux ]"; Callback = function()
 if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(LocalPlayer.UserId,1597133271) then
     _G.HasGameBreakingFeaturesAccess = true
