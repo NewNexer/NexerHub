@@ -1980,11 +1980,11 @@ local ttime = time or 4
 local mmode = mode or warn
 local iimg = 0
 if mmode == true then
-iimg = 18797434345
+iimg = 136186846844342
 elseif mmode == false then
-iimg = 18797440055
+iimg = 71508738660632
 elseif mmode == warn then
-iimg = 18797417802
+iimg = 9441432403
 end
 RayfieldLibrary:Notify({
 	Title = title,
@@ -3808,24 +3808,89 @@ function RayfieldLibrary:CreateWindow(Settings)
 					CodeStroke.Parent = CodeFrame
 
 					local padX = 10
-					local topInset = codeLanguage ~= '' and 28 or 10
+					local headerHeight = 24
+					local topInset = headerHeight + 10
 					local codeWidth = math.max(80, contentWidth - padX * 2)
+					local headerTextColor = blendColor(SelectedTheme.TextColor, Color3.fromRGB(160, 190, 255), 0.35)
 
-					if codeLanguage ~= '' then
-						local LangLabel = Instance.new('TextLabel')
-						LangLabel.Name = 'Language'
-						LangLabel.BackgroundTransparency = 1
-						LangLabel.BorderSizePixel = 0
-						LangLabel.TextXAlignment = Enum.TextXAlignment.Left
-						LangLabel.TextYAlignment = Enum.TextYAlignment.Top
-						LangLabel.Font = Enum.Font.GothamBold
-						LangLabel.TextSize = 11
-						LangLabel.TextColor3 = blendColor(SelectedTheme.TextColor, Color3.fromRGB(160, 190, 255), 0.35)
-						LangLabel.Text = string.upper(codeLanguage)
-						LangLabel.Size = UDim2.new(1, -(padX * 2), 0, 14)
-						LangLabel.Position = UDim2.new(0, padX, 0, 8)
-						LangLabel.Parent = CodeFrame
+					local HeaderFrame = Instance.new('Frame')
+					HeaderFrame.Name = 'Header'
+					HeaderFrame.BackgroundTransparency = 1
+					HeaderFrame.BorderSizePixel = 0
+					HeaderFrame.Size = UDim2.new(1, -(padX * 2), 0, headerHeight)
+					HeaderFrame.Position = UDim2.new(0, padX, 0, 6)
+					HeaderFrame.Parent = CodeFrame
+
+					local languageText = codeLanguage ~= '' and string.upper(codeLanguage) or 'CODE'
+					local LangLabel = Instance.new('TextLabel')
+					LangLabel.Name = 'Language'
+					LangLabel.BackgroundTransparency = 1
+					LangLabel.BorderSizePixel = 0
+					LangLabel.TextXAlignment = Enum.TextXAlignment.Left
+					LangLabel.TextYAlignment = Enum.TextYAlignment.Center
+					LangLabel.Font = Enum.Font.GothamBold
+					LangLabel.TextSize = 11
+					LangLabel.TextColor3 = headerTextColor
+					LangLabel.Text = languageText
+					LangLabel.Size = UDim2.new(1, -30, 1, 0)
+					LangLabel.Parent = HeaderFrame
+
+					local CopyButton = Instance.new('ImageButton')
+					CopyButton.Name = 'CopyButton'
+					CopyButton.AutoButtonColor = false
+					CopyButton.BackgroundColor3 = blendColor(SelectedTheme.SecondaryElementBackground, SelectedTheme.SecondaryElementStroke, 0.18)
+					CopyButton.BorderSizePixel = 0
+					CopyButton.AnchorPoint = Vector2.new(1, 0)
+					CopyButton.Position = UDim2.new(1, 0, 0, 1)
+					CopyButton.Size = UDim2.new(0, 20, 0, 20)
+					CopyButton.Image = 'rbxassetid://83983589022863'
+					CopyButton.ImageColor3 = headerTextColor
+					CopyButton.ImageTransparency = 0.08
+					CopyButton.Parent = HeaderFrame
+
+					local CopyCorner = Instance.new('UICorner')
+					CopyCorner.CornerRadius = UDim.new(0, 6)
+					CopyCorner.Parent = CopyButton
+
+					local CopyStroke = Instance.new('UIStroke')
+					CopyStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+					CopyStroke.Color = blendColor(SelectedTheme.SecondaryElementStroke, SelectedTheme.TextColor, 0.12)
+					CopyStroke.Transparency = 0.25
+					CopyStroke.Parent = CopyButton
+
+					local function setCopyVisuals(isCopied)
+						if isCopied then
+							TweenService:Create(CopyButton, TweenInfo.new(0.18, Enum.EasingStyle.Exponential), {BackgroundColor3 = blendColor(SelectedTheme.TabTextColor or SelectedTheme.TextColor, SelectedTheme.SecondaryElementBackground, 0.55)}):Play()
+							TweenService:Create(CopyButton, TweenInfo.new(0.18, Enum.EasingStyle.Exponential), {ImageColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+							TweenService:Create(CopyStroke, TweenInfo.new(0.18, Enum.EasingStyle.Exponential), {Transparency = 0.05}):Play()
+						else
+							TweenService:Create(CopyButton, TweenInfo.new(0.18, Enum.EasingStyle.Exponential), {BackgroundColor3 = blendColor(SelectedTheme.SecondaryElementBackground, SelectedTheme.SecondaryElementStroke, 0.18)}):Play()
+							TweenService:Create(CopyButton, TweenInfo.new(0.18, Enum.EasingStyle.Exponential), {ImageColor3 = headerTextColor}):Play()
+							TweenService:Create(CopyStroke, TweenInfo.new(0.18, Enum.EasingStyle.Exponential), {Transparency = 0.25}):Play()
+						end
 					end
+
+					CopyButton.MouseEnter:Connect(function()
+						TweenService:Create(CopyButton, TweenInfo.new(0.18, Enum.EasingStyle.Exponential), {BackgroundColor3 = blendColor(SelectedTheme.SecondaryElementBackground, SelectedTheme.SecondaryElementStroke, 0.3)}):Play()
+						TweenService:Create(CopyStroke, TweenInfo.new(0.18, Enum.EasingStyle.Exponential), {Transparency = 0.12}):Play()
+					end)
+
+					CopyButton.MouseLeave:Connect(function()
+						setCopyVisuals(false)
+					end)
+
+					CopyButton.MouseButton1Click:Connect(function()
+						local clipboardFn = setclipboard or toclipboard or (Clipboard and Clipboard.set)
+						if clipboardFn then
+							pcall(clipboardFn, rawCode)
+							setCopyVisuals(true)
+							task.delay(0.8, function()
+								if CopyButton and CopyButton.Parent then
+									setCopyVisuals(false)
+								end
+							end)
+						end
+					end)
 
 					local CodeLabel = Instance.new('TextLabel')
 					CodeLabel.Name = 'Code'
