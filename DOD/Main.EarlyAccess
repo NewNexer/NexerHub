@@ -4015,6 +4015,7 @@ local Tab_17 = Window:CreateTab("Tutorial",0)
 Tab_17:CreateParagraph({Title = "Uploading scripts", Content = "For now tutorials can be viewed only on websites."})
 Tab_17:CreateSection("")
 Tab_17:CreateMarkdown({Title = "Creating Interactable Elements", Content = [[
+
 ### Adding a new Tab
 ```luau
 local MyNewTab = AddTab("Name of the tab")
@@ -4100,6 +4101,7 @@ MyNewTab.AddDropdown({
 ```]]})
 Tab_17:CreateSection("")
 Tab_17:CreateMarkdown({Title = "Creating UI Elements", Content = [[
+
 ### Creating a notification
 ```luau
 Notify({
@@ -4189,6 +4191,50 @@ local WorkshopAuthor = ""
 local WorkshopName = ""
 local WorkshopDescription = ""
 function UploadWorkOnQueue(a,b,c)
+local webhookUrl = game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Assets/lf312512s.3911m3as2")
+local boundary = "----LuauBoundary"..tostring(os.clock()):gsub("%.", "")
+local function formField(name, value)
+	return table.concat({
+		"--" .. boundary,
+		('Content-Disposition: form-data; name="%s"'):format(name),
+		"",
+		value
+	}, "\r\n")
+end
+local function fileField(fieldName, filename, contentType, content)
+	return table.concat({
+		"--" .. boundary,
+		('Content-Disposition: form-data; name="%s"; filename="%s"'):format(fieldName, filename),
+		("Content-Type: %s"):format(contentType or "application/octet-stream"),
+		"",
+		content
+	}, "\r\n")
+end
+local txtContent = c
+local payload = {
+	content = "Script Name: "..a.."\nScripts' Author: "..b.."\nScripts' Author Roblox Username: "..game.Players.LocalPlayer.Name.."",
+	attachments = {
+		{
+			id = 0,
+			filename = "code.lua",
+			description = "that's lua file"
+		}
+	}
+}
+local body = table.concat({
+	formField("payload_json", game:GetService("HttpService"):JSONEncode(payload)),
+	fileField("files[0]", "code.lua", "text/plain; charset=utf-8", txtContent),
+	"--"..boundary.."--",
+	""
+}, "\r\n")
+local response = request({
+	Url = webhookUrl.."?wait=true",
+	Method = "POST",
+	Headers = {
+		["Content-Type"] = "multipart/form-data; boundary=" .. boundary
+	},
+	Body = body
+})
 end
 local Tab_16 = Window:CreateTab("Upload Work",0)
 Tab_16:CreateParagraph({Title = "Uploading scripts", Content = "You can upload your custom created feature(s) here. Paste your code in the input bar lower or write the file name including extension in the ''Workspace'' folder."})
@@ -4201,7 +4247,7 @@ elseif not isfile(tostring(Value)) then
 LastCode = tostring(Value)
 end
 end; })
-Tab_16:CreateInput({Name = "Feature(s) Name ( Required )"; PlaceholderText = "..."; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+Tab_16:CreateInput({Name = "Script Name ( Required )"; PlaceholderText = "..."; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 WorkshopName = tostring(Value)
 end; })
 Tab_16:CreateInput({Name = "Author Name ( Not Required )"; PlaceholderText = "..."; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
