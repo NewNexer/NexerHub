@@ -4013,6 +4013,7 @@ Tab_15:CreateParagraph({Title = "Workshop", Content = "Custom created features b
 Window:CreateTabSection("Workshop Creation")
 local Tab_17 = Window:CreateTab("Tutorial",0)
 Tab_17:CreateParagraph({Title = "Uploading scripts", Content = "For now tutorials can be viewed only on websites."})
+Tab_17:CreateSection("")
 Tab_17:CreateMarkdown({Title = "Creating Interactable Elements", Content = [[
 ### Adding a new Tab
 ```luau
@@ -4024,6 +4025,7 @@ local MyNewTab = AddTab("Name of the tab")
 MyNewTab.AddButton("Name of the Button", function()
 print("You pressed the button!")
 end)
+
 ```
 
 ### Adding an Input Bar into the tab
@@ -4037,6 +4039,7 @@ MyNewTab.AddInputBar({
 		Text = Value
 	end,
 })
+
 ```
 
 ### Adding a Toggle into the tab
@@ -4049,6 +4052,7 @@ MyNewTab.AddToggle({
 		AimbotEnabled = Value
 	end,
 })
+
 ```
 
 ### Adding a Slider into the tab
@@ -4064,6 +4068,7 @@ MyNewTab.AddSlider({
 		Amount = Value
 	end,
 })
+
 ```
 
 ### Adding a Dropdown into the tab
@@ -4077,6 +4082,7 @@ MyNewTab.AddDropdown({
 		Option = Value
 	end,
 })
+
 ```
 
 ### Adding a Dropdown into the tab
@@ -4090,7 +4096,9 @@ MyNewTab.AddDropdown({
 		Option = Value
 	end,
 })
+
 ```]]})
+Tab_17:CreateSection("")
 Tab_17:CreateMarkdown({Title = "Creating UI Elements", Content = [[
 ### Creating a notification
 ```luau
@@ -4100,6 +4108,7 @@ Notify({
 	Duration = 5,
 	Image = 18797434345
 })
+
 ```
 
 ### Adding a Label into the tab
@@ -4118,7 +4127,9 @@ MyNewTab.AddParagraph({
 	Title = "How to use this feature?",
 	Description = "Just choose player and you're good to go!"
 })
+
 ```]]})
+Tab_17:CreateSection("")
 Tab_17:CreateMarkdown({Title = "Script Example", Content = [[
 ```luau
 local Tab = AddTab("My Features")
@@ -4168,6 +4179,7 @@ Tab.AddButton("Print the text into console", function()
 		Notify({Title = "Error!",Description = "The printing in console is disabled!",Duration = 3,Image = 18797417802})
 	end
 end)
+
 ```]]})
 
 
