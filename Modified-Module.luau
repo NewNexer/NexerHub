@@ -3614,6 +3614,410 @@ function RayfieldLibrary:CreateWindow(Settings)
 			return ParagraphValue
 		end
 
+		-- Markdown
+		function Tab:CreateMarkdown(MarkdownSettings)
+			local MarkdownValue = {}
+			if type(MarkdownSettings) == "string" then
+				MarkdownSettings = {Content = MarkdownSettings}
+			else
+				MarkdownSettings = MarkdownSettings or {}
+			end
+
+			local Markdown = Elements.Template.Paragraph:Clone()
+			Markdown.Visible = true
+			Markdown.Parent = TabPage
+			Markdown.ClipsDescendants = true
+			Markdown.BackgroundTransparency = 1
+			Markdown.UIStroke.Transparency = 1
+			Markdown.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
+			Markdown.UIStroke.Color = SelectedTheme.SecondaryElementStroke
+			Markdown.Name = tostring(MarkdownSettings.Title or MarkdownSettings.Name or 'Markdown')
+
+			for _, Child in ipairs(Markdown:GetChildren()) do
+				if not Child:IsA('UIStroke') and not Child:IsA('UICorner') then
+					Child:Destroy()
+				end
+			end
+
+			local Holder = Instance.new('Frame')
+			Holder.Name = 'MarkdownHolder'
+			Holder.BackgroundTransparency = 1
+			Holder.Parent = Markdown
+			Holder.Position = UDim2.new(0, 12, 0, 10)
+			Holder.Size = UDim2.new(1, -24, 0, 0)
+
+			local HolderLayout = Instance.new('UIListLayout')
+			HolderLayout.Padding = UDim.new(0, 6)
+			HolderLayout.FillDirection = Enum.FillDirection.Vertical
+			HolderLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+			HolderLayout.SortOrder = Enum.SortOrder.LayoutOrder
+			HolderLayout.Parent = Holder
+
+			local function colorToHex(Color)
+				return string.format('#%02X%02X%02X', math.floor(Color.R * 255 + 0.5), math.floor(Color.G * 255 + 0.5), math.floor(Color.B * 255 + 0.5))
+			end
+
+			local function blendColor(ColorA, ColorB, Alpha)
+				return Color3.new(
+					ColorA.R + (ColorB.R - ColorA.R) * Alpha,
+					ColorA.G + (ColorB.G - ColorA.G) * Alpha,
+					ColorA.B + (ColorB.B - ColorA.B) * Alpha
+				)
+			end
+
+			local function escapeRichText(Text)
+				Text = tostring(Text or '')
+				Text = Text:gsub('&', '&amp;')
+				Text = Text:gsub('<', '&lt;')
+				Text = Text:gsub('>', '&gt;')
+				return Text
+			end
+
+			local function measureText(Text, TextSize, Font, Width)
+				Width = math.max(40, Width or 40)
+				return TextService:GetTextSize(tostring(Text or ''), TextSize, Font, Vector2.new(Width, 100000))
+			end
+
+			local function applyInlineMarkdown(Text)
+				local AccentHex = colorToHex(SelectedTheme.TabTextColor or SelectedTheme.TextColor)
+				local InlineCodeHex = colorToHex(blendColor(SelectedTheme.TextColor, Color3.fromRGB(140, 180, 255), 0.35))
+				local Rich = escapeRichText(Text)
+				Rich = Rich:gsub('%[([^%]]+)%]%(([^%)]+)%)', '<u><font color="' .. AccentHex .. '">%1</font></u>')
+				Rich = Rich:gsub('%*%*([^%*][^%*]-)%*%*', '<b>%1</b>')
+				Rich = Rich:gsub('__([^_][^_]-)__', '<b>%1</b>')
+				Rich = Rich:gsub('~~([^~][^~]-)~~', '<s>%1</s>')
+				Rich = Rich:gsub('`([^`\n]+)`', '<font color="' .. InlineCodeHex .. '"><b>%1</b></font>')
+				Rich = Rich:gsub('%*([^%*\n]+)%*', '<i>%1</i>')
+				Rich = Rich:gsub('_([^_\n]+)_', '<i>%1</i>')
+				return Rich
+			end
+
+			local function clearBlocks()
+				for _, Child in ipairs(Holder:GetChildren()) do
+					if Child ~= HolderLayout then
+						Child:Destroy()
+					end
+				end
+			end
+
+			local function updateMarkdownSize()
+				local buttonSize = Elements.Template.Button.Size
+				local contentHeight = HolderLayout.AbsoluteContentSize.Y
+				Holder.Size = UDim2.new(1, -24, 0, contentHeight)
+				Markdown.Size = UDim2.new(buttonSize.X.Scale, buttonSize.X.Offset, 0, math.max(42, contentHeight + 20))
+			end
+
+			HolderLayout:GetPropertyChangedSignal('AbsoluteContentSize'):Connect(updateMarkdownSize)
+
+			local lastKnownWidth = 0
+			local renderMarkdown
+			local function getContentWidth()
+				local width = Markdown.AbsoluteSize.X
+				if width <= 0 then
+					local buttonSize = Elements.Template.Button.Size
+					if buttonSize.X.Offset > 0 then
+						width = buttonSize.X.Offset
+					else
+						width = 420
+					end
+				end
+				return math.max(140, width - 24)
+			end
+
+			local function createTextBlock(Name, Text, TextSize, Font, Height, RichTextEnabled, TextColor, ExtraIndent)
+				local Label = Instance.new('TextLabel')
+				Label.Name = Name
+				Label.BackgroundTransparency = 1
+				Label.BorderSizePixel = 0
+				Label.RichText = RichTextEnabled or false
+				Label.TextWrapped = true
+				Label.TextXAlignment = Enum.TextXAlignment.Left
+				Label.TextYAlignment = Enum.TextYAlignment.Top
+				Label.Text = Text
+				Label.TextSize = TextSize
+				Label.Font = Font
+				Label.TextColor3 = TextColor or SelectedTheme.TextColor
+				Label.Size = UDim2.new(1, -(ExtraIndent or 0), 0, Height)
+				Label.Parent = Holder
+				return Label
+			end
+
+			renderMarkdown = function(CurrentSettings)
+				CurrentSettings = CurrentSettings or MarkdownSettings or {}
+				clearBlocks()
+				Markdown.Name = tostring(CurrentSettings.Title or CurrentSettings.Name or 'Markdown')
+
+				local markdownText = tostring(CurrentSettings.Content or CurrentSettings.Markdown or CurrentSettings.Text or '')
+				local contentWidth = getContentWidth()
+				lastKnownWidth = contentWidth
+
+				local headingTitle = tostring(CurrentSettings.Title or '')
+				if headingTitle ~= '' then
+					local titleHeight = math.max(18, measureText(headingTitle, 16, Enum.Font.GothamBold, contentWidth).Y)
+					createTextBlock('MarkdownTitle', escapeRichText(headingTitle), 16, Enum.Font.GothamBold, titleHeight, true, SelectedTheme.TextColor)
+				end
+
+				local lines = string.split(markdownText, '\n')
+				local paragraphLines = {}
+				local codeLines = {}
+				local inCodeBlock = false
+				local codeLanguage = ''
+
+				local function flushParagraph()
+					if #paragraphLines == 0 then
+						return
+					end
+					local paragraphText = table.concat(paragraphLines, '\n')
+					local richText = applyInlineMarkdown(paragraphText)
+					local height = math.max(16, measureText(paragraphText, 13, Enum.Font.Gotham, contentWidth).Y)
+					createTextBlock('ParagraphBlock', richText, 13, Enum.Font.Gotham, height, true, SelectedTheme.TextColor)
+					table.clear(paragraphLines)
+				end
+
+				local function addSpacer(Height)
+					local Spacer = Instance.new('Frame')
+					Spacer.Name = 'Spacer'
+					Spacer.BackgroundTransparency = 1
+					Spacer.BorderSizePixel = 0
+					Spacer.Size = UDim2.new(1, 0, 0, Height or 4)
+					Spacer.Parent = Holder
+				end
+
+				local function flushCodeBlock()
+					if #codeLines == 0 then
+						codeLanguage = ''
+						return
+					end
+
+					local rawCode = table.concat(codeLines, '\n')
+					local CodeFrame = Instance.new('Frame')
+					CodeFrame.Name = 'CodeBlock'
+					CodeFrame.BackgroundColor3 = blendColor(SelectedTheme.SecondaryElementBackground, Color3.fromRGB(40, 40, 45), 0.35)
+					CodeFrame.BorderSizePixel = 0
+					CodeFrame.Size = UDim2.new(1, 0, 0, 0)
+					CodeFrame.Parent = Holder
+
+					local CodeCorner = Instance.new('UICorner')
+					CodeCorner.CornerRadius = UDim.new(0, 8)
+					CodeCorner.Parent = CodeFrame
+
+					local CodeStroke = Instance.new('UIStroke')
+					CodeStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+					CodeStroke.Color = blendColor(SelectedTheme.SecondaryElementStroke, SelectedTheme.TextColor, 0.15)
+					CodeStroke.Transparency = 0.15
+					CodeStroke.Parent = CodeFrame
+
+					local padX = 10
+					local topInset = codeLanguage ~= '' and 28 or 10
+					local codeWidth = math.max(80, contentWidth - padX * 2)
+
+					if codeLanguage ~= '' then
+						local LangLabel = Instance.new('TextLabel')
+						LangLabel.Name = 'Language'
+						LangLabel.BackgroundTransparency = 1
+						LangLabel.BorderSizePixel = 0
+						LangLabel.TextXAlignment = Enum.TextXAlignment.Left
+						LangLabel.TextYAlignment = Enum.TextYAlignment.Top
+						LangLabel.Font = Enum.Font.GothamBold
+						LangLabel.TextSize = 11
+						LangLabel.TextColor3 = blendColor(SelectedTheme.TextColor, Color3.fromRGB(160, 190, 255), 0.35)
+						LangLabel.Text = string.upper(codeLanguage)
+						LangLabel.Size = UDim2.new(1, -(padX * 2), 0, 14)
+						LangLabel.Position = UDim2.new(0, padX, 0, 8)
+						LangLabel.Parent = CodeFrame
+					end
+
+					local CodeLabel = Instance.new('TextLabel')
+					CodeLabel.Name = 'Code'
+					CodeLabel.BackgroundTransparency = 1
+					CodeLabel.BorderSizePixel = 0
+					CodeLabel.RichText = false
+					CodeLabel.TextWrapped = true
+					CodeLabel.TextXAlignment = Enum.TextXAlignment.Left
+					CodeLabel.TextYAlignment = Enum.TextYAlignment.Top
+					CodeLabel.Font = Enum.Font.Code
+					CodeLabel.TextSize = 13
+					CodeLabel.TextColor3 = blendColor(SelectedTheme.TextColor, Color3.fromRGB(190, 210, 255), 0.18)
+					CodeLabel.Text = rawCode
+					local codeHeight = math.max(18, measureText(rawCode, 13, Enum.Font.Code, codeWidth).Y)
+					CodeLabel.Size = UDim2.new(1, -(padX * 2), 0, codeHeight)
+					CodeLabel.Position = UDim2.new(0, padX, 0, topInset)
+					CodeLabel.Parent = CodeFrame
+
+					CodeFrame.Size = UDim2.new(1, 0, 0, topInset + codeHeight + 10)
+					table.clear(codeLines)
+					codeLanguage = ''
+				end
+
+				for _, rawLine in ipairs(lines) do
+					local line = rawLine or ''
+					local fenceLanguage = line:match('^```%s*([%w_-]*)%s*$')
+					if fenceLanguage ~= nil then
+						if inCodeBlock then
+							flushCodeBlock()
+							inCodeBlock = false
+						else
+							flushParagraph()
+							inCodeBlock = true
+							codeLanguage = fenceLanguage or ''
+						end
+					elseif inCodeBlock then
+						table.insert(codeLines, line)
+					elseif line:match('^%s*$') then
+						flushParagraph()
+						addSpacer(2)
+					else
+						local headingHashes, headingText = line:match('^(%s*#+)%s+(.+)$')
+						local quoteText = line:match('^%s*>%s+(.+)$')
+						local bulletText = line:match('^%s*[-%*+]%s+(.+)$')
+						local orderedIndex, orderedText = line:match('^%s*(%d+)%.%s+(.+)$')
+						local divider = line:match('^%s*[-*_][-*_][-*_]+%s*$')
+
+						if headingHashes and headingText then
+							flushParagraph()
+							local cleanHashes = headingHashes:gsub('%s', '')
+							local level = math.clamp(#cleanHashes, 1, 6)
+							local sizes = {24, 20, 17, 15, 14, 13}
+							local headingSize = sizes[level] or 13
+							local headingHeight = math.max(headingSize, measureText(headingText, headingSize, Enum.Font.GothamBold, contentWidth).Y)
+							createTextBlock('Heading' .. tostring(level), applyInlineMarkdown(headingText), headingSize, Enum.Font.GothamBold, headingHeight, true, SelectedTheme.TextColor)
+						elseif quoteText then
+							flushParagraph()
+							local QuoteFrame = Instance.new('Frame')
+							QuoteFrame.Name = 'QuoteBlock'
+							QuoteFrame.BackgroundTransparency = 1
+							QuoteFrame.BorderSizePixel = 0
+							QuoteFrame.Size = UDim2.new(1, 0, 0, 0)
+							QuoteFrame.Parent = Holder
+
+							local QuoteBar = Instance.new('Frame')
+							QuoteBar.Name = 'Bar'
+							QuoteBar.BorderSizePixel = 0
+							QuoteBar.BackgroundColor3 = blendColor(SelectedTheme.TabTextColor or SelectedTheme.TextColor, SelectedTheme.SecondaryElementStroke, 0.35)
+							QuoteBar.Size = UDim2.new(0, 3, 1, 0)
+							QuoteBar.Parent = QuoteFrame
+
+							local quoteWidth = math.max(80, contentWidth - 14)
+							local QuoteLabel = Instance.new('TextLabel')
+							QuoteLabel.Name = 'QuoteText'
+							QuoteLabel.BackgroundTransparency = 1
+							QuoteLabel.BorderSizePixel = 0
+							QuoteLabel.RichText = true
+							QuoteLabel.TextWrapped = true
+							QuoteLabel.TextXAlignment = Enum.TextXAlignment.Left
+							QuoteLabel.TextYAlignment = Enum.TextYAlignment.Top
+							QuoteLabel.Font = Enum.Font.Gotham
+							QuoteLabel.TextSize = 13
+							QuoteLabel.TextColor3 = blendColor(SelectedTheme.TextColor, SelectedTheme.SecondaryElementStroke, 0.15)
+							QuoteLabel.Text = applyInlineMarkdown(quoteText)
+							local quoteHeight = math.max(16, measureText(quoteText, 13, Enum.Font.Gotham, quoteWidth).Y)
+							QuoteLabel.Size = UDim2.new(1, -10, 0, quoteHeight)
+							QuoteLabel.Position = UDim2.new(0, 10, 0, 0)
+							QuoteLabel.Parent = QuoteFrame
+
+							QuoteFrame.Size = UDim2.new(1, 0, 0, quoteHeight)
+						elseif bulletText or orderedText then
+							flushParagraph()
+							local bulletBody = bulletText or orderedText or ''
+							local markerText = bulletText and '•' or (tostring(orderedIndex) .. '.')
+							local ItemFrame = Instance.new('Frame')
+							ItemFrame.Name = 'ListItem'
+							ItemFrame.BackgroundTransparency = 1
+							ItemFrame.BorderSizePixel = 0
+							ItemFrame.Size = UDim2.new(1, 0, 0, 0)
+							ItemFrame.Parent = Holder
+
+							local Marker = Instance.new('TextLabel')
+							Marker.Name = 'Marker'
+							Marker.BackgroundTransparency = 1
+							Marker.BorderSizePixel = 0
+							Marker.TextXAlignment = Enum.TextXAlignment.Left
+							Marker.TextYAlignment = Enum.TextYAlignment.Top
+							Marker.Font = Enum.Font.GothamBold
+							Marker.TextSize = 13
+							Marker.TextColor3 = SelectedTheme.TabTextColor or SelectedTheme.TextColor
+							Marker.Text = markerText
+							Marker.Size = UDim2.new(0, 16, 0, 16)
+							Marker.Parent = ItemFrame
+
+							local itemWidth = math.max(80, contentWidth - 18)
+							local ItemLabel = Instance.new('TextLabel')
+							ItemLabel.Name = 'ItemText'
+							ItemLabel.BackgroundTransparency = 1
+							ItemLabel.BorderSizePixel = 0
+							ItemLabel.RichText = true
+							ItemLabel.TextWrapped = true
+							ItemLabel.TextXAlignment = Enum.TextXAlignment.Left
+							ItemLabel.TextYAlignment = Enum.TextYAlignment.Top
+							ItemLabel.Font = Enum.Font.Gotham
+							ItemLabel.TextSize = 13
+							ItemLabel.TextColor3 = SelectedTheme.TextColor
+							ItemLabel.Text = applyInlineMarkdown(bulletBody)
+							local itemHeight = math.max(16, measureText(bulletBody, 13, Enum.Font.Gotham, itemWidth).Y)
+							ItemLabel.Size = UDim2.new(1, -18, 0, itemHeight)
+							ItemLabel.Position = UDim2.new(0, 18, 0, 0)
+							ItemLabel.Parent = ItemFrame
+
+							ItemFrame.Size = UDim2.new(1, 0, 0, itemHeight)
+						elseif divider then
+							flushParagraph()
+							local Divider = Instance.new('Frame')
+							Divider.Name = 'MarkdownDivider'
+							Divider.BorderSizePixel = 0
+							Divider.BackgroundColor3 = blendColor(SelectedTheme.SecondaryElementStroke, SelectedTheme.TextColor, 0.08)
+							Divider.Size = UDim2.new(1, 0, 0, 1)
+							Divider.Parent = Holder
+						else
+							table.insert(paragraphLines, line)
+						end
+					end
+				end
+
+				flushParagraph()
+				if inCodeBlock then
+					flushCodeBlock()
+				end
+
+				updateMarkdownSize()
+			end
+
+			updateMarkdownSize()
+			renderMarkdown(MarkdownSettings)
+
+			TweenService:Create(Markdown, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
+			TweenService:Create(Markdown.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
+
+			task.defer(function()
+				renderMarkdown(MarkdownSettings)
+			end)
+
+			Markdown:GetPropertyChangedSignal('AbsoluteSize'):Connect(function()
+				local newWidth = getContentWidth()
+				if math.abs(newWidth - lastKnownWidth) >= 4 then
+					task.defer(function()
+						renderMarkdown(MarkdownSettings)
+					end)
+				end
+			end)
+
+			function MarkdownValue:Set(NewMarkdownSettings)
+				if type(NewMarkdownSettings) == 'string' then
+					MarkdownSettings = {Content = NewMarkdownSettings}
+				else
+					MarkdownSettings = NewMarkdownSettings or MarkdownSettings
+				end
+				renderMarkdown(MarkdownSettings)
+			end
+
+			Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
+				Markdown.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
+				Markdown.UIStroke.Color = SelectedTheme.SecondaryElementStroke
+				renderMarkdown(MarkdownSettings)
+			end)
+
+			return MarkdownValue
+		end
+
 		-- Input
 		function Tab:CreateInput(InputSettings)
 			local Input = Elements.Template.Input:Clone()
