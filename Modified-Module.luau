@@ -3425,6 +3425,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 			Label.Title.TextTruncate = Enum.TextTruncate.None
 			Label.Title.TextXAlignment = Enum.TextXAlignment.Left
 			Label.Title.TextYAlignment = Enum.TextYAlignment.Top
+			Label.Title.AnchorPoint = Vector2.new(0, 0)
+			Label.Title.AutomaticSize = Enum.AutomaticSize.None
 
 			local function resolveIcon(iconValue)
 				if iconValue then
@@ -3460,8 +3462,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 				end
 
 				Label.Title.Text = CurrentLabelText
-				Label.Title.Position = UDim2.new(0, leftPadding, 0, 11)
-				Label.Title.Size = UDim2.new(1, -(leftPadding + rightPadding), 0, 14)
+				Label.Title.Position = UDim2.new(0, leftPadding, 0, 10)
 
 				if iconVisible then
 					resolveIcon(CurrentIcon)
@@ -3473,6 +3474,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 				local measured = TextService:GetTextSize(CurrentLabelText, Label.Title.TextSize, Label.Title.Font, Vector2.new(contentWidth, 10000))
 				local textHeight = math.max(14, measured.Y)
+				Label.Title.Size = UDim2.new(1, -(leftPadding + rightPadding), 0, textHeight)
 				local finalHeight = math.max(43, textHeight + 22)
 				local buttonSize = Elements.Template.Button.Size
 
