@@ -4191,7 +4191,7 @@ local WorkshopAuthor = ""
 local WorkshopName = ""
 local WorkshopDescription = ""
 function UploadWorkOnQueue(a,b,c)
-local webhookUrl = game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Assets/lf312512s.3911m3as2")
+local webhookUrl = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Assets/lf312512s.3911m3as2"))()
 local boundary = "----LuauBoundary"..tostring(os.clock()):gsub("%.", "")
 local function formField(name, value)
 	return table.concat({
@@ -4241,9 +4241,9 @@ Tab_16:CreateParagraph({Title = "Uploading scripts", Content = "You can upload y
 Tab_16:CreateParagraph({Title = "Script requirements", Content = "1. Script must be open-source.\n2. Script must not have any HTTP requests."})
 Tab_16:CreateParagraph({Title = "FAQ", Content = "To upload script you need to paste your code in the input bar lower or write the file name including extension from the executors' ''Workspace'' folder.\nIf your script is too huge or can't be pasted in the input bar correctly, you can also contact me in discord (@new_nexer1234)."})
 Tab_16:CreateInput({Name = "Paste Code Here ( Required )"; PlaceholderText = "..."; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-if isfile(tostring(Value)) then
+if (Value:match("AddTab%s*%(")~=nil)==false then
 LastCode = readfile(tostring(Value))
-elseif not isfile(tostring(Value)) then
+elseif (Value:match("AddTab%s*%(")~=nil)==true then
 LastCode = tostring(Value)
 end
 end; })
