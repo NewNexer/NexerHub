@@ -3414,91 +3414,107 @@ function RayfieldLibrary:CreateWindow(Settings)
 			local LabelValue = {}
 
 			local Label = Elements.Template.Label:Clone()
-			Label.Title.Text = LabelText
 			Label.Visible = true
 			Label.Parent = TabPage
+			Label.ClipsDescendants = true
 
 			Label.BackgroundColor3 = Color or SelectedTheme.SecondaryElementBackground
 			Label.UIStroke.Color = Color or SelectedTheme.SecondaryElementStroke
 
-			if Icon then
-				if typeof(Icon) == 'string' and Icons then
-					local asset = getIcon(Icon)
+			Label.Title.TextWrapped = true
+			Label.Title.TextTruncate = Enum.TextTruncate.None
+			Label.Title.TextXAlignment = Enum.TextXAlignment.Left
+			Label.Title.TextYAlignment = Enum.TextYAlignment.Top
 
-					Label.Icon.Image = 'rbxassetid://'..asset.id
-					Label.Icon.ImageRectOffset = asset.imageRectOffset
-					Label.Icon.ImageRectSize = asset.imageRectSize
-				else
-					Label.Icon.Image = getAssetUri(Icon)
-				end
-			else
-				Label.Icon.Image = "rbxassetid://" .. 0
-			end
-
-			if Icon and Label:FindFirstChild('Icon') then
-				Label.Title.Position = UDim2.new(0, 45, 0.5, 0)
-				Label.Title.Size = UDim2.new(1, -100, 0, 14)
-
-				if Icon then
-					if typeof(Icon) == 'string' and Icons then
-						local asset = getIcon(Icon)
-
+			local function resolveIcon(iconValue)
+				if iconValue then
+					if typeof(iconValue) == 'string' and Icons then
+						local asset = getIcon(iconValue)
 						Label.Icon.Image = 'rbxassetid://'..asset.id
 						Label.Icon.ImageRectOffset = asset.imageRectOffset
 						Label.Icon.ImageRectSize = asset.imageRectSize
 					else
-						Label.Icon.Image = getAssetUri(Icon)
+						Label.Icon.Image = getAssetUri(iconValue)
+						Label.Icon.ImageRectOffset = Vector2.new(0, 0)
+						Label.Icon.ImageRectSize = Vector2.new(0, 0)
 					end
 				else
-					Label.Icon.Image = "rbxassetid://" .. 0
+					Label.Icon.Image = "rbxassetid://0"
+					Label.Icon.ImageRectOffset = Vector2.new(0, 0)
+					Label.Icon.ImageRectSize = Vector2.new(0, 0)
 				end
-
-				Label.Icon.Visible = true
 			end
 
+			local CurrentLabelText = tostring(LabelText or "")
+			local CurrentIcon = Icon
+			local CurrentColor = Color
+
+			local function updateLabelSize()
+				local iconVisible = CurrentIcon ~= nil and Label:FindFirstChild('Icon') ~= nil
+				local leftPadding = iconVisible and 45 or 12
+				local rightPadding = 12
+				local contentWidth = math.max(80, Label.AbsoluteSize.X - leftPadding - rightPadding)
+				if contentWidth <= 80 then
+					local estimatedWidth = math.max(120, TabPage.AbsoluteSize.X - leftPadding - rightPadding - 8)
+					contentWidth = estimatedWidth
+				end
+
+				Label.Title.Text = CurrentLabelText
+				Label.Title.Position = UDim2.new(0, leftPadding, 0, 11)
+				Label.Title.Size = UDim2.new(1, -(leftPadding + rightPadding), 0, 14)
+
+				if iconVisible then
+					resolveIcon(CurrentIcon)
+					Label.Icon.Visible = true
+				else
+					resolveIcon(nil)
+					Label.Icon.Visible = false
+				end
+
+				local measured = TextService:GetTextSize(CurrentLabelText, Label.Title.TextSize, Label.Title.Font, Vector2.new(contentWidth, 10000))
+				local textHeight = math.max(14, measured.Y)
+				local finalHeight = math.max(43, textHeight + 22)
+				local buttonSize = Elements.Template.Button.Size
+
+				Label.Size = UDim2.new(buttonSize.X.Scale, buttonSize.X.Offset, 0, finalHeight)
+				Label.Title.Size = UDim2.new(1, -(leftPadding + rightPadding), 0, textHeight)
+				Label.Name = CurrentLabelText ~= "" and CurrentLabelText or "Label"
+			end
+
+			updateLabelSize()
 			Label.Icon.ImageTransparency = 1
 			Label.BackgroundTransparency = 1
 			Label.UIStroke.Transparency = 1
 			Label.Title.TextTransparency = 1
 
-			TweenService:Create(Label, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = Color and 0.8 or 0}):Play()
-			TweenService:Create(Label.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = Color and 0.7 or 0}):Play()
+			TweenService:Create(Label, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = CurrentColor and 0.8 or 0}):Play()
+			TweenService:Create(Label.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = CurrentColor and 0.7 or 0}):Play()
 			TweenService:Create(Label.Icon, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0.2}):Play()
-			TweenService:Create(Label.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = Color and 0.2 or 0}):Play()	
+			TweenService:Create(Label.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = CurrentColor and 0.2 or 0}):Play()	
 
-			function LabelValue:Set(NewLabel, Icon, Color)
-				Label.Title.Text = NewLabel
+			task.defer(updateLabelSize)
+			TabPage:GetPropertyChangedSignal('AbsoluteSize'):Connect(function()
+				updateLabelSize()
+			end)
 
-				if Color then
-					Label.BackgroundColor3 = Color or SelectedTheme.SecondaryElementBackground
-					Label.UIStroke.Color = Color or SelectedTheme.SecondaryElementStroke
+			function LabelValue:Set(NewLabel, NewIcon, NewColor)
+				CurrentLabelText = tostring(NewLabel or CurrentLabelText or "")
+				if NewIcon ~= nil then
+					CurrentIcon = NewIcon
 				end
 
-				if Icon and Label:FindFirstChild('Icon') then
-					Label.Title.Position = UDim2.new(0, 45, 0.5, 0)
-					Label.Title.Size = UDim2.new(1, -100, 0, 14)
-
-					if Icon then
-						if typeof(Icon) == 'string' and Icons then
-							local asset = getIcon(Icon)
-
-							Label.Icon.Image = 'rbxassetid://'..asset.id
-							Label.Icon.ImageRectOffset = asset.imageRectOffset
-							Label.Icon.ImageRectSize = asset.imageRectSize
-						else
-							Label.Icon.Image = getAssetUri(Icon)
-						end
-					else
-						Label.Icon.Image = "rbxassetid://" .. 0
-					end
-
-					Label.Icon.Visible = true
+				if NewColor ~= nil then
+					CurrentColor = NewColor
+					Label.BackgroundColor3 = NewColor or SelectedTheme.SecondaryElementBackground
+					Label.UIStroke.Color = NewColor or SelectedTheme.SecondaryElementStroke
 				end
+
+				updateLabelSize()
 			end
 
 			Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
-				Label.BackgroundColor3 = IgnoreTheme and (Color or Label.BackgroundColor3) or SelectedTheme.SecondaryElementBackground
-				Label.UIStroke.Color = IgnoreTheme and (Color or Label.BackgroundColor3) or SelectedTheme.SecondaryElementStroke
+				Label.BackgroundColor3 = IgnoreTheme and (CurrentColor or Label.BackgroundColor3) or SelectedTheme.SecondaryElementBackground
+				Label.UIStroke.Color = IgnoreTheme and (CurrentColor or Label.BackgroundColor3) or SelectedTheme.SecondaryElementStroke
 			end)
 
 			return LabelValue
