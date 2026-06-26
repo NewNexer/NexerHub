@@ -4206,4 +4206,8 @@ end
 return RayfieldLibrary
 end
 
+function module.IsWorking()
+return (module~=nil)
+end
+
 return module
