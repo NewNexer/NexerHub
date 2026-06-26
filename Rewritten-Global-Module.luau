@@ -969,8 +969,14 @@ local function ChangeTheme(Theme)
 	for _, TabPage in ipairs(Elements:GetChildren()) do
 		for _, Element in ipairs(TabPage:GetChildren()) do
 			if Element.ClassName == "Frame" and Element.Name ~= "Placeholder" and Element.Name ~= "SectionSpacing" and Element.Name ~= "Divider" and Element.Name ~= "SectionTitle" and Element.Name ~= "SearchTitle-fsefsefesfsefesfesfThanks" then
-				-- Skip Markdown elements – they manage their own colors
-				if Element.Name == "Markdown" or Element:FindFirstChild("MarkdownHolder") then
+				-- SAFE CHECK: skip if this is a Markdown element
+				local isMarkdown = Element:FindFirstChild("MarkdownHolder") ~= nil
+				if not isMarkdown and Element.Name == "Markdown" then
+					isMarkdown = true
+				end
+				if isMarkdown then
+					-- Do NOT change its color – it manages itself
+					-- You can add a print to confirm: print("Skipping Markdown:", Element.Name)
 					continue
 				end
 				Element.BackgroundColor3 = SelectedTheme.ElementBackground
@@ -1650,6 +1656,10 @@ local function Unhide()
 						
 						local isMarkdown = element:FindFirstChild("MarkdownHolder") ~= nil
 						if isMarkdown then
+    element.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
+    if element.UIStroke then
+        element.UIStroke.Color = SelectedTheme.SecondaryElementStroke
+    end
 							-- Show Markdown: only transparency, keep existing color
 							TweenService:Create(element, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 							if element.UIStroke then
