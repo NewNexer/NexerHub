@@ -1368,6 +1368,12 @@ local function closeSearch()
 	Main.Search.Input.Interactable = false
 end
 
+-- ========================================================================
+--                FIXED Hide / Unhide / Maximise / Minimise
+--   These functions now handle Markdown elements by toggling transparency
+--   only, never changing BackgroundColor3 or UIStroke.Color.
+-- ========================================================================
+
 local function Hide(notify: boolean?)
 	if MPrompt then
 		MPrompt.Title.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -1428,15 +1434,14 @@ local function Hide(notify: boolean?)
 				if element.ClassName == "Frame" then
 					if element.Name ~= "SectionSpacing" and element.Name ~= "Placeholder" then
 						
-						local isMarkdown = element:FindFirstChild("MarkdownHolder") ~= nil or element.Name == "Markdown"
-						
+						-- Detect Markdown by the presence of MarkdownHolder
+						local isMarkdown = element:FindFirstChild("MarkdownHolder") ~= nil
 						if isMarkdown then
-							-- Only hide the element itself and its children, don't change color
+							-- Hide Markdown: only change transparency, never color
 							TweenService:Create(element, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
 							if element.UIStroke then
 								TweenService:Create(element.UIStroke, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
 							end
-							
 							for _, child in ipairs(element:GetChildren()) do
 								if child:IsA("TextLabel") or child:IsA("Frame") or child:IsA("ImageButton") or child:IsA("ImageLabel") then
 									TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
@@ -1450,7 +1455,7 @@ local function Hide(notify: boolean?)
 								end
 							end
 						else
-							-- Normal elements
+							-- Normal elements: keep original hiding logic
 							if element.Name == "SectionTitle" or element.Name == 'SearchTitle-fsefsefesfsefesfesfThanks' then
 								if element.Title then
 									TweenService:Create(element.Title, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
@@ -1468,7 +1473,6 @@ local function Hide(notify: boolean?)
 									TweenService:Create(element.Title, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
 								end
 							end
-							
 							for _, child in ipairs(element:GetChildren()) do
 								if child.ClassName == "Frame" or child.ClassName == "TextLabel" or child.ClassName == "TextBox" or child.ClassName == "ImageButton" or child.ClassName == "ImageLabel" then
 									child.Visible = false
@@ -1508,14 +1512,13 @@ local function Maximise()
 				if element.ClassName == "Frame" then
 					if element.Name ~= "SectionSpacing" and element.Name ~= "Placeholder" then
 						
-						local isMarkdown = element:FindFirstChild("MarkdownHolder") ~= nil or element.Name == "Markdown"
-						
+						local isMarkdown = element:FindFirstChild("MarkdownHolder") ~= nil
 						if isMarkdown then
+							-- Show Markdown: only transparency, keep existing color
 							TweenService:Create(element, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 							if element.UIStroke then
 								TweenService:Create(element.UIStroke, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
 							end
-							
 							for _, child in ipairs(element:GetChildren()) do
 								if child:IsA("TextLabel") or child:IsA("Frame") or child:IsA("ImageButton") or child:IsA("ImageLabel") then
 									child.Visible = true
@@ -1546,7 +1549,6 @@ local function Maximise()
 									TweenService:Create(element.Title, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
 								end
 							end
-							
 							for _, child in ipairs(element:GetChildren()) do
 								if child.ClassName == "Frame" or child.ClassName == "TextLabel" or child.ClassName == "TextBox" or child.ClassName == "ImageButton" or child.ClassName == "ImageLabel" then
 									child.Visible = true
@@ -1580,7 +1582,6 @@ local function Maximise()
 	task.wait(0.5)
 	Debounce = false
 end
-
 
 local function Unhide()
 	Debounce = true
@@ -1643,15 +1644,13 @@ local function Unhide()
 				if element.ClassName == "Frame" then
 					if element.Name ~= "SectionSpacing" and element.Name ~= "Placeholder" then
 						
-						local isMarkdown = element:FindFirstChild("MarkdownHolder") ~= nil or element.Name == "Markdown"
-						
+						local isMarkdown = element:FindFirstChild("MarkdownHolder") ~= nil
 						if isMarkdown then
-							-- Only show, keep color as set in CreateMarkdown
+							-- Show Markdown: only transparency, keep existing color
 							TweenService:Create(element, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 							if element.UIStroke then
 								TweenService:Create(element.UIStroke, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
 							end
-							
 							for _, child in ipairs(element:GetChildren()) do
 								if child:IsA("TextLabel") or child:IsA("Frame") or child:IsA("ImageButton") or child:IsA("ImageLabel") then
 									child.Visible = true
@@ -1665,7 +1664,6 @@ local function Unhide()
 								end
 							end
 						else
-							-- Normal elements
 							if element.Name == "SectionTitle" or element.Name == 'SearchTitle-fsefsefesfsefesfesfThanks' then
 								if element.Title then
 									TweenService:Create(element.Title, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {TextTransparency = 0.4}):Play()
@@ -1683,7 +1681,6 @@ local function Unhide()
 									TweenService:Create(element.Title, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
 								end
 							end
-							
 							for _, child in ipairs(element:GetChildren()) do
 								if child.ClassName == "Frame" or child.ClassName == "TextLabel" or child.ClassName == "TextBox" or child.ClassName == "ImageButton" or child.ClassName == "ImageLabel" then
 									child.Visible = true
@@ -1726,14 +1723,12 @@ local function Minimise()
 				if element.ClassName == "Frame" then
 					if element.Name ~= "SectionSpacing" and element.Name ~= "Placeholder" then
 						
-						local isMarkdown = element:FindFirstChild("MarkdownHolder") ~= nil or element.Name == "Markdown"
-						
+						local isMarkdown = element:FindFirstChild("MarkdownHolder") ~= nil
 						if isMarkdown then
 							TweenService:Create(element, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
 							if element.UIStroke then
 								TweenService:Create(element.UIStroke, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
 							end
-							
 							for _, child in ipairs(element:GetChildren()) do
 								if child:IsA("TextLabel") or child:IsA("Frame") or child:IsA("ImageButton") or child:IsA("ImageLabel") then
 									TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
@@ -1764,7 +1759,6 @@ local function Minimise()
 									TweenService:Create(element.Title, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
 								end
 							end
-							
 							for _, child in ipairs(element:GetChildren()) do
 								if child.ClassName == "Frame" or child.ClassName == "TextLabel" or child.ClassName == "TextBox" or child.ClassName == "ImageButton" or child.ClassName == "ImageLabel" then
 									child.Visible = false
@@ -1794,96 +1788,9 @@ local function Minimise()
 	Debounce = false
 end
 
-local function saveSettings() -- Save settings to config file
-	local encoded
-	local success, err = pcall(function()
-		encoded = HttpService:JSONEncode(settingsTable)
-	end)
-
-	if success then
-		if useStudio then
-			if script.Parent['get.val'] then
-				script.Parent['get.val'].Value = encoded
-			end
-		end
-		if writefile then
-			writefile(RayfieldFolder..'/settings'..ConfigurationExtension, encoded)
-		end
-	end
-end
-
-local function updateSetting(category: string, setting: string, value: any)
-	if not settingsInitialized then
-		return
-	end
-	settingsTable[category][setting].Value = value
-	overriddenSettings[`{category}.{setting}`] = nil -- If user changes an overriden setting, remove the override
-	saveSettings()
-end
-
-local function createSettings(window)
-	if not (writefile and isfile and readfile and isfolder and makefolder) and not useStudio then
-		if Topbar['Settings'] then Topbar.Settings.Visible = false end
-		Topbar['Search'].Position = UDim2.new(1, -75, 0.5, 0)
-		warn('Can\'t create settings as no file-saving functionality is available.')
-		return
-	end
-
-	local newTab = window:CreateTab('Rayfield Settings', 0, true)
-
-	if TabList['Rayfield Settings'] then
-		TabList['Rayfield Settings'].LayoutOrder = 1000
-	end
-
-	if Elements['Rayfield Settings'] then
-		Elements['Rayfield Settings'].LayoutOrder = 1000
-	end
-
-	-- Create sections and elements
-	for categoryName, settingCategory in pairs(settingsTable) do
-		newTab:CreateSection(categoryName)
-
-		for settingName, setting in pairs(settingCategory) do
-			if setting.Type == 'input' then
-				setting.Element = newTab:CreateInput({
-					Name = setting.Name,
-					CurrentValue = setting.Value,
-					PlaceholderText = setting.Placeholder,
-					Ext = true,
-					RemoveTextAfterFocusLost = setting.ClearOnFocus,
-					Callback = function(Value)
-						updateSetting(categoryName, settingName, Value)
-					end,
-				})
-			elseif setting.Type == 'toggle' then
-				setting.Element = newTab:CreateToggle({
-					Name = setting.Name,
-					CurrentValue = setting.Value,
-					Ext = true,
-					Callback = function(Value)
-						updateSetting(categoryName, settingName, Value)
-					end,
-				})
-			elseif setting.Type == 'bind' then
-				setting.Element = newTab:CreateKeybind({
-					Name = setting.Name,
-					CurrentKeybind = setting.Value,
-					HoldToInteract = false,
-					Ext = true,
-					CallOnChange = true,
-					Callback = function(Value)
-						updateSetting(categoryName, settingName, Value)
-					end,
-				})
-			end
-		end
-	end
-
-	settingsCreated = true
-	loadSettings()
-	saveSettings()
-end
-
+-- ========================================================================
+--              END OF FIXED HIDE / UNHIDE / MAXIMISE / MINIMISE
+-- ========================================================================
 
 
 function RayfieldLibrary:CreateWindow(Settings)
@@ -2188,12 +2095,6 @@ function RayfieldLibrary:CreateWindow(Settings)
 				local KeyFound = false
 				local FoundKey = ''
 				for _, MKey in ipairs(Settings.KeySettings.Key) do
-					--if string.find(KeyMain.Input.InputBox.Text, MKey) then
-					--	KeyFound = true
-					--	FoundKey = MKey
-					--end
-
-
 					-- stricter key check
 					if KeyMain.Input.InputBox.Text == MKey then
 						KeyFound = true
@@ -2920,472 +2821,482 @@ function RayfieldLibrary:CreateWindow(Settings)
 			return ParagraphValue
 		end
 
--- Markdown
-function Tab:CreateMarkdown(MarkdownSettings)
-    local MarkdownValue = {}
-    if type(MarkdownSettings) == "string" then
-        MarkdownSettings = {Content = MarkdownSettings}
-    else
-        MarkdownSettings = MarkdownSettings or {}
-    end
+		-- ============================================================
+		--           NEW CreateMarkdown – No White Background
+		-- ============================================================
+		function Tab:CreateMarkdown(MarkdownSettings)
+			local MarkdownValue = {}
+			if type(MarkdownSettings) == "string" then
+				MarkdownSettings = {Content = MarkdownSettings}
+			else
+				MarkdownSettings = MarkdownSettings or {}
+			end
 
-    local Markdown = Elements.Template.Paragraph:Clone()
-    Markdown.Visible = true
-    Markdown.Parent = TabPage
-    Markdown.ClipsDescendants = true
-    Markdown.BackgroundTransparency = 1
-    Markdown.UIStroke.Transparency = 1
-    Markdown.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
-    Markdown.UIStroke.Color = SelectedTheme.SecondaryElementStroke
-    Markdown.Name = "Markdown"
+			local Markdown = Elements.Template.Paragraph:Clone()
+			Markdown.Name = "Markdown"
+			Markdown.Visible = true
+			Markdown.Parent = TabPage
+			Markdown.ClipsDescendants = true
 
-    for _, Child in ipairs(Markdown:GetChildren()) do
-        if not Child:IsA('UIStroke') and not Child:IsA('UICorner') then
-            Child:Destroy()
-        end
-    end
+			-- Set theme colors once – never change them again (only transparency)
+			Markdown.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
+			Markdown.UIStroke.Color = SelectedTheme.SecondaryElementStroke
+			Markdown.BackgroundTransparency = 1  -- start hidden
 
-    local Holder = Instance.new('Frame')
-    Holder.Name = 'MarkdownHolder'
-    Holder.BackgroundTransparency = 1
-    Holder.Parent = Markdown
-    Holder.Position = UDim2.new(0, 12, 0, 10)
-    Holder.Size = UDim2.new(1, -24, 0, 0)
+			-- Remove default Title/Content children
+			for _, Child in ipairs(Markdown:GetChildren()) do
+				if not Child:IsA('UIStroke') and not Child:IsA('UICorner') then
+					Child:Destroy()
+				end
+			end
 
-    local HolderLayout = Instance.new('UIListLayout')
-    HolderLayout.Padding = UDim.new(0, 6)
-    HolderLayout.FillDirection = Enum.FillDirection.Vertical
-    HolderLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
-    HolderLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    HolderLayout.Parent = Holder
+			local Holder = Instance.new('Frame')
+			Holder.Name = 'MarkdownHolder'  -- critical for detection
+			Holder.BackgroundTransparency = 1
+			Holder.Parent = Markdown
+			Holder.Position = UDim2.new(0, 12, 0, 10)
+			Holder.Size = UDim2.new(1, -24, 0, 0)
 
-    local function colorToHex(Color)
-        return string.format('#%02X%02X%02X', math.floor(Color.R * 255 + 0.5), math.floor(Color.G * 255 + 0.5), math.floor(Color.B * 255 + 0.5))
-    end
+			local HolderLayout = Instance.new('UIListLayout')
+			HolderLayout.Padding = UDim.new(0, 6)
+			HolderLayout.FillDirection = Enum.FillDirection.Vertical
+			HolderLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+			HolderLayout.SortOrder = Enum.SortOrder.LayoutOrder
+			HolderLayout.Parent = Holder
 
-    local function blendColor(ColorA, ColorB, Alpha)
-        return Color3.new(
-            ColorA.R + (ColorB.R - ColorA.R) * Alpha,
-            ColorA.G + (ColorB.G - ColorA.G) * Alpha,
-            ColorA.B + (ColorB.B - ColorA.B) * Alpha
-        )
-    end
+			-- Helper functions (same as original)
+			local function colorToHex(Color)
+				return string.format('#%02X%02X%02X', math.floor(Color.R * 255 + 0.5), math.floor(Color.G * 255 + 0.5), math.floor(Color.B * 255 + 0.5))
+			end
 
-    local function escapeRichText(Text)
-        Text = tostring(Text or '')
-        Text = Text:gsub('&', '&amp;')
-        Text = Text:gsub('<', '&lt;')
-        Text = Text:gsub('>', '&gt;')
-        return Text
-    end
+			local function blendColor(ColorA, ColorB, Alpha)
+				return Color3.new(
+					ColorA.R + (ColorB.R - ColorA.R) * Alpha,
+					ColorA.G + (ColorB.G - ColorA.G) * Alpha,
+					ColorA.B + (ColorB.B - ColorA.B) * Alpha
+				)
+			end
 
-    local function measureText(Text, TextSize, Font, Width)
-        Width = math.max(40, Width or 40)
-        return TextService:GetTextSize(tostring(Text or ''), TextSize, Font, Vector2.new(Width, 100000))
-    end
+			local function escapeRichText(Text)
+				Text = tostring(Text or '')
+				Text = Text:gsub('&', '&amp;')
+				Text = Text:gsub('<', '&lt;')
+				Text = Text:gsub('>', '&gt;')
+				return Text
+			end
 
-    local function applyInlineMarkdown(Text)
-        local AccentHex = colorToHex(SelectedTheme.TabTextColor or SelectedTheme.TextColor)
-        local InlineCodeHex = colorToHex(blendColor(SelectedTheme.TextColor, Color3.fromRGB(140, 180, 255), 0.35))
-        local Rich = escapeRichText(Text)
-        Rich = Rich:gsub('%[([^%]]+)%]%(([^%)]+)%)', '<u><font color="' .. AccentHex .. '">%1</font></u>')
-        Rich = Rich:gsub('%*%*([^%*][^%*]-)%*%*', '<b>%1</b>')
-        Rich = Rich:gsub('__([^_][^_]-)__', '<b>%1</b>')
-        Rich = Rich:gsub('~~([^~][^~]-)~~', '<s>%1</s>')
-        Rich = Rich:gsub('`([^`\n]+)`', '<font color="' .. InlineCodeHex .. '"><b>%1</b></font>')
-        Rich = Rich:gsub('%*([^%*\n]+)%*', '<i>%1</i>')
-        Rich = Rich:gsub('_([^_\n]+)_', '<i>%1</i>')
-        return Rich
-    end
+			local function measureText(Text, TextSize, Font, Width)
+				Width = math.max(40, Width or 40)
+				return TextService:GetTextSize(tostring(Text or ''), TextSize, Font, Vector2.new(Width, 100000))
+			end
 
-    local function clearBlocks()
-        for _, Child in ipairs(Holder:GetChildren()) do
-            if Child ~= HolderLayout then
-                Child:Destroy()
-            end
-        end
-    end
+			local function applyInlineMarkdown(Text)
+				local AccentHex = colorToHex(SelectedTheme.TabTextColor or SelectedTheme.TextColor)
+				local InlineCodeHex = colorToHex(blendColor(SelectedTheme.TextColor, Color3.fromRGB(140, 180, 255), 0.35))
+				local Rich = escapeRichText(Text)
+				Rich = Rich:gsub('%[([^%]]+)%]%(([^%)]+)%)', '<u><font color="' .. AccentHex .. '">%1</font></u>')
+				Rich = Rich:gsub('%*%*([^%*][^%*]-)%*%*', '<b>%1</b>')
+				Rich = Rich:gsub('__([^_][^_]-)__', '<b>%1</b>')
+				Rich = Rich:gsub('~~([^~][^~]-)~~', '<s>%1</s>')
+				Rich = Rich:gsub('`([^`\n]+)`', '<font color="' .. InlineCodeHex .. '"><b>%1</b></font>')
+				Rich = Rich:gsub('%*([^%*\n]+)%*', '<i>%1</i>')
+				Rich = Rich:gsub('_([^_\n]+)_', '<i>%1</i>')
+				return Rich
+			end
 
-    local function updateMarkdownSize()
-        local buttonSize = Elements.Template.Button.Size
-        local contentHeight = HolderLayout.AbsoluteContentSize.Y
-        Holder.Size = UDim2.new(1, -24, 0, contentHeight)
-        Markdown.Size = UDim2.new(buttonSize.X.Scale, buttonSize.X.Offset, 0, math.max(42, contentHeight + 20))
-    end
+			local function clearBlocks()
+				for _, Child in ipairs(Holder:GetChildren()) do
+					if Child ~= HolderLayout then
+						Child:Destroy()
+					end
+				end
+			end
 
-    HolderLayout:GetPropertyChangedSignal('AbsoluteContentSize'):Connect(updateMarkdownSize)
+			local function updateMarkdownSize()
+				local buttonSize = Elements.Template.Button.Size
+				local contentHeight = HolderLayout.AbsoluteContentSize.Y
+				Holder.Size = UDim2.new(1, -24, 0, contentHeight)
+				Markdown.Size = UDim2.new(buttonSize.X.Scale, buttonSize.X.Offset, 0, math.max(42, contentHeight + 20))
+			end
 
-    local lastKnownWidth = 0
-    local renderMarkdown
-    local function getContentWidth()
-        local width = Markdown.AbsoluteSize.X
-        if width <= 0 then
-            local buttonSize = Elements.Template.Button.Size
-            if buttonSize.X.Offset > 0 then
-                width = buttonSize.X.Offset
-            else
-                width = 420
-            end
-        end
-        return math.max(140, width - 24)
-    end
+			HolderLayout:GetPropertyChangedSignal('AbsoluteContentSize'):Connect(updateMarkdownSize)
 
-    local function createTextBlock(Name, Text, TextSize, Font, Height, RichTextEnabled, TextColor, ExtraIndent)
-        local Label = Instance.new('TextLabel')
-        Label.Name = Name
-        Label.BackgroundTransparency = 1
-        Label.BorderSizePixel = 0
-        Label.RichText = RichTextEnabled or false
-        Label.TextWrapped = true
-        Label.TextXAlignment = Enum.TextXAlignment.Left
-        Label.TextYAlignment = Enum.TextYAlignment.Top
-        Label.Text = Text
-        Label.TextSize = TextSize
-        Label.Font = Font
-        Label.TextColor3 = TextColor or SelectedTheme.TextColor
-        Label.Size = UDim2.new(1, -(ExtraIndent or 0), 0, Height)
-        Label.Parent = Holder
-        return Label
-    end
+			local lastKnownWidth = 0
+			local renderMarkdown
+			local function getContentWidth()
+				local width = Markdown.AbsoluteSize.X
+				if width <= 0 then
+					local buttonSize = Elements.Template.Button.Size
+					if buttonSize.X.Offset > 0 then
+						width = buttonSize.X.Offset
+					else
+						width = 420
+					end
+				end
+				return math.max(140, width - 24)
+			end
 
-    renderMarkdown = function(CurrentSettings)
-        CurrentSettings = CurrentSettings or MarkdownSettings or {}
-        clearBlocks()
-        Markdown.Name = tostring(CurrentSettings.Title or CurrentSettings.Name or 'Markdown')
+			local function createTextBlock(Name, Text, TextSize, Font, Height, RichTextEnabled, TextColor, ExtraIndent)
+				local Label = Instance.new('TextLabel')
+				Label.Name = Name
+				Label.BackgroundTransparency = 1
+				Label.BorderSizePixel = 0
+				Label.RichText = RichTextEnabled or false
+				Label.TextWrapped = true
+				Label.TextXAlignment = Enum.TextXAlignment.Left
+				Label.TextYAlignment = Enum.TextYAlignment.Top
+				Label.Text = Text
+				Label.TextSize = TextSize
+				Label.Font = Font
+				Label.TextColor3 = TextColor or SelectedTheme.TextColor
+				Label.Size = UDim2.new(1, -(ExtraIndent or 0), 0, Height)
+				Label.Parent = Holder
+				return Label
+			end
 
-        local markdownText = tostring(CurrentSettings.Content or CurrentSettings.Markdown or CurrentSettings.Text or '')
-        local contentWidth = getContentWidth()
-        lastKnownWidth = contentWidth
+			renderMarkdown = function(CurrentSettings)
+				CurrentSettings = CurrentSettings or MarkdownSettings or {}
+				clearBlocks()
+				Markdown.Name = tostring(CurrentSettings.Title or CurrentSettings.Name or 'Markdown')
 
-        local headingTitle = tostring(CurrentSettings.Title or '')
-        if headingTitle ~= '' then
-            local titleHeight = math.max(18, measureText(headingTitle, 16, Enum.Font.GothamBold, contentWidth).Y)
-            createTextBlock('MarkdownTitle', escapeRichText(headingTitle), 16, Enum.Font.GothamBold, titleHeight, true, SelectedTheme.TextColor)
-        end
+				local markdownText = tostring(CurrentSettings.Content or CurrentSettings.Markdown or CurrentSettings.Text or '')
+				local contentWidth = getContentWidth()
+				lastKnownWidth = contentWidth
 
-        local lines = string.split(markdownText, '\n')
-        local paragraphLines = {}
-        local codeLines = {}
-        local inCodeBlock = false
-        local codeLanguage = ''
+				local headingTitle = tostring(CurrentSettings.Title or '')
+				if headingTitle ~= '' then
+					local titleHeight = math.max(18, measureText(headingTitle, 16, Enum.Font.GothamBold, contentWidth).Y)
+					createTextBlock('MarkdownTitle', escapeRichText(headingTitle), 16, Enum.Font.GothamBold, titleHeight, true, SelectedTheme.TextColor)
+				end
 
-        local function flushParagraph()
-            if #paragraphLines == 0 then return end
-            local paragraphText = table.concat(paragraphLines, '\n')
-            local richText = applyInlineMarkdown(paragraphText)
-            local height = math.max(16, measureText(paragraphText, 13, Enum.Font.Gotham, contentWidth).Y)
-            createTextBlock('ParagraphBlock', richText, 13, Enum.Font.Gotham, height, true, SelectedTheme.TextColor)
-            table.clear(paragraphLines)
-        end
+				local lines = string.split(markdownText, '\n')
+				local paragraphLines = {}
+				local codeLines = {}
+				local inCodeBlock = false
+				local codeLanguage = ''
 
-        local function addSpacer(Height)
-            local Spacer = Instance.new('Frame')
-            Spacer.Name = 'Spacer'
-            Spacer.BackgroundTransparency = 1
-            Spacer.BorderSizePixel = 0
-            Spacer.Size = UDim2.new(1, 0, 0, Height or 4)
-            Spacer.Parent = Holder
-        end
+				local function flushParagraph()
+					if #paragraphLines == 0 then return end
+					local paragraphText = table.concat(paragraphLines, '\n')
+					local richText = applyInlineMarkdown(paragraphText)
+					local height = math.max(16, measureText(paragraphText, 13, Enum.Font.Gotham, contentWidth).Y)
+					createTextBlock('ParagraphBlock', richText, 13, Enum.Font.Gotham, height, true, SelectedTheme.TextColor)
+					table.clear(paragraphLines)
+				end
 
-        local function flushCodeBlock()
-            if #codeLines == 0 then
-                codeLanguage = ''
-                return
-            end
+				local function addSpacer(Height)
+					local Spacer = Instance.new('Frame')
+					Spacer.Name = 'Spacer'
+					Spacer.BackgroundTransparency = 1
+					Spacer.BorderSizePixel = 0
+					Spacer.Size = UDim2.new(1, 0, 0, Height or 4)
+					Spacer.Parent = Holder
+				end
 
-            local rawCode = table.concat(codeLines, '\n')
-            local CodeFrame = Instance.new('Frame')
-            CodeFrame.Name = 'CodeBlock'
-            CodeFrame.BackgroundColor3 = blendColor(SelectedTheme.SecondaryElementBackground, Color3.fromRGB(40, 40, 45), 0.35)
-            CodeFrame.BorderSizePixel = 0
-            CodeFrame.Size = UDim2.new(1, 0, 0, 0)
-            CodeFrame.Parent = Holder
+				local function flushCodeBlock()
+					if #codeLines == 0 then
+						codeLanguage = ''
+						return
+					end
 
-            local CodeCorner = Instance.new('UICorner')
-            CodeCorner.CornerRadius = UDim.new(0, 8)
-            CodeCorner.Parent = CodeFrame
+					local rawCode = table.concat(codeLines, '\n')
+					local CodeFrame = Instance.new('Frame')
+					CodeFrame.Name = 'CodeBlock'
+					CodeFrame.BackgroundColor3 = blendColor(SelectedTheme.SecondaryElementBackground, Color3.fromRGB(40, 40, 45), 0.35)
+					CodeFrame.BorderSizePixel = 0
+					CodeFrame.Size = UDim2.new(1, 0, 0, 0)
+					CodeFrame.Parent = Holder
 
-            local CodeStroke = Instance.new('UIStroke')
-            CodeStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-            CodeStroke.Color = blendColor(SelectedTheme.SecondaryElementStroke, SelectedTheme.TextColor, 0.15)
-            CodeStroke.Transparency = 0.15
-            CodeStroke.Parent = CodeFrame
+					local CodeCorner = Instance.new('UICorner')
+					CodeCorner.CornerRadius = UDim.new(0, 8)
+					CodeCorner.Parent = CodeFrame
 
-            local padX = 10
-            local headerHeight = 24
-            local topInset = headerHeight + 10
-            local codeWidth = math.max(80, contentWidth - padX * 2)
-            local headerTextColor = blendColor(SelectedTheme.TextColor, Color3.fromRGB(160, 190, 255), 0.35)
+					local CodeStroke = Instance.new('UIStroke')
+					CodeStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+					CodeStroke.Color = blendColor(SelectedTheme.SecondaryElementStroke, SelectedTheme.TextColor, 0.15)
+					CodeStroke.Transparency = 0.15
+					CodeStroke.Parent = CodeFrame
 
-            local HeaderFrame = Instance.new('Frame')
-            HeaderFrame.Name = 'Header'
-            HeaderFrame.BackgroundTransparency = 1
-            HeaderFrame.BorderSizePixel = 0
-            HeaderFrame.Size = UDim2.new(1, -(padX * 2), 0, headerHeight)
-            HeaderFrame.Position = UDim2.new(0, padX, 0, 6)
-            HeaderFrame.Parent = CodeFrame
+					local padX = 10
+					local headerHeight = 24
+					local topInset = headerHeight + 10
+					local codeWidth = math.max(80, contentWidth - padX * 2)
+					local headerTextColor = blendColor(SelectedTheme.TextColor, Color3.fromRGB(160, 190, 255), 0.35)
 
-            local languageText = codeLanguage ~= '' and string.upper(codeLanguage) or 'CODE'
-            local LangLabel = Instance.new('TextLabel')
-            LangLabel.Name = 'Language'
-            LangLabel.BackgroundTransparency = 1
-            LangLabel.BorderSizePixel = 0
-            LangLabel.TextXAlignment = Enum.TextXAlignment.Left
-            LangLabel.TextYAlignment = Enum.TextYAlignment.Center
-            LangLabel.Font = Enum.Font.GothamBold
-            LangLabel.TextSize = 11
-            LangLabel.TextColor3 = headerTextColor
-            LangLabel.Text = languageText
-            LangLabel.Size = UDim2.new(1, -30, 1, 0)
-            LangLabel.Parent = HeaderFrame
+					local HeaderFrame = Instance.new('Frame')
+					HeaderFrame.Name = 'Header'
+					HeaderFrame.BackgroundTransparency = 1
+					HeaderFrame.BorderSizePixel = 0
+					HeaderFrame.Size = UDim2.new(1, -(padX * 2), 0, headerHeight)
+					HeaderFrame.Position = UDim2.new(0, padX, 0, 6)
+					HeaderFrame.Parent = CodeFrame
 
-            local CopyButton = Instance.new('ImageButton')
-            CopyButton.Name = 'CopyButton'
-            CopyButton.AutoButtonColor = false
-            CopyButton.BackgroundColor3 = blendColor(SelectedTheme.SecondaryElementBackground, SelectedTheme.SecondaryElementStroke, 0.18)
-            CopyButton.BorderSizePixel = 0
-            CopyButton.AnchorPoint = Vector2.new(1, 0)
-            CopyButton.Position = UDim2.new(1, 0, 0, 1)
-            CopyButton.Size = UDim2.new(0, 20, 0, 20)
-            CopyButton.Image = 'rbxassetid://83983589022863'
-            CopyButton.ImageColor3 = headerTextColor
-            CopyButton.ImageTransparency = 0.08
-            CopyButton.Parent = HeaderFrame
+					local languageText = codeLanguage ~= '' and string.upper(codeLanguage) or 'CODE'
+					local LangLabel = Instance.new('TextLabel')
+					LangLabel.Name = 'Language'
+					LangLabel.BackgroundTransparency = 1
+					LangLabel.BorderSizePixel = 0
+					LangLabel.TextXAlignment = Enum.TextXAlignment.Left
+					LangLabel.TextYAlignment = Enum.TextYAlignment.Center
+					LangLabel.Font = Enum.Font.GothamBold
+					LangLabel.TextSize = 11
+					LangLabel.TextColor3 = headerTextColor
+					LangLabel.Text = languageText
+					LangLabel.Size = UDim2.new(1, -30, 1, 0)
+					LangLabel.Parent = HeaderFrame
 
-            local CopyCorner = Instance.new('UICorner')
-            CopyCorner.CornerRadius = UDim.new(0, 6)
-            CopyCorner.Parent = CopyButton
+					local CopyButton = Instance.new('ImageButton')
+					CopyButton.Name = 'CopyButton'
+					CopyButton.AutoButtonColor = false
+					CopyButton.BackgroundColor3 = blendColor(SelectedTheme.SecondaryElementBackground, SelectedTheme.SecondaryElementStroke, 0.18)
+					CopyButton.BorderSizePixel = 0
+					CopyButton.AnchorPoint = Vector2.new(1, 0)
+					CopyButton.Position = UDim2.new(1, 0, 0, 1)
+					CopyButton.Size = UDim2.new(0, 20, 0, 20)
+					CopyButton.Image = 'rbxassetid://83983589022863'
+					CopyButton.ImageColor3 = headerTextColor
+					CopyButton.ImageTransparency = 0.08
+					CopyButton.Parent = HeaderFrame
 
-            local CopyStroke = Instance.new('UIStroke')
-            CopyStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-            CopyStroke.Color = blendColor(SelectedTheme.SecondaryElementStroke, SelectedTheme.TextColor, 0.12)
-            CopyStroke.Transparency = 0.25
-            CopyStroke.Parent = CopyButton
+					local CopyCorner = Instance.new('UICorner')
+					CopyCorner.CornerRadius = UDim.new(0, 6)
+					CopyCorner.Parent = CopyButton
 
-            local function setCopyVisuals(isCopied)
-                if isCopied then
-                    TweenService:Create(CopyButton, TweenInfo.new(0.18, Enum.EasingStyle.Exponential), {BackgroundColor3 = blendColor(SelectedTheme.TabTextColor or SelectedTheme.TextColor, SelectedTheme.SecondaryElementBackground, 0.55)}):Play()
-                    TweenService:Create(CopyButton, TweenInfo.new(0.18, Enum.EasingStyle.Exponential), {ImageColor3 = Color3.fromRGB(255, 255, 255)}):Play()
-                    TweenService:Create(CopyStroke, TweenInfo.new(0.18, Enum.EasingStyle.Exponential), {Transparency = 0.05}):Play()
-                else
-                    TweenService:Create(CopyButton, TweenInfo.new(0.18, Enum.EasingStyle.Exponential), {BackgroundColor3 = blendColor(SelectedTheme.SecondaryElementBackground, SelectedTheme.SecondaryElementStroke, 0.18)}):Play()
-                    TweenService:Create(CopyButton, TweenInfo.new(0.18, Enum.EasingStyle.Exponential), {ImageColor3 = headerTextColor}):Play()
-                    TweenService:Create(CopyStroke, TweenInfo.new(0.18, Enum.EasingStyle.Exponential), {Transparency = 0.25}):Play()
-                end
-            end
+					local CopyStroke = Instance.new('UIStroke')
+					CopyStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+					CopyStroke.Color = blendColor(SelectedTheme.SecondaryElementStroke, SelectedTheme.TextColor, 0.12)
+					CopyStroke.Transparency = 0.25
+					CopyStroke.Parent = CopyButton
 
-            CopyButton.MouseEnter:Connect(function()
-                TweenService:Create(CopyButton, TweenInfo.new(0.18, Enum.EasingStyle.Exponential), {BackgroundColor3 = blendColor(SelectedTheme.SecondaryElementBackground, SelectedTheme.SecondaryElementStroke, 0.3)}):Play()
-                TweenService:Create(CopyStroke, TweenInfo.new(0.18, Enum.EasingStyle.Exponential), {Transparency = 0.12}):Play()
-            end)
+					local function setCopyVisuals(isCopied)
+						if isCopied then
+							TweenService:Create(CopyButton, TweenInfo.new(0.18, Enum.EasingStyle.Exponential), {BackgroundColor3 = blendColor(SelectedTheme.TabTextColor or SelectedTheme.TextColor, SelectedTheme.SecondaryElementBackground, 0.55)}):Play()
+							TweenService:Create(CopyButton, TweenInfo.new(0.18, Enum.EasingStyle.Exponential), {ImageColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+							TweenService:Create(CopyStroke, TweenInfo.new(0.18, Enum.EasingStyle.Exponential), {Transparency = 0.05}):Play()
+						else
+							TweenService:Create(CopyButton, TweenInfo.new(0.18, Enum.EasingStyle.Exponential), {BackgroundColor3 = blendColor(SelectedTheme.SecondaryElementBackground, SelectedTheme.SecondaryElementStroke, 0.18)}):Play()
+							TweenService:Create(CopyButton, TweenInfo.new(0.18, Enum.EasingStyle.Exponential), {ImageColor3 = headerTextColor}):Play()
+							TweenService:Create(CopyStroke, TweenInfo.new(0.18, Enum.EasingStyle.Exponential), {Transparency = 0.25}):Play()
+						end
+					end
 
-            CopyButton.MouseLeave:Connect(function()
-                setCopyVisuals(false)
-            end)
+					CopyButton.MouseEnter:Connect(function()
+						TweenService:Create(CopyButton, TweenInfo.new(0.18, Enum.EasingStyle.Exponential), {BackgroundColor3 = blendColor(SelectedTheme.SecondaryElementBackground, SelectedTheme.SecondaryElementStroke, 0.3)}):Play()
+						TweenService:Create(CopyStroke, TweenInfo.new(0.18, Enum.EasingStyle.Exponential), {Transparency = 0.12}):Play()
+					end)
 
-            CopyButton.MouseButton1Click:Connect(function()
-                local clipboardFn = setclipboard or toclipboard or (Clipboard and Clipboard.set)
-                if clipboardFn then
-                    pcall(clipboardFn, rawCode)
-                    setCopyVisuals(true)
-                    task.delay(0.8, function()
-                        if CopyButton and CopyButton.Parent then
-                            setCopyVisuals(false)
-                        end
-                    end)
-                end
-            end)
+					CopyButton.MouseLeave:Connect(function()
+						setCopyVisuals(false)
+					end)
 
-            local CodeLabel = Instance.new('TextLabel')
-            CodeLabel.Name = 'Code'
-            CodeLabel.BackgroundTransparency = 1
-            CodeLabel.BorderSizePixel = 0
-            CodeLabel.RichText = false
-            CodeLabel.TextWrapped = true
-            CodeLabel.TextXAlignment = Enum.TextXAlignment.Left
-            CodeLabel.TextYAlignment = Enum.TextYAlignment.Top
-            CodeLabel.Font = Enum.Font.Code
-            CodeLabel.TextSize = 13
-            CodeLabel.TextColor3 = blendColor(SelectedTheme.TextColor, Color3.fromRGB(190, 210, 255), 0.18)
-            CodeLabel.Text = rawCode
-            local codeHeight = math.max(18, measureText(rawCode, 13, Enum.Font.Code, codeWidth).Y)
-            CodeLabel.Size = UDim2.new(1, -(padX * 2), 0, codeHeight)
-            CodeLabel.Position = UDim2.new(0, padX, 0, topInset)
-            CodeLabel.Parent = CodeFrame
+					CopyButton.MouseButton1Click:Connect(function()
+						local clipboardFn = setclipboard or toclipboard or (Clipboard and Clipboard.set)
+						if clipboardFn then
+							pcall(clipboardFn, rawCode)
+							setCopyVisuals(true)
+							task.delay(0.8, function()
+								if CopyButton and CopyButton.Parent then
+									setCopyVisuals(false)
+								end
+							end)
+						end
+					end)
 
-            CodeFrame.Size = UDim2.new(1, 0, 0, topInset + codeHeight + 10)
-            table.clear(codeLines)
-            codeLanguage = ''
-        end
+					local CodeLabel = Instance.new('TextLabel')
+					CodeLabel.Name = 'Code'
+					CodeLabel.BackgroundTransparency = 1
+					CodeLabel.BorderSizePixel = 0
+					CodeLabel.RichText = false
+					CodeLabel.TextWrapped = true
+					CodeLabel.TextXAlignment = Enum.TextXAlignment.Left
+					CodeLabel.TextYAlignment = Enum.TextYAlignment.Top
+					CodeLabel.Font = Enum.Font.Code
+					CodeLabel.TextSize = 13
+					CodeLabel.TextColor3 = blendColor(SelectedTheme.TextColor, Color3.fromRGB(190, 210, 255), 0.18)
+					CodeLabel.Text = rawCode
+					local codeHeight = math.max(18, measureText(rawCode, 13, Enum.Font.Code, codeWidth).Y)
+					CodeLabel.Size = UDim2.new(1, -(padX * 2), 0, codeHeight)
+					CodeLabel.Position = UDim2.new(0, padX, 0, topInset)
+					CodeLabel.Parent = CodeFrame
 
-        for _, rawLine in ipairs(lines) do
-            local line = rawLine or ''
-            local fenceLanguage = line:match('^```%s*([%w_-]*)%s*$')
-            if fenceLanguage ~= nil then
-                if inCodeBlock then
-                    flushCodeBlock()
-                    inCodeBlock = false
-                else
-                    flushParagraph()
-                    inCodeBlock = true
-                    codeLanguage = fenceLanguage or ''
-                end
-            elseif inCodeBlock then
-                table.insert(codeLines, line)
-            elseif line:match('^%s*$') then
-                flushParagraph()
-                addSpacer(2)
-            else
-                local headingHashes, headingText = line:match('^(%s*#+)%s+(.+)$')
-                local quoteText = line:match('^%s*>%s+(.+)$')
-                local bulletText = line:match('^%s*[-%*+]%s+(.+)$')
-                local orderedIndex, orderedText = line:match('^%s*(%d+)%.%s+(.+)$')
-                local divider = line:match('^%s*[-*_][-*_][-*_]+%s*$')
+					CodeFrame.Size = UDim2.new(1, 0, 0, topInset + codeHeight + 10)
+					table.clear(codeLines)
+					codeLanguage = ''
+				end
 
-                if headingHashes and headingText then
-                    flushParagraph()
-                    local cleanHashes = headingHashes:gsub('%s', '')
-                    local level = math.clamp(#cleanHashes, 1, 6)
-                    local sizes = {24, 20, 17, 15, 14, 13}
-                    local headingSize = sizes[level] or 13
-                    local headingHeight = math.max(headingSize, measureText(headingText, headingSize, Enum.Font.GothamBold, contentWidth).Y)
-                    createTextBlock('Heading' .. tostring(level), applyInlineMarkdown(headingText), headingSize, Enum.Font.GothamBold, headingHeight, true, SelectedTheme.TextColor)
-                elseif quoteText then
-                    flushParagraph()
-                    local QuoteFrame = Instance.new('Frame')
-                    QuoteFrame.Name = 'QuoteBlock'
-                    QuoteFrame.BackgroundTransparency = 1
-                    QuoteFrame.BorderSizePixel = 0
-                    QuoteFrame.Size = UDim2.new(1, 0, 0, 0)
-                    QuoteFrame.Parent = Holder
+				for _, rawLine in ipairs(lines) do
+					local line = rawLine or ''
+					local fenceLanguage = line:match('^```%s*([%w_-]*)%s*$')
+					if fenceLanguage ~= nil then
+						if inCodeBlock then
+							flushCodeBlock()
+							inCodeBlock = false
+						else
+							flushParagraph()
+							inCodeBlock = true
+							codeLanguage = fenceLanguage or ''
+						end
+					elseif inCodeBlock then
+						table.insert(codeLines, line)
+					elseif line:match('^%s*$') then
+						flushParagraph()
+						addSpacer(2)
+					else
+						local headingHashes, headingText = line:match('^(%s*#+)%s+(.+)$')
+						local quoteText = line:match('^%s*>%s+(.+)$')
+						local bulletText = line:match('^%s*[-%*+]%s+(.+)$')
+						local orderedIndex, orderedText = line:match('^%s*(%d+)%.%s+(.+)$')
+						local divider = line:match('^%s*[-*_][-*_][-*_]+%s*$')
 
-                    local QuoteBar = Instance.new('Frame')
-                    QuoteBar.Name = 'Bar'
-                    QuoteBar.BorderSizePixel = 0
-                    QuoteBar.BackgroundColor3 = blendColor(SelectedTheme.TabTextColor or SelectedTheme.TextColor, SelectedTheme.SecondaryElementStroke, 0.35)
-                    QuoteBar.Size = UDim2.new(0, 3, 1, 0)
-                    QuoteBar.Parent = QuoteFrame
+						if headingHashes and headingText then
+							flushParagraph()
+							local cleanHashes = headingHashes:gsub('%s', '')
+							local level = math.clamp(#cleanHashes, 1, 6)
+							local sizes = {24, 20, 17, 15, 14, 13}
+							local headingSize = sizes[level] or 13
+							local headingHeight = math.max(headingSize, measureText(headingText, headingSize, Enum.Font.GothamBold, contentWidth).Y)
+							createTextBlock('Heading' .. tostring(level), applyInlineMarkdown(headingText), headingSize, Enum.Font.GothamBold, headingHeight, true, SelectedTheme.TextColor)
+						elseif quoteText then
+							flushParagraph()
+							local QuoteFrame = Instance.new('Frame')
+							QuoteFrame.Name = 'QuoteBlock'
+							QuoteFrame.BackgroundTransparency = 1
+							QuoteFrame.BorderSizePixel = 0
+							QuoteFrame.Size = UDim2.new(1, 0, 0, 0)
+							QuoteFrame.Parent = Holder
 
-                    local quoteWidth = math.max(80, contentWidth - 14)
-                    local QuoteLabel = Instance.new('TextLabel')
-                    QuoteLabel.Name = 'QuoteText'
-                    QuoteLabel.BackgroundTransparency = 1
-                    QuoteLabel.BorderSizePixel = 0
-                    QuoteLabel.RichText = true
-                    QuoteLabel.TextWrapped = true
-                    QuoteLabel.TextXAlignment = Enum.TextXAlignment.Left
-                    QuoteLabel.TextYAlignment = Enum.TextYAlignment.Top
-                    QuoteLabel.Font = Enum.Font.Gotham
-                    QuoteLabel.TextSize = 13
-                    QuoteLabel.TextColor3 = blendColor(SelectedTheme.TextColor, SelectedTheme.SecondaryElementStroke, 0.15)
-                    QuoteLabel.Text = applyInlineMarkdown(quoteText)
-                    local quoteHeight = math.max(16, measureText(quoteText, 13, Enum.Font.Gotham, quoteWidth).Y)
-                    QuoteLabel.Size = UDim2.new(1, -10, 0, quoteHeight)
-                    QuoteLabel.Position = UDim2.new(0, 10, 0, 0)
-                    QuoteLabel.Parent = QuoteFrame
+							local QuoteBar = Instance.new('Frame')
+							QuoteBar.Name = 'Bar'
+							QuoteBar.BorderSizePixel = 0
+							QuoteBar.BackgroundColor3 = blendColor(SelectedTheme.TabTextColor or SelectedTheme.TextColor, SelectedTheme.SecondaryElementStroke, 0.35)
+							QuoteBar.Size = UDim2.new(0, 3, 1, 0)
+							QuoteBar.Parent = QuoteFrame
 
-                    QuoteFrame.Size = UDim2.new(1, 0, 0, quoteHeight)
-                elseif bulletText or orderedText then
-                    flushParagraph()
-                    local bulletBody = bulletText or orderedText or ''
-                    local markerText = bulletText and '•' or (tostring(orderedIndex) .. '.')
-                    local ItemFrame = Instance.new('Frame')
-                    ItemFrame.Name = 'ListItem'
-                    ItemFrame.BackgroundTransparency = 1
-                    ItemFrame.BorderSizePixel = 0
-                    ItemFrame.Size = UDim2.new(1, 0, 0, 0)
-                    ItemFrame.Parent = Holder
+							local quoteWidth = math.max(80, contentWidth - 14)
+							local QuoteLabel = Instance.new('TextLabel')
+							QuoteLabel.Name = 'QuoteText'
+							QuoteLabel.BackgroundTransparency = 1
+							QuoteLabel.BorderSizePixel = 0
+							QuoteLabel.RichText = true
+							QuoteLabel.TextWrapped = true
+							QuoteLabel.TextXAlignment = Enum.TextXAlignment.Left
+							QuoteLabel.TextYAlignment = Enum.TextYAlignment.Top
+							QuoteLabel.Font = Enum.Font.Gotham
+							QuoteLabel.TextSize = 13
+							QuoteLabel.TextColor3 = blendColor(SelectedTheme.TextColor, SelectedTheme.SecondaryElementStroke, 0.15)
+							QuoteLabel.Text = applyInlineMarkdown(quoteText)
+							local quoteHeight = math.max(16, measureText(quoteText, 13, Enum.Font.Gotham, quoteWidth).Y)
+							QuoteLabel.Size = UDim2.new(1, -10, 0, quoteHeight)
+							QuoteLabel.Position = UDim2.new(0, 10, 0, 0)
+							QuoteLabel.Parent = QuoteFrame
 
-                    local Marker = Instance.new('TextLabel')
-                    Marker.Name = 'Marker'
-                    Marker.BackgroundTransparency = 1
-                    Marker.BorderSizePixel = 0
-                    Marker.TextXAlignment = Enum.TextXAlignment.Left
-                    Marker.TextYAlignment = Enum.TextYAlignment.Top
-                    Marker.Font = Enum.Font.GothamBold
-                    Marker.TextSize = 13
-                    Marker.TextColor3 = SelectedTheme.TabTextColor or SelectedTheme.TextColor
-                    Marker.Text = markerText
-                    Marker.Size = UDim2.new(0, 16, 0, 16)
-                    Marker.Parent = ItemFrame
+							QuoteFrame.Size = UDim2.new(1, 0, 0, quoteHeight)
+						elseif bulletText or orderedText then
+							flushParagraph()
+							local bulletBody = bulletText or orderedText or ''
+							local markerText = bulletText and '•' or (tostring(orderedIndex) .. '.')
+							local ItemFrame = Instance.new('Frame')
+							ItemFrame.Name = 'ListItem'
+							ItemFrame.BackgroundTransparency = 1
+							ItemFrame.BorderSizePixel = 0
+							ItemFrame.Size = UDim2.new(1, 0, 0, 0)
+							ItemFrame.Parent = Holder
 
-                    local itemWidth = math.max(80, contentWidth - 18)
-                    local ItemLabel = Instance.new('TextLabel')
-                    ItemLabel.Name = 'ItemText'
-                    ItemLabel.BackgroundTransparency = 1
-                    ItemLabel.BorderSizePixel = 0
-                    ItemLabel.RichText = true
-                    ItemLabel.TextWrapped = true
-                    ItemLabel.TextXAlignment = Enum.TextXAlignment.Left
-                    ItemLabel.TextYAlignment = Enum.TextYAlignment.Top
-                    ItemLabel.Font = Enum.Font.Gotham
-                    ItemLabel.TextSize = 13
-                    ItemLabel.TextColor3 = SelectedTheme.TextColor
-                    ItemLabel.Text = applyInlineMarkdown(bulletBody)
-                    local itemHeight = math.max(16, measureText(bulletBody, 13, Enum.Font.Gotham, itemWidth).Y)
-                    ItemLabel.Size = UDim2.new(1, -18, 0, itemHeight)
-                    ItemLabel.Position = UDim2.new(0, 18, 0, 0)
-                    ItemLabel.Parent = ItemFrame
+							local Marker = Instance.new('TextLabel')
+							Marker.Name = 'Marker'
+							Marker.BackgroundTransparency = 1
+							Marker.BorderSizePixel = 0
+							Marker.TextXAlignment = Enum.TextXAlignment.Left
+							Marker.TextYAlignment = Enum.TextYAlignment.Top
+							Marker.Font = Enum.Font.GothamBold
+							Marker.TextSize = 13
+							Marker.TextColor3 = SelectedTheme.TabTextColor or SelectedTheme.TextColor
+							Marker.Text = markerText
+							Marker.Size = UDim2.new(0, 16, 0, 16)
+							Marker.Parent = ItemFrame
 
-                    ItemFrame.Size = UDim2.new(1, 0, 0, itemHeight)
-                elseif divider then
-                    flushParagraph()
-                    local Divider = Instance.new('Frame')
-                    Divider.Name = 'MarkdownDivider'
-                    Divider.BorderSizePixel = 0
-                    Divider.BackgroundColor3 = blendColor(SelectedTheme.SecondaryElementStroke, SelectedTheme.TextColor, 0.08)
-                    Divider.Size = UDim2.new(1, 0, 0, 1)
-                    Divider.Parent = Holder
-                else
-                    table.insert(paragraphLines, line)
-                end
-            end
-        end
+							local itemWidth = math.max(80, contentWidth - 18)
+							local ItemLabel = Instance.new('TextLabel')
+							ItemLabel.Name = 'ItemText'
+							ItemLabel.BackgroundTransparency = 1
+							ItemLabel.BorderSizePixel = 0
+							ItemLabel.RichText = true
+							ItemLabel.TextWrapped = true
+							ItemLabel.TextXAlignment = Enum.TextXAlignment.Left
+							ItemLabel.TextYAlignment = Enum.TextYAlignment.Top
+							ItemLabel.Font = Enum.Font.Gotham
+							ItemLabel.TextSize = 13
+							ItemLabel.TextColor3 = SelectedTheme.TextColor
+							ItemLabel.Text = applyInlineMarkdown(bulletBody)
+							local itemHeight = math.max(16, measureText(bulletBody, 13, Enum.Font.Gotham, itemWidth).Y)
+							ItemLabel.Size = UDim2.new(1, -18, 0, itemHeight)
+							ItemLabel.Position = UDim2.new(0, 18, 0, 0)
+							ItemLabel.Parent = ItemFrame
 
-        flushParagraph()
-        if inCodeBlock then
-            flushCodeBlock()
-        end
+							ItemFrame.Size = UDim2.new(1, 0, 0, itemHeight)
+						elseif divider then
+							flushParagraph()
+							local Divider = Instance.new('Frame')
+							Divider.Name = 'MarkdownDivider'
+							Divider.BorderSizePixel = 0
+							Divider.BackgroundColor3 = blendColor(SelectedTheme.SecondaryElementStroke, SelectedTheme.TextColor, 0.08)
+							Divider.Size = UDim2.new(1, 0, 0, 1)
+							Divider.Parent = Holder
+						else
+							table.insert(paragraphLines, line)
+						end
+					end
+				end
 
-        updateMarkdownSize()
-    end
+				flushParagraph()
+				if inCodeBlock then
+					flushCodeBlock()
+				end
 
-    updateMarkdownSize()
-    renderMarkdown(MarkdownSettings)
+				updateMarkdownSize()
+			end
 
-    TweenService:Create(Markdown, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
-    TweenService:Create(Markdown.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
+			updateMarkdownSize()
+			renderMarkdown(MarkdownSettings)
 
-    task.defer(function()
-        renderMarkdown(MarkdownSettings)
-    end)
+			-- Initial fade in
+			TweenService:Create(Markdown, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
+			TweenService:Create(Markdown.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
 
-    Markdown:GetPropertyChangedSignal('AbsoluteSize'):Connect(function()
-        local newWidth = getContentWidth()
-        if math.abs(newWidth - lastKnownWidth) >= 4 then
-            task.defer(function()
-                renderMarkdown(MarkdownSettings)
-            end)
-        end
-    end)
+			task.defer(function()
+				renderMarkdown(MarkdownSettings)
+			end)
 
-    function MarkdownValue:Set(NewMarkdownSettings)
-        if type(NewMarkdownSettings) == 'string' then
-            MarkdownSettings = {Content = NewMarkdownSettings}
-        else
-            MarkdownSettings = NewMarkdownSettings or MarkdownSettings
-        end
-        renderMarkdown(MarkdownSettings)
-    end
+			Markdown:GetPropertyChangedSignal('AbsoluteSize'):Connect(function()
+				local newWidth = getContentWidth()
+				if math.abs(newWidth - lastKnownWidth) >= 4 then
+					task.defer(function()
+						renderMarkdown(MarkdownSettings)
+					end)
+				end
+			end)
 
-    Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
-        Markdown.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
-        Markdown.UIStroke.Color = SelectedTheme.SecondaryElementStroke
-        renderMarkdown(MarkdownSettings)
-    end)
+			function MarkdownValue:Set(NewMarkdownSettings)
+				if type(NewMarkdownSettings) == 'string' then
+					MarkdownSettings = {Content = NewMarkdownSettings}
+				else
+					MarkdownSettings = NewMarkdownSettings or MarkdownSettings
+				end
+				renderMarkdown(MarkdownSettings)
+			end
 
-    return MarkdownValue
-end
+			-- When theme changes, update colors (but keep transparency as is)
+			Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
+				Markdown.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
+				Markdown.UIStroke.Color = SelectedTheme.SecondaryElementStroke
+				renderMarkdown(MarkdownSettings)
+			end)
+
+			return MarkdownValue
+		end
+		-- ============================================================
+		--              END OF NEW CreateMarkdown
+		-- ============================================================
 
 		-- Input
 		function Tab:CreateInput(InputSettings)
@@ -3599,18 +3510,6 @@ end
 					DropdownOption.BackgroundTransparency = 1
 					DropdownOption.UIStroke.Transparency = 1
 					DropdownOption.Title.TextTransparency = 1
-
-					--local Dropdown = Tab:CreateDropdown({
-					--	Name = "Dropdown Example",
-					--	Options = {"Option 1","Option 2"},
-					--	CurrentOption = {"Option 1"},
-					--  MultipleOptions = true,
-					--	Flag = "Dropdown1",
-					--	Callback = function(TableOfOptions)
-
-					--	end,
-					--})
-
 
 					DropdownOption.Interact.ZIndex = 50
 					DropdownOption.Interact.MouseButton1Click:Connect(function()
@@ -4553,211 +4452,6 @@ end
 if useStudio then
 	-- run w/ studio
 	-- Feel free to place your own script here to see how it'd work in Roblox Studio before running it on your execution software.
-
-
-	--local Window = RayfieldLibrary:CreateWindow({
-	--	Name = "Rayfield Example Window",
-	--	LoadingTitle = "Rayfield Interface Suite",
-	--	Theme = 'Default',
-	--	Icon = 0,
-	--	LoadingSubtitle = "by Sirius",
-	--	ConfigurationSaving = {
-	--		Enabled = true,
-	--		FolderName = nil, -- Create a custom folder for your hub/game
-	--		FileName = "Big Hub52"
-	--	},
-	--	Discord = {
-	--		Enabled = false,
-	--		Invite = "noinvitelink", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ABCD would be ABCD
-	--		RememberJoins = true -- Set this to false to make them join the discord every time they load it up
-	--	},
-	--	KeySystem = false, -- Set this to true to use our key system
-	--	KeySettings = {
-	--		Title = "Untitled",
-	--		Subtitle = "Key System",
-	--		Note = "No method of obtaining the key is provided",
-	--		FileName = "Key", -- It is recommended to use something unique as other scripts using Rayfield may overwrite your key file
-	--		SaveKey = true, -- The user's key will be saved, but if you change the key, they will be unable to use your script
-	--		GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
-	--		Key = {"Hello"} -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
-	--	}
-	--})
-
-	--local Tab = Window:CreateTab("Tab Example", 'key-round') -- Title, Image
-	--local Tab2 = Window:CreateTab("Tab Example 2", 4483362458) -- Title, Image
-
-	--local Section = Tab2:CreateSection("Section")
-
-
-	--local ColorPicker = Tab2:CreateColorPicker({
-	--	Name = "Color Picker",
-	--	Color = Color3.fromRGB(255,255,255),
-	--	Flag = "ColorPicfsefker1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
-	--	Callback = function(Value)
-	--		-- The function that takes place every time the color picker is moved/changed
-	--		-- The variable (Value) is a Color3fromRGB value based on which color is selected
-	--	end
-	--})
-
-	--local Slider = Tab2:CreateSlider({
-	--	Name = "Slider Example",
-	--	Range = {0, 100},
-	--	Increment = 10,
-	--	Suffix = "Bananas",
-	--	CurrentValue = 40,
-	--	Flag = "Slidefefsr1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
-	--	Callback = function(Value)
-	--		-- The function that takes place when the slider changes
-	--		-- The variable (Value) is a number which correlates to the value the slider is currently at
-	--	end,
-	--})
-
-	--local Input = Tab2:CreateInput({
-	--	Name = "Input Example",
-	--	CurrentValue = '',
-	--	PlaceholderText = "Input Placeholder",
-	--	Flag = 'dawdawd',
-	--	RemoveTextAfterFocusLost = false,
-	--	Callback = function(Text)
-	--		-- The function that takes place when the input is changed
-	--		-- The variable (Text) is a string for the value in the text box
-	--	end,
-	--})
-
-
-	----RayfieldLibrary:Notify({Title = "Rayfield Interface", Content = "Welcome to Rayfield. These - are the brand new notification design for Rayfield, with custom sizing and Rayfield calculated wait times.", Image = 4483362458})
-
-	--local Section = Tab:CreateSection("Section Example")
-
-	--local Button = Tab:CreateButton({
-	--	Name = "Change Theme",
-	--	Callback = function()
-	--		-- The function that takes place when the button is pressed
-	--		Window.ModifyTheme('DarkBlue')
-	--	end,
-	--})
-
-	--local Toggle = Tab:CreateToggle({
-	--	Name = "Toggle Example",
-	--	CurrentValue = false,
-	--	Flag = "Toggle1adwawd", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
-	--	Callback = function(Value)
-	--		-- The function that takes place when the toggle is pressed
-	--		-- The variable (Value) is a boolean on whether the toggle is true or false
-	--	end,
-	--})
-
-	--local ColorPicker = Tab:CreateColorPicker({
-	--	Name = "Color Picker",
-	--	Color = Color3.fromRGB(255,255,255),
-	--	Flag = "ColorPicker1awd", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
-	--	Callback = function(Value)
-	--		-- The function that takes place every time the color picker is moved/changed
-	--		-- The variable (Value) is a Color3fromRGB value based on which color is selected
-	--	end
-	--})
-
-	--local Slider = Tab:CreateSlider({
-	--	Name = "Slider Example",
-	--	Range = {0, 100},
-	--	Increment = 10,
-	--	Suffix = "Bananas",
-	--	CurrentValue = 40,
-	--	Flag = "Slider1dawd", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
-	--	Callback = function(Value)
-	--		-- The function that takes place when the slider changes
-	--		-- The variable (Value) is a number which correlates to the value the slider is currently at
-	--	end,
-	--})
-
-	--local Input = Tab:CreateInput({
-	--	Name = "Input Example",
-	--	CurrentValue = "Helo",
-	--	PlaceholderText = "Adaptive Input",
-	--	RemoveTextAfterFocusLost = false,
-	--	Flag = 'Input1',
-	--	Callback = function(Text)
-	--		-- The function that takes place when the input is changed
-	--		-- The variable (Text) is a string for the value in the text box
-	--	end,
-	--})
-
-	--local thoptions = {}
-	--for themename, theme in pairs(RayfieldLibrary.Theme) do
-	--	table.insert(thoptions, themename)
-	--end
-
-	--local Dropdown = Tab:CreateDropdown({
-	--	Name = "Theme",
-	--	Options = thoptions,
-	--	CurrentOption = {"Default"},
-	--	MultipleOptions = false,
-	--	Flag = "Dropdown1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
-	--	Callback = function(Options)
-	--		--Window.ModifyTheme(Options[1])
-	--		-- The function that takes place when the selected option is changed
-	--		-- The variable (Options) is a table of strings for the current selected options
-	--	end,
-	--})
-
-
-	--Window.ModifyTheme({
-	--	TextColor = Color3.fromRGB(50, 55, 60),
-	--	Background = Color3.fromRGB(240, 245, 250),
-	--	Topbar = Color3.fromRGB(215, 225, 235),
-	--	Shadow = Color3.fromRGB(200, 210, 220),
-
-	--	NotificationBackground = Color3.fromRGB(210, 220, 230),
-	--	NotificationActionsBackground = Color3.fromRGB(225, 230, 240),
-
-	--	TabBackground = Color3.fromRGB(200, 210, 220),
-	--	TabStroke = Color3.fromRGB(180, 190, 200),
-	--	TabBackgroundSelected = Color3.fromRGB(175, 185, 200),
-	--	TabTextColor = Color3.fromRGB(50, 55, 60),
-	--	SelectedTabTextColor = Color3.fromRGB(30, 35, 40),
-
-	--	ElementBackground = Color3.fromRGB(210, 220, 230),
-	--	ElementBackgroundHover = Color3.fromRGB(220, 230, 240),
-	--	SecondaryElementBackground = Color3.fromRGB(200, 210, 220),
-	--	ElementStroke = Color3.fromRGB(190, 200, 210),
-	--	SecondaryElementStroke = Color3.fromRGB(180, 190, 200),
-
-	--	SliderBackground = Color3.fromRGB(200, 220, 235),  -- Lighter shade
-	--	SliderProgress = Color3.fromRGB(70, 130, 180),
-	--	SliderStroke = Color3.fromRGB(150, 180, 220),
-
-	--	ToggleBackground = Color3.fromRGB(210, 220, 230),
-	--	ToggleEnabled = Color3.fromRGB(70, 160, 210),
-	--	ToggleDisabled = Color3.fromRGB(180, 180, 180),
-	--	ToggleEnabledStroke = Color3.fromRGB(60, 150, 200),
-	--	ToggleDisabledStroke = Color3.fromRGB(140, 140, 140),
-	--	ToggleEnabledOuterStroke = Color3.fromRGB(100, 120, 140),
-	--	ToggleDisabledOuterStroke = Color3.fromRGB(120, 120, 130),
-
-	--	DropdownSelected = Color3.fromRGB(220, 230, 240),
-	--	DropdownUnselected = Color3.fromRGB(200, 210, 220),
-
-	--	InputBackground = Color3.fromRGB(220, 230, 240),
-	--	InputStroke = Color3.fromRGB(180, 190, 200),
-	--	PlaceholderColor = Color3.fromRGB(150, 150, 150)
-	--})
-
-	--local Keybind = Tab:CreateKeybind({
-	--	Name = "Keybind Example",
-	--	CurrentKeybind = "Q",
-	--	HoldToInteract = false,
-	--	Flag = "Keybind1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
-	--	Callback = function(Keybind)
-	--		-- The function that takes place when the keybind is pressed
-	--		-- The variable (Keybind) is a boolean for whether the keybind is being held or not (HoldToInteract needs to be true)
-	--	end,
-	--})
-
-	--local Label = Tab:CreateLabel("Label Example")
-
-	--local Label2 = Tab:CreateLabel("Warning", 4483362458, Color3.fromRGB(255, 159, 49),  true)
-
-	--local Paragraph = Tab:CreateParagraph({Title = "Paragraph Example", Content = "Paragraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph Example"})
 end
 
 if CEnabled and Main:FindFirstChild('Notice') then
@@ -4771,10 +4465,6 @@ if CEnabled and Main:FindFirstChild('Notice') then
 	TweenService:Create(Main.Notice, TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.InOut), {Size = UDim2.new(0, 280, 0, 35), Position = UDim2.new(0.5, 0, 0, -50), BackgroundTransparency = 0.5}):Play()
 	TweenService:Create(Main.Notice.Title, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 0.1}):Play()
 end
--- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA why :(
---if not useStudio then
---	task.spawn(loadWithTimeout, "https://raw.githubusercontent.com/SiriusSoftwareLtd/Sirius/refs/heads/request/boost.lua")
---end
 
 task.delay(4, function()
 	RayfieldLibrary.LoadConfiguration()
