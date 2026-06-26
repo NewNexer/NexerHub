@@ -1428,16 +1428,15 @@ local function Hide(notify: boolean?)
 				if element.ClassName == "Frame" then
 					if element.Name ~= "SectionSpacing" and element.Name ~= "Placeholder" then
 						
-						local isMarkdown = element.Name == "Markdown" or element:FindFirstChild("MarkdownHolder")
+						local isMarkdown = element:FindFirstChild("MarkdownHolder") ~= nil or element.Name == "Markdown"
 						
 						if isMarkdown then
-							-- Hide the Markdown element itself
+							-- Hide Markdown element itself
 							TweenService:Create(element, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
 							if element.UIStroke then
 								TweenService:Create(element.UIStroke, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
 							end
 							
-							-- Hide all Markdown children
 							for _, child in ipairs(element:GetChildren()) do
 								if child:IsA("TextLabel") or child:IsA("Frame") or child:IsA("ImageButton") or child:IsA("ImageLabel") then
 									TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
@@ -1451,7 +1450,6 @@ local function Hide(notify: boolean?)
 								end
 							end
 						else
-							-- Normal element handling
 							if element.Name == "SectionTitle" or element.Name == 'SearchTitle-fsefsefesfsefesfesfThanks' then
 								if element.Title then
 									TweenService:Create(element.Title, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
@@ -1470,7 +1468,6 @@ local function Hide(notify: boolean?)
 								end
 							end
 							
-							-- Hide all children for normal elements
 							for _, child in ipairs(element:GetChildren()) do
 								if child.ClassName == "Frame" or child.ClassName == "TextLabel" or child.ClassName == "TextBox" or child.ClassName == "ImageButton" or child.ClassName == "ImageLabel" then
 									child.Visible = false
@@ -1510,10 +1507,9 @@ local function Maximise()
 				if element.ClassName == "Frame" then
 					if element.Name ~= "SectionSpacing" and element.Name ~= "Placeholder" then
 						
-						local isMarkdown = element.Name == "Markdown" or element:FindFirstChild("MarkdownHolder")
+						local isMarkdown = element:FindFirstChild("MarkdownHolder") ~= nil or element.Name == "Markdown"
 						
 						if isMarkdown then
-							-- Restore Markdown element's background
 							element.BackgroundTransparency = 0
 							element.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
 							if element.UIStroke then
@@ -1521,7 +1517,6 @@ local function Maximise()
 								element.UIStroke.Color = SelectedTheme.SecondaryElementStroke
 							end
 							
-							-- Show all Markdown children
 							for _, child in ipairs(element:GetChildren()) do
 								if child:IsA("TextLabel") or child:IsA("Frame") or child:IsA("ImageButton") or child:IsA("ImageLabel") then
 									child.Visible = true
@@ -1580,7 +1575,6 @@ local function Maximise()
 				TweenService:Create(tabbtn.Title, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {TextTransparency = 0.2}):Play()
 				TweenService:Create(tabbtn.UIStroke, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Transparency = 0.5}):Play()
 			end
-
 		end
 	end
 
@@ -1605,7 +1599,6 @@ local function Unhide()
 	if MPrompt then
 		TweenService:Create(MPrompt, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 40, 0, 10), Position = UDim2.new(0.5, 0, 0, -50), BackgroundTransparency = 1}):Play()
 		TweenService:Create(MPrompt.Title, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
-
 		task.spawn(function()
 			task.wait(0.5)
 			MPrompt.Visible = false
@@ -1617,7 +1610,6 @@ local function Unhide()
 	end
 
 	dragBar.Position = useMobileSizing and UDim2.new(0.5, 0, 0.5, dragOffsetMobile) or UDim2.new(0.5, 0, 0.5, dragOffset)
-
 	dragInteract.Visible = true
 
 	for _, TopbarButton in ipairs(Topbar:GetChildren()) do
@@ -1627,7 +1619,6 @@ local function Unhide()
 			else
 				TweenService:Create(TopbarButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0.8}):Play()
 			end
-
 		end
 	end
 
@@ -1647,16 +1638,20 @@ local function Unhide()
 		end
 	end
 
+	-- ************************************************************
+	-- CRITICAL: Show all elements, but set proper colors for Markdown
+	-- ************************************************************
 	for _, tab in ipairs(Elements:GetChildren()) do
 		if tab.Name ~= "Template" and tab.ClassName == "ScrollingFrame" and tab.Name ~= "Placeholder" then
 			for _, element in ipairs(tab:GetChildren()) do
 				if element.ClassName == "Frame" then
 					if element.Name ~= "SectionSpacing" and element.Name ~= "Placeholder" then
 						
-						local isMarkdown = element.Name == "Markdown" or element:FindFirstChild("MarkdownHolder")
+						-- Robust detection: check for MarkdownHolder child OR name
+						local isMarkdown = element:FindFirstChild("MarkdownHolder") ~= nil or element.Name == "Markdown"
 						
 						if isMarkdown then
-							-- Restore the Markdown element's own background
+							-- Restore Markdown element's own background
 							element.BackgroundTransparency = 0
 							element.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
 							if element.UIStroke then
@@ -1664,7 +1659,7 @@ local function Unhide()
 								element.UIStroke.Color = SelectedTheme.SecondaryElementStroke
 							end
 							
-							-- Show all Markdown children
+							-- Show all children (they will have their own tweens)
 							for _, child in ipairs(element:GetChildren()) do
 								if child:IsA("TextLabel") or child:IsA("Frame") or child:IsA("ImageButton") or child:IsA("ImageLabel") then
 									child.Visible = true
@@ -1688,6 +1683,8 @@ local function Unhide()
 									TweenService:Create(element.Divider, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0.85}):Play()
 								end
 							else
+								-- IMPORTANT: Set background color for normal elements too, but use their own color (if any)
+								-- We don't want to force a color on non-Markdown elements, but we do need to set transparency
 								TweenService:Create(element, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 								if element.UIStroke then
 									TweenService:Create(element.UIStroke, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
@@ -1697,6 +1694,7 @@ local function Unhide()
 								end
 							end
 							
+							-- Show children
 							for _, child in ipairs(element:GetChildren()) do
 								if child.ClassName == "Frame" or child.ClassName == "TextLabel" or child.ClassName == "TextBox" or child.ClassName == "ImageButton" or child.ClassName == "ImageLabel" then
 									child.Visible = true
