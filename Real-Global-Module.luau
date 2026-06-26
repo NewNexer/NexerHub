@@ -4203,7 +4203,13 @@ return tostring(tbl)
 end
 end
 
-return RayfieldLibrary
+local LatestRayfieldVer = nil
+task.spawn(function()
+LatestRayfieldVer = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+end)
+wait(10)
+
+return ((LatestRayfieldVer~=nil and LatestRayfieldVer) or RayfieldLibrary)
 end
 
 function module.IsWorking()
