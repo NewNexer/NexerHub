@@ -286,6 +286,7 @@ end
 
 local HttpService = getService('HttpService')
 local RunService = getService('RunService')
+local TextService = getService('TextService')
 
 -- Environment Check
 local useStudio = RunService:IsStudio() or false
