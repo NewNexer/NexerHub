@@ -2164,212 +2164,175 @@ function RayfieldLibrary:CreateWindow(Settings)
 	Elements.UIPageLayout.FillDirection = Enum.FillDirection.Horizontal
 	TabList.Template.Visible = false
 
--- В функции RayfieldLibrary:CreateWindow(Settings), в месте где создается Window
+	local FirstTab = false
+	local Window = {}
+	local AllTabs = {}
 
-local FirstTab = false
-local Window = {}
-local AllTabs = {} -- Для хранения всех созданных вкладок
+	function Window:RemoveTab(Tab)
+		if Tab and type(Tab) == "table" and Tab._TabName then
+			for _, tabbtn in ipairs(TabList:GetChildren()) do
+				if tabbtn.ClassName == "Frame" and tabbtn.Name ~= "Placeholder" and tabbtn.Name == Tab._TabName then
+					tabbtn:Destroy()
+					break
+				end
+			end
+			for _, tabpage in ipairs(Elements:GetChildren()) do
+				if tabpage.Name == Tab._TabName then
+					tabpage:Destroy()
+					break
+				end
+			end
+			for i, existingTab in ipairs(AllTabs) do
+				if existingTab == Tab then
+					table.remove(AllTabs, i)
+					break
+				end
+			end
+			Tab._TabName = nil
+			Tab._TabPage = nil
+			Tab._TabButton = nil
+		end
+	end
 
-function Window:RemoveTab(Tab)
-    if Tab and type(Tab) == "table" and Tab._TabName then
-        -- Находим и удаляем кнопку вкладки
-        for _, tabbtn in ipairs(TabList:GetChildren()) do
-            if tabbtn.ClassName == "Frame" and tabbtn.Name ~= "Placeholder" and tabbtn.Name == Tab._TabName then
-                tabbtn:Destroy()
-                break
-            end
-        end
-        -- Находим и удаляем страницу вкладки
-        for _, tabpage in ipairs(Elements:GetChildren()) do
-            if tabpage.Name == Tab._TabName then
-                tabpage:Destroy()
-                break
-            end
-        end
-        -- Удаляем из списка
-        for i, existingTab in ipairs(AllTabs) do
-            if existingTab == Tab then
-                table.remove(AllTabs, i)
-                break
-            end
-        end
-        -- Очищаем ссылки
-        Tab._TabName = nil
-        Tab._TabPage = nil
-        Tab._TabButton = nil
-    end
-end
+	function Window:CreateTab(Name, Image, Ext)
+		local SDone = false
+		local TabButton = TabList.Template:Clone()
+		TabButton.Name = Name
+		TabButton.Title.Text = Name
+		TabButton.Parent = TabList
+		TabButton.Title.TextWrapped = false
+		TabButton.Size = UDim2.new(0, TabButton.Title.TextBounds.X + 30, 0, 30)
 
-function Window:CreateTab(Name, Image, Ext)
-    local SDone = false
-    local TabButton = TabList.Template:Clone()
-    TabButton.Name = Name
-    TabButton.Title.Text = Name
-    TabButton.Parent = TabList
-    TabButton.Title.TextWrapped = false
-    TabButton.Size = UDim2.new(0, TabButton.Title.TextBounds.X + 30, 0, 30)
+		if Image and Image ~= 0 then
+			if typeof(Image) == 'string' and Icons then
+				local asset = getIcon(Image)
 
-    if Image and Image ~= 0 then
-        if typeof(Image) == 'string' and Icons then
-            local asset = getIcon(Image)
+				TabButton.Image.Image = 'rbxassetid://'..asset.id
+				TabButton.Image.ImageRectOffset = asset.imageRectOffset
+				TabButton.Image.ImageRectSize = asset.imageRectSize
+			else
+				TabButton.Image.Image = getAssetUri(Image)
+			end
 
-            TabButton.Image.Image = 'rbxassetid://'..asset.id
-            TabButton.Image.ImageRectOffset = asset.imageRectOffset
-            TabButton.Image.ImageRectSize = asset.imageRectSize
-        else
-            TabButton.Image.Image = getAssetUri(Image)
-        end
+			TabButton.Title.AnchorPoint = Vector2.new(0, 0.5)
+			TabButton.Title.Position = UDim2.new(0, 37, 0.5, 0)
+			TabButton.Image.Visible = true
+			TabButton.Title.TextXAlignment = Enum.TextXAlignment.Left
+			TabButton.Size = UDim2.new(0, TabButton.Title.TextBounds.X + 52, 0, 30)
+		end
 
-        TabButton.Title.AnchorPoint = Vector2.new(0, 0.5)
-        TabButton.Title.Position = UDim2.new(0, 37, 0.5, 0)
-        TabButton.Image.Visible = true
-        TabButton.Title.TextXAlignment = Enum.TextXAlignment.Left
-        TabButton.Size = UDim2.new(0, TabButton.Title.TextBounds.X + 52, 0, 30)
-    end
+		TabButton.BackgroundTransparency = 1
+		TabButton.Title.TextTransparency = 1
+		TabButton.Image.ImageTransparency = 1
+		TabButton.UIStroke.Transparency = 1
 
-    TabButton.BackgroundTransparency = 1
-    TabButton.Title.TextTransparency = 1
-    TabButton.Image.ImageTransparency = 1
-    TabButton.UIStroke.Transparency = 1
+		TabButton.Visible = not Ext or false
 
-    TabButton.Visible = not Ext or false
+		local TabPage = Elements.Template:Clone()
+		TabPage.Name = Name
+		TabPage.Visible = true
 
-    -- Create Elements Page
-    local TabPage = Elements.Template:Clone()
-    TabPage.Name = Name
-    TabPage.Visible = true
+		TabPage.LayoutOrder = #Elements:GetChildren() or Ext and 10000
 
-    TabPage.LayoutOrder = #Elements:GetChildren() or Ext and 10000
+		for _, TemplateElement in ipairs(TabPage:GetChildren()) do
+			if TemplateElement.ClassName == "Frame" and TemplateElement.Name ~= "Placeholder" then
+				TemplateElement:Destroy()
+			end
+		end
 
-    for _, TemplateElement in ipairs(TabPage:GetChildren()) do
-        if TemplateElement.ClassName == "Frame" and TemplateElement.Name ~= "Placeholder" then
-            TemplateElement:Destroy()
-        end
-    end
+		TabPage.Parent = Elements
+		if not FirstTab and not Ext then
+			Elements.UIPageLayout.Animated = false
+			Elements.UIPageLayout:JumpTo(TabPage)
+			Elements.UIPageLayout.Animated = true
+		end
 
-    TabPage.Parent = Elements
-    if not FirstTab and not Ext then
-        Elements.UIPageLayout.Animated = false
-        Elements.UIPageLayout:JumpTo(TabPage)
-        Elements.UIPageLayout.Animated = true
-    end
+		TabButton.UIStroke.Color = SelectedTheme.TabStroke
 
-    TabButton.UIStroke.Color = SelectedTheme.TabStroke
+		if Elements.UIPageLayout.CurrentPage == TabPage then
+			TabButton.BackgroundColor3 = SelectedTheme.TabBackgroundSelected
+			TabButton.Image.ImageColor3 = SelectedTheme.SelectedTabTextColor
+			TabButton.Title.TextColor3 = SelectedTheme.SelectedTabTextColor
+		else
+			TabButton.BackgroundColor3 = SelectedTheme.TabBackground
+			TabButton.Image.ImageColor3 = SelectedTheme.TabTextColor
+			TabButton.Title.TextColor3 = SelectedTheme.TabTextColor
+		end
 
-    if Elements.UIPageLayout.CurrentPage == TabPage then
-        TabButton.BackgroundColor3 = SelectedTheme.TabBackgroundSelected
-        TabButton.Image.ImageColor3 = SelectedTheme.SelectedTabTextColor
-        TabButton.Title.TextColor3 = SelectedTheme.SelectedTabTextColor
-    else
-        TabButton.BackgroundColor3 = SelectedTheme.TabBackground
-        TabButton.Image.ImageColor3 = SelectedTheme.TabTextColor
-        TabButton.Title.TextColor3 = SelectedTheme.TabTextColor
-    end
+		task.wait(0.1)
+		if FirstTab or Ext then
+			TabButton.BackgroundColor3 = SelectedTheme.TabBackground
+			TabButton.Image.ImageColor3 = SelectedTheme.TabTextColor
+			TabButton.Title.TextColor3 = SelectedTheme.TabTextColor
+			TweenService:Create(TabButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0.7}):Play()
+			TweenService:Create(TabButton.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0.2}):Play()
+			TweenService:Create(TabButton.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0.2}):Play()
+			TweenService:Create(TabButton.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 0.5}):Play()
+		elseif not Ext then
+			FirstTab = Name
+			TabButton.BackgroundColor3 = SelectedTheme.TabBackgroundSelected
+			TabButton.Image.ImageColor3 = SelectedTheme.SelectedTabTextColor
+			TabButton.Title.TextColor3 = SelectedTheme.SelectedTabTextColor
+			TweenService:Create(TabButton.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0}):Play()
+			TweenService:Create(TabButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
+			TweenService:Create(TabButton.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+		end
 
-    -- Animate
-    task.wait(0.1)
-    if FirstTab or Ext then
-        TabButton.BackgroundColor3 = SelectedTheme.TabBackground
-        TabButton.Image.ImageColor3 = SelectedTheme.TabTextColor
-        TabButton.Title.TextColor3 = SelectedTheme.TabTextColor
-        TweenService:Create(TabButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0.7}):Play()
-        TweenService:Create(TabButton.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0.2}):Play()
-        TweenService:Create(TabButton.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0.2}):Play()
-        TweenService:Create(TabButton.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 0.5}):Play()
-    elseif not Ext then
-        FirstTab = Name
-        TabButton.BackgroundColor3 = SelectedTheme.TabBackgroundSelected
-        TabButton.Image.ImageColor3 = SelectedTheme.SelectedTabTextColor
-        TabButton.Title.TextColor3 = SelectedTheme.SelectedTabTextColor
-        TweenService:Create(TabButton.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0}):Play()
-        TweenService:Create(TabButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
-        TweenService:Create(TabButton.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
-    end
+		TabButton.Interact.MouseButton1Click:Connect(function()
+			if Minimised then return end
+			TweenService:Create(TabButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
+			TweenService:Create(TabButton.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
+			TweenService:Create(TabButton.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+			TweenService:Create(TabButton.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0}):Play()
+			TweenService:Create(TabButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.TabBackgroundSelected}):Play()
+			TweenService:Create(TabButton.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextColor3 = SelectedTheme.SelectedTabTextColor}):Play()
+			TweenService:Create(TabButton.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageColor3 = SelectedTheme.SelectedTabTextColor}):Play()
 
-    TabButton.Interact.MouseButton1Click:Connect(function()
-        if Minimised then return end
-        TweenService:Create(TabButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
-        TweenService:Create(TabButton.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
-        TweenService:Create(TabButton.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
-        TweenService:Create(TabButton.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0}):Play()
-        TweenService:Create(TabButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.TabBackgroundSelected}):Play()
-        TweenService:Create(TabButton.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextColor3 = SelectedTheme.SelectedTabTextColor}):Play()
-        TweenService:Create(TabButton.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageColor3 = SelectedTheme.SelectedTabTextColor}):Play()
+			for _, OtherTabButton in ipairs(TabList:GetChildren()) do
+				if OtherTabButton.Name ~= "Template" and OtherTabButton.ClassName == "Frame" and OtherTabButton ~= TabButton and OtherTabButton.Name ~= "Placeholder" then
+					TweenService:Create(OtherTabButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.TabBackground}):Play()
+					TweenService:Create(OtherTabButton.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextColor3 = SelectedTheme.TabTextColor}):Play()
+					TweenService:Create(OtherTabButton.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageColor3 = SelectedTheme.TabTextColor}):Play()
+					TweenService:Create(OtherTabButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0.7}):Play()
+					TweenService:Create(OtherTabButton.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0.2}):Play()
+					TweenService:Create(OtherTabButton.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0.2}):Play()
+					TweenService:Create(OtherTabButton.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 0.5}):Play()
+				end
+			end
 
-        for _, OtherTabButton in ipairs(TabList:GetChildren()) do
-            if OtherTabButton.Name ~= "Template" and OtherTabButton.ClassName == "Frame" and OtherTabButton ~= TabButton and OtherTabButton.Name ~= "Placeholder" then
-                TweenService:Create(OtherTabButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.TabBackground}):Play()
-                TweenService:Create(OtherTabButton.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextColor3 = SelectedTheme.TabTextColor}):Play()
-                TweenService:Create(OtherTabButton.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageColor3 = SelectedTheme.TabTextColor}):Play()
-                TweenService:Create(OtherTabButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0.7}):Play()
-                TweenService:Create(OtherTabButton.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0.2}):Play()
-                TweenService:Create(OtherTabButton.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0.2}):Play()
-                TweenService:Create(OtherTabButton.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 0.5}):Play()
-            end
-        end
+			if Elements.UIPageLayout.CurrentPage ~= TabPage then
+				Elements.UIPageLayout:JumpTo(TabPage)
+			end
+		end)
 
-        if Elements.UIPageLayout.CurrentPage ~= TabPage then
-            Elements.UIPageLayout:JumpTo(TabPage)
-        end
-    end)
+		local Tab = {}
+		Tab._TabName = Name
+		Tab._TabButton = TabButton
+		Tab._TabPage = TabPage
+		
+		function Tab:Set(NewName)
+			if NewName and type(NewName) == "string" and NewName ~= "" then
+				self._TabName = NewName
+				
+				if self._TabButton then
+					self._TabButton.Name = NewName
+					self._TabButton.Title.Text = NewName
+					self._TabButton.Size = UDim2.new(0, self._TabButton.Title.TextBounds.X + 30, 0, 30)
+					if Image and Image ~= 0 then
+						self._TabButton.Size = UDim2.new(0, self._TabButton.Title.TextBounds.X + 52, 0, 30)
+					end
+				end
+				
+				if self._TabPage then
+					self._TabPage.Name = NewName
+				end
+			else
+				warn("Rayfield | Tab:Set() - NewName must be a non-empty string")
+			end
+		end
+		
+		table.insert(AllTabs, Tab)
 
-    local Tab = {}
-    Tab._TabName = Name
-    Tab._TabButton = TabButton
-    Tab._TabPage = TabPage
-    
-    -- Функция для изменения названия вкладки
-    function Tab:Set(NewName)
-        if NewName and type(NewName) == "string" and NewName ~= "" then
-            -- Обновляем имя в объекте
-            self._TabName = NewName
-            
-            -- Обновляем кнопку вкладки
-            if self._TabButton then
-                self._TabButton.Name = NewName
-                self._TabButton.Title.Text = NewName
-                -- Пересчитываем размер
-                self._TabButton.Size = UDim2.new(0, self._TabButton.Title.TextBounds.X + 30, 0, 30)
-                -- Если есть иконка, добавляем дополнительное место
-                if Image and Image ~= 0 then
-                    self._TabButton.Size = UDim2.new(0, self._TabButton.Title.TextBounds.X + 52, 0, 30)
-                end
-            end
-            
-            -- Обновляем страницу вкладки
-            if self._TabPage then
-                self._TabPage.Name = NewName
-            end
-        else
-            warn("Rayfield | Tab:Set() - NewName must be a non-empty string")
-        end
-    end
-    
-    -- Сохраняем в список для RemoveTab
-    table.insert(AllTabs, Tab)
-
-    -- ... (остальной код создания элементов вкладки)
-
-    Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
-        TabButton.UIStroke.Color = SelectedTheme.TabStroke
-
-        if Elements.UIPageLayout.CurrentPage == TabPage then
-            TabButton.BackgroundColor3 = SelectedTheme.TabBackgroundSelected
-            TabButton.Image.ImageColor3 = SelectedTheme.SelectedTabTextColor
-            TabButton.Title.TextColor3 = SelectedTheme.SelectedTabTextColor
-        else
-            TabButton.BackgroundColor3 = SelectedTheme.TabBackground
-            TabButton.Image.ImageColor3 = SelectedTheme.TabTextColor
-            TabButton.Title.TextColor3 = SelectedTheme.TabTextColor
-        end
-    end)
-
-    return Tab
-end
-
-local Tab = {}
-
-		-- Button
 		function Tab:CreateButton(ButtonSettings)
 			local ButtonValue = {}
 
@@ -2438,15 +2401,13 @@ local Tab = {}
 			return ButtonValue
 		end
 
-		-- Remove Button
 		function Tab:RemoveButton(Button)
 			if Button and type(Button) == "table" and Button._Element then
 				Button._Element:Destroy()
 			end
 		end
 
-		-- ColorPicker
-		function Tab:CreateColorPicker(ColorPickerSettings) -- by Throit
+		function Tab:CreateColorPicker(ColorPickerSettings)
 			ColorPickerSettings.Type = "ColorPicker"
 			local ColorPicker = Elements.Template.ColorPicker:Clone()
 			local Background = ColorPicker.CPBackground
@@ -2548,12 +2509,10 @@ local Tab = {}
 			local hex = string.format("#%02X%02X%02X",color.R*0xFF,color.G*0xFF,color.B*0xFF)
 			ColorPicker.HexInput.InputBox.Text = hex
 			local function setDisplay()
-				--Main
 				Main.MainPoint.Position = UDim2.new(s,-Main.MainPoint.AbsoluteSize.X/2,1-v,-Main.MainPoint.AbsoluteSize.Y/2)
 				Main.MainPoint.ImageColor3 = Color3.fromHSV(h,s,v)
 				Background.BackgroundColor3 = Color3.fromHSV(h,1,1)
 				Display.BackgroundColor3 = Color3.fromHSV(h,s,v)
-				--Slider 
 				local x = h * Slider.AbsoluteSize.X
 				Slider.SliderPoint.Position = UDim2.new(0,x-Slider.SliderPoint.AbsoluteSize.X/2,0.5,0)
 				Slider.SliderPoint.ImageColor3 = Color3.fromHSV(h,1,1)
@@ -2585,7 +2544,6 @@ local Tab = {}
 					SaveConfiguration()
 				end
 			end)
-			--RGB
 			local function rgbBoxes(box,toChange)
 				local value = tonumber(box.Text) 
 				local color = Color3.fromHSV(h,s,v) 
@@ -2701,14 +2659,12 @@ local Tab = {}
 			return ColorPickerSettings
 		end
 
-		-- Remove ColorPicker
 		function Tab:RemoveColorPicker(ColorPicker)
 			if ColorPicker and type(ColorPicker) == "table" and ColorPicker._Element then
 				ColorPicker._Element:Destroy()
 			end
 		end
 
-		-- Section
 		function Tab:CreateSection(SectionName)
 			local SectionValue = {}
 
@@ -2737,14 +2693,12 @@ local Tab = {}
 			return SectionValue
 		end
 
-		-- Remove Section
 		function Tab:RemoveSection(Section)
 			if Section and type(Section) == "table" and Section._Element then
 				Section._Element:Destroy()
 			end
 		end
 
-		-- Divider
 		function Tab:CreateDivider()
 			local DividerValue = {}
 
@@ -2764,15 +2718,13 @@ local Tab = {}
 			return DividerValue
 		end
 
-		-- Remove Divider
 		function Tab:RemoveDivider(Divider)
 			if Divider and type(Divider) == "table" and Divider._Element then
 				Divider._Element:Destroy()
 			end
 		end
 
-		-- Label
-		function Tab:CreateLabel(LabelText : string, Icon: number, Color : Color3, IgnoreTheme : boolean)
+		function Tab:CreateLabel(LabelText, Icon, Color, IgnoreTheme)
 			local LabelValue = {}
 
 			local Label = Elements.Template.Label:Clone()
@@ -2868,14 +2820,12 @@ local Tab = {}
 			return LabelValue
 		end
 
-		-- Remove Label
 		function Tab:RemoveLabel(Label)
 			if Label and type(Label) == "table" and Label._Element then
 				Label._Element:Destroy()
 			end
 		end
 
-		-- Paragraph
 		function Tab:CreateParagraph(ParagraphSettings)
 			local ParagraphValue = {}
 
@@ -2913,7 +2863,6 @@ local Tab = {}
 			return ParagraphValue
 		end
 
-		-- Remove Paragraph
 		function Tab:RemoveParagraph(Paragraph)
 			if Paragraph and type(Paragraph) == "table" and Paragraph._Element then
 				Paragraph._Element:Destroy()
@@ -3041,14 +2990,12 @@ local Tab = {}
 			return Markdown
 		end
 
-		-- Remove Markdown
 		function Tab:RemoveMarkdown(Markdown)
 			if Markdown and type(Markdown) == "table" and Markdown._Element then
 				Markdown._Element:Destroy()
 			end
 		end
 
-		-- Input
 		function Tab:CreateInput(InputSettings)
 			local Input = Elements.Template.Input:Clone()
 			Input.Name = InputSettings.Name
@@ -3140,14 +3087,12 @@ local Tab = {}
 			return InputSettings
 		end
 
-		-- Remove Input
 		function Tab:RemoveInput(Input)
 			if Input and type(Input) == "table" and Input._Element then
 				Input._Element:Destroy()
 			end
 		end
 
-		-- Dropdown
 		function Tab:CreateDropdown(DropdownSettings)
 			local Dropdown = Elements.Template.Dropdown:Clone()
 			if string.find(DropdownSettings.Name,"closed") then
@@ -3428,7 +3373,7 @@ local Tab = {}
 				end
 			end
 
-			function DropdownSettings:Refresh(optionsTable: table)
+			function DropdownSettings:Refresh(optionsTable)
 				DropdownSettings.Options = optionsTable
 				for _, option in Dropdown.List:GetChildren() do
 					if option.ClassName == "Frame" and option.Name ~= "Placeholder" then
@@ -3454,14 +3399,12 @@ local Tab = {}
 			return DropdownSettings
 		end
 
-		-- Remove Dropdown
 		function Tab:RemoveDropdown(Dropdown)
 			if Dropdown and type(Dropdown) == "table" and Dropdown._Element then
 				Dropdown._Element:Destroy()
 			end
 		end
 
-		-- Keybind
 		function Tab:CreateKeybind(KeybindSettings)
 			local CheckingForKey = false
 			local Keybind = Elements.Template.Keybind:Clone()
@@ -3594,14 +3537,12 @@ local Tab = {}
 			return KeybindSettings
 		end
 
-		-- Remove Keybind
 		function Tab:RemoveKeybind(Keybind)
 			if Keybind and type(Keybind) == "table" and Keybind._Element then
 				Keybind._Element:Destroy()
 			end
 		end
 
-		-- Toggle
 		function Tab:CreateToggle(ToggleSettings)
 			local ToggleValue = {}
 
@@ -3774,14 +3715,12 @@ local Tab = {}
 			return ToggleSettings
 		end
 
-		-- Remove Toggle
 		function Tab:RemoveToggle(Toggle)
 			if Toggle and type(Toggle) == "table" and Toggle._Element then
 				Toggle._Element:Destroy()
 			end
 		end
 
-		-- Slider
 		function Tab:CreateSlider(SliderSettings)
 			local SLDragging = false
 			local Slider = Elements.Template.Slider:Clone()
@@ -3955,7 +3894,6 @@ local Tab = {}
 			return SliderSettings
 		end
 
-		-- Remove Slider
 		function Tab:RemoveSlider(Slider)
 			if Slider and type(Slider) == "table" and Slider._Element then
 				Slider._Element:Destroy()
@@ -3981,7 +3919,6 @@ local Tab = {}
 
 	Elements.Visible = true
 
-
 	task.wait(1.1)
 	TweenService:Create(Main, TweenInfo.new(0.7, Enum.EasingStyle.Exponential, Enum.EasingDirection.InOut), {Size = UDim2.new(0, 390, 0, 90)}):Play()
 	task.wait(0.3)
@@ -4003,7 +3940,6 @@ local Tab = {}
 	end
 	Topbar.ChangeSize.ImageTransparency = 1
 	Topbar.Hide.ImageTransparency = 1
-
 
 	task.wait(0.5)
 	Topbar.Visible = true
@@ -4065,7 +4001,8 @@ function RayfieldLibrary:IsVisible(): boolean
 	return not Hidden
 end
 
-local hideHotkeyConnection -- Has to be initialized here since the connection is made later in the script
+local hideHotkeyConnection
+
 function RayfieldLibrary:Destroy()
 	rayfieldDestroyed = true
 	hideHotkeyConnection:Disconnect()
@@ -4158,7 +4095,6 @@ if Topbar:FindFirstChild('Settings') then
 
 end
 
-
 Topbar.Hide.MouseButton1Click:Connect(function()
 	setVisibility(Hidden, not useMobileSizing)
 end)
@@ -4197,7 +4133,6 @@ for _, TopbarButton in ipairs(Topbar:GetChildren()) do
 		end)
 	end
 end
-
 
 function RayfieldLibrary:LoadConfiguration()
 	local config
@@ -4241,22 +4176,21 @@ function RayfieldLibrary:LoadConfiguration()
 	globalLoaded = true
 end
 
-
 function RayfieldLibrary:GetDropdownValue(tbl)
-if type(tbl) == "table" then
-for _,element in ipairs(tbl) do
-return tostring(element)
-end
-else
-return tostring(tbl)
-end
+	if type(tbl) == "table" then
+		for _,element in ipairs(tbl) do
+			return tostring(element)
+		end
+	else
+		return tostring(tbl)
+	end
 end
 
 return RayfieldLibrary
 end
 
 function module.IsWorking()
-return (module~=nil)
+	return (module~=nil)
 end
 
 return module
