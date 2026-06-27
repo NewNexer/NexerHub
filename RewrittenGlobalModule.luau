@@ -2805,120 +2805,109 @@ function Tab:CreateMarkdown(Filling)
 	Element.Parent = TabPage
 
 	local Corner = Instance.new("UICorner")
-	Corner.CornerRadius = UDim.new(0,8)
+	Corner.CornerRadius = UDim.new(0,6)
 	Corner.Parent = Element
 
-	local Stroke = Instance.new("UIStroke")
-	Stroke.Color = SelectedTheme.ElementStroke
-	Stroke.Transparency = 0.5
-	Stroke.Parent = Element
-
 	local Padding = Instance.new("UIPadding")
-	Padding.PaddingTop = UDim.new(0,10)
-	Padding.PaddingBottom = UDim.new(0,10)
-	Padding.PaddingLeft = UDim.new(0,12)
-	Padding.PaddingRight = UDim.new(0,12)
+	Padding.PaddingTop = UDim.new(0,8)
+	Padding.PaddingBottom = UDim.new(0,8)
+	Padding.PaddingLeft = UDim.new(0,10)
+	Padding.PaddingRight = UDim.new(0,10)
 	Padding.Parent = Element
 
 	local Layout = Instance.new("UIListLayout")
-	Layout.Padding = UDim.new(0,6)
+	Layout.Padding = UDim.new(0,4)
 	Layout.Parent = Element
 
 
-	local function AddText(Text, Size)
 
-		local Label = Instance.new("TextLabel")
-		Label.Parent = Element
-		Label.BackgroundTransparency = 1
-		Label.AutomaticSize = Enum.AutomaticSize.Y
-		Label.Size = UDim2.new(1,0,0,Size+5)
+	local function Label(Text, Size)
 
-		Label.Text = Text
-		Label.TextSize = Size
-		Label.Font = Enum.Font.Gotham
-		Label.TextWrapped = true
+		local L = Instance.new("TextLabel")
 
-		Label.TextXAlignment = Enum.TextXAlignment.Left
-		Label.TextYAlignment = Enum.TextYAlignment.Center
+		L.Parent = Element
+		L.BackgroundTransparency = 1
+		L.Size = UDim2.new(1,0,0,Size+4)
+		L.AutomaticSize = Enum.AutomaticSize.Y
 
-		Label.TextColor3 = SelectedTheme.TextColor
+		L.Font = Enum.Font.Gotham
+		L.TextSize = Size
+
+		L.Text = Text
+		L.TextWrapped = true
+
+		L.TextColor3 = SelectedTheme.TextColor
+
+		L.TextXAlignment = Enum.TextXAlignment.Left
+		L.TextYAlignment = Enum.TextYAlignment.Center
 
 	end
 
 
 
-	local function AddCode(Code)
+	local function CodeBlock(Code)
 
-		local Frame = Instance.new("Frame")
-		Frame.Parent = Element
-		Frame.Size = UDim2.new(1,0,0,120)
-		Frame.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
+		local CodeFrame = Instance.new("Frame")
+
+		CodeFrame.Parent = Element
+		CodeFrame.Size = UDim2.new(1,0,0,0)
+		CodeFrame.AutomaticSize = Enum.AutomaticSize.Y
+
+		CodeFrame.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
 
 
-		local Corner = Instance.new("UICorner")
-		Corner.Parent = Frame
+		local C = Instance.new("UICorner")
+		C.CornerRadius = UDim.new(0,5)
+		C.Parent = CodeFrame
 
 
-		local Box = Instance.new("TextLabel")
+		local P = Instance.new("UIPadding")
+		P.PaddingTop = UDim.new(0,8)
+		P.PaddingBottom = UDim.new(0,8)
+		P.PaddingLeft = UDim.new(0,8)
+		P.PaddingRight = UDim.new(0,8)
+		P.Parent = CodeFrame
 
-		Box.Parent = Frame
-		Box.BackgroundTransparency = 1
-		Box.Position = UDim2.new(0,10,0,10)
-		Box.Size = UDim2.new(1,-55,1,-20)
 
-		Box.Text = Code
-		Box.TextSize = 14
-		Box.Font = Enum.Font.Code
-		Box.TextWrapped = true
+		local Text = Instance.new("TextLabel")
 
-		Box.TextXAlignment = Enum.TextXAlignment.Left
-		Box.TextYAlignment = Enum.TextYAlignment.Top
+		Text.Parent = CodeFrame
+		Text.BackgroundTransparency = 1
 
-		Box.TextColor3 = SelectedTheme.TextColor
+		Text.Size = UDim2.new(1,-35,0,0)
+		Text.AutomaticSize = Enum.AutomaticSize.Y
+
+		Text.Font = Enum.Font.Code
+		Text.TextSize = 14
+
+		Text.Text = Code
+		Text.TextWrapped = true
+
+		Text.TextColor3 = SelectedTheme.TextColor
+
+		Text.TextXAlignment = Enum.TextXAlignment.Left
+		Text.TextYAlignment = Enum.TextYAlignment.Top
 
 
 
 		local Copy = Instance.new("ImageButton")
 
-		Copy.Parent = Frame
+		Copy.Parent = CodeFrame
 		Copy.BackgroundTransparency = 1
 
-		Copy.Size = UDim2.new(0,28,0,28)
-		Copy.Position = UDim2.new(1,-38,0,8)
+		Copy.Size = UDim2.new(0,25,0,25)
+		Copy.Position = UDim2.new(1,-28,0,5)
 
 		Copy.Image = "rbxassetid://83983589022863"
 
 
-
-		Copy.MouseEnter:Connect(function()
-			game:GetService("TweenService"):Create(
-				Copy,
-				TweenInfo.new(.15),
-				{ImageTransparency = .3}
-			):Play()
-		end)
-
-
-		Copy.MouseLeave:Connect(function()
-			game:GetService("TweenService"):Create(
-				Copy,
-				TweenInfo.new(.15),
-				{ImageTransparency = 0}
-			):Play()
-		end)
-
-
-
 		Copy.MouseButton1Click:Connect(function()
-
 			if setclipboard then
 				setclipboard(Code)
 			end
-
 		end)
 
 	end
-
 
 
 
@@ -2927,82 +2916,61 @@ function Tab:CreateMarkdown(Filling)
 		or Filling
 
 
-
-	local Lines = Text:split("\n")
-
-	local CodeMode = false
+	local InCode = false
 	local Code = ""
 
 
-	for _,Line in ipairs(Lines) do
+	for _,Line in ipairs(Text:split("\n")) do
 
 
 		if Line:match("^```") then
 
+			if InCode then
 
-			if CodeMode then
+				CodeBlock(Code)
 
-				AddCode(Code)
 				Code = ""
-				CodeMode = false
+				InCode = false
 
 			else
 
-				CodeMode = true
+				InCode = true
 
 			end
 
 
-
-		elseif CodeMode then
-
+		elseif InCode then
 
 			Code ..= Line.."\n"
 
 
-
 		elseif Line:match("^### ") then
 
-			AddText(Line:sub(5),18)
-
+			Label(Line:sub(5),18)
 
 
 		elseif Line:match("^## ") then
 
-			AddText(Line:sub(4),22)
-
+			Label(Line:sub(4),20)
 
 
 		elseif Line:match("^# ") then
 
-			AddText(Line:sub(3),28)
-
+			Label(Line:sub(3),24)
 
 
 		elseif Line:match("^%- ") then
 
-			AddText("• "..Line:sub(3),16)
-
+			Label("• "..Line:sub(3),16)
 
 
 		elseif Line ~= "" then
 
-			AddText(Line,16)
+			Label(Line,16)
 
 		end
 
 	end
-
-
-	-- Rayfield-like intro animation
-	Element.BackgroundTransparency = 1
-
-	game:GetService("TweenService"):Create(
-		Element,
-		TweenInfo.new(.25),
-		{BackgroundTransparency = 0}
-	):Play()
-
 
 
 	return Markdown
