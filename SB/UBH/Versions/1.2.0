@@ -49,7 +49,7 @@ local loadmoduleattempt = 0
 local Module = nil
 repeat task.wait()
 local lodsuc, loderr = pcall(function()
-Module = LocalModule or loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/SB-Module.luau"))()
+Module = LocalModule or loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/Modified%20Module.luau"))()
 end)
 if not lodsuc then
 loadmoduleattempt += 1
