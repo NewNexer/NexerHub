@@ -1,0 +1,3882 @@
+--[[
+
+Your Variables and global variables
+
+]]--
+
+
+
+--[[ You can change this ]]--
+local SupportedPlaces = {11520107397,9015014224,6403373529,124596094333302,136802962479827,112289147222582,78262906459073,11828384869,17290438723,14422118326,14422118326,16034567693,18550498098,13833961666,74169485398268,115782629143468,102908326578005,92516899071319,101113181694564,125845699717230,129665246576996,128229958211947,79885102123162,93981091811742,106620300132058,92483185275059,77283826005207,117232463555132,103505724406848,89837553336708,97220865182663,15228348051,132277598079047}
+
+repeat task.wait() until game:FindService("Players") and game:GetService("Players").LocalPlayer~=nil
+local LocalPlayer, LP = game:GetService("Players").LocalPlayer, game:GetService("Players").LocalPlayer
+local Character, Char
+local HumanoidRootPart, HRP
+local Humanoid, Hum
+pcall(function()
+Character, Char = LocalPlayer.Character, LocalPlayer.Character
+end)
+pcall(function()
+HumanoidRootPart, HRP = Character.HumanoidRootPart, Character.HumanoidRootPart
+end)
+pcall(function()
+Humanoid, Hum = Character.Humanoid, Character.Humanoid
+end)
+LocalPlayer.CharacterAdded:Connect(function(char)
+pcall(function()
+Character, Char = nil, nil
+HumanoidRootPart, HRP = nil, nil
+Humanoid, Hum = nil, nil
+task.wait()
+Character, Char = char, char
+repeat task.wait() until char:FindFirstChild("HumanoidRootPart")
+HumanoidRootPart, HRP = char.HumanoidRootPart, char.HumanoidRootPart
+repeat task.wait() until Character:FindFirstChild("Humanoid")
+Humanoid, Hum = char.Humanoid, char.Humanoid
+end)
+end)
+function CreateMessage(a)
+local instancename = (a=="Message" and a) or "Hint"
+local msg = Instance.new(instancename,game:GetService("CoreGui"))
+msg.Name = "BadgeHubNof"
+msg.Text = ""
+return msg
+end
+local msg = CreateMessage()
+msg.Text = "Loading Modules... (0/1)"
+local loadmoduleattempt = 0
+local Module = nil
+repeat task.wait()
+local lodsuc, loderr = pcall(function()
+Module = LocalModule or loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/SB-Module.luau"))()
+end)
+if not lodsuc then
+loadmoduleattempt += 1
+msg.Text = "Failed loading Modules, re-trying... ( Attempt "..tostring(loadmoduleattempt).." )"
+task.wait(1)
+elseif lodsuc and Module.IsWorking ~= nil then
+msg.Text = "Loading Modules... (1/1)"
+task.wait(1)
+else
+loadmoduleattempt += 1
+msg.Text = "Failed loading Modules, re-trying... ( Attempt "..tostring(loadmoduleattempt).." )"
+task.wait(1)
+end
+until msg.Text == "Loading Modules... (1/1)"
+EquipGlove = Module.EquipGlove
+TeleportToArena = Module.TeleportToArena
+TouchObject = Module.TouchObject
+Slap = Module.Slap
+task.wait(1)
+msg.Text = "Launching Rayfield..."
+--[[ Loading rayfield here ]] --
+local Rayfield = Module:GetWorkingRayfield()
+task.delay(2,function()
+msg:Destroy()
+end)
+
+GameKey = ""..((game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name ~= nil and game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name) or "Unknown")..""
+--[[ Creating Window ]]--
+local Window = Rayfield:CreateWindow({
+   Name = ""..GameKey.." | Ultimate Badge Hub",
+   Icon = 0,    
+   LoadingTitle = "SB:UBH",
+   LoadingSubtitle = "Developed by Nexer",
+   Theme = "Amethyst",
+   DisableRayfieldPrompts = true,
+   DisableBuildWarnings = true,
+   ConfigurationSaving = {
+      Enabled = false,
+      FolderName = "",
+      FileName = ""
+   },
+   Discord = {
+      Enabled = false,
+      Invite = "noinvitelink",
+      RememberJoins = true
+   },
+   KeySystem = false,
+   KeySettings = {
+      Title = "Verify yourself firstly!",
+      Subtitle = "Key Needed!",
+      Note = "The key is ''cheese''",
+      FileName = "Key",
+      SaveKey = true,
+      GrabKeyFromSite = false,
+      Key = {"cheese"}
+   }
+})
+
+
+
+
+
+
+--[[
+
+Tabs And Main Functions
+
+]]--
+
+
+local Tab1 = Window:CreateTab("Overview",0)
+
+Tab1:CreateSection("Overview")
+
+Tab1:CreateParagraph({Title = "Overview", Content = "This script was developed by Nexer. By using this tool, you can easily earn many badges. Enjoy!\n\n( PS: If you encountered an error, please DM me in discord! My current discord username is @new_nexer1234 )"})
+
+Tab1:CreateSection("Other")
+if game.PlaceId == 11520107397 or game.PlaceId == 9015014224 or game.PlaceId == 6403373529 or game.PlaceId == 124596094333302 or game.PlaceId == 136802962479827 or game.PlaceId == 112289147222582 or game.PlaceId == 78262906459073 then
+Tab1:CreateDropdown({Name = "Glove Equip Method"; Options = {"fireclickdetector","_NETWORK"}; CurrentOption = "fireclickdetector"; MultiSelection = false; Callback = function(Value)
+_G.BadgeHubSettings.GloveEquipMethod = Rayfield:GetDropdownValue(Value)
+end; })
+end
+Tab1:CreateButton({Name = "Delete all stuck messages/hints/notifications"; Callback = function()
+for i,v in next, game:GetService("CoreGui"):GetChildren() do
+if v.Name=="BadgeHubNof" then
+v:Destroy()
+end
+end
+end; })
+if game.PlaceId == 11520107397 or game.PlaceId == 9015014224 or game.PlaceId == 6403373529 or game.PlaceId == 124596094333302 or game.PlaceId == 136802962479827 or game.PlaceId == 112289147222582 or game.PlaceId == 78262906459073 then
+Tab1:CreateButton({Name = "Reset Portals"; Callback = function()
+workspace.Lobby["Teleport1"].CFrame = CFrame.new(-1210.16235, 329.900879, 3.98652339, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+workspace.Lobby["Teleport1"].Size = Vector3.new(0.8665102124214172, 14.070901870727539, 8.572914123535156)
+workspace.Lobby["Teleport2"].CFrame = CFrame.new(-1210.16235, 329.955811, -8.03007889, 1, 0, 0, 0, -1, 0, 0, 0, -1)
+workspace.Lobby["Teleport2"].Size = Vector3.new(0.8665102124214172, 13.961214065551758, 9.13329792022705)
+end; })
+end
+Tab1:CreateButton({Name = "Close Gui"; Callback = function()
+Rayfield:Destroy()
+end; })
+
+if game.PlaceId == 11828384869 then
+
+local Main = Window:CreateTab("Artifacts",0)
+Main:CreateButton({Name = "Teleport to Alchemist Hood Artifact"; Callback = function()
+HumanoidRootPart:PivotTo(CFrame.new(-53.19437789916992, 3.1999995708465576, -37.72947311401367))
+end; })
+Main:CreateButton({Name = "Teleport to First Artifact"; Callback = function()
+HumanoidRootPart:PivotTo(CFrame.new(223.61134338378906, 3.200000047683716, 83.69230651855469))
+end; })
+Main:CreateButton({Name = "Teleport to Second Artifact"; Callback = function()
+HumanoidRootPart:PivotTo(CFrame.new(-199.0915985107422, 3.200000047683716, -129.43972778320312))
+end; })
+Main:CreateButton({Name = "Teleport to Third Artifact"; Callback = function()
+HumanoidRootPart:PivotTo(CFrame.new(84.27069854736328, 3.200000047683716, -207.86036682128906))
+end; })
+Main:CreateButton({Name = "Teleport to Fourth Artifact"; Callback = function()
+HumanoidRootPart:PivotTo(CFrame.new(111.54388427734375, 3.200000047683716, 194.86898803710938))
+end; })
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateButton({Name = "Auto-Collect Alchemist Hood Artifact"; Callback = function()
+for i,v in next, workspace:GetDescendants() do
+if v:IsA("ClickDetector") then
+fireclickdetector(v)
+end
+end
+end; })
+AutoObtainment:CreateButton({Name = "Auto-Get Elude"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Elude..."
+while task.wait() do
+HumanoidRootPart:PivotTo(workspace.Ruins.Elude.Glove.CFrame)
+end
+end; })
+AutoObtainment:CreateButton({Name = "Auto-Get Counter"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Counter..."
+for i,v in next, workspace:GetDescendants() do
+if v:IsA("ClickDetector") then
+fireclickdetector(v)
+end
+end
+HumanoidRootPart:PivotTo(CFrame.new(0,1500,0))
+task.wait(1)
+HumanoidRootPart.Anchored = true
+Time = 120
+for i = 1,Time do
+Time = Time - 1
+Instance.new("Message",workspace).Text = "Seconds left to receive: "..Time
+task.wait(1)
+workspace:FindFirstChildWhichIsA("Message"):Destroy()
+end
+task.wait(2)
+for i,v in pairs(workspace:GetDescendants()) do
+if v:IsA("ClickDetector") then
+fireclickdetector(v)
+end
+end
+end; })
+AutoObtainment:CreateButton({Name = "Auto-Get Elude + Counter"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Elude + Counter..."
+for i,v in next, workspace:GetDescendants() do
+if v:IsA("ClickDetector") then
+fireclickdetector(v)
+end
+end
+HumanoidRootPart:PivotTo(CFrame.new(0,1500,0))
+task.wait(1)
+HumanoidRootPart.Anchored = true
+Time = 120
+for i = 1,Time do
+Time = Time - 1
+Instance.new("Message",workspace).Text = "Seconds left to receive: "..Time
+task.wait(1)
+workspace:FindFirstChildWhichIsA("Message"):Destroy()
+end
+task.wait(2)
+task.spawn(function()
+while task.wait() do
+HumanoidRootPart:PivotTo(workspace.Ruins.Elude.Glove.CFrame)
+end
+end)
+task.wait(.25)
+for i,v in pairs(workspace:GetDescendants()) do
+if v:IsA("ClickDetector") then
+fireclickdetector(v)
+end
+end
+end; })
+
+elseif game.PlaceId == 17290438723 then
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateButton({Name = "Auto-Get Frostbite"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Frostbite..."
+HumanoidRootPart:PivotTo(CFrame.new(-555, 180, 55))
+task.wait(1.5)
+for i,v in next, workspace:GetDescendants() do
+if v:IsA("ProximityPrompt") then
+v.Enabled = true
+v.HoldDuration = 0
+fireproximityprompt(v)
+end
+end
+end; })
+
+elseif game.PlaceId == 14422118326 then
+
+local Main = Window:CreateTab("Combat",0)
+
+local AutoKillImps = false
+Main:CreateToggle({Name = "Auto-Kill Imps"; CurrentValue = false; Callback = function(Value)
+AutoKillImps = Value
+if AutoKillImps==true then
+repeat task.wait(.1)
+for i,v in next, workspace.Mobs:GetChildren() do
+if v and v:FindFirstChild("Body") then
+game.ReplicatedStorage.b:FireServer(v.Body)
+task.wait()
+end
+end
+until AutoKillImps==false
+end
+end; })
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateButton({Name = "Auto-Collect Artifact"; Callback = function()
+fireclickdetector(workspace._ugcQuestObjectBobPlushie.ClickDetector)
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Collect Snow Peep"; Callback = function()
+HumanoidRootPart:PivotTo(CFrame.new(6276,-239,1849))
+task.wait(3)
+fireclickdetector(workspace.TheCrypt.SnowPeep.Handle.ClickDetector)
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Null"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Null..."
+HumanoidRootPart:PivotTo(CFrame.new(5460,-189,1845))
+task.wait(3)
+for i,v in next, workspace:GetChildren() do
+if v and v.Name=="Model" and v:FindFirstChild("Handle") and v.Handle:FindFirstChild("ClickDetector") then
+if v.Handle.Size == Vector3.new(25,25,25) then
+fireclickdetector(v.Handle.ClickDetector)
+end
+end
+end
+msg:Destroy()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Tinkerer"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Tinkerer..."
+HumanoidRootPart:PivotTo(CFrame.new(4845,-214,800))
+task.wait(3)
+for i,v in next, workspace:GetChildren() do
+if v and v.Name=="Model" and v:FindFirstChild("Handle") and v.Handle:FindFirstChild("ClickDetector") then
+if v.Handle.Size == Vector3.new(12,12,12) then
+fireclickdetector(v.Handle.ClickDetector)
+end
+end
+end
+msg:Destroy()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Tinkerer + Null"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Tinkerer + Null..."
+HumanoidRootPart:PivotTo(CFrame.new(4845,-214,800))
+task.wait(3)
+HumanoidRootPart:PivotTo(CFrame.new(5460,-189,1845))
+task.wait(3)
+for i,v in next, workspace:GetChildren() do
+if v and v.Name=="Model" and v:FindFirstChild("Handle") and v.Handle:FindFirstChild("ClickDetector") then
+fireclickdetector(v.Handle.ClickDetector)
+end
+end
+msg:Destroy()
+end; })
+
+elseif game.PlaceId == 14422118326 then
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateButton({Name = "Auto-Get Fan"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Fan..."
+for i=1,50 do
+HumanoidRootPart:PivotTo(workspace.QuestStuff.Key.CFrame)
+end
+task.wait(1.5)
+game:GetService("ReplicatedStorage").RemoteEvents.SuitUpClown:FireServer()
+task.wait(.25)
+game:GetService("ReplicatedStorage").RemoteEvents.KeyQuest:FireServer()
+task.wait(.25)
+game:GetService("ReplicatedStorage").RemoteEvents.KeyAcquired:FireServer()
+task.wait(.25)
+game:GetService("ReplicatedStorage").RemoteEvents.GOHOME:FireServer()
+task.wait(.25)
+game:GetService("ReplicatedStorage").RemoteEvents.KeyBadgeReward:FireServer()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Boxer"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Boxer..."
+HumanoidRootPart:PivotTo(CFrame.new(4231, 3511, 271))
+repeat task.wait() until workspace:FindFirstChild("BoxingGloves")
+task.wait(2)
+for i=1,2 do
+fireclickdetector(workspace.BoxingGloves.ClickDetector)
+task.wait(.5)
+end
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Riftshot"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Riftshot..."
+HumanoidRootPart:PivotTo(CFrame.new(-260, 16, 486))
+task.wait(2)
+game.ReplicatedStorage.RemoteEvents.TargetPractice.OnComplete:FireServer()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Clock"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Clock..."
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata(GlobalTPData..' msg.Text = "Getting Clock..." for i=1,2 do for i,v in ipairs(workspace:GetDescendants()) do if v.ClassName == "ClickDetector" then fireclickdetector(v) end end task.wait(2.5) end while task.wait() do HumanoidRootPart:PivotTo(CFrame.new(26.34,4,-1.84)) end')
+task.wait(.5)
+while task.wait() do
+HumanoidRootPart:PivotTo(workspace.Buildings["wizard twoer"].Cone.CFrame * CFrame.new(0,15,0))
+end
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Metaverse"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Metaverse..."
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata(GlobalTPData..' msg.Text = "Getting Metaverse..." local Platform = (game.UserInputService.TouchEnabled and not game.UserInputService.MouseEnabled) and "Mobile" or "PC" fireclickdetector(workspace.Kitchen.Fridge.HitBox.ClickDetector) fireclickdetector(workspace.Kitchen.Fridge.GrantAward.ClickDetector) task.wait(.25) fireclickdetector(workspace.Microwave.HitBox.ClickDetector) task.wait(10) fireclickdetector(workspace.Microwave.HitBox.ClickDetector) task.wait(1) fireclickdetector(workspace.Microwave.Brewzucki.ClickDetector) repeat task.wait() until LocalPlayer.Backpack:FindFirstChild("Brewzucki") if LocalPlayer.Backpack:FindFirstChild("Brewzucki") then LocalPlayer.Backpack["Brewzucki"].Parent = Character end Character["Brewzucki"]:Activate() task.wait(3) if LocalPlayer.Backpack:FindFirstChild("Brewzucki") then LocalPlayer.Backpack["Brewzucki"].Parent = Character end repeat task.wait() until Character:FindFirstChild("Brewzucki") Character["Brewzucki"]:Destroy() task.wait(2) fireclickdetector(workspace.BasementTable.HitBox.ClickDetector) task.wait(15) HumanoidRootPart.CFrame = workspace.ComputerChair.Seat.CFrame task.wait(5) game:GetService("ReplicatedStorage").Remotes.ComputerState:FireServer("Victory") task.wait(.25) game:GetService("ReplicatedStorage").Remotes.ComputerState:Destroy() LocalPlayer.PlayerGui.RealComputerScreenGui.Enabled = false Character.Humanoid.Sit = false task.wait(1.5) HumanoidRootPart.CFrame = CFrame.new(-14,37,49) task.wait(2) repeat task.wait() if Platform == "Mobile" then if LocalPlayer.PlayerGui.DavidShrineQTE.DavidShrineQTE.Mobile.SpawnArea:FindFirstChild("TapLabel") then LocalPlayer.PlayerGui.DavidShrineQTE.DavidShrineQTE.Mobile.SpawnArea.TapLabel.Size = UDim2.new(10000, 0, 10000, 0) game:GetService("VirtualUser"):CaptureController() game:GetService("VirtualUser"):ClickButton1(Vector2.new()) end elseif Platform == "PC" then if LocalPlayer.PlayerGui.DavidShrineQTE.DavidShrineQTE.PC.QuickTimeLabel.Visible == true then game:GetService("VirtualInputManager"):SendKeyEvent(true, LocalPlayer.PlayerGui.DavidShrineQTE.DavidShrineQTE.PC.QuickTimeLabel.Text, false, game:GetService("VirtualInputManager")) task.wait() game:GetService("VirtualInputManager"):SendKeyEvent(false, LocalPlayer.PlayerGui.DavidShrineQTE.DavidShrineQTE.PC.QuickTimeLabel.Text, false, game:GetService("VirtualInputManager")) end end until LocalPlayer.PlayerGui.DavidShrineQTE.DavidShrineQTE.ScoreLabel.Text == "Score: 150"')
+task.wait(.5)
+while task.wait() do
+HumanoidRootPart:PivotTo(workspace.Buildings["wizard twoer 2"].Model.Trigger.CFrame)
+end
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Untitled Tag Glove"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Untitled Tag Glove..."
+game:GetService("TeleportService"):Teleport(115782629143468)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=115782629143468 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Untitled Tag Glove..."
+HumanoidRootPart:PivotTo(CFrame.new(0,300,0))]])
+end; })
+
+elseif game.PlaceId == 16034567693 then
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateButton({Name = "Auto-Get Admin"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Admin..."
+HumanoidRootPart:PivotTo(CFrame.new(502, 76, 59))
+task.wait(5)
+task.spawn(function()
+if getconnections then
+pcall(function()
+for i,v in next, getconnections(LocalPlayer.Idled) do
+v:Disable() 
+end
+end)
+else
+while task.wait(10) do
+Humanoid.Jump = true
+end
+end
+end)
+Time = 3600
+for i = 1,Time do
+Time = Time - 1
+Instance.new("Message",workspace).Text = "Seconds left to receive: "..Time
+task.wait(1)
+workspace:FindFirstChildWhichIsA("Message"):Destroy()
+end
+end; })
+
+elseif game.PlaceId == 18550498098 then
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateButton({Name = "Auto-Get Hunter"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Hunter..."
+task.spawn(function()
+local start = tick()
+while tick() - start < 26 do
+HumanoidRootPart:PivotTo(CFrame.new(3261, -70, 823))
+task.wait()
+end
+end)
+task.wait(3)
+TouchObject(workspace["the cube of life"].Part, 1)
+TouchObject(workspace["Big Heart"], 1)
+for i,v in next, workspace:GetDescendants() do
+if v.Name == "ShackLever" and v:FindFirstChildWhichIsA("ClickDetector") then
+pcall(function()
+for i=1,10 do
+fireclickdetector(v:FindFirstChildWhichIsA("ClickDetector"))
+task.wait(.1)
+end
+end)
+end
+end
+repeat task.wait() until workspace.Map.Components:FindFirstChild("GuideNPC")
+task.spawn(function()
+repeat task.wait()
+local start = tick()
+while tick() - start < 0.66 do
+HumanoidRootPart:PivotTo(CFrame.new(650, 255, -275))
+task.wait()
+end
+local start = tick()
+while tick() - start < 0.66 do
+HumanoidRootPart:PivotTo(CFrame.new(599, 250, -322))
+task.wait()
+end
+local start = tick()
+while tick() - start < 0.66 do
+HumanoidRootPart:PivotTo(CFrame.new(550, 245, -375))
+task.wait()
+end
+until ASIU_WS~=nil
+end)
+while task.wait(.2) do
+if LocalPlayer.Backpack:FindFirstChild("Lantern") then
+LocalPlayer.Backpack.Lantern.Parent = Character
+end
+for i,v in pairs(workspace:GetChildren()) do
+if v.Name == "PusherWall" then
+v.CanCollide = false
+end
+game.Players.LocalPlayer.Character.Lantern:Activate()
+if v.Name == "golem" and v:FindFirstChild("Hitbox") then
+if Character:FindFirstChild("Lantern") and Character.Lantern:FindFirstChild("Network") then
+Character.Lantern.Network:FireServer("Hit", v.Hitbox)
+end
+end
+if (v.Name == "GuideNPC" or v.Name == "ReplicaNPC") and v:FindFirstChild("HumanoidRootPart") then
+if Character:FindFirstChild("Lantern") and Character.Lantern:FindFirstChild("Network") then
+Character.Lantern.Network:FireServer("Hit", v.HumanoidRootPart)
+end
+end
+if v.Name == "TrackGloveMissile" then
+if Character:FindFirstChild("Lantern") and Character.Lantern:FindFirstChild("Network") then
+Character.Lantern.Network:FireServer("Hit", v)
+end
+end
+end
+end
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Hunter + Avatar"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Hunter + Avatar..."
+task.spawn(function()
+local start = tick()
+while tick() - start < 26 do
+HumanoidRootPart:PivotTo(CFrame.new(3261, -70, 823))
+task.wait()
+end
+end)
+task.wait(5)
+for i,v in next, workspace:GetDescendants() do
+if v.Name == "ShackLever" and v:FindFirstChildWhichIsA("ClickDetector") then
+pcall(function()
+for i=1,10 do
+fireclickdetector(v:FindFirstChildWhichIsA("ClickDetector"))
+task.wait(.1)
+end
+end)
+end
+end
+repeat task.wait() until workspace.Map.Components:FindFirstChild("GuideNPC")
+task.spawn(function()
+repeat task.wait()
+local start = tick()
+while tick() - start < 0.66 do
+HumanoidRootPart:PivotTo(CFrame.new(650, 255, -275))
+task.wait()
+end
+local start = tick()
+while tick() - start < 0.66 do
+HumanoidRootPart:PivotTo(CFrame.new(599, 250, -322))
+task.wait()
+end
+local start = tick()
+while tick() - start < 0.66 do
+HumanoidRootPart:PivotTo(CFrame.new(550, 245, -375))
+task.wait()
+end
+until ASIU_WS~=nil
+end)
+while task.wait(.2) do
+if LocalPlayer.Backpack:FindFirstChild("Lantern") then
+LocalPlayer.Backpack.Lantern.Parent = Character
+end
+for i,v in pairs(workspace:GetChildren()) do
+if v.Name == "PusherWall" then
+v.CanCollide = false
+end
+game.Players.LocalPlayer.Character.Lantern:Activate()
+if v.Name == "golem" and v:FindFirstChild("Hitbox") then
+if Character:FindFirstChild("Lantern") and Character.Lantern:FindFirstChild("Network") then
+Character.Lantern.Network:FireServer("Hit", v.Hitbox)
+end
+end
+if (v.Name == "GuideNPC" or v.Name == "ReplicaNPC") and v:FindFirstChild("HumanoidRootPart") then
+if Character:FindFirstChild("Lantern") and Character.Lantern:FindFirstChild("Network") then
+Character.Lantern.Network:FireServer("Hit", v.HumanoidRootPart)
+end
+end
+if v.Name == "TrackGloveMissile" then
+if Character:FindFirstChild("Lantern") and Character.Lantern:FindFirstChild("Network") then
+Character.Lantern.Network:FireServer("Hit", v)
+end
+end
+end
+end
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Relude"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Relude..."
+task.spawn(function()
+local start = tick()
+while tick() - start < 26 do
+HumanoidRootPart:PivotTo(CFrame.new(3261, -70, 823))
+task.wait()
+end
+end)
+task.wait(3)
+TouchObject(workspace["the cube of life"].Part, 1)
+TouchObject(workspace["Big Heart"], 1)
+for i,v in next, workspace:GetDescendants() do
+if v.Name == "ShackLever" and v:FindFirstChildWhichIsA("ClickDetector") then
+pcall(function()
+for i=1,10 do
+fireclickdetector(v:FindFirstChildWhichIsA("ClickDetector"))
+task.wait(.1)
+end
+end)
+end
+end
+repeat task.wait() until workspace.Map.Components:FindFirstChild("GuideNPC")
+task.spawn(function()
+repeat task.wait()
+local start = tick()
+while tick() - start < 0.66 do
+HumanoidRootPart:PivotTo(CFrame.new(650, 255, -275))
+task.wait()
+end
+local start = tick()
+while tick() - start < 0.66 do
+HumanoidRootPart:PivotTo(CFrame.new(599, 250, -322))
+task.wait()
+end
+local start = tick()
+while tick() - start < 0.66 do
+HumanoidRootPart:PivotTo(CFrame.new(550, 245, -375))
+task.wait()
+end
+until ASIU_WS~=nil
+end)
+while task.wait(.2) do
+if LocalPlayer.Backpack:FindFirstChild("Lantern") then
+LocalPlayer.Backpack.Lantern.Parent = Character
+end
+game:GetService("ReplicatedStorage").Remotes.Data.AnswerInCutscene:FireServer("Spare")
+for i,v in pairs(workspace:GetChildren()) do
+if v.Name == "PusherWall" then
+v.CanCollide = false
+end
+game.Players.LocalPlayer.Character.Lantern:Activate()
+if v.Name == "golem" and v:FindFirstChild("Hitbox") then
+if Character:FindFirstChild("Lantern") and Character.Lantern:FindFirstChild("Network") then
+Character.Lantern.Network:FireServer("Hit", v.Hitbox)
+end
+end
+if (v.Name == "GuideNPC" or v.Name == "ReplicaNPC") and v:FindFirstChild("HumanoidRootPart") then
+if Character:FindFirstChild("Lantern") and Character.Lantern:FindFirstChild("Network") then
+Character.Lantern.Network:FireServer("Hit", v.HumanoidRootPart)
+end
+end
+if v.Name == "TrackGloveMissile" then
+if Character:FindFirstChild("Lantern") and Character.Lantern:FindFirstChild("Network") then
+Character.Lantern.Network:FireServer("Hit", v)
+end
+end
+end
+end
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Relude + Avatar"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Relude + Avatar..."
+task.spawn(function()
+local start = tick()
+while tick() - start < 26 do
+HumanoidRootPart:PivotTo(CFrame.new(3261, -70, 823))
+task.wait()
+end
+end)
+task.wait(5)
+for i,v in next, workspace:GetDescendants() do
+if v.Name == "ShackLever" and v:FindFirstChildWhichIsA("ClickDetector") then
+pcall(function()
+for i=1,10 do
+fireclickdetector(v:FindFirstChildWhichIsA("ClickDetector"))
+task.wait(.1)
+end
+end)
+end
+end
+repeat task.wait() until workspace.Map.Components:FindFirstChild("GuideNPC")
+task.spawn(function()
+repeat task.wait()
+local start = tick()
+while tick() - start < 0.66 do
+HumanoidRootPart:PivotTo(CFrame.new(650, 255, -275))
+task.wait()
+end
+local start = tick()
+while tick() - start < 0.66 do
+HumanoidRootPart:PivotTo(CFrame.new(599, 250, -322))
+task.wait()
+end
+local start = tick()
+while tick() - start < 0.66 do
+HumanoidRootPart:PivotTo(CFrame.new(550, 245, -375))
+task.wait()
+end
+until ASIU_WS~=nil
+end)
+while task.wait(.2) do
+if LocalPlayer.Backpack:FindFirstChild("Lantern") then
+LocalPlayer.Backpack.Lantern.Parent = Character
+end
+game:GetService("ReplicatedStorage").Remotes.Data.AnswerInCutscene:FireServer("Spare")
+for i,v in pairs(workspace:GetChildren()) do
+if v.Name == "PusherWall" then
+v.CanCollide = false
+end
+game.Players.LocalPlayer.Character.Lantern:Activate()
+if v.Name == "golem" and v:FindFirstChild("Hitbox") then
+if Character:FindFirstChild("Lantern") and Character.Lantern:FindFirstChild("Network") then
+Character.Lantern.Network:FireServer("Hit", v.Hitbox)
+end
+end
+if (v.Name == "GuideNPC" or v.Name == "ReplicaNPC") and v:FindFirstChild("HumanoidRootPart") then
+if Character:FindFirstChild("Lantern") and Character.Lantern:FindFirstChild("Network") then
+Character.Lantern.Network:FireServer("Hit", v.HumanoidRootPart)
+end
+end
+if v.Name == "TrackGloveMissile" then
+if Character:FindFirstChild("Lantern") and Character.Lantern:FindFirstChild("Network") then
+Character.Lantern.Network:FireServer("Hit", v)
+end
+end
+end
+end
+end; })
+
+elseif game.PlaceId == 13833961666 then
+
+local Main = Window:CreateTab("Main",0)
+
+Main:CreateSection("Main")
+
+local SlapEternalbob = false
+Main:CreateToggle({Name = "Auto-Slap Eternal Bob"; CurrentValue = false; Callback = function(Value)
+SlapEternalbob = Value
+if SlapEternalbob==true then
+repeat task.wait(.05)
+workspace.bobBoss.DamageEvent:FireServer()
+until SlapEternalbob==false
+end
+end; })
+
+local Whatismyglove = ""
+if Character:FindFirstChildWhichIsA("Tool") then
+Whatismyglove = Character:FindFirstChildWhichIsA("Tool").Name
+elseif LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") then
+Whatismyglove = LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool").Name
+end
+
+local SlapMinibobs = false
+Main:CreateToggle({Name = "Auto-Slap Mini Bobs"; CurrentValue = false; Callback = function(Value)
+SlapMinibobs = Value
+if SlapMinibobs==true then
+repeat task.wait(2)
+if workspace:FindFirstChild("BobClone") then
+for i,v in next, workspace:GetChildren() do
+if v.Name == "BobClone" and v:FindFirstChild("HumanoidRootPart") then
+if Whatismyglove == "Killstreak" then
+game:GetService("ReplicatedStorage").KSHit:FireServer(v.HumanoidRootPart)
+elseif Whatismyglove == "Reaper" then
+game:GetService("ReplicatedStorage").ReaperHit:FireServer(v.HumanoidRootPart)
+elseif Whatismyglove == "God's Hand" then
+game:GetService("ReplicatedStorage").Godshand:FireServer(v.HumanoidRootPart)
+elseif Whatismyglove == "Tycoon" then
+game:GetService("ReplicatedStorage").GeneralHit:FireServer(v.HumanoidRootPart)
+end
+end
+end
+end
+until SlapMinibobs==false
+end
+end; })
+
+local ClickTycoon = false
+Main:CreateToggle({Name = "Auto-Click Tycoon"; CurrentValue = false; Callback = function(Value)
+ClickTycoon = Value
+if ClickTycoon==true then
+repeat task.wait(.05)
+for i,v in next, workspace:GetChildren() do
+if string.find(v.Name, "ÅTycoon") and v:FindFirstChild("Click") and v.Click:FindFirstChild("ClickDetector") then
+fireclickdetector(v.Click.ClickDetector)
+fireclickdetector(v.Click.ClickDetector)
+end
+end
+until ClickTycoon==false
+end
+end; })
+
+Main:CreateSection("Immunities")
+
+Main:CreateToggle({Name = "Anti Rings"; CurrentValue = false; Callback = function(Value)
+if Value==true then
+if LocalPlayer.PlayerScripts:FindFirstChild("VFXListener") and LocalPlayer.PlayerScripts.VFXListener:FindFirstChild("BigExplosion") then
+LocalPlayer.PlayerScripts.VFXListener.SmallMeteorVFX.Parent = game.LogService
+end
+elseif Value==false and LocalPlayer.PlayerScripts:FindFirstChild("VFXListener") then
+game.LogService.BigExplosion.Parent = LocalPlayer.PlayerScripts.VFXListener
+end
+end; })
+
+Main:CreateToggle({Name = "Anti Meteors"; CurrentValue = false; Callback = function(Value)
+if Value==true then
+if LocalPlayer.PlayerScripts:FindFirstChild("VFXListener") and LocalPlayer.PlayerScripts.VFXListener:FindFirstChild("SmallMeteorVFX") then
+LocalPlayer.PlayerScripts.VFXListener.SmallMeteorVFX.Parent = game.LogService
+end
+elseif Value==false and LocalPlayer.PlayerScripts:FindFirstChild("VFXListener") then
+game.LogService.SmallMeteorVFX.Parent = LocalPlayer.PlayerScripts.VFXListener
+end
+end; })
+
+Main:CreateSection("Other")
+
+Main:CreateButton({Name = "Toggle VFX"; Callback = function()
+if LocalPlayer.PlayerScripts:FindFirstChild("VFXListener") then
+LocalPlayer.PlayerScripts:FindFirstChild("VFXListener").Parent = game.LogService
+else
+game.LogService.VFXListener.Parent = LocalPlayer.PlayerScripts
+end
+end; })
+
+elseif game.PlaceId == 74169485398268 then
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateButton({Name = "Auto-Get Bind"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Bind..."
+for i=1,10 do
+fireclickdetector(workspace.Orb:FindFirstChildWhichIsA("ClickDetector"))
+end
+end; })
+
+elseif game.PlaceId == 115782629143468 then
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateButton({Name = "Auto-Get Untitled Tag Glove"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Untitled Tag Glove..."
+HumanoidRootPart:PivotTo(CFrame.new(0,300,0))
+end; })
+
+elseif game.PlaceId == 102908326578005 then
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateButton({Name = "Auto-Get Clock"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Clock..."
+for i=1,2 do for i,v in ipairs(workspace:GetDescendants()) do if v.ClassName == "ClickDetector" then fireclickdetector(v) end end task.wait(2.5) end
+while task.wait() do HumanoidRootPart:PivotTo(CFrame.new(26.34,4,-1.84)) end
+end; })
+
+elseif game.PlaceId == 92516899071319 then
+
+local Main = Window:CreateTab("Main",0)
+
+local clickpillows = false
+Main:CreateToggle({Name = "Auto-Click Pillows"; CurrentValue = false; Callback = function(Value)
+clickpillows = Value
+if clickpillows==true then
+repeat task.wait(.05)
+for i,v in next, workspace:GetDescendants() do
+if v:IsA("ClickDetector") then
+fireclickdetector(v)
+end
+end
+until clickpillows==false
+end
+end; })
+
+elseif game.PlaceId == 101113181694564 then
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateButton({Name = "Auto-Get Conker"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Conker..."
+workspace.ChildAdded:Connect(function(c)
+if c.Name=="Conker" then
+TouchObject(c)
+task.delay(.3,function()
+fireproximityprompt(workspace.Map.CoreAssets.Bowl.ProximityPrompt)
+end)
+end
+end)
+game:GetService("ReplicatedStorage").Remotes.Dialogue.FinishedNPCDialogue:FireServer(true)
+task.wait(3)
+fireclickdetector(workspace.Map.Props.BasketCollection.Basket.ClickDetector)
+task.wait(5)
+while true do
+if LocalPlayer.Backpack:FindFirstChild("Glove") then
+LocalPlayer.Backpack.Glove.Parent = Character
+end
+task.wait()
+if Character:FindFirstChild("Glove") and Character.Glove:FindFirstChild("Hitbox") then
+Character.Glove.Hitbox.Size = Vector3.new(100,100,100)
+Character.Glove:Activate()
+end
+HumanoidRootPart:PivotTo(workspace.StartRoundPart.CFrame)
+end
+end; })
+
+elseif game.PlaceId == 125845699717230 then
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateButton({Name = "Auto-Get Doorkeeper"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Doorkeeper..."
+for i=1,100 do
+for i,v in next, workspace:GetDescendants() do
+if v.Name=="ClickDetector" then
+pcall(function()
+fireclickdetector(v)
+end)
+end
+end
+end
+end; })
+
+elseif game.PlaceId == 129665246576996 then
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateButton({Name = "Auto-Get Eggler"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Eggler..."
+while true do
+if HumanoidRootPart then
+HumanoidRootPart:PivotTo(CFrame.new(69,4240,2))
+end
+task.wait()
+for i,v in pairs(workspace:GetDescendants()) do
+if v and v.Name == "root" and v:FindFirstChildWhichIsA("TouchTransmitter") then
+TouchObject(v)
+end
+if v:IsA("ProximityPrompt") then
+v.HoldDuration = 0
+end
+end
+task.wait()
+if workspace:FindFirstChild("Kenneth") and workspace.Kenneth:FindFirstChild("Head") and workspace.Kenneth.Head:FindFirstChild("ProximityPrompt") then
+fireproximityprompt(workspace.Kenneth.Head.ProximityPrompt)
+end
+task.wait()
+game:GetService("ReplicatedStorage").Common.Dialogue.Remotes.ResondToDialogue:FireServer(1)
+task.wait()
+HumanoidRootPart.Anchored = false
+task.wait()
+end
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Shellbert"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Shellbert..."
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata(GlobalTPData..' msg.Text = "Getting Shellbert..." for i=1,3 do game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Cutscene"):WaitForChild("OnComplete"):FireServer("Scene1") task.wait() game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("PhaseTransition"):WaitForChild("Switch"):FireServer() task.wait() game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("PhaseTransition"):WaitForChild("Finished"):FireServer() task.wait() game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Cutscene"):WaitForChild("OnLoaded"):FireServer("Scene2") task.wait() game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Cutscene"):WaitForChild("OnComplete"):FireServer("Scene2") task.wait() game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("GloveReward"):WaitForChild("Replicate"):FireServer() task.wait() end task.wait(2) for i=1,50 do HumanoidRootPart:PivotTo(workspace.RewardGlove.RewardGlove.CFrame) end')
+while task.wait(.1) do
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("FourthTrialTeleport"):FireServer()
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("InviteFriends"):WaitForChild("PlayWithParty"):FireServer()
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("InviteFriends"):WaitForChild("CancelPartyTeleport"):FireServer()
+end
+end; })
+
+elseif game.PlaceId == 128229958211947 then
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateButton({Name = "Auto-Get Shellbert"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Shellbert..."
+for i=1,3 do
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Cutscene"):WaitForChild("OnComplete"):FireServer("Scene1")
+task.wait()
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("PhaseTransition"):WaitForChild("Switch"):FireServer()
+task.wait()
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("PhaseTransition"):WaitForChild("Finished"):FireServer()
+task.wait()
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Cutscene"):WaitForChild("OnLoaded"):FireServer("Scene2")
+task.wait()
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Cutscene"):WaitForChild("OnComplete"):FireServer("Scene2")
+task.wait()
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("GloveReward"):WaitForChild("Replicate"):FireServer()
+task.wait()
+end
+task.wait(2)
+for i=1,50 do
+HumanoidRootPart:PivotTo(workspace.RewardGlove.RewardGlove.CFrame)
+end
+end; })
+
+elseif game.PlaceId == 79885102123162 then
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateButton({Name = "Auto-Get Collector"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Collector... ( This may take a little bit long. Eventually you will get all gloves! )"
+for i,v in next, workspace.Map["obstacle/puzzles"].CastleIsland.Hexa_Path:GetChildren() do
+if v and v:IsA("BasePart") then
+v.Size = Vector3.new(100,1,100)
+end
+end
+repeat task.wait(.2)
+for _,location in next, workspace.Map.GloveLocation:GetChildren() do
+if location then
+print("Scanning location ("..location.Name..")")
+Character:PivotTo(location:FindFirstChildWhichIsA("BasePart",true).CFrame)
+task.wait(5)
+for _,glove in next, location:GetChildren() do
+if glove then
+print("Trying to get "..glove.Name.." glove")
+if (glove:GetAttribute("Solved")~=nil and glove:GetAttribute("Solved")==false) and glove:GetAttribute("Visible")==false then
+glove:SetAttribute("Solved",true)
+task.wait(1)
+TouchObject(glove:GetChildren()[1], 2)
+elseif (glove:GetAttribute("Solved")==nil or glove:GetAttribute("Solved")==true) and glove:GetAttribute("Visible")==true then
+TouchObject(glove:GetChildren()[1], 2)
+else
+print("Skipping glove "..glove.Name..". Solved | Visible", glove:GetAttribute("Solved"), glove:GetAttribute("Visible"))
+continue
+end
+end
+end
+end
+end
+until game:GetService("BadgeService"):UserHasBadgeAsync(LocalPlayer.UserId, 1902849233175110)
+end; })
+
+elseif game.PlaceId == 93981091811742 then
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateButton({Name = "Auto-Get Lotus"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Lotus..."
+fireclickdetector(workspace.Lotus1_Red.Lotus.Primary.ClickDetector)
+game:GetService("ReplicatedStorage").Remotes.Lotus2Complete:FireServer()
+fireclickdetector(workspace.Lotus4_Pink.Lotus.Primary.ClickDetector)
+fireclickdetector(workspace.Lotus5_White.Lotus.Primary.ClickDetector)
+TouchObject(workspace.Lotus3_Blue.Detector)
+task.wait(.2)
+game:GetService("ReplicatedStorage").Remotes.Minigames.Complete:FireServer()
+repeat task.wait() until workspace.Lotus3_Blue:FindFirstChild("Lotus") and workspace.Lotus3_Blue.Lotus:FindFirstChild("Primary") and workspace.Lotus3_Blue.Lotus.Primary:FindFirstChild("ClickDetector")
+fireclickdetector(workspace.Lotus3_Blue.Lotus.Primary.ClickDetector)
+end; })
+
+elseif game.PlaceId == 106620300132058 then
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateButton({Name = "Auto-Get Plate"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Plate..."
+repeat task.wait()
+HumanoidRootPart:PivotTo(workspace.Plate.Plate.CFrame*CFrame.new(0,30,0))
+until workspace["Glove Model"].Hand.Transparency~=1
+while task.wait() do
+HumanoidRootPart:PivotTo(workspace["Glove Model"].Hand.CFrame)
+end
+end; })
+
+elseif game.PlaceId == 92483185275059 then
+
+local Main = Window:CreateTab("Main",0)
+
+Main:CreateButton({Name = "Teleport to Exit ( Any Maze )"; Callback = function()
+for i,v in next, workspace:GetDescendants() do
+if v:IsA("ProximityPrompt") and v.Name=="EndPrompt" then
+HumanoidRootPart:PivotTo(v.Parent.Parent.CFrame)
+end
+end
+end; })
+
+AutoObtainment:CreateButton({Name = "Start Chase ( Maze 5 )"; Callback = function()
+HumanoidRootPart:PivotTo(CFrame.new(-343,19,340))
+end; })
+
+AutoObtainment:CreateButton({Name = "End Chase ( Maze 5 )"; Callback = function()
+HumanoidRootPart:PivotTo(CFrame.new(-83,3,1520))
+end; })
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateButton({Name = "Auto-Get Harvester"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Harvester..."
+task.wait(10)
+for i=1,4 do
+HumanoidRootPart:PivotTo(CFrame.new(-1827,-69,308))
+task.wait(1)
+fireproximityprompt(workspace.Shed.StartDoor["Cylinder.025"].Attachment.ProximityPrompt)
+repeat task.wait() until LocalPlayer.PlayerGui.Transition.Frame.BackgroundTransparency~=1
+repeat task.wait() until LocalPlayer.PlayerGui.Transition.Frame.BackgroundTransparency==1
+for i,v in next, workspace:GetDescendants() do
+if v:IsA("ProximityPrompt") and v.Name=="EndPrompt" then
+HumanoidRootPart:PivotTo(v.Parent.Parent.CFrame)
+task.wait(1)
+fireproximityprompt(v)
+end
+end
+repeat task.wait() until LocalPlayer.PlayerGui.Transition.Frame.BackgroundTransparency~=1
+repeat task.wait() until LocalPlayer.PlayerGui.Transition.Frame.BackgroundTransparency==1
+end
+HumanoidRootPart:PivotTo(CFrame.new(-1827,-69,308))
+task.wait(1)
+fireproximityprompt(workspace.Shed.StartDoor["Cylinder.025"].Attachment.ProximityPrompt)
+repeat task.wait() until LocalPlayer.PlayerGui.Transition.Frame.BackgroundTransparency~=1
+repeat task.wait() until LocalPlayer.PlayerGui.Transition.Frame.BackgroundTransparency==1
+HumanoidRootPart:PivotTo(CFrame.new(-343,19,340))
+task.wait(25)
+HumanoidRootPart:PivotTo(CFrame.new(-83,3,1520))
+end; })
+
+elseif game.PlaceId == 77283826005207 then
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateButton({Name = "Auto-Get G-X"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting G-X..."
+task.wait(15)
+for i=1,3 do
+if workspace.Map.Lobby and workspace.Map.Lobby:FindFirstChild("Portal"..i) and workspace.Map.Lobby["Portal"..i]:FindFirstChild("Part") then
+TouchObject(workspace.Map.Lobby["Portal"..i].Part)
+repeat task.wait() until workspace.Map:FindFirstChild("Challenge"..i)
+task.wait(1)
+if workspace.Map["Challenge"..i]:FindFirstChild("RedButton") and workspace.Map["Challenge"..i].RedButton:FindFirstChild("Button") and workspace.Map["Challenge"..i].RedButton.Button:FindFirstChild("ClickDetector") then
+fireclickdetector(workspace.Map["Challenge"..i].RedButton.Button.ClickDetector)
+end
+repeat task.wait() until not workspace.Map:FindFirstChild("Challenge"..i)
+end
+task.wait(1)
+end
+if workspace.Map.Lobby:FindFirstChild("EndPortal") and workspace.Map.Lobby.EndPortal:FindFirstChild("Portal") then
+TouchObject(workspace.Map.Lobby.EndPortal.Portal)
+end
+end; })
+
+elseif game.PlaceId == 117232463555132 then
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateButton({Name = "Auto-Get Swordfighter"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Swordfighter..."
+HumanoidRootPart:PivotTo(workspace.Map.Components.NPCs.FinalBoss.FinalBoss.Head.CFrame * CFrame.new(0,10,0))
+task.wait(4)
+workspace.Map.Components.NPCs.FinalBoss.FinalBoss:FindFirstChildWhichIsA("Humanoid").RigType = "R15"
+workspace.Map.Components.NPCs.FinalBoss.FinalBoss:FindFirstChildWhichIsA("Humanoid").Health = 0
+repeat task.wait() until LocalPlayer.PlayerGui.SkipButton.SkipDialogueButton.Visible == true
+task.wait()
+repeat task.wait() until LocalPlayer.PlayerGui.SkipButton.SkipDialogueButton.Visible == false
+while task.wait() do
+HumanoidRootPart:PivotTo(workspace.Map.Components.GloveIsland.ClaimGlove.CFrame)
+fireproximityprompt(workspace.Map.Components.GloveIsland.ClaimGlove:FindFirstChildWhichIsA("ProximityPrompt"))
+end
+end; })
+
+elseif game.PlaceId == 103505724406848 then
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateButton({Name = "Auto-Get Poltergeist"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Poltergeist..."
+task.spawn(function()
+repeat task.wait()
+local start = tick()
+while tick() - start < 2 do
+HumanoidRootPart:PivotTo(CFrame.new(-75, 29, -191))
+task.wait()
+end
+local start = tick()
+while tick() - start < 2 do
+HumanoidRootPart:PivotTo(CFrame.new(-90, 29, -200))
+task.wait()
+end
+local start = tick()
+while tick() - start < 2 do
+HumanoidRootPart:PivotTo(CFrame.new(-60, 29, -175))
+task.wait()
+end
+until ASIU_WS~=nil
+end)
+while task.wait(.05) do
+if workspace.Enemies:FindFirstChild("Boss Zombie") and workspace.Enemies["Boss Zombie"]:FindFirstChild("HumanoidRootPart") then
+game:GetService("ReplicatedStorage").Remotes.GeneralHit:FireServer(workspace.Enemies["Boss Zombie"].HumanoidRootPart)
+end
+end
+end; })
+
+elseif game.PlaceId == 89837553336708 then
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateButton({Name = "Auto-Get Suction"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Suction..."
+fireclickdetector(workspace["plunger glove"].ClickDetector)
+end; })
+
+elseif game.PlaceId == 97220865182663 then
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateButton({Name = "Auto-Get Mouse"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Mouse..."
+if workspace.Game.Buildings.City:FindFirstChild("City") == nil then
+game.ReplicatedStorage.Remotes.PlaceBuilding:FireServer("City", Vector3.new(3.125, 43.4450798034668, -57.1875), 0)
+end
+workspace.Game.Enemies.ChildAdded:Connect(function(rat)
+if rat and rat.Name=="Rat" then
+local Hitbox = rat:WaitForChild("Hitbox",2)
+local Humanoid = rat:WaitForChild("Humanoid",2)
+if Hitbox~=nil then
+Hitbox.Anchored = true
+for i=1,50 do
+game.ReplicatedStorage.Remotes.GloveHit:FireServer(Hitbox)
+end
+end
+if Humanoid~=nil then
+Humanoid.Health = 0
+end
+end
+end)
+while task.wait(1) do
+game.ReplicatedStorage.Remotes.UnlockGloveWithOrbs:FireServer()
+end
+end; })
+
+elseif game.PlaceId == 15228348051 then
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateButton({Name = "Auto-Get Druid ( Use instantly upon joining!!! At wave 1!!! )"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Druid..."
+workspace:WaitForChild("Maps"):WaitForChild(LocalPlayer.Name.."'s Map"):WaitForChild("Defences").ChildAdded:Connect(function(c)
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("SwitchPriority",{defence = c})
+end)
+repeat task.wait(.1)
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(27.41149139404297, 9.75, -0.999542236328125, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Defence2"})
+until LocalPlayer.PlayerGui.TowerDefenceUI.WaveNo.Text=="Wave 4"
+for i=1,4 do
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(49.46138381958008, 9.75, 66.52367401123047, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Defence1"})
+task.wait(.1)
+end
+task.spawn(function()
+while task.wait(.1) do
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(53.56528854370117, 9.149999618530273, -21.576744079589844, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Defence3"})
+for i,v in next, workspace:WaitForChild("Maps"):WaitForChild(LocalPlayer.Name.."'s Map"):WaitForChild("Defences"):GetChildren() do
+if v.Name=="Defence3" then
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("Upgrade",{defence = v})
+elseif v.Name=="Defence2" then
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("Upgrade",{defence = v})
+end
+end
+end
+end)
+repeat task.wait(2) until game:GetService("BadgeService"):UserHasBadgeAsync(LocalPlayer.UserId, 2153911928)
+game:GetService("TeleportService"):Teleport(6403373529)
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Scythe ( Use instantly upon joining!!! At wave 1!!! )"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Scythe..."
+workspace:WaitForChild("Maps"):WaitForChild(LocalPlayer.Name.."'s Map"):WaitForChild("Defences").ChildAdded:Connect(function(c)
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("SwitchPriority",{defence = c})
+end)
+repeat task.wait(.1)
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(17.541378021240234, 9.25, -18.65252685546875, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Scarecrow"})
+until LocalPlayer.PlayerGui.TowerDefenceUI.WaveNo.Text=="Wave 2"
+for i=1,5 do
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(61.623069763183594, 9.149999618530273, 88.51512145996094, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Farmer1"})
+task.wait(.1)
+end
+repeat task.wait(.1) until LocalPlayer.PlayerGui.TowerDefenceUI.WaveNo.Text=="Wave 3"
+repeat task.wait(.1)
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(61.623069763183594, 9.149999618530273, 88.51512145996094, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Farmer1"})
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(31.84327507019043, 9.149999618530273, 6.6344146728515625, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Farmer2"})
+until LocalPlayer.PlayerGui.TowerDefenceUI.WaveNo.Text=="Wave 4"
+repeat task.wait(.1)
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(31.84327507019043, 9.149999618530273, 6.6344146728515625, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Farmer2"})
+task.wait()
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(78.2428970336914, 9.149999618530273, -5.7471466064453125, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Farmer Tencelll"})
+until LocalPlayer.PlayerGui.TowerDefenceUI.WaveNo.Text=="Wave 5"
+repeat task.wait(.1)
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(78.2428970336914, 9.149999618530273, -5.7471466064453125, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Farmer Tencelll"})
+task.wait()
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(78.2428970336914, 9.149999618530273, -5.7471466064453125, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Defence3"})
+until LocalPlayer.PlayerGui.TowerDefenceUI.WaveNo.Text=="Wave 6"
+task.spawn(function()
+while task.wait(.1) do
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(78.2428970336914, 9.149999618530273, -5.7471466064453125, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Defence3"})
+task.wait()
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(31.84327507019043, 9.149999618530273, 6.6344146728515625, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Defence2"})
+end
+end)
+repeat task.wait(2) until game:GetService("BadgeService"):UserHasBadgeAsync(LocalPlayer.UserId, 3318257806017965)
+game:GetService("TeleportService"):Teleport(6403373529)
+end; })
+
+elseif game.PlaceId == 132277598079047 then
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateButton({Name = "Auto-Get Slender"; Callback = function()
+local msg = CreateMessage()
+msg.Text = "Getting Slender..."
+local vector = Vector3.new(0,0,0)
+for i,v in next, workspace:GetDescendants() do
+if v:IsA("ProximityPrompt") then
+pcall(function()
+v.MaxActivationDistance = 100
+v.HoldDuration = 0
+for i=1,150 do
+HumanoidRootPart:PivotTo(v.Parent.CFrame)
+for _,p in next, Character:GetDescendants() do
+if p:IsA("BasePart") then
+p.Velocity, p.RotVelocity = vector, vector
+end
+end
+task.wait(.005)
+end
+fireproximityprompt(v)
+for i=1,150 do
+HumanoidRootPart:PivotTo(v.Parent.CFrame)
+for _,p in next, Character:GetDescendants() do
+if p:IsA("BasePart") then
+p.Velocity, p.RotVelocity = vector, vector
+end
+end
+task.wait(.005)
+end
+end)
+end
+end
+end; })
+
+
+elseif game.PlaceId == 11520107397 or game.PlaceId == 9015014224 or game.PlaceId == 6403373529 or game.PlaceId == 124596094333302 or game.PlaceId == 136802962479827 or game.PlaceId == 112289147222582 or game.PlaceId == 78262906459073 then
+
+_G.AutoFarms = {
+    ["Hallow_Jack"] = false;
+    ["Hammer"] = false;
+    ["Jet"] = false;
+    ["Phase"] = false;
+    ["Glitch"] = false;
+    ["MATERIALIZE"] = false;
+    ["Siphon"] = false;
+    ["Slapples"] = false;
+    ["Candy_Corns"] = false;
+    ["Gifts"] = false;
+    ["Pinata"] = false;
+}
+task.spawn(function()
+local autofarms_task_000=true
+repeat task.wait(.05)
+if _G.AutoFarms.Hallow_Jack==true then
+if workspace:FindFirstChild("Gravestone") and workspace.Gravestone:FindFirstChildWhichIsA("ClickDetector") and Character and Character:FindFirstChild("KillstreakLevel") and Character.KillstreakLevel.Value > 9 then
+fireclickdetector(workspace.Gravestone:FindFirstChildWhichIsA("ClickDetector"))
+end
+end
+if _G.AutoFarms.Hammer==true then
+if workspace:FindFirstChild("Toolbox") then
+TouchObject(workspace.Toolbox)
+end
+end
+if _G.AutoFarms.Jet==true then
+if workspace:FindFirstChild("JetOrb") then
+TouchObject(workspace.JetOrb)
+end
+end
+if _G.AutoFarms.Phase==true then
+if workspace:FindFirstChild("PhaseOrb") then
+TouchObject(workspace.PhaseOrb)
+end
+end
+if _G.AutoFarms.Glitch==true then
+if workspace:FindFirstChild("GlitchOrb") then
+TouchObject(workspace.GlitchOrb)
+end
+end
+if _G.AutoFarms.MATERIALIZE==true then
+if workspace:FindFirstChild("MATERIALIZEOrb") then
+TouchObject(workspace.MATERIALIZEOrb)
+end
+end
+if _G.AutoFarms.Siphon==true then
+if workspace:FindFirstChild("SiphonOrb") then
+TouchObject(workspace.SiphonOrb)
+end
+end
+if _G.AutoFarms.Slapples==true then
+if Character and HumanoidRootPart and Character:FindFirstChild("entered") then
+for _,slapple in next, workspace.Arena.island5.Slapples:GetChildren() do
+if slapple and (slapple.Name == "Slapple" or slapple.Name == "GoldenSlapple") and slapple:FindFirstChild("Glove") and Character and HumanoidRootPart and Character:FindFirstChild("entered") then
+TouchObject(slapple.Glove)
+end
+end
+end
+end
+if _G.AutoFarms.Candy_Corns==true then
+for _,candy_corn in next, workspace.CandyCorns:GetChildren() do
+if candy_corn then
+TouchObject(candy_corn)
+end
+end
+end
+if _G.AutoFarms.Gifts==true then
+if workspace:FindFirstChild("Gift") then
+for _,gift in next, workspace:GetChildren() do
+if gift.Name=="Gift" then
+TouchObject(gift)
+end
+end
+end
+end
+if _G.AutoFarms.Pinata==true then
+if workspace:FindFirstChild("Pinata") then
+Slap({[1]=workspace.Pinata.Glove})
+end
+end
+until autofarms_task_000==false
+end)
+
+local AutoFarm = Window:CreateTab("Auto-Farm",0)
+AutoFarm:CreateSection("Objects Farm")
+AutoFarm:CreateToggle({Name = "Farm Jet Orb"; CurrentValue = false; Callback = function(Value)
+_G.AutoFarms.Jet = Value
+end; })
+AutoFarm:CreateToggle({Name = "Farm Phase Orb"; CurrentValue = false; Callback = function(Value)
+_G.AutoFarms.Phase = Value
+end; })
+AutoFarm:CreateToggle({Name = "Farm Glitch Orb"; CurrentValue = false; Callback = function(Value)
+_G.AutoFarms.Glitch = Value
+end; })
+AutoFarm:CreateToggle({Name = "Farm MATERIALIZE Orb"; CurrentValue = false; Callback = function(Value)
+_G.AutoFarms.MATERIALIZE = Value
+end; })
+AutoFarm:CreateToggle({Name = "Farm Siphon Orb"; CurrentValue = false; Callback = function(Value)
+_G.AutoFarms.Siphon = Value
+end; })
+local VisualHammer = false
+AutoFarm:CreateToggle({Name = "Farm Toolboxes"; CurrentValue = false; Callback = function(Value)
+_G.AutoFarms.Hammer = Value
+VisualHammer = Value
+end; })
+AutoFarm:CreateToggle({Name = "Farm Gravestones"; CurrentValue = false; Callback = function(Value)
+_G.AutoFarms.Hallow_Jack = Value
+end; })
+AutoFarm:CreateToggle({Name = "Farm Slapples"; CurrentValue = false; Callback = function(Value)
+_G.AutoFarms.Slapples = Value
+end; })
+AutoFarm:CreateToggle({Name = "Farm Candy Corns"; CurrentValue = false; Callback = function(Value)
+_G.AutoFarms.Candy_Corns = Value
+end; })
+AutoFarm:CreateToggle({Name = "Farm Gifts"; CurrentValue = false; Callback = function(Value)
+_G.AutoFarms.Gifts = Value
+end; })
+AutoFarm:CreateToggle({Name = "Farm Pinata"; CurrentValue = false; Callback = function(Value)
+_G.AutoFarms.Pinata = Value
+end; })
+
+local SimplifiedObtainments = Window:CreateTab("Simplified Obtainments",0)
+SimplifiedObtainments:CreateButton({Name = "Get Cake Mix for Firework Glove"; Callback = function()
+game:GetService("ReplicatedStorage").Firework:InvokeServer()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Cake Mix")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("EquipItem", "Cake Mix")
+end; })
+SimplifiedObtainments:CreateButton({Name = "Get Ragdolled 100 times (for Kinetic Glove)"; Callback = function()
+for i=1,110 do
+game.ReplicatedStorage.SelfKnockback:FireServer({Force=0;Direction=Vector3.new(0,1/10,0)})
+task.wait(.05)
+end
+end; })
+SimplifiedObtainments:CreateButton({Name = "Auto-Complete Eggler Quest"; Callback = function()
+if not workspace:FindFirstChild("EasterHuntEggs") then return end
+for i,v in next, workspace.EasterHuntEggs:GetChildren() do
+if v and v:FindFirstChild("ClickDetector") then
+fireclickdetector(v.ClickDetector)
+end
+end
+end; })
+
+
+
+
+
+
+
+
+
+
+
+
+
+local GlobalTPData = [[repeat task.wait() until game:FindService("Players") and game:GetService("Players").LocalPlayer~=nil
+local LocalPlayer, LP = game:GetService("Players").LocalPlayer, game:GetService("Players").LocalPlayer
+local Character, Char
+local HumanoidRootPart, HRP
+local Humanoid, Hum
+pcall(function()
+repeat task.wait() until LocalPlayer.Character
+Character, Char = LocalPlayer.Character, LocalPlayer.Character
+end)
+pcall(function()
+repeat task.wait() until Character.HumanoidRootPart
+HumanoidRootPart, HRP = Character.HumanoidRootPart, Character.HumanoidRootPart
+end)
+pcall(function()
+Humanoid, Hum = Character.Humanoid, Character.Humanoid
+end)
+LocalPlayer.CharacterAdded:Connect(function(char)
+pcall(function()
+Character, Char = nil, nil
+HumanoidRootPart, HRP = nil, nil
+Humanoid, Hum = nil, nil
+task.wait()
+Character, Char = char, char
+repeat task.wait() until char:FindFirstChild("HumanoidRootPart")
+HumanoidRootPart, HRP = char.HumanoidRootPart, char.HumanoidRootPart
+repeat task.wait() until Character:FindFirstChild("Humanoid")
+Humanoid, Hum = char.Humanoid, char.Humanoid
+end)
+end)
+function CreateMessage(a)
+local instancename = (a=="Message" and a) or "Hint"
+local msg = Instance.new(instancename,game:GetService("CoreGui"))
+msg.Name = "BadgeHubNof"
+msg.Text = ""
+return msg
+end
+repeat task.wait() until game:FindService("CoreGui")
+local msg = CreateMessage()
+msg.Text = "Loading Modules... (0/1)"
+local loadmoduleattempt = 0
+local Module = nil
+repeat task.wait()
+local lodsuc, loderr = pcall(function()
+Module = LocalModule or loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/SB-Module.luau"))()
+end)
+if not lodsuc then
+loadmoduleattempt += 1
+msg.Text = "Failed loading Modules, re-trying... ( Attempt "..tostring(loadmoduleattempt).." )"
+task.wait(1)
+elseif lodsuc and Module.IsWorking ~= nil then
+msg.Text = "Loading Modules... (1/1)"
+task.wait(1)
+else
+loadmoduleattempt += 1
+msg.Text = "Failed loading Modules, re-trying... ( Attempt "..tostring(loadmoduleattempt).." )"
+task.wait(1)
+end
+until msg.Text == "Loading Modules... (1/1)"
+EquipGlove = Module.EquipGlove
+TeleportToArena = Module.TeleportToArena
+TouchObject = Module.TouchObject
+Slap = Module.Slap
+task.wait(1)]]
+
+local AutoObtainment = Window:CreateTab("Auto Obtainment",0)
+
+AutoObtainment:CreateSection("No Requirements ( Can be obtained at any point of the game, even at 0 slaps )")
+
+AutoObtainment:CreateButton({Name = "Auto-Get Lag Glove"; Callback = function()
+local a = CreateMessage()
+a.Text = "Getting Lag..."
+game.ReplicatedStorage.Events.celestial:FireServer("air_time_guy")
+a:Destroy()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Recall Glove"; Callback = function()
+if not HumanoidRootPart then return end
+local a = CreateMessage()
+a.Text = "Getting Recall..."
+repeat task.wait() game:GetService("ReplicatedStorage").RecallReset:FireServer(nil, true) rsanswrr = game:GetService("ReplicatedStorage").RecallLastInteractionSteps:InvokeServer(false) until rsanswrr=="Simon says walk through the portal to collect your reward"
+task.wait(2) HumanoidRootPart:PivotTo(workspace.RepressedMemories.Portal.CFrame)
+a:Destroy()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Acrobat Glove"; Callback = function()
+local a = CreateMessage()
+a.Text = "Getting Acrobat..."
+local b = _G.BadgeHubSettings.GloveEquipMethod
+_G.BadgeHubSettings.GloveEquipMethod = "_NETWORK"
+game:GetService("ReplicatedStorage").HasUserFavorited.OnClientInvoke = function() return true end
+EquipGlove("Acrobat")
+a:Destroy()
+_G.BadgeHubSettings.GloveEquipMethod = b
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Iceskate"; Callback = function()
+local a = CreateMessage()
+a.Text = "Getting Iceskate..."
+game.ReplicatedStorage.IceSkate:FireServer("Freeze")
+a:Destroy()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get G-X"; Callback = function()
+game:GetService("TeleportService"):Teleport(77283826005207)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=77283826005207 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting G-X..."
+task.wait(15)
+for i=1,3 do
+if workspace.Map.Lobby and workspace.Map.Lobby:FindFirstChild("Portal"..i) and workspace.Map.Lobby["Portal"..i]:FindFirstChild("Part") then
+TouchObject(workspace.Map.Lobby["Portal"..i].Part)
+repeat task.wait() until workspace.Map:FindFirstChild("Challenge"..i)
+task.wait(1)
+if workspace.Map["Challenge"..i]:FindFirstChild("RedButton") and workspace.Map["Challenge"..i].RedButton:FindFirstChild("Button") and workspace.Map["Challenge"..i].RedButton.Button:FindFirstChild("ClickDetector") then
+fireclickdetector(workspace.Map["Challenge"..i].RedButton.Button.ClickDetector)
+end
+repeat task.wait() until not workspace.Map:FindFirstChild("Challenge"..i)
+end
+task.wait(1)
+end
+if workspace.Map.Lobby:FindFirstChild("EndPortal") and workspace.Map.Lobby.EndPortal:FindFirstChild("Portal") then
+TouchObject(workspace.Map.Lobby.EndPortal.Portal)
+end]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Suction"; Callback = function()
+game:GetService("ReplicatedStorage").Events.suction_obby_tp:FireServer()
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=89837553336708 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Suction..."
+fireclickdetector(workspace["plunger glove"].ClickDetector)]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Conker"; Callback = function()
+game:GetService("TeleportService"):Teleport(101113181694564)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=101113181694564 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Conker..."
+workspace.ChildAdded:Connect(function(c)
+if c.Name=="Conker" then
+TouchObject(c)
+task.delay(.3,function()
+fireproximityprompt(workspace.Map.CoreAssets.Bowl.ProximityPrompt)
+end)
+end
+end)
+game:GetService("ReplicatedStorage").Remotes.Dialogue.FinishedNPCDialogue:FireServer(true)
+task.wait(3)
+fireclickdetector(workspace.Map.Props.BasketCollection.Basket.ClickDetector)
+task.wait(5)
+while true do
+if LocalPlayer.Backpack:FindFirstChild("Glove") then
+LocalPlayer.Backpack.Glove.Parent = Character
+end
+task.wait()
+if Character:FindFirstChild("Glove") and Character.Glove:FindFirstChild("Hitbox") then
+Character.Glove.Hitbox.Size = Vector3.new(100,100,100)
+Character.Glove:Activate()
+end
+HumanoidRootPart:PivotTo(workspace.StartRoundPart.CFrame)
+end]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Lotus"; Callback = function()
+game:GetService("TeleportService"):Teleport(93981091811742)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=93981091811742 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Lotus..."
+fireclickdetector(workspace.Lotus1_Red.Lotus.Primary.ClickDetector)
+game:GetService("ReplicatedStorage").Remotes.Lotus2Complete:FireServer()
+fireclickdetector(workspace.Lotus4_Pink.Lotus.Primary.ClickDetector)
+fireclickdetector(workspace.Lotus5_White.Lotus.Primary.ClickDetector)
+TouchObject(workspace.Lotus3_Blue.Detector)
+task.wait(.2)
+game:GetService("ReplicatedStorage").Remotes.Minigames.Complete:FireServer()
+repeat task.wait() until workspace.Lotus3_Blue:FindFirstChild("Lotus") and workspace.Lotus3_Blue.Lotus:FindFirstChild("Primary") and workspace.Lotus3_Blue.Lotus.Primary:FindFirstChild("ClickDetector")
+fireclickdetector(workspace.Lotus3_Blue.Lotus.Primary.ClickDetector)]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Doorkeeper"; Callback = function()
+game:GetService("TeleportService"):Teleport(125845699717230)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=125845699717230 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Doorkeeper..."
+for i=1,100 do
+for i,v in next, workspace:GetDescendants() do
+if v.Name=="ClickDetector" then
+pcall(function()
+fireclickdetector(v)
+end)
+end
+end
+end]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Plate"; Callback = function()
+game:GetService("TeleportService"):Teleport(106620300132058)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=106620300132058 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Plate..."
+repeat task.wait()
+HumanoidRootPart:PivotTo(workspace.Plate.Plate.CFrame*CFrame.new(0,30,0))
+until workspace["Glove Model"].Hand.Transparency~=1
+while task.wait() do
+HumanoidRootPart:PivotTo(workspace["Glove Model"].Hand.CFrame)
+end]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Poltergeist"; Callback = function()
+game:GetService("TeleportService"):Teleport(103505724406848)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=103505724406848 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Poltergeist..."
+task.spawn(function()
+repeat task.wait()
+local start = tick()
+while tick() - start < 2 do
+HumanoidRootPart:PivotTo(CFrame.new(-75, 29, -191))
+task.wait()
+end
+local start = tick()
+while tick() - start < 2 do
+HumanoidRootPart:PivotTo(CFrame.new(-90, 29, -200))
+task.wait()
+end
+local start = tick()
+while tick() - start < 2 do
+HumanoidRootPart:PivotTo(CFrame.new(-60, 29, -175))
+task.wait()
+end
+until ASIU_WS~=nil
+end)
+while task.wait(.05) do
+if workspace.Enemies:FindFirstChild("Boss Zombie") and workspace.Enemies["Boss Zombie"]:FindFirstChild("HumanoidRootPart") then
+game:GetService("ReplicatedStorage").Remotes.GeneralHit:FireServer(workspace.Enemies["Boss Zombie"].HumanoidRootPart)
+end
+end]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Harvester"; Callback = function()
+game:GetService("TeleportService"):Teleport(92483185275059)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=92483185275059 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Harvester..."
+task.wait(10)
+for i=1,4 do
+HumanoidRootPart:PivotTo(CFrame.new(-1827,-69,308))
+task.wait(1)
+fireproximityprompt(workspace.Shed.StartDoor["Cylinder.025"].Attachment.ProximityPrompt)
+repeat task.wait() until LocalPlayer.PlayerGui.Transition.Frame.BackgroundTransparency~=1
+repeat task.wait() until LocalPlayer.PlayerGui.Transition.Frame.BackgroundTransparency==1
+for i,v in next, workspace:GetDescendants() do
+if v:IsA("ProximityPrompt") and v.Name=="EndPrompt" then
+HumanoidRootPart:PivotTo(v.Parent.Parent.CFrame)
+task.wait(1)
+fireproximityprompt(v)
+end
+end
+repeat task.wait() until LocalPlayer.PlayerGui.Transition.Frame.BackgroundTransparency~=1
+repeat task.wait() until LocalPlayer.PlayerGui.Transition.Frame.BackgroundTransparency==1
+end
+HumanoidRootPart:PivotTo(CFrame.new(-1827,-69,308))
+task.wait(1)
+fireproximityprompt(workspace.Shed.StartDoor["Cylinder.025"].Attachment.ProximityPrompt)
+repeat task.wait() until LocalPlayer.PlayerGui.Transition.Frame.BackgroundTransparency~=1
+repeat task.wait() until LocalPlayer.PlayerGui.Transition.Frame.BackgroundTransparency==1
+HumanoidRootPart:PivotTo(CFrame.new(-343,19,340))
+task.wait(25)
+HumanoidRootPart:PivotTo(CFrame.new(-83,3,1520))]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Debug"; Callback = function()
+local a = CreateMessage()
+a.Text = "Getting Debug..."
+fireclickdetector(workspace["Debug Room"].Keypad.Buttons[tostring(workspace["Debug Room"].DuckTable.DuckTable.Duckies.Value)].ClickDetector)
+task.wait()
+fireclickdetector(workspace["Debug Room"].Keypad.Buttons[tostring(workspace["Debug Room"].AdminGloves.GlovesCode.SurfaceGui.AdminNumber.Text)].ClickDetector)
+task.wait()
+fireclickdetector(workspace["Debug Room"].Keypad.Buttons[tostring(workspace["Debug Room"].Maze:GetChildren()[4].SurfaceGui.MazeNumber.Text)].ClickDetector)
+task.wait()
+fireclickdetector(workspace["Debug Room"].Keypad.Buttons["7"].ClickDetector)
+task.wait()
+fireclickdetector(workspace["Debug Room"].Keypad.Buttons.Enter.ClickDetector)
+a:Destroy()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Fan + Boxer + Riftshot"; Callback = function()
+game:GetService("TeleportService"):Teleport(7234087065)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=7234087065 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Boxer..."
+for i=1,50 do
+HumanoidRootPart:PivotTo(CFrame.new(4231, 3511, 271))
+end
+repeat task.wait() until workspace:FindFirstChild("BoxingGloves")
+task.wait(2)
+for i=1,2 do
+fireclickdetector(workspace.BoxingGloves.ClickDetector)
+task.wait(.5)
+end
+msg.Text = "Getting Riftshot..."
+for i=1,50 do
+HumanoidRootPart:PivotTo(CFrame.new(-260, 16, 486))
+end
+task.wait(1)
+game.ReplicatedStorage.RemoteEvents.TargetPractice.OnComplete:FireServer()
+task.wait(1)
+msg.Text = "Getting Fan..."
+for i=1,50 do
+HumanoidRootPart:PivotTo(workspace.QuestStuff.Key.CFrame)
+end
+task.wait(1.5)
+game:GetService("ReplicatedStorage").RemoteEvents.SuitUpClown:FireServer()
+task.wait(.25)
+game:GetService("ReplicatedStorage").RemoteEvents.KeyQuest:FireServer()
+task.wait(.25)
+game:GetService("ReplicatedStorage").RemoteEvents.KeyAcquired:FireServer()
+task.wait(.25)
+game:GetService("ReplicatedStorage").RemoteEvents.GOHOME:FireServer()
+task.wait(.25)
+game:GetService("ReplicatedStorage").RemoteEvents.KeyBadgeReward:FireServer()
+task.wait(1)
+game:GetService("TeleportService"):Teleport(6403373529)]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Fan"; Callback = function()
+game:GetService("TeleportService"):Teleport(7234087065)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=7234087065 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Fan..."
+HumanoidRootPart:PivotTo(workspace.QuestStuff.Key.CFrame)
+task.wait(1.5)
+game:GetService("ReplicatedStorage").RemoteEvents.SuitUpClown:FireServer()
+task.wait(.25)
+game:GetService("ReplicatedStorage").RemoteEvents.KeyQuest:FireServer()
+task.wait(.25)
+game:GetService("ReplicatedStorage").RemoteEvents.KeyAcquired:FireServer()
+task.wait(.25)
+game:GetService("ReplicatedStorage").RemoteEvents.GOHOME:FireServer()
+task.wait(.25)
+game:GetService("ReplicatedStorage").RemoteEvents.KeyBadgeReward:FireServer()
+task.wait(1)
+game:GetService("TeleportService"):Teleport(6403373529)]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Boxer"; Callback = function()
+game:GetService("TeleportService"):Teleport(7234087065)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=7234087065 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Boxer..."
+HumanoidRootPart:PivotTo(CFrame.new(4231, 3511, 271))
+repeat task.wait() until workspace:FindFirstChild("BoxingGloves")
+task.wait(2)
+for i=1,2 do
+fireclickdetector(workspace.BoxingGloves.ClickDetector)
+task.wait(.5)
+end
+task.wait(1)
+game:GetService("TeleportService"):Teleport(6403373529)]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Riftshot"; Callback = function()
+game:GetService("TeleportService"):Teleport(7234087065)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=7234087065 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Riftshot..."
+HumanoidRootPart:PivotTo(CFrame.new(-260, 16, 486))
+task.wait(2)
+game.ReplicatedStorage.RemoteEvents.TargetPractice.OnComplete:FireServer()
+task.wait(1)
+game:GetService("TeleportService"):Teleport(6403373529)]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Clock"; Callback = function()
+game:GetService("TeleportService"):Teleport(7234087065)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=7234087065 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Clock..."
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata(GlobalTPData..' msg.Text = "Getting Clock..." for i=1,2 do for i,v in ipairs(workspace:GetDescendants()) do if v.ClassName == "ClickDetector" then fireclickdetector(v) end end task.wait(2.5) end while task.wait() do HumanoidRootPart:PivotTo(CFrame.new(26.34,4,-1.84)) end')
+task.wait(.5)
+while task.wait() do
+game.Players.LocalPlayer.Character.HumanoidRootPart:PivotTo(workspace.Buildings["wizard twoer"].Cone.CFrame * CFrame.new(0,15,0))
+end]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Metaverse"; Callback = function()
+game:GetService("TeleportService"):Teleport(7234087065)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=7234087065 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Metaverse..."
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata(GlobalTPData..' msg.Text = "Getting Metaverse..." local Platform = (game.UserInputService.TouchEnabled and not game.UserInputService.MouseEnabled) and "Mobile" or "PC" fireclickdetector(workspace.Kitchen.Fridge.HitBox.ClickDetector) fireclickdetector(workspace.Kitchen.Fridge.GrantAward.ClickDetector) task.wait(.25) fireclickdetector(workspace.Microwave.HitBox.ClickDetector) task.wait(10) fireclickdetector(workspace.Microwave.HitBox.ClickDetector) task.wait(1) fireclickdetector(workspace.Microwave.Brewzucki.ClickDetector) repeat task.wait() until LocalPlayer.Backpack:FindFirstChild("Brewzucki") if LocalPlayer.Backpack:FindFirstChild("Brewzucki") then LocalPlayer.Backpack["Brewzucki"].Parent = Character end Character["Brewzucki"]:Activate() task.wait(3) if LocalPlayer.Backpack:FindFirstChild("Brewzucki") then LocalPlayer.Backpack["Brewzucki"].Parent = Character end repeat task.wait() until Character:FindFirstChild("Brewzucki") Character["Brewzucki"]:Destroy() task.wait(2) fireclickdetector(workspace.BasementTable.HitBox.ClickDetector) task.wait(15) HumanoidRootPart.CFrame = workspace.ComputerChair.Seat.CFrame task.wait(5) game:GetService("ReplicatedStorage").Remotes.ComputerState:FireServer("Victory") task.wait(.25) game:GetService("ReplicatedStorage").Remotes.ComputerState:Destroy() LocalPlayer.PlayerGui.RealComputerScreenGui.Enabled = false Character.Humanoid.Sit = false task.wait(1.5) HumanoidRootPart.CFrame = CFrame.new(-14,37,49) task.wait(2) repeat task.wait() if Platform == "Mobile" then if LocalPlayer.PlayerGui.DavidShrineQTE.DavidShrineQTE.Mobile.SpawnArea:FindFirstChild("TapLabel") then LocalPlayer.PlayerGui.DavidShrineQTE.DavidShrineQTE.Mobile.SpawnArea.TapLabel.Size = UDim2.new(10000, 0, 10000, 0) game:GetService("VirtualUser"):CaptureController() game:GetService("VirtualUser"):ClickButton1(Vector2.new()) end elseif Platform == "PC" then if LocalPlayer.PlayerGui.DavidShrineQTE.DavidShrineQTE.PC.QuickTimeLabel.Visible == true then game:GetService("VirtualInputManager"):SendKeyEvent(true, LocalPlayer.PlayerGui.DavidShrineQTE.DavidShrineQTE.PC.QuickTimeLabel.Text, false, game:GetService("VirtualInputManager")) task.wait() game:GetService("VirtualInputManager"):SendKeyEvent(false, LocalPlayer.PlayerGui.DavidShrineQTE.DavidShrineQTE.PC.QuickTimeLabel.Text, false, game:GetService("VirtualInputManager")) end end until LocalPlayer.PlayerGui.DavidShrineQTE.DavidShrineQTE.ScoreLabel.Text == "Score: 150"')
+task.wait(.5)
+while task.wait() do
+HumanoidRootPart:PivotTo(workspace.Buildings["wizard twoer 2"].Model.Trigger.CFrame)
+end]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Untitled Tag Glove"; Callback = function()
+game:GetService("TeleportService"):Teleport(115782629143468)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=115782629143468 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Untitled Tag Glove..."
+HumanoidRootPart:PivotTo(CFrame.new(0,300,0))]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Bind"; Callback = function()
+game:GetService("TeleportService"):Teleport(74169485398268)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=74169485398268 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Bind..."
+for i=1,10 do
+fireclickdetector(workspace.Orb:FindFirstChildWhichIsA("ClickDetector"))
+end]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Paint"; Callback = function()
+game:GetService("TeleportService"):Teleport(90553746175288)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=90553746175288 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Paint..."
+task.spawn(function()
+while task.wait(.33) do
+for i,v in next, workspace:GetChildren() do
+if v.Name=="npc" then
+local args = {
+	"slap",
+	{
+		Instance = v.HumanoidRootPart
+	}
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("tool"):WaitForChild("hit"):FireServer(unpack(args))
+end
+end
+end
+end)
+
+while task.wait(.1) do
+for i,v in next, workspace:WaitForChild("MainMap"):GetDescendants() do
+if v:IsA("BasePart") then
+local args = {
+	"paint"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("tool"):WaitForChild("use"):FireServer(unpack(args))
+task.wait()
+local args = {
+	"paint",
+	{
+		Instance = v,
+		Material = v.Material,
+		Normal = Vector3.yAxis,
+		Position = v.Position
+	}
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("tool"):WaitForChild("hit"):FireServer(unpack(args))
+end
+end
+end]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Elude"; Callback = function()
+game:GetService("TeleportService"):Teleport(11828384869)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=11828384869 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Elude..."
+while task.wait() do
+HumanoidRootPart:PivotTo(workspace.Ruins.Elude.Glove.CFrame)
+end]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Counter"; Callback = function()
+game:GetService("TeleportService"):Teleport(11828384869)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=11828384869 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Counter..."
+for i,v in next, workspace:GetDescendants() do
+if v:IsA("ClickDetector") then
+fireclickdetector(v)
+end
+end
+HumanoidRootPart:PivotTo(CFrame.new(0,1500,0))
+task.wait(1)
+HumanoidRootPart.Anchored = true
+Time = 120
+for i = 1,Time do
+Time = Time - 1
+Instance.new("Message",workspace).Text = "Seconds left to receive: "..Time
+task.wait(1)
+workspace:FindFirstChildWhichIsA("Message"):Destroy()
+end
+task.wait(2)
+for i,v in pairs(workspace:GetDescendants()) do
+if v:IsA("ClickDetector") then
+fireclickdetector(v)
+end
+end]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Elude + Counter"; Callback = function()
+game:GetService("TeleportService"):Teleport(11828384869)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=11828384869 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Elude + Counter..."
+for i,v in next, workspace:GetDescendants() do
+if v:IsA("ClickDetector") then
+fireclickdetector(v)
+end
+end
+HumanoidRootPart:PivotTo(CFrame.new(0,1500,0))
+task.wait(1)
+HumanoidRootPart.Anchored = true
+Time = 120
+for i = 1,Time do
+Time = Time - 1
+Instance.new("Message",workspace).Text = "Seconds left to receive: "..Time
+task.wait(1)
+workspace:FindFirstChildWhichIsA("Message"):Destroy()
+end
+task.wait(2)
+task.spawn(function()
+while task.wait() do
+HumanoidRootPart:PivotTo(workspace.Ruins.Elude.Glove.CFrame)
+end
+end)
+task.wait(.25)
+for i,v in pairs(workspace:GetDescendants()) do
+if v:IsA("ClickDetector") then
+fireclickdetector(v)
+end
+end]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Collector"; Callback = function()
+game:GetService("TeleportService"):Teleport(79885102123162)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=79885102123162 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Collector... ( This may take a little bit long. Eventually you will get all gloves! )"
+for i,v in next, workspace.Map["obstacle/puzzles"].CastleIsland.Hexa_Path:GetChildren() do
+if v and v:IsA("BasePart") then
+v.Size = Vector3.new(100,1,100)
+end
+end
+repeat task.wait(.2)
+for _,location in next, workspace.Map.GloveLocation:GetChildren() do
+if location then
+print("Scanning location ("..location.Name..")")
+Character:PivotTo(location:FindFirstChildWhichIsA("BasePart",true).CFrame)
+task.wait(5)
+for _,glove in next, location:GetChildren() do
+if glove then
+print("Trying to get "..glove.Name.." glove")
+if (glove:GetAttribute("Solved")~=nil and glove:GetAttribute("Solved")==false) and glove:GetAttribute("Visible")==false then
+glove:SetAttribute("Solved",true)
+task.wait(1)
+TouchObject(glove:GetChildren()[1], 2)
+elseif (glove:GetAttribute("Solved")==nil or glove:GetAttribute("Solved")==true) and glove:GetAttribute("Visible")==true then
+TouchObject(glove:GetChildren()[1], 2)
+else
+print("Skipping glove "..glove.Name..". Solved | Visible", glove:GetAttribute("Solved"), glove:GetAttribute("Visible"))
+continue
+end
+end
+end
+end
+end
+until game:GetService("BadgeService"):UserHasBadgeAsync(LocalPlayer.UserId, 1902849233175110)]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Eggler ( You have to take quest and take quest rewards by yourself )"; Callback = function()
+local a = CreateMessage()
+a.Text = "Getting Eggler..."
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=129665246576996 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Eggler..."
+while true do
+if HumanoidRootPart then
+HumanoidRootPart:PivotTo(CFrame.new(69,4240,2))
+end
+task.wait()
+for i,v in pairs(workspace:GetDescendants()) do
+if v and v.Name == "root" and v:FindFirstChildWhichIsA("TouchTransmitter") then
+TouchObject(v)
+end
+if v:IsA("ProximityPrompt") then
+v.HoldDuration = 0
+end
+end
+task.wait()
+if workspace:FindFirstChild("Kenneth") and workspace.Kenneth:FindFirstChild("Head") and workspace.Kenneth.Head:FindFirstChild("ProximityPrompt") then
+fireproximityprompt(workspace.Kenneth.Head.ProximityPrompt)
+end
+task.wait()
+game:GetService("ReplicatedStorage").Common.Dialogue.Remotes.ResondToDialogue:FireServer(1)
+task.wait()
+HumanoidRootPart.Anchored = false
+task.wait()
+end]])
+if workspace.BountyHunterRoom:FindFirstChild("EggTeleport") and workspace.BountyHunterRoom.EggTeleport:FindFirstChildWhichIsA("ClickDetector") then
+for i=1,10 do
+fireclickdetector(workspace.BountyHunterRoom.EggTeleport:FindFirstChildWhichIsA("ClickDetector"))
+game:GetService("ReplicatedStorage"):WaitForChild("FriendInviteOption"):FireServer(false)
+task.wait(.1)
+end
+end
+if workspace:FindFirstChild("EasterHuntEggs") then
+for i,v in next, workspace.EasterHuntEggs:GetChildren() do
+if v and v:FindFirstChildWhichIsA("ClickDetector") then
+fireclickdetector(v:FindFirstChildWhichIsA("ClickDetector"))
+end
+end
+end
+task.wait(.15)
+while true do
+fireclickdetector(workspace.BountyHunterRoom.EggTeleport:FindFirstChildWhichIsA("ClickDetector"))
+game:GetService("ReplicatedStorage"):WaitForChild("FriendInviteOption"):FireServer(false)
+task.wait(.5)
+end
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Shellbert ( You have to take quest and take quest rewards by yourself )"; Callback = function()
+local a = CreateMessage()
+a.Text = "Getting Shellbert..."
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=129665246576996 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Shellbert..."
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata(GlobalTPData..' msg.Text = "Getting Shellbert..." for i=1,3 do game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Cutscene"):WaitForChild("OnComplete"):FireServer("Scene1") task.wait() game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("PhaseTransition"):WaitForChild("Switch"):FireServer() task.wait() game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("PhaseTransition"):WaitForChild("Finished"):FireServer() task.wait() game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Cutscene"):WaitForChild("OnLoaded"):FireServer("Scene2") task.wait() game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Cutscene"):WaitForChild("OnComplete"):FireServer("Scene2") task.wait() game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("GloveReward"):WaitForChild("Replicate"):FireServer() task.wait() end task.wait(2) for i=1,50 do HumanoidRootPart:PivotTo(workspace.RewardGlove.RewardGlove.CFrame) end')
+while task.wait(.1) do
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("FourthTrialTeleport"):FireServer()
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("InviteFriends"):WaitForChild("PlayWithParty"):FireServer()
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("InviteFriends"):WaitForChild("CancelPartyTeleport"):FireServer()
+end]])
+if workspace.BountyHunterRoom:FindFirstChild("EggTeleport") and workspace.BountyHunterRoom.EggTeleport:FindFirstChildWhichIsA("ClickDetector") then
+for i=1,10 do
+fireclickdetector(workspace.BountyHunterRoom.EggTeleport:FindFirstChildWhichIsA("ClickDetector"))
+game:GetService("ReplicatedStorage"):WaitForChild("FriendInviteOption"):FireServer(false)
+task.wait(.1)
+end
+end
+if workspace:FindFirstChild("EasterHuntEggs") then
+for i,v in next, workspace.EasterHuntEggs:GetChildren() do
+if v and v:FindFirstChildWhichIsA("ClickDetector") then
+fireclickdetector(v:FindFirstChildWhichIsA("ClickDetector"))
+end
+end
+end
+task.wait(.15)
+while true do
+fireclickdetector(workspace.BountyHunterRoom.EggTeleport:FindFirstChildWhichIsA("ClickDetector"))
+game:GetService("ReplicatedStorage"):WaitForChild("FriendInviteOption"):FireServer(false)
+task.wait(.5)
+end
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Frostbite"; Callback = function()
+game:GetService("TeleportService"):Teleport(17290438723)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=17290438723 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Frostbite..."
+HumanoidRootPart:PivotTo(CFrame.new(-555, 180, 55))
+task.wait(1.5)
+for i,v in next, workspace:GetDescendants() do
+if v:IsA("ProximityPrompt") then
+v.Enabled = true
+v.HoldDuration = 0
+fireproximityprompt(v)
+end
+end]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Admin"; Callback = function()
+local a = game:GetService("ReplicatedStorage").Assets.Retro.Map.RetroObbyMap:Clone()
+a.Parent = workspace
+HumanoidRootPart:PivotTo(a:GetChildren()[5].StaffApp.Button.CFrame)
+task.wait(1.5)
+fireclickdetector(a:GetChildren()[5].StaffApp.Button.ClickDetector)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=16034567693 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Admin..."
+HumanoidRootPart:PivotTo(CFrame.new(502, 76, 59))
+task.wait(5)
+task.spawn(function()
+if getconnections then
+pcall(function()
+for i,v in next, getconnections(LocalPlayer.Idled) do
+v:Disable() 
+end
+end)
+else
+while task.wait(10) do
+Humanoid.Jump = true
+end
+end
+end)
+Time = 3600
+for i = 1,Time do
+Time = Time - 1
+Instance.new("Message",workspace).Text = "Seconds left to receive: "..Time
+task.wait(1)
+workspace:FindFirstChildWhichIsA("Message"):Destroy()
+end]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Hunter"; Callback = function()
+Instance.new("Message",game.CoreGui).Text = "You're being teleported, please wait..."
+repeat task.wait() until workspace.BountyHunterRoom.Build.Model["Meshes/boxshadow_Cube.005"].Counter.SurfaceGui.TextLabel.Text=="1" and workspace.BountyHunterRoom.Build.Model["Meshes/boxshadow_Cube.005"].PlayerCounter.SurfaceGui.TextLabel.Text=="0/4 Hunters" and HumanoidRootPart and Humanoid and Humanoid.Health~=0
+TouchObject(workspace.BountyHunterRoom.Build.Model["Meshes/boxshadow_Cube.005"].Hitbox)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=18550498098 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Hunter..."
+task.spawn(function()
+local start = tick()
+while tick() - start < 26 do
+HumanoidRootPart:PivotTo(CFrame.new(3261, -70, 823))
+task.wait()
+end
+end)
+task.wait(3)
+TouchObject(workspace["the cube of life"].Part, 1)
+TouchObject(workspace["Big Heart"], 1)
+for i,v in next, workspace:GetDescendants() do
+if v.Name == "ShackLever" and v:FindFirstChildWhichIsA("ClickDetector") then
+pcall(function()
+for i=1,10 do
+fireclickdetector(v:FindFirstChildWhichIsA("ClickDetector"))
+task.wait(.1)
+end
+end)
+end
+end
+repeat task.wait() until workspace.Map.Components:FindFirstChild("GuideNPC")
+task.spawn(function()
+repeat task.wait()
+local start = tick()
+while tick() - start < 0.66 do
+HumanoidRootPart:PivotTo(CFrame.new(650, 255, -275))
+task.wait()
+end
+local start = tick()
+while tick() - start < 0.66 do
+HumanoidRootPart:PivotTo(CFrame.new(599, 250, -322))
+task.wait()
+end
+local start = tick()
+while tick() - start < 0.66 do
+HumanoidRootPart:PivotTo(CFrame.new(550, 245, -375))
+task.wait()
+end
+until ASIU_WS~=nil
+end)
+while task.wait(.2) do
+if LocalPlayer.Backpack:FindFirstChild("Lantern") then
+LocalPlayer.Backpack.Lantern.Parent = Character
+end
+for i,v in pairs(workspace:GetChildren()) do
+if v.Name == "PusherWall" then
+v.CanCollide = false
+end
+game.Players.LocalPlayer.Character.Lantern:Activate()
+if v.Name == "golem" and v:FindFirstChild("Hitbox") then
+if Character:FindFirstChild("Lantern") and Character.Lantern:FindFirstChild("Network") then
+Character.Lantern.Network:FireServer("Hit", v.Hitbox)
+end
+end
+if (v.Name == "GuideNPC" or v.Name == "ReplicaNPC") and v:FindFirstChild("HumanoidRootPart") then
+if Character:FindFirstChild("Lantern") and Character.Lantern:FindFirstChild("Network") then
+Character.Lantern.Network:FireServer("Hit", v.HumanoidRootPart)
+end
+end
+if v.Name == "TrackGloveMissile" then
+if Character:FindFirstChild("Lantern") and Character.Lantern:FindFirstChild("Network") then
+Character.Lantern.Network:FireServer("Hit", v)
+end
+end
+end
+end]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Hunter + Avatar"; Callback = function()
+Instance.new("Message",game.CoreGui).Text = "You're being teleported, please wait..."
+repeat task.wait() until workspace.BountyHunterRoom.Build.Model["Meshes/boxshadow_Cube.005"].Counter.SurfaceGui.TextLabel.Text=="1" and workspace.BountyHunterRoom.Build.Model["Meshes/boxshadow_Cube.005"].PlayerCounter.SurfaceGui.TextLabel.Text=="0/4 Hunters" and HumanoidRootPart and Humanoid and Humanoid.Health~=0
+TouchObject(workspace.BountyHunterRoom.Build.Model["Meshes/boxshadow_Cube.005"].Hitbox)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=18550498098 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Hunter + Avatar..."
+task.spawn(function()
+local start = tick()
+while tick() - start < 26 do
+HumanoidRootPart:PivotTo(CFrame.new(3261, -70, 823))
+task.wait()
+end
+end)
+task.wait(5)
+for i,v in next, workspace:GetDescendants() do
+if v.Name == "ShackLever" and v:FindFirstChildWhichIsA("ClickDetector") then
+pcall(function()
+for i=1,10 do
+fireclickdetector(v:FindFirstChildWhichIsA("ClickDetector"))
+task.wait(.1)
+end
+end)
+end
+end
+repeat task.wait() until workspace.Map.Components:FindFirstChild("GuideNPC")
+task.spawn(function()
+repeat task.wait()
+local start = tick()
+while tick() - start < 0.66 do
+HumanoidRootPart:PivotTo(CFrame.new(650, 255, -275))
+task.wait()
+end
+local start = tick()
+while tick() - start < 0.66 do
+HumanoidRootPart:PivotTo(CFrame.new(599, 250, -322))
+task.wait()
+end
+local start = tick()
+while tick() - start < 0.66 do
+HumanoidRootPart:PivotTo(CFrame.new(550, 245, -375))
+task.wait()
+end
+until ASIU_WS~=nil
+end)
+while task.wait(.2) do
+if LocalPlayer.Backpack:FindFirstChild("Lantern") then
+LocalPlayer.Backpack.Lantern.Parent = Character
+end
+for i,v in pairs(workspace:GetChildren()) do
+if v.Name == "PusherWall" then
+v.CanCollide = false
+end
+game.Players.LocalPlayer.Character.Lantern:Activate()
+if v.Name == "golem" and v:FindFirstChild("Hitbox") then
+if Character:FindFirstChild("Lantern") and Character.Lantern:FindFirstChild("Network") then
+Character.Lantern.Network:FireServer("Hit", v.Hitbox)
+end
+end
+if (v.Name == "GuideNPC" or v.Name == "ReplicaNPC") and v:FindFirstChild("HumanoidRootPart") then
+if Character:FindFirstChild("Lantern") and Character.Lantern:FindFirstChild("Network") then
+Character.Lantern.Network:FireServer("Hit", v.HumanoidRootPart)
+end
+end
+if v.Name == "TrackGloveMissile" then
+if Character:FindFirstChild("Lantern") and Character.Lantern:FindFirstChild("Network") then
+Character.Lantern.Network:FireServer("Hit", v)
+end
+end
+end
+end]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Relude"; Callback = function()
+Instance.new("Message",game.CoreGui).Text = "You're being teleported, please wait..."
+repeat task.wait() until workspace.BountyHunterRoom.Build.Model["Meshes/boxshadow_Cube.005"].Counter.SurfaceGui.TextLabel.Text=="1" and workspace.BountyHunterRoom.Build.Model["Meshes/boxshadow_Cube.005"].PlayerCounter.SurfaceGui.TextLabel.Text=="0/4 Hunters" and HumanoidRootPart and Humanoid and Humanoid.Health~=0
+TouchObject(workspace.BountyHunterRoom.Build.Model["Meshes/boxshadow_Cube.005"].Hitbox)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=18550498098 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Relude..."
+task.spawn(function()
+local start = tick()
+while tick() - start < 26 do
+HumanoidRootPart:PivotTo(CFrame.new(3261, -70, 823))
+task.wait()
+end
+end)
+task.wait(3)
+TouchObject(workspace["the cube of life"].Part, 1)
+TouchObject(workspace["Big Heart"], 1)
+for i,v in next, workspace:GetDescendants() do
+if v.Name == "ShackLever" and v:FindFirstChildWhichIsA("ClickDetector") then
+pcall(function()
+for i=1,10 do
+fireclickdetector(v:FindFirstChildWhichIsA("ClickDetector"))
+task.wait(.1)
+end
+end)
+end
+end
+repeat task.wait() until workspace.Map.Components:FindFirstChild("GuideNPC")
+task.spawn(function()
+repeat task.wait()
+local start = tick()
+while tick() - start < 0.66 do
+HumanoidRootPart:PivotTo(CFrame.new(650, 255, -275))
+task.wait()
+end
+local start = tick()
+while tick() - start < 0.66 do
+HumanoidRootPart:PivotTo(CFrame.new(599, 250, -322))
+task.wait()
+end
+local start = tick()
+while tick() - start < 0.66 do
+HumanoidRootPart:PivotTo(CFrame.new(550, 245, -375))
+task.wait()
+end
+until ASIU_WS~=nil
+end)
+while task.wait(.2) do
+if LocalPlayer.Backpack:FindFirstChild("Lantern") then
+LocalPlayer.Backpack.Lantern.Parent = Character
+end
+game:GetService("ReplicatedStorage").Remotes.Data.AnswerInCutscene:FireServer("Spare")
+for i,v in pairs(workspace:GetChildren()) do
+if v.Name == "PusherWall" then
+v.CanCollide = false
+end
+game.Players.LocalPlayer.Character.Lantern:Activate()
+if v.Name == "golem" and v:FindFirstChild("Hitbox") then
+if Character:FindFirstChild("Lantern") and Character.Lantern:FindFirstChild("Network") then
+Character.Lantern.Network:FireServer("Hit", v.Hitbox)
+end
+end
+if (v.Name == "GuideNPC" or v.Name == "ReplicaNPC") and v:FindFirstChild("HumanoidRootPart") then
+if Character:FindFirstChild("Lantern") and Character.Lantern:FindFirstChild("Network") then
+Character.Lantern.Network:FireServer("Hit", v.HumanoidRootPart)
+end
+end
+if v.Name == "TrackGloveMissile" then
+if Character:FindFirstChild("Lantern") and Character.Lantern:FindFirstChild("Network") then
+Character.Lantern.Network:FireServer("Hit", v)
+end
+end
+end
+end]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Relude + Avatar"; Callback = function()
+Instance.new("Message",game.CoreGui).Text = "You're being teleported, please wait..."
+repeat task.wait() until workspace.BountyHunterRoom.Build.Model["Meshes/boxshadow_Cube.005"].Counter.SurfaceGui.TextLabel.Text=="1" and workspace.BountyHunterRoom.Build.Model["Meshes/boxshadow_Cube.005"].PlayerCounter.SurfaceGui.TextLabel.Text=="0/4 Hunters" and HumanoidRootPart and Humanoid and Humanoid.Health~=0
+TouchObject(workspace.BountyHunterRoom.Build.Model["Meshes/boxshadow_Cube.005"].Hitbox)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=18550498098 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Relude + Avatar..."
+task.spawn(function()
+local start = tick()
+while tick() - start < 26 do
+HumanoidRootPart:PivotTo(CFrame.new(3261, -70, 823))
+task.wait()
+end
+end)
+task.wait(5)
+for i,v in next, workspace:GetDescendants() do
+if v.Name == "ShackLever" and v:FindFirstChildWhichIsA("ClickDetector") then
+pcall(function()
+for i=1,10 do
+fireclickdetector(v:FindFirstChildWhichIsA("ClickDetector"))
+task.wait(.1)
+end
+end)
+end
+end
+repeat task.wait() until workspace.Map.Components:FindFirstChild("GuideNPC")
+task.spawn(function()
+repeat task.wait()
+local start = tick()
+while tick() - start < 0.66 do
+HumanoidRootPart:PivotTo(CFrame.new(650, 255, -275))
+task.wait()
+end
+local start = tick()
+while tick() - start < 0.66 do
+HumanoidRootPart:PivotTo(CFrame.new(599, 250, -322))
+task.wait()
+end
+local start = tick()
+while tick() - start < 0.66 do
+HumanoidRootPart:PivotTo(CFrame.new(550, 245, -375))
+task.wait()
+end
+until ASIU_WS~=nil
+end)
+while task.wait(.2) do
+if LocalPlayer.Backpack:FindFirstChild("Lantern") then
+LocalPlayer.Backpack.Lantern.Parent = Character
+end
+game:GetService("ReplicatedStorage").Remotes.Data.AnswerInCutscene:FireServer("Spare")
+for i,v in pairs(workspace:GetChildren()) do
+if v.Name == "PusherWall" then
+v.CanCollide = false
+end
+game.Players.LocalPlayer.Character.Lantern:Activate()
+if v.Name == "golem" and v:FindFirstChild("Hitbox") then
+if Character:FindFirstChild("Lantern") and Character.Lantern:FindFirstChild("Network") then
+Character.Lantern.Network:FireServer("Hit", v.Hitbox)
+end
+end
+if (v.Name == "GuideNPC" or v.Name == "ReplicaNPC") and v:FindFirstChild("HumanoidRootPart") then
+if Character:FindFirstChild("Lantern") and Character.Lantern:FindFirstChild("Network") then
+Character.Lantern.Network:FireServer("Hit", v.HumanoidRootPart)
+end
+end
+if v.Name == "TrackGloveMissile" then
+if Character:FindFirstChild("Lantern") and Character.Lantern:FindFirstChild("Network") then
+Character.Lantern.Network:FireServer("Hit", v)
+end
+end
+end
+end]])
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Tycoon"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if #game.Players:GetPlayers() < 7 then
+Rayfield:Notification("Error!","Not enough players!",3,false)
+end
+local a = CreateMessage()
+a.Text = "Getting Tycoon..."
+if Character:FindFirstChild("entered")==nil then
+TeleportToArena(2)
+end
+task.wait(.5)
+repeat task.wait()
+a.Text = LocalPlayer.PlayerGui.PlateIndicator.TextLabel.Text
+HumanoidRootPart:PivotTo(workspace.Arena.Plate.CFrame * CFrame.new(0,2.2,0))
+until a.Text=="Plate Counter: 600" or #game.Players:GetPlayers() < 7 or Humanoid.Health==0
+if #game.Players:GetPlayers() < 7 then
+a.Text = "Not enough players!"
+task.wait(3)
+elseif Humanoid.Health==0 then
+a.Text = "You were killed!"
+task.wait(3)
+end
+if Humanoid then
+Humanoid.Health=0
+end
+a:Destroy()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Glovel ( You have to take quest and take quest rewards by yourself )"; Callback = function()
+if not HumanoidRootPart then return end
+local a = CreateMessage()
+a.Text = "Getting Glovel..."
+if Character:FindFirstChild("entered")==nil then TeleportToArena(1) end
+repeat task.wait()
+HumanoidRootPart.CFrame = CFrame.new(-19.483200073242188, -5.144442081451416, -207.45977783203125)
+game:GetService("ReplicatedStorage").DigEvent:FireServer({["index"] = 2,["cf"] = CFrame.new(42.7222366, -6.17449856, 91.5175781, -0.414533257, 1.72594355e-05, -0.91003418, -5.57037238e-05, 1, 4.4339522e-05, 0.91003418, 6.90724992e-05, -0.414533257)})
+until workspace:FindFirstChild("TreasureChestFolder") ~= nil and workspace.TreasureChestFolder:FindFirstChild("TreasureChest") ~= nil
+task.wait(1.5)
+workspace.TreasureChestFolder.TreasureChest.OpenRemote:FireServer()
+task.wait(.5)
+Humanoid.Health = 0
+task.wait(4)
+a:Destroy()
+end; })
+
+function FindRandomPlayer()
+local AllPlayers = game:GetService("Players"):GetChildren()
+local RandomPlayer = AllPlayers[math.random(1, #AllPlayers)]
+repeat task.wait()
+RandomPlayer = AllPlayers[math.random(1, #AllPlayers)]
+until RandomPlayer and RandomPlayer ~= LocalPlayer and RandomPlayer.Character and RandomPlayer.Character:FindFirstChild("entered") and RandomPlayer.Character:FindFirstChild("rock") == nil and RandomPlayer.Character:FindFirstChild("RobTransformed") == nil and RandomPlayer.Character:FindFirstChild("stevebody") == nil and RandomPlayer.Character:FindFirstChildWhichIsA("Humanoid") and RandomPlayer.Character:FindFirstChildWhichIsA("Humanoid").Health ~= 0 and RandomPlayer.Character:FindFirstChild("Torso") and RandomPlayer.Character:FindFirstChild("Torso").Transparency~=1 and RandomPlayer.Character.Torso:FindFirstChild("BuddyBox") == nil and RandomPlayer.Character:FindFirstChild("Head") and RandomPlayer.Character.Head:FindFirstChild("ScreamParticles") == nil and RandomPlayer.Character:FindFirstChild("Reversed") == nil and RandomPlayer.Character.Head:FindFirstChild("UnoDraw4Card") == nil and RandomPlayer.Character.Head.BrickColor ~= "New Yeller" and RandomPlayer.Character:FindFirstChild("HumanoidRootPart") and RandomPlayer.Character.HumanoidRootPart:FindFirstChild("BlackheartREAL") == nil and RandomPlayer.Character.HumanoidRootPart:FindFirstChild("BlockedShield") == nil and Character and HumanoidRootPart and Humanoid
+return RandomPlayer.Character
+end
+function PressKey(keycode)
+local VirtualInputManager = game:GetService("VirtualInputManager")
+VirtualInputManager:SendKeyEvent(true, Enum.KeyCode[keycode], false, game)
+task.wait(0.05)
+VirtualInputManager:SendKeyEvent(false, Enum.KeyCode[keycode], false, game)
+end
+
+AutoObtainment:CreateSection("Slap Gloves Requirement ( Can be obtained only if you have specific gloves that cost slaps )")
+
+AutoObtainment:CreateButton({Name = "Auto-Get Lamp ( Requires ZZZZZZZ )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting Lamp..."
+EquipGlove("ZZZZZZZ")
+for i=1,20 do
+game.ReplicatedStorage.nightmare:FireServer("LightBroken")
+end
+a:Destroy()
+end; })
+
+local RNG_Method = "Slap 5 More"
+AutoObtainment:CreateDropdown({Name = "RNG Method"; Options = {"Slap 5 More", "Slap Replica", "Slap People"}; CurrentOption = "Slap 5 More"; MultiSelection = false; Callback = function(Value)
+RNG_Method = Rayfield:GetDropdownValue(Value)
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get RNG ( Required Glove Differs on Choosen Method )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting RNG..."
+if RNG_Method=="Slap 5 More" then
+local slappingdone = false
+EquipGlove("5 More")
+HumanoidRootPart:PivotTo(CFrame.new(17891,-23.8,-3517))
+task.wait(1)
+HumanoidRootPart.Anchored = true
+task.wait(.5)
+for i=1,2 do
+game:GetService("ReplicatedStorage").Events.slasher2:FireServer(true)
+task.wait()
+end
+task.wait(.5)
+for i=1,6 do
+game.ReplicatedStorage.GeneralAbility:FireServer()
+task.wait(1.33)
+end
+EquipGlove("Dice")
+repeat task.wait(.6)
+for i,v in next, workspace[LocalPlayer.Name.."_More"]:GetChildren() do
+game.ReplicatedStorage.DiceHit:FireServer(v.HumanoidRootPart)
+task.wait()
+end
+until game:GetService("BadgeService"):UserHasBadgeAsync(LocalPlayer.UserId, 2130031244) or Humanoid.Health==0
+slappingdone = true
+elseif RNG_Method=="Slap Replica" then
+local slappingdone = false
+HumanoidRootPart:PivotTo(CFrame.new(17891,-23.8,-3517))
+task.wait(1)
+HumanoidRootPart.Anchored = true
+task.wait(.5)
+for i=1,2 do
+game:GetService("ReplicatedStorage").Events.slasher2:FireServer(true)
+task.wait()
+end
+task.wait(.5)
+repeat task.wait(.6)
+if not workspace:FindFirstChild("Å"..LocalPlayer.Name) then
+EquipGlove("Replica")
+game.ReplicatedStorage.Duplicate:FireServer(true)
+EquipGlove("Dice")
+repeat task.wait() until workspace:FindFirstChild("Å"..LocalPlayer.Name)
+end
+game.ReplicatedStorage.DiceHit:FireServer(workspace["Å"..LocalPlayer.Name]:WaitForChild("HumanoidRootPart"))
+until game:GetService("BadgeService"):UserHasBadgeAsync(LocalPlayer.UserId, 2130031244) or Humanoid.Health==0
+slappingdone = true
+elseif RNG_Method=="Slap People" then
+EquipGlove("Ghost")
+game.ReplicatedStorage.Ghostinvisibilityactivated:FireServer()
+task.wait(.5)
+EquipGlove("Dice")
+local vector = Vector3.new(0,0,0)
+repeat task.wait()
+local rp = FindRandomPlayer()
+for i=1,100 do
+HumanoidRootPart:PivotTo(rp:WaitForChild("HumanoidRootPart").CFrame)
+for _,p in next, Character:GetDescendants() do
+if p:IsA("BasePart") then
+p.Velocity, p.RotVelocity = vector, vector
+end
+end
+task.wait(.005)
+end
+game.ReplicatedStorage.DiceHit:FireServer(rp:WaitForChild("HumanoidRootPart"))
+for i=1,100 do
+HumanoidRootPart:PivotTo(rp:WaitForChild("HumanoidRootPart").CFrame)
+for _,p in next, Character:GetDescendants() do
+if p:IsA("BasePart") then
+p.Velocity, p.RotVelocity = vector, vector
+end
+end
+task.wait(.005)
+end
+until game:GetService("BadgeService"):UserHasBadgeAsync(LocalPlayer.UserId, 2130031244) or Humanoid.Health==0
+end
+task.wait(1)
+Humanoid.Health = 0
+a:Destroy()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Camera ( Requires Ghost )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting Camera..."
+EquipGlove("Ghost")
+game.ReplicatedStorage.Ghostinvisibilityactivated:FireServer()
+repeat task.wait() until workspace:FindFirstChild("CameraModel")
+task.wait(.5)
+HumanoidRootPart:PivotTo(workspace.CameraModel.Handle.CFrame)
+task.wait(1)
+fireproximityprompt(workspace.CameraModel.Handle.ProximityPrompt)
+repeat task.wait() until Character:FindFirstChild("Camera") or LocalPlayer.Backpack:FindFirstChild("Camera")
+task.wait(.5)
+local vector = Vector3.new(0,0,0)
+for i,v in next, workspace.Camera_Obtainment_PNGS:GetChildren() do
+if not v then continue end
+if LocalPlayer.Backpack:FindFirstChild("Camera") then
+LocalPlayer.Backpack.Camera.Parent = Character
+end
+for i=1,400 do
+HumanoidRootPart.CFrame = v.CFrame
+for _,p in next, Character:GetDescendants() do
+if p:IsA("BasePart") then
+p.Velocity, p.RotVelocity = vector, vector
+end
+end
+task.wait(.005)
+end
+game:GetService("ReplicatedStorage").Assets.Obtainments.Camera.Remotes.IsPhotoValid:InvokeServer(v)
+end
+a:Destroy()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Fish ( Requires ZZZZZZZ )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting Fish..."
+EquipGlove("ZZZZZZZ")
+game.ReplicatedStorage.ZZZZZZZSleep:FireServer()
+task.wait(2)
+for i,v in next, Character:GetDescendants() do
+if v:IsA("BasePart") then
+v:PivotTo(CFrame.new(3000,3000,3000))
+end
+end
+task.wait(2.5)
+HumanoidRootPart.Anchored = true
+task.spawn(function()
+if getconnections then
+pcall(function()
+for i,v in next, getconnections(LocalPlayer.Idled) do
+v:Disable() 
+end
+end)
+end
+end)
+Time = 3597
+for i = 1,Time do
+Time = Time - 1
+Instance.new("Message",workspace).Text = "Seconds left to receive: "..Time
+task.wait(1)
+workspace:FindFirstChildWhichIsA("Message"):Destroy()
+if Humanoid.Health==0 then break end
+end
+a:Destroy()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Trap ( Requires Brick )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting Trap..."
+EquipGlove("Brick")
+TeleportToArena(1)
+HumanoidRootPart:PivotTo(CFrame.new(3000,3000,3000))
+task.wait(1.5)
+HumanoidRootPart.Anchored = true
+task.spawn(function()
+if getconnections then
+pcall(function()
+for i,v in next, getconnections(LocalPlayer.Idled) do
+v:Disable() 
+end
+end)
+end
+end)
+local FarmBricks = true
+task.spawn(function()
+repeat task.wait(5)
+game:GetService("ReplicatedStorage").lbrick:FireServer()
+until FarmBricks==false
+end)
+Time = 5000
+for i = 1,Time do
+Time = Time - 1
+Instance.new("Message",workspace).Text = "Seconds left to receive: "..Time
+task.wait(1)
+workspace:FindFirstChildWhichIsA("Message"):Destroy()
+if Humanoid.Health==0 then FarmBricks=false break end
+end
+a:Destroy()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Voodoo ( Requires Ghost )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting Voodoo..."
+EquipGlove("Ghost")
+game.ReplicatedStorage.Ghostinvisibilityactivated:FireServer()
+HumanoidRootPart:PivotTo(CFrame.new(3000,3000,3000))
+task.wait(1.5)
+HumanoidRootPart.Anchored = true
+task.spawn(function()
+if getconnections then
+pcall(function()
+for i,v in next, getconnections(LocalPlayer.Idled) do
+v:Disable() 
+end
+end)
+end
+end)
+Time = 3597
+for i = 1,Time do
+Time = Time - 1
+Instance.new("Message",workspace).Text = "Seconds left to receive: "..Time
+task.wait(1)
+workspace:FindFirstChildWhichIsA("Message"):Destroy()
+if Humanoid.Health==0 then break end
+end
+a:Destroy()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Trap + Fish + Voodoo ( Requires Ghost )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting Trap + Fish + Voodoo..."
+EquipGlove("Ghost")
+game.ReplicatedStorage.Ghostinvisibilityactivated:FireServer()
+task.wait(.5)
+EquipGlove("ZZZZZZZ")
+game.ReplicatedStorage.ZZZZZZZSleep:FireServer()
+task.wait(2)
+EquipGlove("Brick")
+TeleportToArena(1)
+for i,v in next, Character:GetDescendants() do
+if v:IsA("BasePart") then
+v:PivotTo(CFrame.new(3000,3000,3000))
+end
+end
+task.wait(2.5)
+HumanoidRootPart.Anchored = true
+task.spawn(function()
+if getconnections then
+pcall(function()
+for i,v in next, getconnections(LocalPlayer.Idled) do
+v:Disable() 
+end
+end)
+end
+end)
+local FarmBricks = true
+task.spawn(function()
+repeat task.wait(5)
+game:GetService("ReplicatedStorage").lbrick:FireServer()
+until FarmBricks==false
+end)
+Time = 5000
+for i = 1,Time do
+Time = Time - 1
+Instance.new("Message",workspace).Text = "Seconds left to receive: "..Time
+task.wait(1)
+workspace:FindFirstChildWhichIsA("Message"):Destroy()
+if Humanoid.Health==0 then FarmBricks=false break end
+end
+a:Destroy()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Plank ( Requires Fort )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting Plank..."
+EquipGlove("Fort")
+TeleportToArena(1)
+HumanoidRootPart:PivotTo(CFrame.new(-410,75,-41))
+task.wait(2)
+PressKey("E")
+task.wait(2)
+HumanoidRootPart:PivotTo(CFrame.new(-406,87,-51))
+task.wait(4)
+Humanoid.Health = 0
+a:Destroy()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get buddies ( Requires Golden )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting buddies..."
+EquipGlove("Ghost")
+game.ReplicatedStorage.Ghostinvisibilityactivated:FireServer()
+task.wait(.5)
+EquipGlove("Golden")
+game:GetService("ReplicatedStorage"):WaitForChild("Goldify"):FireServer(true)
+local vector = Vector3.new(0,0,0)
+repeat task.wait()
+local rp = FindRandomPlayer()
+for i=1,150 do
+HumanoidRootPart:PivotTo(rp:WaitForChild("HumanoidRootPart").CFrame)
+for _,p in next, Character:GetDescendants() do
+if p:IsA("BasePart") then
+p.Velocity, p.RotVelocity = vector, vector
+end
+end
+task.wait(.005)
+end
+game.ReplicatedStorage.GoldenHit:FireServer(rp:WaitForChild("HumanoidRootPart"),true)
+for i=1,150 do
+HumanoidRootPart:PivotTo(rp:WaitForChild("HumanoidRootPart").CFrame)
+for _,p in next, Character:GetDescendants() do
+if p:IsA("BasePart") then
+p.Velocity, p.RotVelocity = vector, vector
+end
+end
+task.wait(.005)
+end
+until game:GetService("BadgeService"):UserHasBadgeAsync(LocalPlayer.UserId, 2124760928) or Humanoid.Health==0
+task.wait(1)
+Humanoid.Health = 0
+a:Destroy()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get [REDACTED] ( Requires 5000 Slaps )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting [REDACTED]..."
+for i=1,10 do
+TouchObject(workspace.PocketDimension.Doors[tostring(i)])
+task.wait(1)
+if Humanoid.Health~=0 then
+Humanoid.Health=0
+break
+else
+task.wait(3)
+repeat task.wait() until HumanoidRootPart and Humanoid
+end
+end
+a:Destroy()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Mouse ( Requires el gato )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+EquipGlove("el gato")
+fireclickdetector(workspace.Arena.Cheese.ClickDetector)
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=97220865182663 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Mouse..."
+if workspace.Game.Buildings.City:FindFirstChild("City") == nil then
+game.ReplicatedStorage.Remotes.PlaceBuilding:FireServer("City", Vector3.new(3.125, 43.4450798034668, -57.1875), 0)
+end
+workspace.Game.Enemies.ChildAdded:Connect(function(rat)
+if rat and rat.Name=="Rat" then
+local Hitbox = rat:WaitForChild("Hitbox",2)
+local Humanoid = rat:WaitForChild("Humanoid",2)
+if Hitbox~=nil then
+Hitbox.Anchored = true
+for i=1,50 do
+game.ReplicatedStorage.Remotes.GloveHit:FireServer(Hitbox)
+end
+end
+if Humanoid~=nil then
+Humanoid.Health = 0
+end
+end
+end)
+while task.wait(1) do
+game.ReplicatedStorage.Remotes.UnlockGloveWithOrbs:FireServer()
+end]])
+end; })
+
+local AllQuests = {"_questChainSnowPeepUGC";"_questChainRunMaze";"_questChainCursedBlastEnergy";"_questChainHitmansHandkerchief";"_questChainMysteriousNote";"_questChainEasterHunter";"_questShatteredReality";"_questFourSeasons";"_questChainCursedBlastEnergy";"_questOperaGX";}
+
+AutoObtainment:CreateButton({Name = "Auto-Get Slender ( Requires Pocket, you have to take quest and take rewards by yourself )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting Slender..."
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=132277598079047 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Slender..."
+local vector = Vector3.new(0,0,0)
+for i,v in next, workspace:GetDescendants() do
+if v:IsA("ProximityPrompt") then
+pcall(function()
+v.MaxActivationDistance = 100
+v.HoldDuration = 0
+for i=1,150 do
+HumanoidRootPart:PivotTo(v.Parent.CFrame)
+for _,p in next, Character:GetDescendants() do
+if p:IsA("BasePart") then
+p.Velocity, p.RotVelocity = vector, vector
+end
+end
+task.wait(.005)
+end
+fireproximityprompt(v)
+for i=1,150 do
+HumanoidRootPart:PivotTo(v.Parent.CFrame)
+for _,p in next, Character:GetDescendants() do
+if p:IsA("BasePart") then
+p.Velocity, p.RotVelocity = vector, vector
+end
+end
+task.wait(.005)
+end
+end)
+end
+end]])
+if workspace.BountyHunterRoom:FindFirstChild("BountyHunterLever") then
+for i=1,2 do
+HumanoidRootPart:PivotTo(CFrame.new(17907, -130, -3554))
+task.wait(1)
+fireproximityprompt(workspace.BountyHunterRoom.BountyHunterLever.Root.ProximityPrompt)
+task.wait(1)
+pcall(function()
+fireclickdetector(workspace.Lobby["Clothesline Model"].Part.ClickDetector)
+end)
+end
+return
+end
+EquipGlove("Balloony")
+TeleportToArena(1)
+Humanoid.Health = 0
+task.wait(4)
+EquipGlove("Pocket")
+TeleportToArena(1)
+HumanoidRootPart:PivotTo(CFrame.new(123, 255, 2))
+workspace.TapeRecorder.Front.ProximityPrompt.MaxActivationDistance = 100
+local order = 1
+local code = {}
+for i,v in next, workspace.TapeRecorder.Front.DigitsSFX:GetChildren() do if v and v:IsA("Sound") then
+v:GetPropertyChangedSignal("Playing"):Once(function()
+if v.Playing then
+code[order] = tonumber(v.Name)
+order = order + 1
+end
+end)
+end end
+task.wait(1)
+fireproximityprompt(workspace.TapeRecorder.Front.ProximityPrompt)
+if LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") then
+LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool"):Destroy()
+elseif Character:FindFirstChildWhichIsA("Tool") then
+Character:FindFirstChildWhichIsA("Tool"):Destroy()
+end
+repeat task.wait() until workspace.TapeRecorder.PowerButton.Color==Color3.fromRGB(0, 255, 0)
+repeat task.wait() until workspace.TapeRecorder.PowerButton.Color==Color3.fromRGB(255, 0, 0)
+HumanoidRootPart:PivotTo(CFrame.new(17891,-23.8,-3517))
+task.wait(1.5)
+local pos = CFrame.new(17891, -26.45772933959961, -3517, 0.022237541154026985, -0.9997527003288269, -7.423106040960192e-08, -1.5004781062089023e-07, -7.758693953974216e-08, 1, -0.9997527003288269, -0.022237541154026985, -1.5173604595020151e-07)
+game:GetService("ReplicatedStorage"):WaitForChild("GeneralAbility"):FireServer(pos)
+repeat task.wait() until workspace:FindFirstChild(LocalPlayer.Name.."'s Pocket")
+task.wait(1)
+fireproximityprompt(workspace[LocalPlayer.Name.."'s Pocket"].ProximityPrompt)
+repeat task.wait() until workspace:FindFirstChild(LocalPlayer.Name.."'s Room",true)
+task.wait(3)
+local room = workspace:FindFirstChild(LocalPlayer.Name.."'s Room",true)
+for i,v in ipairs(code) do
+fireclickdetector(room.PocketKeypad.Buttons[tostring(v)].ClickDetector)
+task.wait(.1)
+end
+fireclickdetector(room.PocketKeypad.Buttons["Enter"].ClickDetector)
+task.wait(1)
+for i,v in next, room.PocketKeypad.Buttons:GetChildren() do
+if tonumber(v.Name)==nil and v.Name~="Enter" then
+fireclickdetector(v.ClickDetector)
+end
+end
+task.wait(.5)
+for i,v in ipairs(code) do
+fireclickdetector(room.PocketKeypad.Buttons[tostring(v)].ClickDetector)
+task.wait(.1)
+end
+fireclickdetector(room.PocketKeypad.Buttons["Enter"].ClickDetector)
+task.wait(1)
+Humanoid.Health = 0
+task.wait(4)
+repeat task.wait() until workspace.BountyHunterRoom:FindFirstChild("BountyHunterMysteryRoom")
+HumanoidRootPart:PivotTo(CFrame.new(17872, -129, -3551))
+task.wait(2)
+fireclickdetector(workspace.BountyHunterRoom.BountyHunterMysteryRoom:FindFirstChild("ClickDetector",true))
+task.wait(2)
+repeat task.wait() until workspace.BountyHunterRoom:FindFirstChild("BountyHunterLever")
+HumanoidRootPart:PivotTo(CFrame.new(17907, -130, -3554))
+task.wait(1)
+fireproximityprompt(workspace.BountyHunterRoom.BountyHunterLever.Root.ProximityPrompt)
+repeat task.wait() until workspace.Lobby["Clothesline Model"].Part:FindFirstChild("ClickDetector")
+task.wait(.1)
+fireclickdetector(workspace.Lobby["Clothesline Model"].Part.ClickDetector)
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Link ( Requires Error )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting Link..."
+EquipGlove("Error")
+a:Destroy()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get bob ( Might not get it first time, requires God's Hand )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting bob..."
+EquipGlove("Ghost")
+game.ReplicatedStorage.Ghostinvisibilityactivated:FireServer()
+task.wait(.5)
+EquipGlove("God's Hand")
+game.ReplicatedStorage.TimestopJump:FireServer()
+game.ReplicatedStorage.Timestopchoir:FireServer()
+game.ReplicatedStorage.Timestop:FireServer()
+task.wait(5)
+EquipGlove("Replica")
+TeleportToArena(1)
+for i=1,150000 do
+game.ReplicatedStorage.Duplicate:FireServer(true)
+end
+a:Destroy()
+end; })
+
+AutoObtainment:CreateSection("Badge Gloves Requirement ( Can be obtained only if you have specific gloves that require badges )")
+
+AutoObtainment:CreateButton({Name = "Auto-Get Undead ( Requires Clock )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting Undead..."
+EquipGlove("Clock")
+TeleportToArena(1)
+HumanoidRootPart:PivotTo(CFrame.new(17891,-23.8,-3517))
+task.wait(1.5)
+game.ReplicatedStorage.GeneralAbility:FireServer(HumanoidRootPart.CFrame)
+repeat task.wait() until workspace:FindFirstChild(LocalPlayer.Name.."'s clock")
+task.wait(.5)
+repeat task.wait() until workspace[LocalPlayer.Name.."'s clock"].Hitbox.BillboardGui.current_ability.Text=="Revive Time"
+repeat task.wait() until workspace[LocalPlayer.Name.."'s clock"].Hitbox.BillboardGui.current_ability.Text~="Revive Time"
+HumanoidRootPart:PivotTo(CFrame.new(114,-45,2))
+repeat task.wait() until Humanoid.Health==0
+a:Destroy()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Jester ( Requires Elude )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting Jester..."
+EquipGlove("Elude")
+TeleportToArena(1)
+for i=1,200 do
+Slap({[1]=HumanoidRootPart})
+end
+a:Destroy()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Swordfighter ( Requires Retro )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting Swordfighter..."
+EquipGlove("Retro")
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=117232463555132 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Swordfighter..."
+HumanoidRootPart:PivotTo(workspace.Map.Components.NPCs.FinalBoss.FinalBoss.Head.CFrame * CFrame.new(0,10,0))
+task.wait(4)
+workspace.Map.Components.NPCs.FinalBoss.FinalBoss:FindFirstChildWhichIsA("Humanoid").RigType = "R15"
+workspace.Map.Components.NPCs.FinalBoss.FinalBoss:FindFirstChildWhichIsA("Humanoid").Health = 0
+repeat task.wait() until LocalPlayer.PlayerGui.SkipButton.SkipDialogueButton.Visible == true
+task.wait()
+repeat task.wait() until LocalPlayer.PlayerGui.SkipButton.SkipDialogueButton.Visible == false
+while task.wait() do
+HumanoidRootPart:PivotTo(workspace.Map.Components.GloveIsland.ClaimGlove.CFrame)
+fireproximityprompt(workspace.Map.Components.GloveIsland.ClaimGlove:FindFirstChildWhichIsA("ProximityPrompt"))
+end]])
+HumanoidRootPart:PivotTo(CFrame.new(316,40,196))
+task.wait(2)
+game.ReplicatedStorage.RetroAbility:FireServer("Ban Hammer")
+task.wait(3)
+HumanoidRootPart:PivotTo(CFrame.new(310,34,191))
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get 🗿 ( Requires Trap )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting 🗿..."
+EquipGlove("Trap")
+TeleportToArena(1)
+HumanoidRootPart:PivotTo(CFrame.new(17891,-23.8,-3517))
+task.wait(1.5)
+game:GetService("ReplicatedStorage").funnyhilariousbeartrap:FireServer()
+task.wait(3)
+HumanoidRootPart:PivotTo(workspace.BearTrap.HitBox.CFrame)
+a:Destroy()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Alchemist ( Requires Plague )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+amountofkills = 0
+local a = CreateMessage()
+a.Text = "Getting Alchemist... ( Kills 0/5 )"
+if tonumber(LocalPlayer.leaderstats.Slaps.Value)>665 then
+EquipGlove("Ghost")
+game.ReplicatedStorage.Ghostinvisibilityactivated:FireServer()
+task.wait(.5)
+end
+EquipGlove("Plague")
+TeleportToArena(1)
+for i=1,2 do
+if LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") then
+LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool"):Destroy()
+elseif Character:FindFirstChildWhichIsA("Tool") then
+Character:FindFirstChildWhichIsA("Tool").Parent = LocalPlayer.Backpack
+end
+task.wait(.1)
+end
+local vector = Vector3.new(0,0,0)
+repeat task.wait()
+local rp = FindRandomPlayer()
+for i=1,150 do
+HumanoidRootPart:PivotTo(rp:WaitForChild("HumanoidRootPart").CFrame)
+for _,p in next, Character:GetDescendants() do
+if p:IsA("BasePart") then
+p.Velocity, p.RotVelocity = vector, vector
+end
+end
+task.wait(.005)
+end
+game.ReplicatedStorage.PlagueHit:FireServer(rp:WaitForChild("HumanoidRootPart"))
+for i=1,100 do
+HumanoidRootPart:PivotTo(CFrame.new(17891,-23.8,-3517))
+for _,p in next, Character:GetDescendants() do
+if p:IsA("BasePart") then
+p.Velocity, p.RotVelocity = vector, vector
+end
+end
+task.wait(.005)
+end
+if rp and rp:FindFirstChild("HumanoidRootPart") and rp:FindFirstChild("Humanoid") and rp.Humanoid.Health~=0 and rp.HumanoidRootPart:FindFirstChild("InfectionParticle") then
+repeat task.wait(.05)
+if rp and rp:FindFirstChild("HumanoidRootPart") and rp:FindFirstChild("Humanoid") and rp.Humanoid.Health~=0 and rp.HumanoidRootPart:FindFirstChild("InfectionParticle") then
+repeat task.wait(.5)
+if rp and rp:FindFirstChild("HumanoidRootPart") and rp:FindFirstChild("Humanoid") and rp.Humanoid.Health~=0 and rp.HumanoidRootPart:FindFirstChild("InfectionParticle") and rp:FindFirstChild("Ragdolled") and rp.Ragdolled.Value==false then
+game:GetService("ReplicatedStorage").Events.camera:FireServer({cf=rp:WaitForChild("HumanoidRootPart").CFrame})
+end
+until not rp or not rp:FindFirstChild("HumanoidRootPart") or not rp:FindFirstChild("Humanoid") or not rp.HumanoidRootPart:FindFirstChild("InfectionParticle") or rp.Humanoid.Health==0 or rp.Ragdolled.Value==true or Humanoid.Health==0
+if rp and rp:FindFirstChild("Ragdolled") and rp.Ragdolled.Value==true and rp:FindFirstChild("Humanoid") and rp.Humanoid.Health~=0 then
+repeat task.wait() until rp.Ragdolled.Value==false or rp.Humanoid.Health==0 or Humanoid.Health==0
+end
+end
+until not rp or not rp:FindFirstChild("HumanoidRootPart") or not rp:FindFirstChild("Humanoid") or not rp.HumanoidRootPart:FindFirstChild("InfectionParticle") or rp.Humanoid.Health==0 or Humanoid.Health==0
+end
+if rp and rp:FindFirstChild("Humanoid") and rp.Humanoid.Health==0 then
+amountofkills = amountofkills + 1
+a.Text = "Getting Alchemist... ( Kills "..amountofkills.."/5 )"
+end
+until game:GetService("BadgeService"):UserHasBadgeAsync(LocalPlayer.UserId, 2153473254) or Humanoid.Health==0
+task.wait(1)
+Humanoid.Health = 0
+a:Destroy()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Druid ( Requires Alchemist )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting Druid..."
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=15228348051 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Druid..."
+workspace:WaitForChild("Maps"):WaitForChild(LocalPlayer.Name.."'s Map"):WaitForChild("Defences").ChildAdded:Connect(function(c)
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("SwitchPriority",{defence = c})
+end)
+repeat task.wait(.1)
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(27.41149139404297, 9.75, -0.999542236328125, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Defence2"})
+until LocalPlayer.PlayerGui.TowerDefenceUI.WaveNo.Text=="Wave 4"
+for i=1,4 do
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(49.46138381958008, 9.75, 66.52367401123047, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Defence1"})
+task.wait(.1)
+end
+task.spawn(function()
+while task.wait(.1) do
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(53.56528854370117, 9.149999618530273, -21.576744079589844, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Defence3"})
+for i,v in next, workspace:WaitForChild("Maps"):WaitForChild(LocalPlayer.Name.."'s Map"):WaitForChild("Defences"):GetChildren() do
+if v.Name=="Defence3" then
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("Upgrade",{defence = v})
+elseif v.Name=="Defence2" then
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("Upgrade",{defence = v})
+end
+end
+end
+end)
+repeat task.wait(2) until game:GetService("BadgeService"):UserHasBadgeAsync(LocalPlayer.UserId, 2153911928)
+game:GetService("TeleportService"):Teleport(6403373529)]])
+EquipGlove("Alchemist")
+TeleportToArena(1)
+HumanoidRootPart:PivotTo(CFrame.new(17891,-23.8,-3517))
+task.wait(1.5)
+if not workspace:FindFirstChild(LocalPlayer.Name.."'s Cauldron") then
+game:GetService("ReplicatedStorage").GeneralAbility:FireServer()
+task.wait(3)
+end
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer( "AddItem","Wild Vine")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer( "AddItem","Blood Rose")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer( "AddItem","Dark Root")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer( "AddItem","Elder Wood")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer( "AddItem","Jade Stone")
+task.wait()
+for i=1,3 do
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Wild Vine")
+end
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Blood Rose")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Dark Root")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Elder Wood")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Jade Stone")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("BrewPotion")
+task.wait(1)
+for i,v in next, Character:GetChildren() do
+if v and v:IsA("Tool") then
+v.Parent = LocalPlayer.Backpack
+end
+end
+task.wait(.5)
+for i,v in next, LocalPlayer.Backpack:GetChildren() do
+if v and v.Name:find("Vine Potion") then
+v.Parent = Character
+end
+end
+task.wait(1)
+game:GetService("ReplicatedStorage"):WaitForChild("AlchemistEvent"):FireServer("UsePotion","Corrupted Vine Potion",false)
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Scythe ( Requires Alchemist )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting Scythe..."
+local tpdata = (queue_on_teleport or queueonteleport)
+tpdata([[if game.PlaceId~=15228348051 then return end
+]]..GlobalTPData..[[
+msg.Text = "Getting Scythe..."
+workspace:WaitForChild("Maps"):WaitForChild(LocalPlayer.Name.."'s Map"):WaitForChild("Defences").ChildAdded:Connect(function(c)
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("SwitchPriority",{defence = c})
+end)
+repeat task.wait(.1)
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(17.541378021240234, 9.25, -18.65252685546875, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Scarecrow"})
+until LocalPlayer.PlayerGui.TowerDefenceUI.WaveNo.Text=="Wave 2"
+for i=1,5 do
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(61.623069763183594, 9.149999618530273, 88.51512145996094, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Farmer1"})
+task.wait(.1)
+end
+repeat task.wait(.1) until LocalPlayer.PlayerGui.TowerDefenceUI.WaveNo.Text=="Wave 3"
+repeat task.wait(.1)
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(61.623069763183594, 9.149999618530273, 88.51512145996094, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Farmer1"})
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(31.84327507019043, 9.149999618530273, 6.6344146728515625, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Farmer2"})
+until LocalPlayer.PlayerGui.TowerDefenceUI.WaveNo.Text=="Wave 4"
+repeat task.wait(.1)
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(31.84327507019043, 9.149999618530273, 6.6344146728515625, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Farmer2"})
+task.wait()
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(78.2428970336914, 9.149999618530273, -5.7471466064453125, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Farmer Tencelll"})
+until LocalPlayer.PlayerGui.TowerDefenceUI.WaveNo.Text=="Wave 5"
+repeat task.wait(.1)
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(78.2428970336914, 9.149999618530273, -5.7471466064453125, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Farmer Tencelll"})
+task.wait()
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(78.2428970336914, 9.149999618530273, -5.7471466064453125, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Defence3"})
+until LocalPlayer.PlayerGui.TowerDefenceUI.WaveNo.Text=="Wave 6"
+task.spawn(function()
+while task.wait(.1) do
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(78.2428970336914, 9.149999618530273, -5.7471466064453125, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Defence3"})
+task.wait()
+game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(31.84327507019043, 9.149999618530273, 6.6344146728515625, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Defence2"})
+end
+end)
+repeat task.wait(2) until game:GetService("BadgeService"):UserHasBadgeAsync(LocalPlayer.UserId, 3318257806017965)
+game:GetService("TeleportService"):Teleport(6403373529)]])
+EquipGlove("Alchemist")
+TeleportToArena(1)
+HumanoidRootPart:PivotTo(CFrame.new(17891,-23.8,-3517))
+task.wait(1.5)
+if not workspace:FindFirstChild(LocalPlayer.Name.."'s Cauldron") then
+game:GetService("ReplicatedStorage").GeneralAbility:FireServer()
+task.wait(3)
+end
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Hazel Lily")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Plane Flower")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Hazel Lily")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Plane Flower")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Plane Flower")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("BrewPotion")
+task.wait(1)
+for i,v in next, Character:GetChildren() do
+if v and v:IsA("Tool") then
+v.Parent = LocalPlayer.Backpack
+end
+end
+task.wait(.5)
+for i,v in next, LocalPlayer.Backpack:GetChildren() do
+if v and v.Name:find("Field Potion") then
+v.Parent = Character
+end
+end
+task.wait(1)
+game:GetService("ReplicatedStorage"):WaitForChild("AlchemistEvent"):FireServer("UsePotion","Corrupted Field Potion",false)
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Water ( Requires Alchemist )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting Water..."
+EquipGlove("Alchemist")
+TeleportToArena(1)
+HumanoidRootPart:PivotTo(CFrame.new(17891,-23.8,-3517))
+task.wait(1.5)
+if not workspace:FindFirstChild(LocalPlayer.Name.."'s Cauldron") then
+game:GetService("ReplicatedStorage").GeneralAbility:FireServer()
+task.wait(3)
+end
+
+-- Grug Potion
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Mushroom")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Mushroom")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("BrewPotion")
+
+-- Nightmare Potion
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Dark Root")
+task.wait()
+for i=1,3 do
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Dark Root")
+end
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("BrewPotion")
+
+-- Confusion Potion
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Red Crystal")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Blue Crystal")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Glowing Mushroom")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Red Crystal")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Blue Crystal")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Glowing Mushroom")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("BrewPotion")
+
+-- Power Potion
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Red Crystal")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Dire Flower")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Wild Vine")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Red Crystal")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Dire Flower")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Wild Vine")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("BrewPotion")
+
+-- Paralyzing Potion
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Plane Flower")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Plane Flower")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Plane Flower")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("BrewPotion")
+
+-- Haste Potion
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Autumn Sprout")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Jade Stone")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Autumn Sprout")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Jade Stone")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("BrewPotion")
+
+-- Invisibility Potion
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Hazel Lily")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Blue Crystal")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Hazel Lily")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Hazel Lily")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Blue Crystal")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("BrewPotion")
+
+-- Explosion Potion
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Red Crystal")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Fire Flower")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Fire Flower")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Fire Flower")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Red Crystal")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("BrewPotion")
+
+-- Invincible Potion
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Elder Wood")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Mushroom")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Mushroom")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Mushroom")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Elder Wood")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("BrewPotion")
+
+-- Toxic Potion
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Dark Root")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Blood Rose")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Red Crystal")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Red Crystal")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Blood Rose")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Dark Root")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Dark Root")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("BrewPotion")
+
+-- Freeze Potion
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Winter Rose")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Wild Vine")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Blue Crystal")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Glowing Mushroom")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Wild Vine")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Blue Crystal")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Glowing Mushroom")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Winter Rose")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Winter Rose")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("BrewPotion")
+
+-- Feather Potion
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Mushroom")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Hazel Lily")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Hazel Lily")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Mushroom")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("BrewPotion")
+
+-- Speed Potion
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Mushroom")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Hazel Lily")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Plane Flower")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Blue Crystal")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Hazel Lily")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Blue Crystal")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Plane Flower")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Mushroom")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Mushroom")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("BrewPotion")
+
+-- Lethal Potion
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Blood Rose")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Blood Rose")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Dark Root")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Dark Root")
+task.wait()
+for i=1,10 do
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Blood Rose")
+end
+for i=1,10 do
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Dark Root")
+end
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("BrewPotion")
+
+-- Slow Potion
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Mushroom")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Blue Crystal")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Jade Stone")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Plane Flower")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Mushroom")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Mushroom")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Blue Crystal")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Blue Crystal")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Jade Stone")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Plane Flower")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("BrewPotion")
+
+-- Antitoxin Potion
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Blue Crystal")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Glowing Mushroom")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Elder Wood")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Plane Flower")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Plane Flower")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Plane Flower")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Elder Wood")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Glowing Mushroom")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Blue Crystal")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("BrewPotion")
+
+-- Corrupted Vine Potion
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer( "AddItem","Wild Vine")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer( "AddItem","Blood Rose")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer( "AddItem","Dark Root")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer( "AddItem","Elder Wood")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer( "AddItem","Jade Stone")
+task.wait()
+for i=1,3 do
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Wild Vine")
+end
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Blood Rose")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Dark Root")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Elder Wood")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Jade Stone")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("BrewPotion")
+
+-- Corrupted Field Potion
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Hazel Lily")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Plane Flower")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Hazel Lily")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Plane Flower")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Plane Flower")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("BrewPotion")
+
+-- Lost Potion
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Blue Crystal")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Elder Wood")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Red Crystal")
+task.wait()
+for i=1,3 do
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Elder Wood")
+end
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Red Crystal")
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Blue Crystal")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("BrewPotion")
+
+-- Idiot Potion
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Cake Mix")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("MixItem","Cake Mix")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("BrewPotion")
+a:Destroy()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Bomb ( Requires Warp )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting Bomb..."
+EquipGlove("Ghost")
+game.ReplicatedStorage.Ghostinvisibilityactivated:FireServer()
+task.wait(.5)
+EquipGlove("Warp")
+local vector = Vector3.new(0,0,0)
+local rp = FindRandomPlayer()
+for i=1,150 do
+HumanoidRootPart:PivotTo(rp:WaitForChild("HumanoidRootPart").CFrame)
+for _,p in next, Character:GetDescendants() do
+if p:IsA("BasePart") then
+p.Velocity, p.RotVelocity = vector, vector
+end
+end
+task.wait(.005)
+end
+game.ReplicatedStorage.WarpHt:FireServer(rp:WaitForChild("HumanoidRootPart"),true)
+for i=1,150 do
+HumanoidRootPart:PivotTo(rp:WaitForChild("HumanoidRootPart").CFrame)
+for _,p in next, Character:GetDescendants() do
+if p:IsA("BasePart") then
+p.Velocity, p.RotVelocity = vector, vector
+end
+end
+task.wait(.005)
+end
+HumanoidRootPart:PivotTo(workspace.DEATHBARRIER.CFrame)
+task.wait(.1)
+game:GetService("ReplicatedStorage").WLOC:FireServer()
+a:Destroy()
+end; })
+
+AutoObtainment:CreateSection("Slap & Badge Gloves Requirement ( It should be obvious )")
+
+AutoObtainment:CreateButton({Name = "Auto-Get Schlop ( Requires Fish & Cloud )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting Schlop..."
+HumanoidRootPart:PivotTo(CFrame.new(243, -16, -0))
+task.wait(1)
+EquipGlove("Cloud")
+task.wait(.5)
+game:GetService("ReplicatedStorage").CloudAbility:FireServer()
+task.wait(.5)
+EquipGlove("fish")
+TeleportToArena(1)
+for i,v in pairs(workspace:GetChildren()) do
+if v.Name:match(LocalPlayer.Name) and v:FindFirstChild("VehicleSeat") then
+pcall(function()
+repeat task.wait()
+HumanoidRootPart:PivotTo(v.VehicleSeat.CFrame)
+until Humanoid.Sit==true
+end)
+end
+end
+for i =1,6 do
+task.wait(.25)
+for i,v in pairs(workspace:GetChildren()) do
+if v.Name:match(LocalPlayer.Name) and v:FindFirstChild("VehicleSeat") then
+pcall(function()
+repeat task.wait()
+HumanoidRootPart:PivotTo(v.VehicleSeat.CFrame)
+until Humanoid.Sit==true
+end)
+end
+end
+end
+HumanoidRootPart:PivotTo(CFrame.new(251, 140, -10))
+task.wait(2)
+game:GetService("ReplicatedStorage").GeneralAbility:FireServer()
+task.wait(1)
+for i=1,400 do
+HumanoidRootPart:PivotTo(game.workspace.Arena.Plate.CFrame)
+task.wait(.005)
+end
+Humanoid.Health = 0
+a:Destroy()
+end; })
+
+AutoObtainment:CreateSection("Location Requirement ( Can be obtained only if you are in specific locations )")
+
+AutoObtainment:CreateButton({Name = "Auto-Get Psycho ( Needs to be in The Limbo )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting Psycho..."
+game.ReplicatedStorage.RecallReset:FireServer(true, false, true)
+a:Destroy()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Retro ( Needs to be in Retro )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting Retro..."
+for i,v in next, workspace["FinishDoor_Retro"]:GetChildren() do
+if v.Name=="Part" and v:FindFirstChildWhichIsA("TouchTransmitter") then
+TouchObject(v)
+return
+end
+end
+a:Destroy()
+end; })
+
+AutoObtainment:CreateButton({Name = "Auto-Get Kraken ( Needs to be in The Abyss )"; Callback = function()
+if not HumanoidRootPart or not Humanoid then return end
+if Character:FindFirstChild("entered") then Rayfield:Notification("Error!","Use in lobby!",3,false) end
+local a = CreateMessage()
+a.Text = "Getting Kraken..."
+game.ReplicatedStorage.AbyssEvent:FireServer(true)
+a:Destroy()
+end; })
+
+local LocationTeleport = Window:CreateTab("Location Teleport",0)
+LocationTeleport:CreateButton({Name = "Normal Arena"; Callback = function()
+HumanoidRootPart:PivotTo(CFrame.new(0,0,0))
+end; })
+LocationTeleport:CreateButton({Name = "Island 1"; Callback = function()
+HumanoidRootPart:PivotTo(CFrame.new(0,0,200))
+end; })
+LocationTeleport:CreateButton({Name = "Island 2"; Callback = function()
+HumanoidRootPart:PivotTo(CFrame.new(0,0,-200))
+end; })
+LocationTeleport:CreateButton({Name = "Island 3"; Callback = function()
+HumanoidRootPart:PivotTo(CFrame.new(-200,0,0))
+end; })
+LocationTeleport:CreateButton({Name = "Cube of Death"; Callback = function()
+HumanoidRootPart:PivotTo(CFrame.new(-266,0,0))
+end; })
+LocationTeleport:CreateButton({Name = "Slapple Island"; Callback = function()
+HumanoidRootPart:PivotTo(CFrame.new(-400,55,-15))
+end; })
+LocationTeleport:CreateButton({Name = "Moai Island"; Callback = function()
+HumanoidRootPart:PivotTo(CFrame.new(200,-10,0))
+end; })
+LocationTeleport:CreateButton({Name = "Castle Island"; Callback = function()
+HumanoidRootPart:PivotTo(CFrame.new(265,40,200))
+end; })
+LocationTeleport:CreateButton({Name = "The Fort"; Callback = function()
+HumanoidRootPart:PivotTo(CFrame.new(-124,0,121))
+end; })
+LocationTeleport:CreateButton({Name = "Default Arena"; Callback = function()
+HumanoidRootPart:PivotTo(CFrame.new(120,360,0))
+end; })
+
+else
+
+local Notice = Window:CreateTab("Notice",0)
+Notice:CreateLabel("This experience is not supported!")
+
+end
+
+local ExperienceTeleport = Window:CreateTab("Experience Teleport",0)
+ExperienceTeleport:CreateLabel("Experiences here were scanned and put automatically, some may kick you")
+local places = game:GetService("AssetService"):GetGamePlacesAsync()
+for _, place in pairs(places:GetCurrentPage()) do
+if tonumber(place.PlaceId)==12459609433302 or tonumber(place.PlaceId)==136802962479827 or tonumber(place.PlaceId)==133668037883089 or tonumber(place.PlaceId)==11359765900 or tonumber(place.PlaceId)==11367956190 or tonumber(place.PlaceId)==12712288037 or tonumber(place.PlaceId)==12845859004 then
+continue
+else
+ExperienceTeleport:CreateButton({Name = ""..place.Name.." | "..((table.find(SupportedPlaces,place.PlaceId) and "Supported ✅") or "Not Supported ❌")..""; Callback = function()
+game:GetService("TeleportService"):Teleport(place.PlaceId)
+end; })
+end
+end
+
+local UpdateLogs = Window:CreateTab("Update Logs",0)
+
+UpdateLogs:CreateParagraph({Title = "Update 1.2.0", Content = [[Script Update ! ! !
+
+New Features
+- Added Alchemist Obtainment
+- Added Scythe Obtainment
+- Added Druid Obtainment
+- Added Shellbert Obtainment
+- Added Bomb Obtainment
+- Added Support to next subplaces: 'Conker Obtainment', 'Doorkeeper Obtainment', 'Find The Gloves', 'Lotus Obtainment', 'Plate glove obtainment', 'Pims Corn Maze', 'OperaGX Obtainment', 'Sword Fight on The Heights', 'Zombies', 'The Suction Trials', 'The Home of The Rat King', 'Slap Battles Tower Defense', 'Collect My Pages', 'The Fourth Trial', 'Egging Over It'
+
+Fixes
+- Fixed All Stuff in ''Auto Obtainment'' Tab ( queue_on_teleport fixes, now they don't execute randomly )
+- Fixed Slender Obtainment ( tape recorder didn't spawn )
+- Fixed Support to 'The Dreamscape' ( main tab didn't appear )
+- Fixed Support to 'The Null Zone' ( i forgot to put stuff )
+- Fixed buddies Obtainment ( didn't goldify )]]})
+
+UpdateLogs:CreateParagraph({Title = "Update 1.1.0", Content = [[Script Update ! ! !
+
+New Features
+- Added Portal Reset
+- Added Hunter Obtainment
+- Added Relude Obtainment
+- Added Water Obtainment
+- Added Pinata Auto Farm
+- Added Support to next subplaces: '?', 'Ice Trials', 'the null zone', 'barzil', 'The Staff Application', 'Where Guide Resides', 'The Dark Realm', 'Garden of Erasure', 'TOH', 'FIVE NIGHTS AT OOGS', 'The Dreamscape'
+
+Fixes
+- Fixed All Stuff in ''Auto Obtainment'' Tab ( sometimes didn't execute properly )
+- Fixed Collector Obtainment ( didn't collect all gloves )
+- Fixed Poltergeist Obtainemt ( enemy stuck )
+- Fixed Eggler Obtainment ( stuck in a loop )
+- Fixed Elude + Counter Obtainment ( wasn't enough time to get elude )
+- Fixed Metaverse Obtainment ( teleport data errors )
+- Fixed Clock Obtainment ( teleport data errors )
+- Fixed Hunter, Relude and Avatar Obtainemnts ( died during bossfight )
+- Fixed Moai Obtainment ( i forgot to put code inside it )
+- Fixed Ragdolling For Kinetic ( ragdolled only twice )]]})
+
+UpdateLogs:CreateParagraph({Title = "Update 1.0.0", Content = "Script Release. Work In Progress! Everything may be buggy and the hub lacks of features."})
