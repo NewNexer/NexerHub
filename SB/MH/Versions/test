@@ -1,0 +1,431 @@
+if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) or (string.find(identifyexecutor(), "Solara") or string.find(identifyexecutor(), "solara") or string.find(identifyexecutor(), "SOLARA")) then
+function fcd(part)
+assert(typeof(part) == "Instance", "invalid argument #1 to 'fireclickdetector' (Instance expected, got " .. type(part) .. ") ", 2)
+local clickDetector = part:FindFirstChild("ClickDetector") or part
+local previousParent = clickDetector.Parent
+local newPart = Instance.new("Part", workspace)
+newPart.Transparency = 1
+newPart.Size = Vector3.new(30, 30, 30)
+newPart.Anchored = true
+newPart.CanCollide = false
+delay(15, function()
+if newPart:IsDescendantOf(game) then
+newPart:Destroy()
+end
+end)
+clickDetector.Parent = newPart
+clickDetector.MaxActivationDistance = math.huge
+local vUser = game:FindService("VirtualUser") or game:GetService("VirtualUser")
+local connection = game:GetService("RunService").Heartbeat:Connect(function()
+local camera = workspace.CurrentCamera or workspace.Camera
+newPart.CFrame = camera.CFrame * CFrame.new(0, 0, -20) * CFrame.new(camera.CFrame.LookVector.X, camera.CFrame.LookVector.Y, camera.CFrame.LookVector.Z)
+vUser:ClickButton1(Vector2.new(20, 20), camera.CFrame)
+end)
+clickDetector.MouseClick:Once(function()
+connection:Disconnect()
+clickDetector.Parent = previousParent
+newPart:Destroy()
+end)
+end
+getgenv().fireclickdetector = fcd
+end
+
+repeat task.wait() until game:FindService("Players") and game:GetService("Players").LocalPlayer~=nil
+local LocalPlayer, LP = game:GetService("Players").LocalPlayer, game:GetService("Players").LocalPlayer
+local Character, Char
+local HumanoidRootPart, HRP
+local Humanoid, Hum
+pcall(function()
+Character, Char = LocalPlayer.Character, LocalPlayer.Character
+end)
+pcall(function()
+HumanoidRootPart, HRP = Character.HumanoidRootPart, Character.HumanoidRootPart
+end)
+pcall(function()
+Humanoid, Hum = Character.Humanoid, Character.Humanoid
+end)
+LocalPlayer.CharacterAdded:Connect(function(char)
+pcall(function()
+Character, Char = nil, nil
+HumanoidRootPart, HRP = nil, nil
+Humanoid, Hum = nil, nil
+task.wait()
+Character, Char = char, char
+repeat task.wait() until char:FindFirstChild("HumanoidRootPart")
+HumanoidRootPart, HRP = char.HumanoidRootPart, char.HumanoidRootPart
+repeat task.wait() until Character:FindFirstChild("Humanoid")
+Humanoid, Hum = char.Humanoid, char.Humanoid
+end)
+end)
+function CreateMessage(a)
+local instancename = (a=="Message" and a) or "Hint"
+local msg = Instance.new(instancename,game:GetService("CoreGui"))
+msg.Name = "BadgeHubNof"
+msg.Text = ""
+return msg
+end
+local msg = CreateMessage()
+msg.Text = "Loading Modules... (0/1)"
+local loadmoduleattempt = 0
+local Module = nil
+repeat task.wait()
+local lodsuc, loderr = pcall(function()
+Module = loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/Modified%20Module.luau"))()
+end)
+if not lodsuc then
+loadmoduleattempt += 1
+msg.Text = "Failed loading Modules, re-trying... ( Attempt "..tostring(loadmoduleattempt).." )"
+task.wait(1)
+elseif lodsuc and Module.IsWorking ~= nil then
+msg.Text = "Loading Modules... (1/1)"
+task.wait(1)
+else
+loadmoduleattempt += 1
+msg.Text = "Failed loading Modules, re-trying... ( Attempt "..tostring(loadmoduleattempt).." )"
+task.wait(1)
+end
+until msg.Text == "Loading Modules... (1/1)"
+EquipGlove = Module.EquipGlove
+TeleportToArena = Module.TeleportToArena
+TouchObject = Module.TouchObject
+Slap = Module.Slap
+task.wait(1)
+msg.Text = "Launching Rayfield..."
+--[[ Loading rayfield here ]] --
+local Rayfield = Module:GetWorkingRayfield()
+task.delay(2,function()
+msg:Destroy()
+end)
+
+GameKey = ""..((game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name ~= nil and game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name) or "Unknown")..""
+--[[ Creating Window ]]--
+local Window = Rayfield:CreateWindow({
+   Name = ""..GameKey.." | Mastery Farm Hub",
+   Icon = 0,    
+   LoadingTitle = "SB:MFH",
+   LoadingSubtitle = "Developed by Nexer",
+   Theme = "Amethyst",
+   DisableRayfieldPrompts = true,
+   DisableBuildWarnings = true,
+   ConfigurationSaving = {
+      Enabled = false,
+      FolderName = "",
+      FileName = ""
+   },
+   Discord = {
+      Enabled = false,
+      Invite = "noinvitelink",
+      RememberJoins = true
+   },
+   KeySystem = false,
+   KeySettings = {
+      Title = "Verify yourself firstly!",
+      Subtitle = "Key Needed!",
+      Note = "The key is ''cheese''",
+      FileName = "Key",
+      SaveKey = true,
+      GrabKeyFromSite = false,
+      Key = {"cheese"}
+   }
+})
+
+if workspace:FindFirstChild("platform1")==nil then
+local platform1 = Instance.new("Part")
+platform1.Position = Vector3.new(10000,10000,10000)
+platform1.Size = Vector3.new(1024,4,1024)
+platform1.Anchored = true
+platform1.Transparency = 0.5
+platform1.CanCollide = true
+platform1.Name = "platform1"
+platform1.Parent = workspace
+end
+
+Window:CreateTabSection("Overview")
+
+local Tab1 = Window:CreateTab("Overview",0)
+
+Tab1:CreateSection("Overview")
+
+Tab1:CreateParagraph({Title = "Overview", Content = "This script was developed by Nexer. By using this tool, you can easily earn many masteries. Enjoy!\n\n( PS: If you encountered an error, please DM me in discord! My current discord username is @new_nexer1234 )"})
+
+Tab1:CreateSection("Other")
+
+Tab1:CreateButton({Name = "Delete all stuck messages/hints/notifications"; Callback = function()
+for i,v in next, game:GetService("CoreGui"):GetChildren() do
+if v.Name=="BadgeHubNof" then
+v:Destroy()
+end
+end
+end; })
+
+Tab1:CreateButton({Name = "Reset Portals"; Callback = function()
+workspace.Lobby["Teleport1"].CFrame = CFrame.new(-1210.16235, 329.900879, 3.98652339, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+workspace.Lobby["Teleport1"].Size = Vector3.new(0.8665102124214172, 14.070901870727539, 8.572914123535156)
+workspace.Lobby["Teleport2"].CFrame = CFrame.new(-1210.16235, 329.955811, -8.03007889, 1, 0, 0, 0, -1, 0, 0, 0, -1)
+workspace.Lobby["Teleport2"].Size = Vector3.new(0.8665102124214172, 13.961214065551758, 9.13329792022705)
+end; })
+
+Tab1:CreateButton({Name = "Close Gui"; Callback = function()
+Rayfield:Destroy()
+end; })
+
+local processes = {}
+function ShutdownProcess(processid)
+processes[processid] = nil
+end
+
+function CreateProcess(gt,g,rem)
+local processid = game:GetService("HttpService"):GenerateGUID(false)
+processes[processid] = true
+local gt = gt or {
+   ["Replica"] = true;
+   ["Cherry"] = false;
+   ["Baller"] = false;
+   ["Blink"] = false;
+   ["UFO"] = false;
+   ["Null"] = false;
+   ["Swordfighter"] = false;
+   ["Poltergeist"] = false;
+   ["Conker"] = false;
+   ["Elf"] = false;
+   ["Command"] = false;
+}
+local g = g or "Glovel"
+local trg = trg or GlovelSlappingProcess
+local rem = rem or game.ReplicatedStorage.GeneralHit
+local NullCooldown = "ended"
+local CherryCooldown = "ended"
+task.spawn(function()
+repeat task.wait(.05)
+for i,v in next, workspace:GetChildren() do
+if LocalPlayer.leaderstats.Glove.Value~=g then continue end
+if v.Name==""..LocalPlayer.Name.."'s UFO" and v:FindFirstChild("UFOTarget") and v.UFOTarget:FindFirstChild("HumanoidRootPart") then
+rem:FireServer(v.UFOTarget.HumanoidRootPart,true)
+end
+if v.Name=="Å"..LocalPlayer.Name.."" and v:FindFirstChild("HumanoidRootPart") then
+rem:FireServer(v.HumanoidRootPart,true)
+end
+if v.Name=="ÅBaller"..LocalPlayer.Name.."" and v:FindFirstChild("HumanoidRootPart") then
+rem:FireServer(v.HumanoidRootPart,true)
+end
+if v.Name=="Blink_"..LocalPlayer.Name.."" and v:FindFirstChild("HumanoidRootPart") then
+rem:FireServer(v.HumanoidRootPart,true)
+end
+if v.Name=="cherry_storage" and v:FindFirstChild("Cherry "..LocalPlayer.Name) and v["Cherry "..LocalPlayer.Name]:FindFirstChild("HumanoidRootPart") then
+rem:FireServer(v["Cherry "..LocalPlayer.Name].HumanoidRootPart,true)
+end
+if v.Name=="Imp" and v:FindFirstChild("Body") then
+rem:FireServer(v.Body,true)
+end
+end
+until processes[processid]~=true or Humanoid.Health==0
+end)
+task.spawn(function()
+repeat task.wait(.1)
+if gt.Baller==true and workspace:FindFirstChild("ÅBaller"..LocalPlayer.Name)==nil then
+EquipGlove("Baller")
+TeleportToArena(2)
+game.ReplicatedStorage.GeneralAbility:FireServer()
+task.wait(.2)
+Humanoid.Health = 0
+LocalPlayer.CharacterAdded:Wait()
+task.wait(2)
+HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,10,0))
+task.wait(1)
+end
+if Character:FindFirstChild("isInArena") and Character.isInArena.Value==false and Character:FindFirstChild("entered")==nil then
+EquipGlove("Counter")
+game:GetService("ReplicatedStorage").Counter:FireServer()
+repeat task.wait() until Character:FindFirstChild("isInArena") and Character.isInArena.Value==true or Humanoid.Health==0 or processes[processid]~=true
+end
+if gt.Cherry==true and CherryCooldown=="ended" then
+EquipGlove("Cherry")
+game.ReplicatedStorage.GeneralAbility:FireServer()
+CherryCooldown = "ongoing"
+task.delay(6, function() CherryCooldown="ended" end)
+end
+if gt.Replica==true and workspace:FindFirstChild("Å"..LocalPlayer.Name)==nil then
+EquipGlove("Replica")
+game.ReplicatedStorage.Duplicate:FireServer()
+repeat task.wait() until workspace:FindFirstChild("Å"..LocalPlayer.Name) or Humanoid.Health==0 or processes[processid]~=true
+end
+if gt.Blink==true and workspace:FindFirstChild("Blink_"..LocalPlayer.Name)==nil then
+EquipGlove("Blink")
+game.ReplicatedStorage.Blink:FireServer("OutOfBody",{["dir"]=Vector3.new(0,0,0),["ismoving"]=false,["mousebehavior"]=Enum.MouseBehavior.Default})
+repeat task.wait() until workspace:FindFirstChild("Blink_"..LocalPlayer.Name) or Humanoid.Health==0 or processes[processid]~=true
+end
+if gt.Null==true and NullCooldown=="ended" then
+EquipGlove("Null")
+game.ReplicatedStorage.NullAbility:FireServer()
+NullCooldown = "ongoing"
+task.delay(15, function() NullCooldown="ended" end)
+end
+if gt.UFO==true and workspace:FindFirstChild(LocalPlayer.Name.."'s UFO")==nil then
+EquipGlove("UFO")
+game.ReplicatedStorage.GeneralAbility:FireServer()
+repeat task.wait() until workspace:FindFirstChild(LocalPlayer.Name.."'s UFO") or Humanoid.Health==0 or processes[processid]~=true
+end
+if LocalPlayer.leaderstats.Glove.Value~=g then
+EquipGlove(g)
+end
+until processes[processid]~=true or Humanoid.Health==0
+end)
+return processid
+end
+
+Window:CreateTabSection("Glovel")
+
+local GlovelYourself = Window:CreateTab("Glovel ( For Yourself )",0)
+
+GlovelYourself:CreateSection("Safezones")
+
+GlovelYourself:CreateButton({Name = "Teleport to baseplate"; Callback = function()
+HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,10,0))
+end; })
+
+GlovelYourself:CreateSection("Task 1")
+
+local DiggingGlovel = false
+GlovelYourself:CreateToggle({Name = "Start Digging ( You need to enter arena )"; Default = false; Callback = function(Value)
+DiggingGlovel = Value
+if DiggingGlovel==true then
+repeat task.wait(.05)
+if Character and Character:FindFirstChild("Head") then
+if Character.Head.Transparency~=1 then
+game:GetService("ReplicatedStorage").GlovelFunc:InvokeServer()
+else
+game:GetService("ReplicatedStorage").GlovelCancel:FireServer()
+end
+end
+until DiggingGlovel==false
+end
+end; })
+
+GlovelYourself:CreateSection("Tasks 2, 3")
+
+local GlovelGlovesForSlapping = {
+   ["Replica"] = false;
+   ["Cherry"] = false;
+   ["Baller"] = false;
+   ["Blink"] = false;
+   ["UFO"] = false;
+   ["Null"] = false;
+   ["Swordfighter"] = false;
+   ["Poltergeist"] = false;
+   ["Conker"] = false;
+   ["Elf"] = false;
+   ["Command"] = false;
+}
+GlovelYourself:CreateToggle({Name = "Slap Replica?"; Default = false; Callback = function(Value)
+GlovelGlovesForSlapping["Replica"] = Value
+end; })
+GlovelYourself:CreateToggle({Name = "Slap Cherry?"; Default = false; Callback = function(Value)
+GlovelGlovesForSlapping["Cherry"] = Value
+end; })
+GlovelYourself:CreateToggle({Name = "Slap Baller?"; Default = false; Callback = function(Value)
+GlovelGlovesForSlapping["Baller"] = Value
+end; })
+GlovelYourself:CreateToggle({Name = "Slap Blink?"; Default = false; Callback = function(Value)
+GlovelGlovesForSlapping["Blink"] = Value
+end; })
+GlovelYourself:CreateToggle({Name = "Slap UFO?"; Default = false; Callback = function(Value)
+GlovelGlovesForSlapping["UFO"] = Value
+end; })
+GlovelYourself:CreateToggle({Name = "Slap Null?"; Default = false; Callback = function(Value)
+GlovelGlovesForSlapping["Null"] = Value
+end; })
+--[[GlovelYourself:CreateToggle({Name = "Slap Swordfighter?"; Default = false; Callback = function(Value)
+GlovelGlovesForSlapping["Swordfighter"] = Value
+end; })]]
+--[[GlovelYourself:CreateToggle({Name = "Slap Poltergeist?"; Default = false; Callback = function(Value)
+GlovelGlovesForSlapping["Poltergeist"] = Value
+end; })]]
+--[[GlovelYourself:CreateToggle({Name = "Slap Conker?"; Default = false; Callback = function(Value)
+GlovelGlovesForSlapping["Conker"] = Value
+end; })]]
+--[[GlovelYourself:CreateToggle({Name = "Slap Elf?"; Default = false; Callback = function(Value)
+GlovelGlovesForSlapping["Elf"] = Value
+end; })]]
+--[[GlovelYourself:CreateToggle({Name = "Slap Command?"; Default = false; Callback = function(Value)
+GlovelGlovesForSlapping["Command"] = Value
+end; })]]
+
+local GlovelProcessID = nil
+GlovelYourself:CreateToggle({Name = "Start slapping clones"; Default = false; Callback = function(Value)
+if Value==true then
+HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,10,0))
+task.wait(1)
+GlovelProcessID = CreateProcess(GlovelGlovesForSlapping, "Glovel", game.ReplicatedStorage.GeneralHit)
+elseif GlovelProcessID~=nil then
+ShutdownProcess(GlovelProcessID)
+end
+end; })
+
+Window:CreateTabSection("Moon")
+
+local MoonYourself = Window:CreateTab("Moon ( For Yourself )",0)
+
+MoonYourself:CreateSection("Safezones")
+
+MoonYourself:CreateButton({Name = "Teleport to baseplate"; Callback = function()
+HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,10,0))
+end; })
+
+MoonYourself:CreateSection("Task 1")
+
+MoonYourself:CreateButton({Name = "Auto-Complete Task"; Callback = function()
+for i=1,200 do
+game:GetService("ReplicatedStorage").Events.celestial:FireServer("unequipped")
+end
+end; })
+
+MoonYourself:CreateSection("Task 2")
+
+local MoonGlovesForSlapping = {
+   ["Replica"] = false;
+   ["Cherry"] = false;
+   ["Baller"] = false;
+   ["Blink"] = false;
+   ["UFO"] = false;
+   ["Null"] = false;
+}
+MoonYourself:CreateToggle({Name = "Slap Replica?"; Default = false; Callback = function(Value)
+MoonGlovesForSlapping["Replica"] = Value
+end; })
+MoonYourself:CreateToggle({Name = "Slap Cherry?"; Default = false; Callback = function(Value)
+MoonGlovesForSlapping["Cherry"] = Value
+end; })
+MoonYourself:CreateToggle({Name = "Slap Baller?"; Default = false; Callback = function(Value)
+MoonGlovesForSlapping["Baller"] = Value
+end; })
+MoonYourself:CreateToggle({Name = "Slap Blink?"; Default = false; Callback = function(Value)
+MoonGlovesForSlapping["Blink"] = Value
+end; })
+MoonYourself:CreateToggle({Name = "Slap UFO?"; Default = false; Callback = function(Value)
+MoonGlovesForSlapping["UFO"] = Value
+end; })
+MoonYourself:CreateToggle({Name = "Slap Null?"; Default = false; Callback = function(Value)
+MoonGlovesForSlapping["Null"] = Value
+end; })
+
+local MoonProcessID = nil
+MoonYourself:CreateToggle({Name = "Start slapping clones"; Default = false; Callback = function(Value)
+if Value==true then
+HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,10,0))
+task.wait(1)
+MoonProcessID = CreateProcess(MoonGlovesForSlapping, "Moon", game.ReplicatedStorage.CelestialHit)
+repeat
+game.Players.LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Freefall)
+game:GetService("ReplicatedStorage").Events.celestial:FireServer("landed",false)
+task.wait()
+game.Players.LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Freefall)
+game:GetService("ReplicatedStorage").Events.celestial:FireServer("landed",true)
+task.wait()
+until processes[MoonProcessID]~=true
+elseif MoonProcessID~=nil then
+ShutdownProcess(MoonProcessID)
+end
+end; })
+
+MoonYourself:CreateSection("Task 3")
+
