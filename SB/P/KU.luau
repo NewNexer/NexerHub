@@ -175,14 +175,14 @@ end; })
 Firework:CreateSection("Mass Kicking")
 Firework:CreateButton({Name = "Kick Everyone"; Callback = function()
 for i,v in next, game:GetService("Players"):GetPlayers() do
-if v and v~=LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health~=0 then
+if v and v~=LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health~=0 and v.Character.Humanoid.Sit~=true then
 FireworkKick(v.Name)
 end
 end
 end; })
 Firework:CreateButton({Name = "Kick Everyone except Friends"; Callback = function()
 for i,v in next, game:GetService("Players"):GetPlayers() do
-if v and v~=LocalPlayer and not v:IsFriendsWith(LocalPlayer.UserId) and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health~=0 then
+if v and v~=LocalPlayer and not v:IsFriendsWith(LocalPlayer.UserId) and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health~=0 and v.Character.Humanoid.Sit~=true then
 FireworkKick(v.Name)
 end
 end
