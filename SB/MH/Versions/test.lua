@@ -165,10 +165,6 @@ workspace.Lobby["Teleport2"].CFrame = CFrame.new(-1210.16235, 329.955811, -8.030
 workspace.Lobby["Teleport2"].Size = Vector3.new(0.8665102124214172, 13.961214065551758, 9.13329792022705)
 end; })
 
-Tab1:CreateToggle({Name = "Anchor Yourself"; Default = false; Callback = function(Value)
-HumanoidRootPart.Anchored = Value
-end; })
-
 Tab1:CreateButton({Name = "Close Gui"; Callback = function()
 Rayfield:Destroy()
 end; })
@@ -1053,3 +1049,12 @@ end; })
 }
 game:GetService("ReplicatedStorage"):WaitForChild("MaceRaiseArm"):FireServer(unpack(args))
 ]]
+Window:CreateTabSection("Other")
+
+local Other = Window:CreateTab("Other",0)
+
+Other:CreateSection("Other")
+
+Other:CreateToggle({Name = "Anchor Yourself"; Default = false; Callback = function(Value)
+HumanoidRootPart.Anchored = Value
+end; })
