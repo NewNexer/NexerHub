@@ -561,7 +561,7 @@ local ClosestAuto = nil
 Heartbeat.ClosestAuto = function()
     local choosrnplayer = nil
     local closestdistance = HitboxReacherRange + 1
-	if workspace:FindFirstChild(LocalPlayer.Name,true).Parent.Name=="Survivor" and Character:FindFirstChild("Vanities") and Character.Vanities:FindFirstChild("CaretakerItem") and Character.Vanities.CaretakerItem.Transparency~=1 then
+	if workspace:FindFirstChild(LocalPlayer.Name,true) and workspace:FindFirstChild(LocalPlayer.Name,true).Parent.Name=="Survivor" and Character:FindFirstChild("Vanities") and Character.Vanities:FindFirstChild("CaretakerItem") and Character.Vanities.CaretakerItem.Transparency~=1 then
     for i,v in next, workspace.GameAssets.Teams.Survivor:GetChildren() do
         if v and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChildWhichIsA("Humanoid") and HumanoidRootPart and Humanoid and Humanoid.Health>0 then
             local humanoid = v:FindFirstChildWhichIsA("Humanoid")
@@ -576,7 +576,7 @@ Heartbeat.ClosestAuto = function()
             end
         end
     end
-	elseif workspace:FindFirstChild(LocalPlayer.Name,true).Parent.Name=="Survivor" then
+	elseif workspace:FindFirstChild(LocalPlayer.Name,true) and workspace:FindFirstChild(LocalPlayer.Name,true).Parent.Name=="Survivor" then
 	for i,v in next, workspace.GameAssets.Teams.Killer:GetChildren() do
         if v and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChildWhichIsA("Humanoid") and HumanoidRootPart and Humanoid and Humanoid.Health>0 then
             local humanoid = v:FindFirstChildWhichIsA("Humanoid")
@@ -589,7 +589,7 @@ Heartbeat.ClosestAuto = function()
             end
         end
     end
-	elseif workspace:FindFirstChild(LocalPlayer.Name,true).Parent.Name=="Killer" then
+	elseif workspace:FindFirstChild(LocalPlayer.Name,true) and workspace:FindFirstChild(LocalPlayer.Name,true).Parent.Name=="Killer" then
     for i,v in next, workspace.GameAssets.Teams.Survivor:GetChildren() do
         if v and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChildWhichIsA("Humanoid") and HumanoidRootPart and Humanoid and Humanoid.Health>0 then
             local humanoid = v:FindFirstChildWhichIsA("Humanoid")
