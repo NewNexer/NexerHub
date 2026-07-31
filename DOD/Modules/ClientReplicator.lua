@@ -1,3 +1,4 @@
+
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -5,6 +6,7 @@ local LocalPlayer = Players.LocalPlayer
 local UpdateServerPos = ReplicatedStorage.Events.RemoteEvents.CustomReplication.UpdateServerPos
 local GameAssets = workspace.GameAssets
 local v1 = 0
+local connector = nil
 
 getgenv().ClientReplicator = {
     ["Spoof Enabled"] = true,
@@ -48,7 +50,7 @@ repeat
     task.wait(0.5)
 until LocalPlayer:FindFirstChild("Stats") and LocalPlayer.Stats:FindFirstChild("LoadedIn")
 
-RunService.RenderStepped:Connect(function(p1)
+connector = RunService.RenderStepped:Connect(function(p1)
     v1 = v1 + p1
 
     local Character = LocalPlayer.Character
@@ -75,10 +77,11 @@ RunService.RenderStepped:Connect(function(p1)
         end
 
         local v12 = HumanoidRootPart and HumanoidRootPart.CFrame or Character:GetPivot()
-        local v3 = if Character:GetAttribute("Ragdolled") then Vector3.new(0, 0, 0) else (HumanoidRootPart and HumanoidRootPart.AssemblyLinearVelocity or Vector3.new(0, 0, 0)) / 17.5
+        local v3 = math.clamp(HumanoidRootPart:FindFirstChild("PingBool") and HumanoidRootPart.PingBool.Value * 0.8 or 0.2, 0.03, 0.13)
+        local v5 = if Character:GetAttribute("Ragdolled") then Vector3.new(0, 0, 0) else (HumanoidRootPart and HumanoidRootPart.AssemblyLinearVelocity or Vector3.new(0, 0, 0)) * v3
 
-        if (Vector3.new(v12) - Vector3.new(v12 + v3)).Magnitude > 7 then
-            v3 = v3 / 2
+        if (Vector3.new(v12) - Vector3.new(v12 + v5)).Magnitude > 8 then
+            v5 = v5 / 2
         end
 
         if ClientReplicator["Extend Hitbox"] and HumanoidRootPart then
@@ -87,7 +90,7 @@ RunService.RenderStepped:Connect(function(p1)
             v12 = v12 + (forwardVector * ClientReplicator["Studs"])
         end
 
-        if ClientReplicator["No Ping Affection"] and HumanoidRootPart and LocalPlayer == Players.LocalPlayer then
+        if ClientReplicator["No Ping Affection"] and HumanoidRootPart then
             local velocity = HumanoidRootPart.AssemblyLinearVelocity
             local speed = velocity.Magnitude
             local ping = GetPing()
@@ -106,7 +109,7 @@ RunService.RenderStepped:Connect(function(p1)
             staminaValue = Character:GetAttribute("Stamina") or 0
         end
 
-        UpdateServerPos:FireServer(v12 + v3, workspace.CurrentCamera.CFrame.LookVector, staminaValue)
+        UpdateServerPos:FireServer(v12 + v5, workspace.CurrentCamera.CFrame.LookVector, staminaValue, tick())
 
         local v6 = GameAssets.Teams.Survivor:GetChildren()
 
@@ -128,14 +131,18 @@ RunService.RenderStepped:Connect(function(p1)
     for v7, v8 in Players:GetPlayers() do
         if v8 ~= LocalPlayer then
             local Character2 = v8.Character
+
             if Character2 then
                 local HumanoidRootPart = Character2:FindFirstChild("HumanoidRootPart")
+
                 if HumanoidRootPart then
                     local v9 = (Character2:FindFirstChild("Replicator_Good") or HumanoidRootPart).CFrame
+
                     if HumanoidRootPart then
-                        HumanoidRootPart.CFrame = HumanoidRootPart.CFrame:Lerp(v9, 0.035)
+                        HumanoidRootPart.CFrame = HumanoidRootPart.CFrame:Lerp(v9, 0.07)
                         continue
                     end
+
                     Character2:PivotTo(v9)
                 end
             end
