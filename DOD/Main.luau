@@ -608,25 +608,25 @@ end
 Heartbeat.HitboxReacherHandler = function()
 if HitboxReacherEnabled==true then
 if WhoToTargetHitboxReach=="Auto" then
-if ClosestAuto and ClosestAuto.Character and ClosestAuto.Character:FindFirstChild("HumanoidRootPart") and (ClosestAuto.Character.HumanoidRootPart.Position-HumanoidRootPart.Position).Magnitude<(HitboxReacherRange+1) then
+if ClosestAuto and ClosestAuto.Character and ClosestAuto.Character:FindFirstChild("HumanoidRootPart") and (ClosestAuto.Character.HumanoidRootPart.Position-HumanoidRootPart.Position).Magnitude<(HitboxReacherRange+1) and ClientReplicator and ClientReplicator.HookOnto then
 ClientReplicator.HookOnto(ClosestAuto)
-else
+elseif ClientReplicator and ClientReplicator.Unhook then
 ClientReplicator.Unhook()
 end
 elseif WhoToTargetHitboxReach=="Killers Only" then
-if ClosestKiller and ClosestKiller.Character and ClosestKiller.Character:FindFirstChild("HumanoidRootPart") and (ClosestKiller.Character.HumanoidRootPart.Position-HumanoidRootPart.Position).Magnitude<(HitboxReacherRange+1) then
+if ClosestKiller and ClosestKiller.Character and ClosestKiller.Character:FindFirstChild("HumanoidRootPart") and (ClosestKiller.Character.HumanoidRootPart.Position-HumanoidRootPart.Position).Magnitude<(HitboxReacherRange+1) and ClientReplicator and ClientReplicator.HookOnto then
 ClientReplicator.HookOnto(ClosestKiller)
-else
+elseif ClientReplicator and ClientReplicator.Unhook then
 ClientReplicator.Unhook()
 end
 elseif WhoToTargetHitboxReach=="Civilians Only" then
-if ClosestCivilian and ClosestCivilian.Character and ClosestCivilian.Character:FindFirstChild("HumanoidRootPart") and (ClosestCivilian.Character.HumanoidRootPart.Position-HumanoidRootPart.Position).Magnitude<(HitboxReacherRange+1) then
+if ClosestCivilian and ClosestCivilian.Character and ClosestCivilian.Character:FindFirstChild("HumanoidRootPart") and (ClosestCivilian.Character.HumanoidRootPart.Position-HumanoidRootPart.Position).Magnitude<(HitboxReacherRange+1) and ClientReplicator and ClientReplicator.HookOnto then
 ClientReplicator.HookOnto(ClosestCivilian)
-else
+elseif ClientReplicator and ClientReplicator.Unhook then
 ClientReplicator.Unhook()
 end
 end
-else
+elseif ClientReplicator and ClientReplicator.Unhook then
 ClientReplicator.Unhook()
 end
 end
