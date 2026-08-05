@@ -1,3 +1,17 @@
+local FetchedHumanoids = {}
+local FetchedMannequins = {}
+-- Slap ''Air''
+for i,v in next, game:GetService("ReplicatedStorage").Assets:GetDescendants() do
+if v and v:IsA("Model") and v:FindFirstChild("isInArena") and v.isInArena.Value==true and v:FindFirstChild("Head") then
+if v.Parent.Name=="Mannequin" then
+table.insert(FetchedMannequins,v.Head)
+end
+table.insert(FetchedHumanoids,v.Head)
+end
+end
+local SlapHiddens = true
+local SlapWhichHiddens = "Mannequins"
+
 if (string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "xeno") or string.find(identifyexecutor(), "XENO")) or (string.find(identifyexecutor(), "Solara") or string.find(identifyexecutor(), "solara") or string.find(identifyexecutor(), "SOLARA")) then
 function fcd(part)
 assert(typeof(part) == "Instance", "invalid argument #1 to 'fireclickdetector' (Instance expected, got " .. type(part) .. ") ", 2)
@@ -85,7 +99,25 @@ msg.Text = "Failed loading Modules, re-trying... ( Attempt "..tostring(loadmodul
 task.wait(1)
 end
 until msg.Text == "Loading Modules... (1/1)"
-EquipGlove = Module.EquipGlove
+pcall(function()
+    local flags = require(game:GetService("ReplicatedStorage").BACKEND.Shared.Flags.FlagService)
+    local orig = flags.IsEnabled
+    flags.IsEnabled = function(flag, ...)
+        if flag == "IgnoreSafety" then
+            return true
+        end
+        return orig(flag, ...)
+    end
+end)
+local network = false
+function EquipGlove(glove)
+    if network and game:GetService("ReplicatedStorage"):FindFirstChild("SelectGlove [STUDIO]",true) then
+        repeat game:GetService("ReplicatedStorage"):FindFirstChild("SelectGlove [STUDIO]",true):FireServer(glove) task.wait(.1) until game:GetService("Players").LocalPlayer.leaderstats.Glove.Value == glove
+    else
+        repeat fireclickdetector(workspace.Lobby[glove]:FindFirstChildWhichIsA("ClickDetector",true)) task.wait(.1) until game:GetService("Players").LocalPlayer.leaderstats.Glove.Value == glove
+    end
+    task.wait(.1)
+end
 TeleportToArena = Module.TeleportToArena
 TouchObject = Module.TouchObject
 Slap = Module.Slap
@@ -163,6 +195,26 @@ workspace.Lobby["Teleport1"].CFrame = CFrame.new(-1210.16235, 329.900879, 3.9865
 workspace.Lobby["Teleport1"].Size = Vector3.new(0.8665102124214172, 14.070901870727539, 8.572914123535156)
 workspace.Lobby["Teleport2"].CFrame = CFrame.new(-1210.16235, 329.955811, -8.03007889, 1, 0, 0, 0, -1, 0, 0, 0, -1)
 workspace.Lobby["Teleport2"].Size = Vector3.new(0.8665102124214172, 13.961214065551758, 9.13329792022705)
+end; })
+
+Tab1:CreateToggle({Name = "Anchor Yourself"; Default = false; Callback = function(Value)
+HumanoidRootPart.Anchored = Value
+end; })
+
+Tab1:CreateToggle({Name = "Equip gloves thru network?"; Default = false; Callback = function(Value)
+network = Value
+end; })
+
+Tab1:CreateToggle({Name = "Slap Hiddens?"; Default = true; Callback = function(Value)
+SlapHiddens = Value
+end; })
+
+Tab1:CreateToggle({Name = "Slap Only Mannequins?"; Default = true; Callback = function(Value)
+if Value==true then
+SlapWhichHiddens = "Mannequins"
+else
+SlapWhichHiddens = "Humanoids"
+end
 end; })
 
 Tab1:CreateButton({Name = "Close Gui"; Callback = function()
@@ -265,6 +317,17 @@ rem:FireServer(v["5"].HumanoidRootPart,true)
 end
 end
 end
+if SlapHiddens==true then
+if SlapWhichHiddens=="Mannequins" then
+for i,v in next, FetchedMannequins do
+rem:FireServer(v,true)
+end
+else
+for i,v in next, FetchedHumanoids do
+rem:FireServer(v,true)
+end
+end
+end
 until processes[processid]~=true or Humanoid.Health==0
 end)
 task.spawn(function()
@@ -278,8 +341,11 @@ game.ReplicatedStorage.Ghostinvisibilityactivated:FireServer()
 repeat task.wait() until Character:FindFirstChild("Head") and Character.Head.Transparency==1 or Humanoid.Health==0
 end
 if Character:FindFirstChild("isInArena") and Character.isInArena.Value==false and Character:FindFirstChild("entered")==nil then
-EquipGlove("Counter")
-game:GetService("ReplicatedStorage").Counter:FireServer()
+EquipGlove("Eggler")
+for i=1,2 do
+game:GetService("ReplicatedStorage").Events.EgglerRAbility:FireServer()
+task.wait(2)
+end
 repeat task.wait() until Character:FindFirstChild("isInArena") and Character.isInArena.Value==true or Humanoid.Health==0 or processes[processid]~=true
 end
 if LocalPlayer.leaderstats.Glove.Value~=g then
@@ -317,8 +383,11 @@ game.ReplicatedStorage.Blink:FireServer("OutOfBody",{["dir"]=Vector3.new(0,0,0),
 repeat task.wait() until workspace:FindFirstChild("Blink_"..LocalPlayer.Name) or Humanoid.Health==0 or processes[processid]~=true
 end
 if Character:FindFirstChild("isInArena") and Character.isInArena.Value==false and Character:FindFirstChild("entered")==nil then
-EquipGlove("Counter")
-game:GetService("ReplicatedStorage").Counter:FireServer()
+EquipGlove("Eggler")
+for i=1,2 do
+game:GetService("ReplicatedStorage").Events.EgglerRAbility:FireServer()
+task.wait(2)
+end
 repeat task.wait() until Character:FindFirstChild("isInArena") and Character.isInArena.Value==true or Humanoid.Health==0 or processes[processid]~=true
 end
 if gt["5 More"]==true and (workspace:FindFirstChild(LocalPlayer.Name.."_More")==nil or workspace[LocalPlayer.Name.."_More"]:FindFirstChild("5")==nil) then
@@ -329,7 +398,10 @@ until workspace:FindFirstChild(LocalPlayer.Name.."_More") and workspace[LocalPla
 end
 if gt.Cherry==true and CherryCooldown=="ended" then
 EquipGlove("Cherry")
+game.ReplicatedStorage.Events.Friction:FireServer("touched_fire")
+repeat task.wait() until Character and Character:FindFirstChild("Ragdolled") and Character.Ragdolled.Value==true
 game.ReplicatedStorage.GeneralAbility:FireServer()
+repeat task.wait() until Character and Character:FindFirstChild("Ragdolled") and Character.Ragdolled.Value==false
 CherryCooldown = "ongoing"
 task.delay(6, function() CherryCooldown="ended" end)
 end
@@ -368,6 +440,36 @@ GlovelYourself:CreateButton({Name = "Teleport to baseplate"; Callback = function
 HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,10,0))
 end; })
 
+GlovelYourself:CreateSection("Tasks 1, 2, 3")
+
+local GlovelAllTasks = false
+GlovelYourself:CreateToggle({Name = "Auto-Farm Tasks 1, 2, 3 ( You need to enter arena )"; Default = false; Callback = function(Value)
+GlovelAllTasks = Value
+if GlovelAllTasks==true then
+repeat task.wait(.05)
+if Character and Character:FindFirstChild("Head") then
+if Character.Head.Transparency~=1 then
+game:GetService("ReplicatedStorage").GlovelFunc:InvokeServer()
+else
+game:GetService("ReplicatedStorage").GlovelCancel:FireServer()
+end
+end
+if SlapHiddens==true then
+if SlapWhichHiddens=="Mannequins" then
+for i,v in next, FetchedMannequins do
+game:GetService("ReplicatedStorage").GeneralHit:FireServer(v,true)
+end
+else
+for i,v in next, FetchedHumanoids do
+game:GetService("ReplicatedStorage").GeneralHit:FireServer(v,true)
+end
+end
+end
+until GlovelAllTasks==false
+end
+end; })
+
+
 GlovelYourself:CreateSection("Task 1")
 
 local DiggingGlovel = false
@@ -385,6 +487,7 @@ end
 until DiggingGlovel==false
 end
 end; })
+
 
 GlovelYourself:CreateSection("Tasks 2, 3")
 
@@ -687,9 +790,9 @@ game.ReplicatedStorage.FlashTeleport:FireServer()
 end
 end; })
 
-Window:CreateTabSection("Bomb")
+Window:CreateTabSection("Bomb ( Broken )")
 
-local BombYourself = Window:CreateTab("Bomb ( For Yourself )",0)
+local BombYourself = Window:CreateTab("Bomb ( Broken, For Yourself )",0)
 
 BombYourself:CreateSection("Safezones")
 
@@ -714,8 +817,11 @@ if Value==true then
 HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,10,0))
 task.wait(1)
 if Character:FindFirstChild("isInArena") and Character.isInArena.Value==false and Character:FindFirstChild("entered")==nil then
-EquipGlove("Counter")
-game:GetService("ReplicatedStorage").Counter:FireServer()
+EquipGlove("Eggler")
+for i=1,2 do
+game:GetService("ReplicatedStorage").Events.EgglerRAbility:FireServer()
+task.wait(2)
+end
 repeat task.wait() until Character:FindFirstChild("isInArena") and Character.isInArena.Value==true or Humanoid.Health==0
 end
 local vector = Vector3.new(0,0,0)
@@ -790,8 +896,11 @@ if Value==true then
 HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,10,0))
 task.wait(1)
 if Character:FindFirstChild("isInArena") and Character.isInArena.Value==false and Character:FindFirstChild("entered")==nil then
-EquipGlove("Counter")
-game:GetService("ReplicatedStorage").Counter:FireServer()
+EquipGlove("Eggler")
+for i=1,2 do
+game:GetService("ReplicatedStorage").Events.EgglerRAbility:FireServer()
+task.wait(2)
+end
 repeat task.wait() until Character:FindFirstChild("isInArena") and Character.isInArena.Value==true or Humanoid.Health==0
 end
 repeat
@@ -806,92 +915,169 @@ until BombProcesss==false or Humanoid.Health==0
 end
 end; })
 
-Window:CreateTabSection("Space")
 
-local SpaceYourself = Window:CreateTab("Space ( For Yourself )",0)
+Window:CreateTabSection("Fort")
 
-SpaceYourself:CreateSection("Safezones")
+local FortYourself = Window:CreateTab("Fort ( For Yourself )",0)
 
-SpaceYourself:CreateButton({Name = "Teleport to baseplate"; Callback = function()
+FortYourself:CreateSection("Safezones")
+
+FortYourself:CreateButton({Name = "Teleport to baseplate"; Callback = function()
 HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,10,0))
 end; })
 
-SpaceYourself:CreateSection("Task 1")
+FortYourself:CreateSection("Task 1")
 
-local ZeroGSpace = false
-SpaceYourself:CreateToggle({Name = "Auto-Farm Task 1"; Default = false; Callback = function(Value)
-ZeroGSpace = Value
-if ZeroGSpace==true then
-repeat task.wait(.05)
-game.ReplicatedStorage.ZeroGSound:FireServer()
-until ZeroGSpace==false
+function PressKey(keycode)
+local VirtualInputManager = game:GetService("VirtualInputManager")
+VirtualInputManager:SendKeyEvent(true, Enum.KeyCode[keycode], false, game)
+task.wait(0.05)
+VirtualInputManager:SendKeyEvent(false, Enum.KeyCode[keycode], false, game)
 end
+FortYourself:CreateButton({Name = "Get Badge"; Callback = function()
+EquipGlove("Fort")
+TeleportToArena(1)
+HumanoidRootPart:PivotTo(CFrame.new(-410,75,-41))
+task.wait(2)
+PressKey("E")
+task.wait(2)
+HumanoidRootPart:PivotTo(CFrame.new(-406,87,-51))
 end; })
 
-SpaceYourself:CreateSection("Tasks 1, 4")
+FortYourself:CreateSection("Tasks 2, 3")
 
-local SpaceProcessID = nil
-SpaceYourself:CreateToggle({Name = "Auto-Farm Tasks 1, 4"; Default = false; Callback = function(Value)
-if Value==true then
+local FortTasks = false
+FortYourself:CreateToggle({Name = "Auto-Farm Tasks 2, 3"; Default = false; Callback = function(Value)
+FortTasks = Value
+if FortTasks==true then
 HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,10,0))
-task.wait(1)
-SpaceProcessID = CreateProcess({["People"]=true;}, "Space", game.ReplicatedStorage.HtSpace)
-repeat task.wait(.05)
-game.ReplicatedStorage.ZeroGSound:FireServer()
-until processes[SpaceProcessID]~=true
-elseif SpaceProcessID~=nil then
-ShutdownProcess(SpaceProcessID)
-end
-end; })
-
-SpaceYourself:CreateSection("Task 3")
-
-SpaceYourself:CreateButton({Name = "Auto-Complete Task 3"; Callback = function()
-HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,10,0))
-task.wait(1)
-if LocalPlayer.leaderstats.Slaps.Value>665 and Character:FindFirstChild("Head") and Character.Head.Transparency~=1 then
-EquipGlove("Ghost")
-game.ReplicatedStorage.Ghostinvisibilityactivated:FireServer()
-repeat task.wait() until Character:FindFirstChild("Head") and Character.Head.Transparency==1 or Humanoid.Health==0
-end
+task.wait(1.5)
 if Character:FindFirstChild("isInArena") and Character.isInArena.Value==false and Character:FindFirstChild("entered")==nil then
-EquipGlove("Counter")
-game:GetService("ReplicatedStorage").Counter:FireServer()
+EquipGlove("Eggler")
+for i=1,2 do
+game:GetService("ReplicatedStorage").Events.EgglerRAbility:FireServer()
+task.wait(2)
+end
+repeat task.wait() until Character:FindFirstChild("isInArena") and Character.isInArena.Value==true or Humanoid.Health==0 or processes[processid]~=true
+end
+if LocalPlayer.leaderstats.Glove.Value~="ZZZZZZZ" then
+EquipGlove("ZZZZZZZ")
+end
+game:GetService("ReplicatedStorage").ZZZZZZZSleep:FireServer()
+task.wait(1)
+if LocalPlayer.leaderstats.Glove.Value~="Fort" then
+EquipGlove("Fort")
+end
+repeat
+game:GetService("ReplicatedStorage").Fortlol:FireServer()
+task.wait(4)
+until FortTasks==false or Humanoid.Health==0
+end
+end; })
+workspace.ChildAdded:Connect(function(fort)
+task.wait(.333)
+if fort.Name=="Part" and fort:FindFirstChild("brownsmoke") and fort.Color==Color3.fromRGB(172, 73, 73) and FortTasks==true then
+fort.CanCollide = false
+game:GetService("RunService").RenderStepped:Wait()
+repeat task.wait(.01)
+fort:PivotTo(HumanoidRootPart.CFrame)
+until fort.Transparency==1
+end
+end)
+
+Window:CreateTabSection("rob")
+
+local robYourself = Window:CreateTab("rob ( For Yourself )",0)
+
+robYourself:CreateSection("Safezones")
+
+robYourself:CreateButton({Name = "Teleport to baseplate"; Callback = function()
+HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,10,0))
+end; })
+
+robYourself:CreateSection("Task 1")
+
+robYourself:CreateButton({Name = "Spawn Portal"; Callback = function()
+HumanoidRootPart:PivotTo(CFrame.new(248, -16, 0))
+task.wait(1.5)
+HumanoidRootPart.Anchored = true
+if Character:FindFirstChild("isInArena") and Character.isInArena.Value==false and Character:FindFirstChild("entered")==nil then
+EquipGlove("Eggler")
+for i=1,2 do
+game:GetService("ReplicatedStorage").Events.EgglerRAbility:FireServer()
+task.wait(2)
+end
 repeat task.wait() until Character:FindFirstChild("isInArena") and Character.isInArena.Value==true or Humanoid.Health==0
 end
-if LocalPlayer.leaderstats.Glove.Value~="Space" then
-EquipGlove("Space")
+if LocalPlayer.leaderstats.Glove.Value~="rob" then
+EquipGlove("rob")
 end
-local vector = Vector3.new(0,0,0)
-for i=1,175 do
-HumanoidRootPart:PivotTo(workspace.Arena.CannonIsland.Cannon.MovingCannon.CannonPart["Meshes/cannon 1"].CFrame)
-for _,p in next, Character:GetDescendants() do
-if p:IsA("BasePart") then
-p.Velocity, p.RotVelocity = vector, vector
+game:GetService("ReplicatedStorage").rob:FireServer()
+task.wait(4)
+if LocalPlayer.leaderstats.Glove.Value~="bob" then
+EquipGlove("bob")
 end
+game:GetService("ReplicatedStorage").bob:FireServer()
+task.wait(2)
+HumanoidRootPart.Anchored = false
+end; })
+
+robYourself:CreateSection("Task 2")
+
+local RobTravel = false
+robYourself:CreateToggle({Name = "Auto-Farm Task 2"; Default = false; Callback = function(Value)
+RobTravel = Value
+if RobTravel==true then
+repeat
+if LocalPlayer.leaderstats.Glove.Value~="rob" then
+EquipGlove("rob")
 end
-task.wait(.005)
-end
-local ams = Instance.new("Message")
-ams.Text = "Enter into cannon in 5 seconds"
-ams.Parent = game:GetService("CoreGui")
-task.wait(5)
-ams:Destroy()
-if Humanoid.Health==0 then return end
-game.ReplicatedStorage.ZeroGSound:FireServer()
-task.wait(.25)
-for i=1,15 do
-workspace:WaitForChild("Arena"):WaitForChild("CannonIsland"):WaitForChild("Cannon"):WaitForChild("_cannonRemote"):FireServer({y = 9e9,x = 9e9,force = 300},true)
+HumanoidRootPart.CFrame = CFrame.new(math.random(10000,20000),math.random(10000,20000),math.random(10000,20000))
+game:GetService("ReplicatedStorage").rob:FireServer()
 task.wait(.05)
-end
-for i=1,200 do
-HumanoidRootPart:PivotTo(CFrame.new(-420,63,-27))
-for _,p in next, Character:GetDescendants() do
-if p:IsA("BasePart") then
-p.Velocity, p.RotVelocity = vector, vector
+until RobTravel==false or Humanoid.Health==0
+for i=1,50 do
+HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,30,0))
+task.wait()
 end
 end
-task.wait(.005)
+end; })
+
+robYourself:CreateSection("Task 3")
+
+local robAbsorb = false
+robYourself:CreateToggle({Name = "Auto-Farm Task 3"; Default = false; Callback = function(Value)
+robAbsorb = Value
+if robAbsorb==true then
+HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,10,0))
+task.wait(1.5)
+if Character:FindFirstChild("isInArena") and Character.isInArena.Value==false and Character:FindFirstChild("entered")==nil then
+EquipGlove("Eggler")
+for i=1,2 do
+game:GetService("ReplicatedStorage").Events.EgglerRAbility:FireServer()
+task.wait(2)
+end
+repeat task.wait() until Character:FindFirstChild("isInArena") and Character.isInArena.Value==true or Humanoid.Health==0 or processes[processid]~=true
+end
+HumanoidRootPart.Anchored = true
+repeat
+if LocalPlayer.leaderstats.Glove.Value~="Cherry" then
+EquipGlove("Cherry")
+end
+game:GetService("ReplicatedStorage").GeneralAbility:FireServer()
+task.wait(1)
+if LocalPlayer.leaderstats.Glove.Value~="rob" then
+EquipGlove("rob")
+end
+game:GetService("ReplicatedStorage").rob:FireServer()
+task.wait(1)
+for i,v in next, workspace.cherry_storage:GetChildren() do
+if v and v.Name=="Cherry "..LocalPlayer.Name.."" and v:FindFirstChild("HumanoidRootPart") then
+v.HumanoidRootPart:PivotTo(HumanoidRootPart.CFrame)
+end
+end
+until robAbsorb==false or Humanoid.Health==0
+HumanoidRootPart.Anchored = false
 end
 end; })
 
@@ -961,6 +1147,99 @@ end
 game.ReplicatedStorage.Well:FireServer()
 task.wait(5)
 until REDACTEDWell==false
+end
+end; })
+
+
+Window:CreateTabSection("Space")
+
+local SpaceYourself = Window:CreateTab("Space ( For Yourself )",0)
+
+SpaceYourself:CreateSection("Safezones")
+
+SpaceYourself:CreateButton({Name = "Teleport to baseplate"; Callback = function()
+HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,10,0))
+end; })
+
+SpaceYourself:CreateSection("Task 1")
+
+local ZeroGSpace = false
+SpaceYourself:CreateToggle({Name = "Auto-Farm Task 1"; Default = false; Callback = function(Value)
+ZeroGSpace = Value
+if ZeroGSpace==true then
+repeat task.wait(.05)
+game.ReplicatedStorage.ZeroGSound:FireServer()
+until ZeroGSpace==false
+end
+end; })
+
+SpaceYourself:CreateSection("Tasks 1, 4")
+
+local SpaceProcessID = nil
+SpaceYourself:CreateToggle({Name = "Auto-Farm Tasks 1, 4"; Default = false; Callback = function(Value)
+if Value==true then
+HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,10,0))
+task.wait(1)
+SpaceProcessID = CreateProcess({["People"]=true;}, "Space", game.ReplicatedStorage.HtSpace)
+repeat task.wait(.05)
+game.ReplicatedStorage.ZeroGSound:FireServer()
+until processes[SpaceProcessID]~=true
+elseif SpaceProcessID~=nil then
+ShutdownProcess(SpaceProcessID)
+end
+end; })
+
+SpaceYourself:CreateSection("Task 3")
+
+SpaceYourself:CreateButton({Name = "Auto-Complete Task 3"; Callback = function()
+HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,10,0))
+task.wait(1)
+if LocalPlayer.leaderstats.Slaps.Value>665 and Character:FindFirstChild("Head") and Character.Head.Transparency~=1 then
+EquipGlove("Ghost")
+game.ReplicatedStorage.Ghostinvisibilityactivated:FireServer()
+repeat task.wait() until Character:FindFirstChild("Head") and Character.Head.Transparency==1 or Humanoid.Health==0
+end
+if Character:FindFirstChild("isInArena") and Character.isInArena.Value==false and Character:FindFirstChild("entered")==nil then
+EquipGlove("Eggler")
+for i=1,2 do
+game:GetService("ReplicatedStorage").Events.EgglerRAbility:FireServer()
+task.wait(2)
+end
+repeat task.wait() until Character:FindFirstChild("isInArena") and Character.isInArena.Value==true or Humanoid.Health==0
+end
+if LocalPlayer.leaderstats.Glove.Value~="Space" then
+EquipGlove("Space")
+end
+local vector = Vector3.new(0,0,0)
+for i=1,175 do
+HumanoidRootPart:PivotTo(workspace.Arena.CannonIsland.Cannon.MovingCannon.CannonPart["Meshes/cannon 1"].CFrame)
+for _,p in next, Character:GetDescendants() do
+if p:IsA("BasePart") then
+p.Velocity, p.RotVelocity = vector, vector
+end
+end
+task.wait(.005)
+end
+local ams = Instance.new("Message")
+ams.Text = "Enter into cannon in 5 seconds"
+ams.Parent = game:GetService("CoreGui")
+task.wait(5)
+ams:Destroy()
+if Humanoid.Health==0 then return end
+game.ReplicatedStorage.ZeroGSound:FireServer()
+task.wait(.25)
+for i=1,15 do
+workspace:WaitForChild("Arena"):WaitForChild("CannonIsland"):WaitForChild("Cannon"):WaitForChild("_cannonRemote"):FireServer({y = 9e9,x = 9e9,force = 300},true)
+task.wait(.05)
+end
+for i=1,200 do
+HumanoidRootPart:PivotTo(CFrame.new(-420,63,-27))
+for _,p in next, Character:GetDescendants() do
+if p:IsA("BasePart") then
+p.Velocity, p.RotVelocity = vector, vector
+end
+end
+task.wait(.005)
 end
 end; })
 
@@ -1049,12 +1328,3 @@ end; })
 }
 game:GetService("ReplicatedStorage"):WaitForChild("MaceRaiseArm"):FireServer(unpack(args))
 ]]
-Window:CreateTabSection("Other")
-
-local Other = Window:CreateTab("Other",0)
-
-Other:CreateSection("Other")
-
-Other:CreateToggle({Name = "Anchor Yourself"; Default = false; Callback = function(Value)
-HumanoidRootPart.Anchored = Value
-end; })
