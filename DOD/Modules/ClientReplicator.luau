@@ -139,7 +139,7 @@ connector = RunService.RenderStepped:Connect(function(p1)
                     local v9 = (Character2:FindFirstChild("Replicator_Good") or HumanoidRootPart).CFrame
 
                     if HumanoidRootPart then
-                        HumanoidRootPart.CFrame = HumanoidRootPart.CFrame:Lerp(v9, 1.12)
+                        HumanoidRootPart.CFrame = HumanoidRootPart.CFrame:Lerp(v9, 0.14)
                         continue
                     end
 
