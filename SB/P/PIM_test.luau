@@ -1,6 +1,6 @@
--- Auto slap orbs
+-- Auto slap orb
 workspace.ChildAdded:Connect(function(c)
-if c.Name=="StaticOrb" or c.Name=="LightOrb" then
+if c.Name=="StaticOrb" then
 local args = {
 	c,
 	vector.create(-0.5, -0.5, -0.5)
@@ -12,7 +12,7 @@ end)
 if game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):FindFirstChild("ArenaFallDamage") then
 game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ArenaFallDamage"):Destroy()
 end
--- Slap Eyes and those flower lamps and mana if for some reason no mana spend didn't work
+-- Slap Eyes, Lamps and orb and regen mana
 while task.wait(.05) do
 if game:GetService("Players").LocalPlayer.Character and game:GetService("Players").LocalPlayer.Character:FindFirstChildWhichIsA("Tool") then
 game:GetService("Players").LocalPlayer.Character:FindFirstChildWhichIsA("Tool"):Activate()
@@ -38,6 +38,13 @@ end
 if workspace:FindFirstChild("ChomperEye") and workspace:WaitForChild("ChomperEye"):FindFirstChild("Base") then
 local args = {
 	workspace:WaitForChild("ChomperEye"):WaitForChild("Base"),
+	vector.create(-0.5, -0.5, -0.5)
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("SlapPest"):FireServer(unpack(args))
+end
+if workspace:FindFirstChild("LightOrb") then
+local args = {
+	workspace:WaitForChild("LightOrb"),
 	vector.create(-0.5, -0.5, -0.5)
 }
 game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("SlapPest"):FireServer(unpack(args))
