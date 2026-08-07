@@ -96,7 +96,6 @@ NETWORK.send_data = function(data)
         local decodedval = game:GetService("HttpService"):JSONDecode(my_data.Settings.Settings.Value)
         if decodedval._gloveRandomizer and decodedval._gloveRandomizer.Value then
             local condata = decodedval._gloveRandomizer.Value
-            -- Add unique ID to make every send detectable
             condata.data = data .. "_" .. game:GetService("HttpService"):GenerateGUID(false)
             NETWORK.edit_setting("_gloveRandomizer", condata)
         end
@@ -121,10 +120,8 @@ NETWORK.on_data_receive = function(callback)
                             local partner_decoded = game:GetService("HttpService"):JSONDecode(partner_data.Settings.Settings.Value)
                             if partner_decoded._gloveRandomizer and partner_decoded._gloveRandomizer.Value then
                                 local current_full_data = partner_decoded._gloveRandomizer.Value.data
-                                -- Only trigger if the full string (including GUID) changed
                                 if current_full_data ~= "" and current_full_data ~= last_full_data then
                                     last_full_data = current_full_data
-                                    -- Strip the GUID suffix before sending to callback
                                     local clean_data = string.match(current_full_data, "^(.*)_[%w%-]+$")
                                     if clean_data then
                                         callback(clean_data)
