@@ -150,7 +150,7 @@ function PieTrajectory.Init(p1)
         fullCleanup()
     end
 end]]
-ClientAbilities.Civilian.Bulge = [[local Variables = require(game:GetService("ReplicatedStorage").ClientModules.Gui.Variables)
+ClientAbilities.Civilian.Bugle = [[local Variables = require(game:GetService("ReplicatedStorage").ClientModules.Gui.Variables)
 local BugleEvent = require(game:GetService("ReplicatedStorage").ClientModules.Gui.Game.Ability.Require.BugleEvent)
 local CreateEvent = function(p1, p2)
     if Variables.PreferredInput == Enum.PreferredInput.Touch then
