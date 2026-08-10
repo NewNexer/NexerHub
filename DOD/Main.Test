@@ -995,7 +995,7 @@ AntiKillerBarriersToggle = WorkspaceImmunity:Toggle({
     Callback = function(state)
         AntiKillerBarriers = state
         if state==true then
-            if workspace.GameAssets:FindFirstChild("Map")==nil or workspace.GameAssets.Map:FindFirstChild("Config")==nil or workspace.GameAssets.Map.Config:FindFirstChild("Barriers")==nil or workspace.GameAssets.Map.Config.Barriers:FindFirstChild("KillerBarriers") then
+            if workspace.GameAssets:FindFirstChild("Map")==nil or workspace.GameAssets.Map:FindFirstChild("Config")==nil or workspace.GameAssets.Map.Config:FindFirstChild("Barriers")==nil or workspace.GameAssets.Map.Config.Barriers:FindFirstChild("KillerBarriers")==nil then
                 AntiKillerBarriersToggle:Set(false)
                 WindUI:Notify({
                     Title = "Fail",
@@ -1258,7 +1258,7 @@ Premium:Toggle({
        ApplyInvisibility(state)
        WindUI:Notify({
             Title = "Success",
-            Content = "Applied invisibility successfully!",
+            Content = "Enabled/Disabled invisibility successfully!",
             Icon = "check",
             Duration = 3,
         })
@@ -1268,11 +1268,11 @@ Premium:Toggle({
 Premium:Toggle({
     Title = "Invisibility + God Mode",
     Callback = function(state)
-       ClientReplicator["Extend Hitbox"] = true
-       ClientReplicator["Studs"] = 9000000
+       ClientReplicator["Extend Hitbox"] = state
+       ClientReplicator["Studs"] = (state==true and 9000000) or 5
        WindUI:Notify({
             Title = "Success",
-            Content = "Applied invisibility and god mode    successfully! ( you are invisible to other player btw )",
+            Content = "Enabled/Disabled invisibility and god mode successfully! ( you are invisible to other player btw )",
             Icon = "check",
             Duration = 6,
         })
