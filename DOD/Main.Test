@@ -1,0 +1,1353 @@
+local LocalPlayer, LP = game:GetService("Players").LocalPlayer, game:GetService("Players").LocalPlayer
+local Character, Char
+local HumanoidRootPart, HRP
+local Humanoid, Hum
+pcall(function()
+Character, Char = LocalPlayer.Character, LocalPlayer.Character
+end)
+pcall(function()
+HumanoidRootPart, HRP = Character.HumanoidRootPart, Character.HumanoidRootPart
+end)
+pcall(function()
+Humanoid, Hum = Character.Humanoid, Character.Humanoid
+end)
+LocalPlayer.CharacterAdded:Connect(function(char)
+pcall(function()
+Character, Char = nil, nil
+HumanoidRootPart, HRP = nil, nil
+Humanoid, Hum = nil, nil
+task.wait()
+Character, Char = char, char
+repeat task.wait() until char:FindFirstChild("HumanoidRootPart")
+HumanoidRootPart, HRP = char.HumanoidRootPart, char.HumanoidRootPart
+repeat task.wait() until Character:FindFirstChild("Humanoid")
+Humanoid, Hum = char.Humanoid, char.Humanoid
+end)
+end)
+
+function CreateMessage(a)
+local instancename = (a=="Message" and a) or "Hint"
+local msg = Instance.new(instancename,game:GetService("CoreGui"))
+msg.Text = ""
+return msg
+end
+
+local _version = "1.6.66"
+local msg = CreateMessage()
+msg.Text = "Loading Modules... (0/5)"
+local modules = {
+	{"WindUI", "https://github.com/Footagesus/WindUI/releases/download/".._version.."/main.lua", true},
+	{"Client Replicator", "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Modules/ClientReplicator.luau", true},
+	{"Client Animations", "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Modules/ClientAnimations.luau", true},
+	{"Client Abilities", "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Modules/ClientAbilities.luau", true},
+    {"Client ESP", "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/DOD/Modules/ClientESP.luau", true},
+}
+if not loaded_modules_dod then
+getgenv().loaded_modules_dod = {}
+end
+local loaded, attempts = {}, {}
+for i = 1, #modules do attempts[i] = 0 end
+local i = 1
+repeat task.wait()
+	local suc, res = pcall(function()
+		return table.find(loaded_modules_dod, tostring(modules[i][3])) and loaded_modules_dod[tostring(modules[i][3])] or modules[i][3] and loadstring(game:HttpGet(modules[i][2]))() or game:HttpGet(modules[i][2])
+	end)
+	if not suc then
+		attempts[i] += 1
+		msg.Text = "Failed loading module '"..modules[i][1].."', retry: "..attempts[i]
+		task.wait(1)
+	else
+		loaded[modules[i][1]] = res
+        table.insert(loaded_modules_dod, tostring(modules[i][1]))
+		msg.Text = "Loading module '"..modules[i][1].."'... ("..tostring(i).."/5)"
+		i += 1
+		task.wait(.5)
+	end
+until i > #modules
+local WindUI = loaded["WindUI"]
+local StoredConnections = {}
+msg.Text = "Launching WindUI..."
+task.delay(2, function() msg:Destroy() end)
+
+local Window = WindUI:CreateWindow({
+    Title = "Nexer Hub",
+    Icon = "gravity:logo-github",
+    Author = "by Nexer",
+    Transparent = true,
+    OpenButton = {
+        Title = "Nexer Hub",
+        CornerRadius = UDim.new(1, 0),
+        StrokeThickness = 2,
+        Enabled = true,
+        Draggable = true,
+        OnlyMobile = false,
+        Scale = 1,
+    },
+})
+
+local Game = Window:Tab({
+    Title = "Game",
+    Desc = "Game module lets you view game data and much more.",
+    Icon = "gravity:planet-earth",
+})
+
+local GameStatus = Game:Paragraph({
+    Title = "Game Status",
+    Desc = "",
+    Image = "check-circle",
+    ImageSize = 20
+})
+
+function FetchKiller()
+local qualified = {}
+for i,v in next, game:GetService("Players"):GetPlayers() do
+if v and v:FindFirstChild("Stats") and v.Stats:FindFirstChild("KillerChance") and v.Stats:FindFirstChild("EquippedKiller") and v.Stats:FindFirstChild("Settings") and v.Stats.Settings:FindFirstChild("KindMode") then
+if v.Stats.Settings.KindMode.Value == false then
+qualified[v.Name] = v.Stats.KillerChance.Value
+end
+end
+end
+local killer = "None"
+local min = -1
+for i,v in pairs(qualified) do
+if i and v then
+if min<v then
+killer = i
+min = v
+end
+end
+end
+return game:GetService("Players"):WaitForChild(killer), game:GetService("Players"):WaitForChild(killer).Stats.EquippedKiller.Value
+end
+
+game:GetService("RunService").RenderStepped:Connect(function()
+local Killer, Equippped = FetchKiller()
+local Seconds = math.floor(workspace.DistributedGameTime)
+GameStatus:SetDesc('⚙ Game Data ⚙\nCurrent Gamemode: '..game:GetService("ReplicatedStorage").GameSettings.Communication.Gamemode.Value..'\nCurrent Status: '..game:GetService("ReplicatedStorage").GameSettings.Communication.Status.Value..'\nCurrent Timer: '..game:GetService("ReplicatedStorage").GameSettings.Communication.Timer.Value..'\nNext Map: '..workspace.GameAssets.Lobby.Config.MapBoard.Title.SurfaceGui.Label.Text..'\nNext Killer: '..Killer.Name..' ('..Equippped..')\n\n⚙ Server Data ⚙\nDie of Death Version: '..game:GetService("ReplicatedStorage").GameSettings.Version.Value..''..game:GetService("ReplicatedStorage").GameSettings.Version.Details.Value..'\nPlace Version: '..tostring(game.PlaceVersion)..'\nServer Time: '..Seconds..' seconds\nServer ID: '..game.JobId..'\n\n⚙ Local Data ⚙\nFPS: '..math.floor(workspace:GetRealPhysicsFPS())..'\nPing: '..game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString()..'\nTime: '..os.date("%X")..'')
+end)
+
+local Movement = Window:Tab({
+    Title = "Movement",
+    Desc = "Movement module lets you edit multiple stamina settings such as stamina regeneration rate and others.",
+    Icon = "gravity:arrows-expand",
+})
+
+local GameMovement = {}
+GameMovement.required = false
+GameMovement.module = {}
+GameMovement.module.MaxStamina = "?"
+GameMovement.module.Stamina = "?"
+GameMovement.module.WalkSpeedModifier = "?"
+GameMovement.module.StaminaDrain = "?"
+GameMovement.module.StaminaRegen = "?"
+GameMovement.module.KillerStaminaRegen = "?"
+GameMovement.module.KillerStaminaDrain = "?"
+if require and not string.lower(identifyexecutor()):find("xeno") and not string.lower(identifyexecutor()):find("solara") then
+    GameMovement.required = true
+    pcall(function()
+        GameMovement.module = require(game:GetService("ReplicatedStorage").ClientModules.Gui.Game.Movement)
+    end)
+end
+
+local SimpleMovement = Movement:Section({
+    Title = "Quick Features",
+    Opened = true
+})
+
+function GetRealMaxStamina()
+    local legitmaxstamina = 100
+    if Character and Character:GetAttribute("Killer") then
+        if Character:GetAttribute("Killer")=="Pursuer" or Character:GetAttribute("Killer")=="Killdroid" or Character:GetAttribute("Killer")=="Badware" then
+            legitmaxstamina = 110
+        elseif Character:GetAttribute("Killer")=="Harken" then
+            legitmaxstamina = 114
+        end
+    end
+    return legitmaxstamina
+end
+local InfiniteStamina = false
+function StartInfiniteStaminaProcess()
+    task.spawn(function()
+        while InfiniteStamina do
+            if Character then
+                Character:SetAttribute("MaxStamina",math.huge)
+            end
+            if GameMovement.required==true then
+                GameMovement.module.Stamina = math.huge
+            end
+            task.wait()
+        end
+        task.wait(.05)
+        if Character then
+            Character:SetAttribute("MaxStamina",(InfiniteStamina==true and math.huge or GetRealMaxStamina()))
+        end
+    end)
+end
+SimpleMovement:Toggle({
+    Title = "Infinite Stamina",
+    Callback = function(state)
+        InfiniteStamina = state
+        if InfiniteStamina == true then
+            StartInfiniteStaminaProcess()
+        end
+    end
+})
+
+local NoStaminaLossEnabled = false
+function StartNoStaminaLossProcess(stamina)
+    task.spawn(function()
+        while NoStaminaLossEnabled do
+            if GameMovement.required==true then
+                GameMovement.module.Stamina = stamina
+            end
+            task.wait()
+        end
+    end)
+end
+local NoStaminaLoss = SimpleMovement:Toggle({
+    Title = "Freeze Stamina",
+    Callback = function(state)
+        NoStaminaLossEnabled = state
+        if Character and Character:GetAttribute("Stamina") and NoStaminaLossEnabled == true then
+            StartNoStaminaLossProcess(Character:GetAttribute("Stamina"))
+        end
+    end
+})
+StoredConnections[game:GetService("HttpService"):GenerateGUID(false)] = LocalPlayer.CharacterAdded:Connect(function()
+if NoStaminaLossEnabled == true then
+NoStaminaLoss:Set(false)
+NoStaminaLossEnabled = false
+end
+end)
+
+local InGameJumpingEnabled = false
+local InGameJumping = SimpleMovement:Toggle({
+    Title = "In-Game Jumping",
+    Callback = function(state)
+        InGameJumpingEnabled = state
+        if Humanoid then
+            Humanoid.UseJumpPower = not state
+        end
+    end
+})
+StoredConnections[game:GetService("HttpService"):GenerateGUID(false)] = LocalPlayer.CharacterAdded:Connect(function()
+if InGameJumpingEnabled == true then
+InGameJumping:Set(false)
+InGameJumpingEnabled = false
+end
+end)
+
+local AdvancedMovement = Movement:Section({
+    Title = "Advanced Features",
+    Opened = false
+})
+
+local MaxStaminaInput = AdvancedMovement:Input({
+    Title = "Max Stamina",
+    Placeholder = "100",
+    Value = "",
+    Callback = function(text)
+        if Character and tonumber(text)~=nil then
+            Character:SetAttribute("MaxStamina",tonumber(text))
+        end
+    end
+})
+StoredConnections[game:GetService("HttpService"):GenerateGUID(false)] = LocalPlayer.CharacterAdded:Connect(function()
+MaxStaminaInput:Set("")
+end)
+
+local StaminaInput = AdvancedMovement:Input({
+    Title = "Stamina",
+    Placeholder = "100",
+    Value = "",
+    Callback = function(text)
+        if GameMovement.required==true and tonumber(text)~=nil then
+            GameMovement.module.Stamina = tonumber(text)
+        end
+    end
+})
+StoredConnections[game:GetService("HttpService"):GenerateGUID(false)] = LocalPlayer.CharacterAdded:Connect(function()
+StaminaInput:Set("")
+end)
+
+AdvancedMovement:Input({
+    Title = "WalkSpeed Modifier",
+    Placeholder = "0",
+    Value = "",
+    Callback = function(text)
+        if GameMovement.required==true and tonumber(text)~=nil then
+            GameMovement.module.WalkSpeedModifier = tonumber(text)
+        end
+    end
+})
+
+AdvancedMovement:Input({
+    Title = "Civilian's Stamina Regeneration",
+    Placeholder = "33",
+    Value = "",
+    Callback = function(text)
+        if GameMovement.required==true and tonumber(text)~=nil then
+            GameMovement.module.StaminaRegen = tonumber(text)
+        end
+    end
+})
+
+AdvancedMovement:Input({
+    Title = "Civilian's Stamina Drain",
+    Placeholder = "12",
+    Value = "",
+    Callback = function(text)
+        if GameMovement.required==true and tonumber(text)~=nil then
+            GameMovement.module.StaminaDrain = tonumber(text)
+        end
+    end
+})
+
+AdvancedMovement:Input({
+    Title = "Killer's Stamina Regeneration",
+    Placeholder = "36",
+    Value = "",
+    Callback = function(text)
+        if GameMovement.required==true and tonumber(text)~=nil then
+            GameMovement.module.KillerStaminaRegen = tonumber(text)
+        end
+    end
+})
+
+AdvancedMovement:Input({
+    Title = "Killer's Stamina Drain",
+    Placeholder = "11",
+    Value = "",
+    Callback = function(text)
+        if GameMovement.required==true and tonumber(text)~=nil then
+            GameMovement.module.KillerStaminaDrain = tonumber(text)
+        end
+    end
+})
+
+local Abilities = Window:Tab({
+    Title = "Abilities",
+    Desc = "Abilities module lets you manipulate some of the ability remotes and edit multiple abilities such as adrenaline and others.",
+    Icon = "gravity:flame",
+})
+
+local SimpleAbilities = Abilities:Section({
+    Title = "Quick Features",
+    Opened = true
+})
+
+local GetThreeAbilities = SimpleAbilities:Button({
+    Title = "Get 3 Abilities",
+    Desc = "Those 3 abilities will be 'Revolver', 'Punch' and 'Block'",
+    Icon = "gravity:broadcast-signal",
+    Callback = function()
+        game:GetService("ReplicatedStorage").Events.RemoteEvents.AbilitySelection:FireServer()
+    end
+})
+
+local AbilitySelection = game:GetService("ReplicatedStorage").Events.RemoteEvents.AbilitySelection
+SimpleAbilities:Toggle({
+    Title = "Never Get Abilities",
+    Callback = function(state)
+        AbilitySelection.Name = (state==false and "AbilitySelection") or "Loading"
+    end
+})
+
+AbilitySelection.OnClientEvent:Connect(function(...)
+local deck1, deck2, deck3, val = ...
+if deck1 and deck2 and deck1[1] and deck1[2] and deck2[1] then
+GetThreeAbilities:SetDesc("Those 3 abilities will be '"..deck1[1].."', '"..deck1[2].."' and '"..deck2[1].."'")
+end
+end)
+
+local Adrenaline = Abilities:Section({
+    Title = "Adrenaline",
+    Opened = false
+})
+
+local AdrenalineExhaustion = true
+Adrenaline:Toggle({
+    Title = "Exhaustion",
+    Value = true,
+    Callback = function(state)
+        AdrenalineExhaustion = state
+    end
+})
+
+local AdrenalinePauseRegen = true
+Adrenaline:Toggle({
+    Title = "Pause Stamina Regeneration",
+    Value = true,
+    Callback = function(state)
+        AdrenalinePauseRegen = state
+    end
+})
+
+local AdrenalineWalkSpeedModifierDuringAbility = 7
+Adrenaline:Input({
+    Title = "WalkSpeed Modifier During Ability",
+    Placeholder = "7",
+    Value = "",
+    Callback = function(text)
+        if tonumber(text) then
+            AdrenalineWalkSpeedModifierDuringAbility = tonumber(text)
+        end
+    end
+})
+
+local AdrenalineWalkSpeedModifierEndAbility = -4
+Adrenaline:Input({
+    Title = "WalkSpeed Modifier at the end of Ability",
+    Placeholder = "-4",
+    Value = "",
+    Callback = function(text)
+        if tonumber(text) then
+            AdrenalineWalkSpeedModifierEndAbility = tonumber(text)
+        end
+    end
+})
+
+function AdrenalineSetUp(Head)
+Head:GetPropertyChangedSignal("Color"):Connect(function()
+if Head.Color == Color3.fromRGB(180, 128, 255) then
+Character:SetAttribute("Exhausted", 0)
+if AdrenalinePauseRegen == false then
+Character:SetAttribute("PauseRegen", 0)
+Character:GetAttributeChangedSignal("PauseRegen"):Once(function()
+if AdrenalinePauseRegen == false then
+Character:SetAttribute("PauseRegen", 0)
+end
+end)
+end
+local Connection
+Connection = Character:GetAttributeChangedSignal("WalkSpeedModifier"):Connect(function()
+if Character:GetAttribute("WalkSpeedModifier") > 6 then
+Character:SetAttribute("WalkSpeedModifier", AdrenalineWalkSpeedModifierDuringAbility+(Character:GetAttribute("WalkSpeedModifier")-7))
+elseif Character:GetAttribute("WalkSpeedModifier") > -3 then
+Character:SetAttribute("WalkSpeedModifier", AdrenalineWalkSpeedModifierEndAbility+(Character:GetAttribute("WalkSpeedModifier")+4))
+Connection:Disconnect()
+end
+end)
+Character:GetAttributeChangedSignal("Exhausted"):Once(function()
+if AdrenalineExhaustion == false then
+Character:SetAttribute("Exhausted", 0)
+end
+end)
+end
+end)
+end
+
+StoredConnections[game:GetService("HttpService"):GenerateGUID(false)] = LocalPlayer.CharacterAdded:Connect(function(Character)
+AdrenalineSetUp(Character:WaitForChild("Head",60))
+end)
+AdrenalineSetUp(Character:WaitForChild("Head",60))
+
+local BonusPad = Abilities:Section({
+    Title = "Bonus Pad",
+    Opened = false
+})
+
+local BonusPadWalkSpeedModifier = 5
+BonusPad:Input({
+    Title = "WalkSpeed Modifier During the Effect",
+    Placeholder = "5",
+    Value = "",
+    Callback = function(text)
+        if tonumber(text) then
+            BonusPadWalkSpeedModifier = tonumber(text)
+        end
+    end
+})
+
+function BonusPadSetUp(Character)
+Character.ChildAdded:Connect(function(Child)
+if Child.Name == "CoolHighlight" and Character and Character:GetAttribute("WalkSpeedModifier") then
+Character:SetAttribute("WalkSpeedModifier", (Character:GetAttribute("WalkSpeedModifier")-5)+BonusPadWalkSpeedModifier)
+end
+end)
+end
+
+StoredConnections[game:GetService("HttpService"):GenerateGUID(false)] = LocalPlayer.CharacterAdded:Connect(function(Character)
+BonusPadSetUp(Character)
+end)
+BonusPadSetUp(Character)
+
+local Bugle = Abilities:Section({
+    Title = "Bugle",
+    Opened = false
+})
+
+Bugle:Button({
+    Title = "Rework Ability (QOL)",
+    Desc = "The PC version of Bugle's minigame will be as easy as on Mobile.",
+    Icon = "mouse-pointer-click",
+    Callback = function()
+        loadstring(ClientAbilities.Civilian.Bugle)()
+        WindUI:Notify({
+            Title = "Success",
+            Content = "Bugle Reworked Successfully!",
+            Icon = "check",
+            Duration = 3,
+        })
+    end
+})
+
+local AutoBugle = false
+Bugle:Toggle({
+    Title = "Auto Minigame",
+    Callback = function(state)
+        AutoBugle = state
+    end
+})
+
+local BugleDelay = 0
+Bugle:Input({
+    Title = "Delay Between Completions ( Auto Minigame )",
+    Placeholder = "0",
+    Value = "",
+    Callback = function(text)
+        if tonumber(text) then
+            BugleDelay = tonumber(text)
+        end
+    end
+})
+
+StoredConnections[game:GetService("HttpService"):GenerateGUID(false)] = LocalPlayer.PlayerGui.MainGui.RoundUI.Civilian.Bugle:GetPropertyChangedSignal("Visible"):Connect(function()
+if LocalPlayer.PlayerGui.MainGui.RoundUI.Civilian.Bugle.Visible and AutoBugle then
+for i=1,4 do
+game:GetService("ReplicatedStorage").Events.RemoteEvents.Abilities.Bugle:FireServer(true)
+if BugleDelay~=0 then
+task.wait(BugleDelay)
+end
+if not LocalPlayer.PlayerGui.MainGui.RoundUI.Civilian.Bugle.Visible then
+break
+end
+end
+end
+end)
+
+local Block = Abilities:Section({
+    Title = "Block",
+    Opened = false
+})
+
+local AutoBlock = false
+Block:Toggle({
+    Title = "Auto Block",
+    Callback = function(state)
+        AutoBlock = state
+    end
+})
+
+local AutoBlockRange = 20
+Block:Input({
+    Title = "Auto Block Range",
+    Placeholder = "18",
+    Value = "",
+    Callback = function(text)
+        if tonumber(text) then
+            AutoBlockRange = tonumber(text)
+        end
+    end
+})
+
+local AutoBlockLookVectorTrigger = 0.45
+Block:Input({
+    Title = "Auto Block Look Vector Trigger",
+    Desc = "Set this value from 0 to 1 only.\n0 = no line of sight, auto block will block even if you are behind killer.\n1 = auto block will strictly block only if killer looks directly at you.",
+    Placeholder = "0.45",
+    Value = "",
+    Callback = function(text)
+        if tonumber(text) then
+            AutoBlockLookVectorTrigger = tonumber(text)
+        end
+    end
+})
+
+function BlockSetUp(klr)
+local function test_1(klr)
+if not klr or not klr:FindFirstChild("HumanoidRootPart") or not Character or not Character:FindFirstChild("CollisionBox") or not Character.CollisionBox:FindFirstChild("HurtBox") then return false end
+local unit = ((Character:WaitForChild("CollisionBox", 60):WaitForChild("HurtBox", 60).Position - klr:WaitForChild("HumanoidRootPart", 60).Position) * Vector3.new(1,0,1)).Unit
+local lookvector = klr:WaitForChild("HumanoidRootPart", 60).CFrame.LookVector * Vector3.new(1,0,1)
+return (lookvector:Dot(unit) > AutoBlockLookVectorTrigger)
+end
+local function test_2(klr)
+if not klr or not klr:FindFirstChild("HumanoidRootPart") or not Character or not Character:FindFirstChild("CollisionBox") or not Character.CollisionBox:FindFirstChild("HurtBox") then return 9000000 end
+return (klr:WaitForChild("HumanoidRootPart", 60).Position - Character:WaitForChild("CollisionBox", 60):WaitForChild("HurtBox", 60).Position).Magnitude or 9000000
+end
+if klr and klr:WaitForChild("HumanoidRootPart", 60):FindFirstChild("Swing") then
+klr:WaitForChild("HumanoidRootPart", 60).Swing.Played:Connect(function()
+if (test_2(klr)<AutoBlockRange)==true and test_1(klr)==true and AutoBlock==true then
+game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Block")
+end
+end)
+elseif klr and klr:WaitForChild("HumanoidRootPart", 60):FindFirstChild("Attack") then
+klr:WaitForChild("HumanoidRootPart", 60).Attack.Played:Connect(function()
+if (test_2(klr)<AutoBlockRange)==true and test_1(klr)==true and AutoBlock==true then
+game:GetService("ReplicatedStorage").Events.RemoteFunctions.UseAbility:InvokeServer("Block")
+end
+end)
+end
+end
+
+for i,v in next, workspace.GameAssets.Teams.Killer:GetChildren() do
+if v and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChildWhichIsA("Humanoid") then
+BlockSetUp(v)
+end
+end
+StoredConnections[game:GetService("HttpService"):GenerateGUID(false)] = workspace.GameAssets.Teams.Killer.ChildAdded:Connect(function(Child)
+BlockSetUp(Child)
+end)
+
+local Dash = Abilities:Section({
+    Title = "Dash",
+    Opened = false
+})
+
+local DashPower = 1250
+Dash:Input({
+    Title = "Power",
+    Placeholder = "1250",
+    Value = "",
+    Callback = function(text)
+        if tonumber(text) then
+            DashPower = tonumber(text)
+        end
+    end
+})
+
+local DashMaxForce = 100000
+Dash:Input({
+    Title = "Max Force",
+    Placeholder = "100000",
+    Value = "",
+    Callback = function(text)
+        if tonumber(text) then
+            DashMaxForce = tonumber(text)
+        end
+    end
+})
+
+local DashDuration = 0.48
+Dash:Input({
+    Title = "Duration",
+    Placeholder = "0.48",
+    Value = "",
+    Callback = function(text)
+        if tonumber(text) then
+            DashDuration = tonumber(text)
+        end
+    end
+})
+
+function DashSetUp(HumanoidRootPart)
+HumanoidRootPart.ChildAdded:Connect(function(Child)
+task.wait()
+if Child.Name == "BodyVelocity" and (Character:GetAttribute("Ragdolled")==nil or Character:GetAttribute("Ragdolled")==0) then
+if DashDuration<0.49 then
+Child.MaxForce = Vector3.new(DashMaxForce,(DashMaxForce*0.05),DashMaxForce)
+Child.P = DashPower
+game:GetService("Debris"):AddItem(c, DashDuration)
+elseif DashDuration>0.48 then
+Child:Destroy()
+local BodyVelocity = Instance.new("BodyVelocity")
+BodyVelocity.MaxForce = Vector3.new(DashMaxForce,(DashMaxForce*0.05),DashMaxForce)
+BodyVelocity.P = DashPower
+BodyVelocity.Velocity = HumanoidRootPart.CFrame.LookVector * 80
+BodyVelocity.Parent = HumanoidRootPart
+game:GetService("Debris"):AddItem(BodyVelocity, DashDuration)
+end
+end
+end)
+end
+
+StoredConnections[game:GetService("HttpService"):GenerateGUID(false)] = LocalPlayer.CharacterAdded:Connect(function(Character)
+DashSetUp(Character:WaitForChild("HumanoidRootPart",60))
+end)
+DashSetUp(HumanoidRootPart)
+
+local Pie = Abilities:Section({
+    Title = "Pie",
+    Opened = false
+})
+
+Pie:Button({
+    Title = "Rework Ability (QOL)",
+    Desc = "The PC version of Pie will be easy to control with Q/E keybinds to move it backwards/forwards. ( Spacebar to shoot )",
+    Icon = "mouse-pointer-click",
+    Callback = function()
+        loadstring(ClientAbilities.Civilian.Pie)()
+        WindUI:Notify({
+            Title = "Success",
+            Content = "Pie reworked successfully!",
+            Icon = "check",
+            Duration = 3,
+        })
+    end
+})
+
+local AimbotPie = false
+Pie:Toggle({
+    Title = "Aimbot Pie",
+    Callback = function(state)
+        AimbotPie = state
+    end
+})
+
+StoredConnections[game:GetService("HttpService"):GenerateGUID(false)] = LocalPlayer.PlayerGui.MainGui.RoundUI.Civilian.Pie:GetPropertyChangedSignal("Visible"):Connect(function()
+if LocalPlayer.PlayerGui.MainGui.RoundUI.Civilian.Pie.Visible and AimbotPie and workspace.GameAssets.Teams.Killer:FindFirstChildWhichIsA("Model") and HumanoidRootPart then
+game:GetService("ReplicatedStorage").Events.RemoteEvents.Abilities.Pie:FireServer((function(t)local d=t.Position-HRP.Position;local h=Vector3.new(d.X,0,d.Z);local s=h.Magnitude;local v=100;local x=s/v;return HRP.CFrame:VectorToObjectSpace(h.Unit*v+Vector3.new(0,(d.Y+0.5*workspace.Gravity*x*x)/x,0))end)(workspace.GameAssets.Teams.Killer:FindFirstChildWhichIsA("Model"):WaitForChild("HumanoidRootPart",60)))
+end
+end)
+
+Abilities:Divider()
+
+local Swing = Abilities:Section({
+    Title = "Swing",
+    Opened = false
+})
+
+local NoCooldownSwing = false
+local NoCooldownSwingConnection1, NoCooldownSwingConnection2
+local NoCooldownSwingToggle = Swing:Toggle({
+    Title = "No Cooldown Swing",
+    Callback = function(state)
+        NoCooldownSwing = state
+        if state==true then
+            NoCooldownSwingConnection1 = Character:GetAttributeChangedSignal("SwingCooldown"):Connect(function()
+                Character:SetAttribute("SwingCooldown","")
+            end)
+            NoCooldownSwingConnection2 = Character:GetAttributeChangedSignal("EjectCooldown"):Connect(function()
+                Character:SetAttribute("EjectCooldown","")
+            end)
+        elseif state==false then
+            if NoCooldownSwingConnection1 then
+                NoCooldownSwingConnection1:Disconnect()
+                NoCooldownSwingConnection1 = nil
+            end
+            if NoCooldownSwingConnection2 then
+                NoCooldownSwingConnection2:Disconnect()
+                NoCooldownSwingConnection2 = nil
+            end
+        end
+    end
+})
+
+StoredConnections[game:GetService("HttpService"):GenerateGUID(false)] = LocalPlayer.CharacterAdded:Connect(function()
+if NoCooldownSwing==true then
+NoCooldownSwingToggle:Set(false)
+NoCooldownSwing = false
+end
+end)
+
+--[[local Cleave = Abilities:Section({
+    Title = "Cleave",
+    Opened = false
+})
+
+local CleaveWalkSpeedModifierDuringAbility = 5
+Cleave:Input({
+    Title = "WalkSpeed Modifier During Ability",
+    Placeholder = "5",
+    Value = "",
+    Callback = function(text)
+        if tonumber(text) then
+            CleaveWalkSpeedModifierDuringAbility = tonumber(text)
+            CleaveSetUp(Character)
+        end
+    end
+})
+
+local CleaveWalkSpeedModifierEndAbility = -3
+Cleave:Input({
+    Title = "WalkSpeed Modifier at the end of Ability",
+    Placeholder = "-3",
+    Value = "",
+    Callback = function(text)
+        if tonumber(text) then
+            CleaveWalkSpeedModifierEndAbility = tonumber(text)
+            CleaveSetUp(Character)
+        end
+    end
+})
+
+function CleaveSetUp(Character)
+task.wait(1)
+if Character and Character:FindFirstChild("BackDagger") then
+Character.BackDagger:GetPropertyChangedSignal("Transparency"):Connect(function()
+if Character.BackDagger.Transparency == 1 then
+Character:SetAttribute("WalkSpeedModifier", (Character:GetAttribute("WalkSpeedModifier")-5)+CleaveWalkSpeedModifierDuringAbility)
+Character:GetAttributeChangedSignal("WalkSpeedModifier"):Once(function()
+Character:SetAttribute("WalkSpeedModifier", CleaveWalkSpeedModifierEndAbility+(Character:GetAttribute("WalkSpeedModifier")+3))
+end)
+end
+end)
+end
+end
+
+StoredConnections[game:GetService("HttpService"):GenerateGUID(false)] = LocalPlayer.CharacterAdded:Connect(function(Character)
+CleaveSetUp(Character)
+end)
+CleaveSetUp(Character)]]
+
+local Immunity = Window:Tab({
+    Title = "Anti(s) / Immunities",
+    Desc = "Immunities module lets you have immunities to certain things.",
+    Icon = "gravity:shield",
+})
+
+local ImmunityPlayer = Immunity:Section({
+    Title = "Player",
+    Opened = true
+})
+
+local AntiStun = false
+local AntiStunConnection1
+local AntiStunToggle = ImmunityPlayer:Toggle({
+    Title = "Anti-Stun",
+    Callback = function(state)
+        AntiStun = state
+        if state==true then
+            AntiStunConnection1 = Character:GetAttributeChangedSignal("WalkSpeedModifier"):Connect(function()
+                if Character:GetAttribute("WalkSpeedModifier")<0 then
+                    Character:SetAttribute("WalkSpeedModifier",0)
+                end
+            end)
+        elseif state==false then
+            if AntiStunConnection1 then
+                AntiStunConnection1:Disconnect()
+                AntiStunConnection1 = nil
+            end
+        end
+    end
+})
+
+StoredConnections[game:GetService("HttpService"):GenerateGUID(false)] = LocalPlayer.CharacterAdded:Connect(function()
+if AntiStun==true then
+AntiStunToggle:Set(false)
+AntiStun = false
+end
+end)
+
+local AntiFatigue = false
+local AntiFatigueConnection1
+local AntiFatigueToggle = ImmunityPlayer:Toggle({
+    Title = "Anti-Fatigue",
+    Callback = function(state)
+        AntiFatigue = state
+        if state==true then
+            Character:SetAttribute("Fatigue",0)
+            task.wait()
+            AntiFatigueConnection1 = Character:GetAttributeChangedSignal("Fatigue"):Connect(function()
+                if Character:GetAttribute("Fatigue")~=0 then
+                    Character:SetAttribute("Fatigue",0)
+                end
+            end)
+        elseif state==false then
+            if AntiFatigueConnection1 then
+                AntiFatigueConnection1:Disconnect()
+                AntiFatigueConnection1 = nil
+            end
+        end
+    end
+})
+
+local AntiSprintDisabling = false
+local AntiSprintDisablingConnection1
+local AntiSprintDisablingToggle = ImmunityPlayer:Toggle({
+    Title = "Anti-Sprint Disabling",
+    Callback = function(state)
+        AntiSprintDisabling = state
+        if state==true then
+            Character:SetAttribute("DisableSprint",false)
+            task.wait()
+            AntiSprintDisablingConnection1 = Character:GetAttributeChangedSignal("DisableSprint"):Connect(function()
+                if Character:GetAttribute("DisableSprint")~=false then
+                    Character:SetAttribute("DisableSprint",false)
+                end
+            end)
+        elseif state==false then
+            if AntiSprintDisablingConnection1 then
+                AntiSprintDisablingConnection1:Disconnect()
+                AntiSprintDisablingConnection1 = nil
+            end
+        end
+    end
+})
+
+StoredConnections[game:GetService("HttpService"):GenerateGUID(false)] = LocalPlayer.CharacterAdded:Connect(function()
+if AntiSprintDisabling==true then
+AntiSprintDisablingToggle:Set(false)
+AntiSprintDisabling = false
+end
+end)
+
+local AntiStaminaRegenPause = false
+local AntiStaminaRegenPauseConnection1
+local AntiStaminaRegenPauseToggle = ImmunityPlayer:Toggle({
+    Title = "Anti-Stamina Regeneration Pause",
+    Callback = function(state)
+        AntiStaminaRegenPause = state
+        if state==true then
+            Character:SetAttribute("PauseRegen",0)
+            task.wait()
+            AntiStaminaRegenPauseConnection1 = Character:GetAttributeChangedSignal("PauseRegen"):Connect(function()
+                if Character:GetAttribute("PauseRegen")~=0 then
+                    Character:SetAttribute("PauseRegen",0)
+                end
+            end)
+        elseif state==false then
+            if AntiStaminaRegenPauseConnection1 then
+                AntiStaminaRegenPauseConnection1:Disconnect()
+                AntiStaminaRegenPauseConnection1 = nil
+            end
+        end
+    end
+})
+
+StoredConnections[game:GetService("HttpService"):GenerateGUID(false)] = LocalPlayer.CharacterAdded:Connect(function()
+if AntiStaminaRegenPause==true then
+AntiStaminaRegenPauseToggle:Set(false)
+AntiStaminaRegenPause = false
+end
+end)
+
+ImmunityPlayer:Toggle({
+    Title = "Anti-Taunt",
+    Callback = function(state)
+        if state==true then
+            if game:GetService("Players").LocalPlayer.PlayerGui.MainGui.RoundUI.Civilian:FindFirstChild("TauntTemplate") then
+                game:GetService("Players").LocalPlayer.PlayerGui.MainGui.RoundUI.Civilian.TauntTemplate.Name = "b"
+            end
+        elseif state==false then
+            if game:GetService("Players").LocalPlayer.PlayerGui.MainGui.RoundUI.Civilian:FindFirstChild("b") then
+                game:GetService("Players").LocalPlayer.PlayerGui.MainGui.RoundUI.Civilian.b.Name = "TauntTemplate"
+            end
+        end
+    end
+})
+
+local AntiDrowningEffectConnection1
+ImmunityPlayer:Toggle({
+    Title = "Anti-Drowning Effect",
+    Callback = function(state)
+        if state==true then
+            if game:GetService("Lighting"):FindFirstChild("Drowning") then
+                game:GetService("Lighting").Drowning:Destroy()
+            end
+            AntiDrowningEffectConnection1 = game:GetService("Lighting").ChildAdded:Connect(function(Child)
+                if Child.Name=="Drowning" then
+                    Child:Destroy()
+                end
+            end)
+        elseif state==false then
+            if AntiDrowningEffectConnection1 then
+                AntiDrowningEffectConnection1:Disconnect()
+                AntiDrowningEffectConnection1 = nil
+            end
+        end
+    end
+})
+
+local WorkspaceImmunity = Immunity:Section({
+    Title = "Workspace",
+    Opened = true
+})
+
+local AntiKillerDoors = false
+local AntiKillerDoorsToggle
+AntiKillerDoorsToggle = WorkspaceImmunity:Toggle({
+    Title = "Anti-Killer Doors",
+    Callback = function(state)
+        AntiKillerDoors = state
+        if state==true then
+            if workspace.GameAssets:FindFirstChild("Map")==nil or workspace.GameAssets.Map:FindFirstChild("Config")==nil or workspace.GameAssets.Map.Config:FindFirstChild("KillerOnly")==nil then
+                AntiKillerDoorsToggle:Set(false)
+                WindUI:Notify({
+                    Title = "Fail",
+                    Content = "Killer Doors not found!",
+                    Icon = "triangle-exclamation",
+                    Duration = 3,
+                })
+                return
+            end
+            workspace.GameAssets.Map.Config.KillerOnly.Parent = game:GetService("CoreGui")
+            workspace.GameAssets.ChildRemoved:Once(function(Child)
+                if Child.Name=="Map" and game:GetService("CoreGui"):FindFirstChild("KillerOnly") then
+                    game:GetService("CoreGui").KillerOnly:Destroy()
+                    if AntiKillerDoors==true then
+                        AntiKillerDoorsToggle:Set(false)
+                    end
+                end
+            end)
+        elseif state==false then
+            if game:GetService("CoreGui"):FindFirstChild("KillerOnly") and (workspace.GameAssets:FindFirstChild("Map") and workspace.GameAssets.Map:FindFirstChild("Config")) then
+                game:GetService("CoreGui").KillerOnly.Parent = workspace.GameAssets.Map.Config
+            end
+        end
+    end
+})
+
+local AntiKillerBarriers = false
+local AntiKillerBarriersToggle
+AntiKillerBarriersToggle = WorkspaceImmunity:Toggle({
+    Title = "Anti-Killer Barriers",
+    Callback = function(state)
+        AntiKillerBarriers = state
+        if state==true then
+            if workspace.GameAssets:FindFirstChild("Map")==nil or workspace.GameAssets.Map:FindFirstChild("Config")==nil or workspace.GameAssets.Map.Config:FindFirstChild("Barriers")==nil or workspace.GameAssets.Map.Config.Barriers:FindFirstChild("KillerBarriers") then
+                AntiKillerBarriersToggle:Set(false)
+                WindUI:Notify({
+                    Title = "Fail",
+                    Content = "Killer Barriers not found!",
+                    Icon = "triangle-exclamation",
+                    Duration = 3,
+                })
+                return
+            end
+            workspace.GameAssets.Map.Config.Barriers.KillerBarriers.Parent = game:GetService("CoreGui")
+            workspace.GameAssets.ChildRemoved:Once(function(Child)
+                if Child.Name=="Map" and game:GetService("CoreGui"):FindFirstChild("KillerBarriers") then 
+                    game:GetService("CoreGui").KillerBarriers:Destroy()
+                    if AntiKillerBarriers==true then
+                        AntiKillerBarriersToggle:Set(false)
+                    end
+                end
+            end)
+        elseif state==false then
+            if game:GetService("CoreGui"):FindFirstChild("KillerBarriers") and (workspace.GameAssets:FindFirstChild("Map") and workspace.GameAssets.Map:FindFirstChild("Config")) then
+                game:GetService("CoreGui").KillerBarriers.Parent = workspace.GameAssets.Map.Config
+            end
+        end
+    end
+})
+
+local Visual = Window:Tab({
+    Title = "Visual",
+    Desc = "Visual module lets you change how you view the world locally.",
+    Icon = "gravity:eye",
+})
+
+local ESP = Visual:Section({
+    Title = "ESP",
+    Opened = true
+})
+
+ESP:Toggle({
+    Title = "ESP",
+    Callback = function(state)
+        DODESP.functions.Toggle(state)
+    end
+})
+
+ESP:Slider({
+    Title = "Transparency (%)",
+    Value = {
+        Min = 0,
+        Max = 100,
+        Default = 50
+    },
+    Step = 1,
+    Callback = function(value)
+        DODESP.functions.SetTransparency(value / 100)
+    end
+})
+
+ESP:Toggle({
+    Title = "Show Username",
+    Value = true,
+    Callback = function(state)
+        DODESP.settings.ShowName = state
+    end
+})
+
+ESP:Toggle({
+    Title = "Show Health",
+    Value = true,
+    Callback = function(state)
+       DODESP.settings.ShowHealth = state
+    end
+})
+
+ESP:Toggle({
+    Title = "Show Stamina",
+    Value = true,
+    Callback = function(state)
+        DODESP.settings.ShowStamina = state
+    end
+})
+
+local Animations = Window:Tab({
+    Title = "Animations",
+    Desc = "Animations module lets you change your character's animations.",
+    Icon = "gravity:face-fun",
+})
+
+local AnimationsWarning = Animations:Paragraph({
+    Title = "Animator not loaded",
+    Desc = "Animator will load after you respawn.",
+    Image = "gravity:triangle-exclamation-fill",
+    ImageSize = 20
+})
+
+function SetSprintAnimation(id)
+if Character and Character:FindFirstChild("Animations") then
+for i,v in next, Character:WaitForChild("Animations"):GetChildren() do
+if v.Name=="Sprint" or (v.Name:find("Sprint") or v.Name:match("Sprint")) then
+v.AnimationId = id
+end
+end
+end
+end
+
+function SetWalkAnimation(id)
+if Character and Character:FindFirstChild("Animations") then
+for i,v in next, Character:WaitForChild("Animations"):GetChildren() do
+if v.Name=="Walk" or (v.Name:find("Walk") or v.Name:match("Walk")) then
+v.AnimationId = id
+end
+end
+end
+end
+
+function SetIdleAnimation(id)
+if Character and Character:FindFirstChild("Animations") then
+for i,v in next, Character:WaitForChild("Animations"):GetChildren() do
+if v.Name=="Idle" or (v.Name:find("Idle") or v.Name:match("Idle")) then
+v.AnimationId = id
+end
+end
+end
+end
+
+StoredConnections[game:GetService("HttpService"):GenerateGUID(false)] = LocalPlayer.CharacterAdded:Once(function()
+local canstart = false
+task.delay(1, function() canstart = true end)
+
+AnimationsWarning:Destroy()
+
+Animations:Dropdown({
+    Title = "Civilian's Animations",
+    Values = {
+        "Civilian",
+        "Old Civilian",
+        "Ghost"
+    },
+    Multi = false,
+    Value = "Civilian",
+    Callback = function(selected)
+        if canstart~=true then return end
+        if selected=="Civilian" then
+            SetSprintAnimation("rbxassetid://137375023685630")
+            SetWalkAnimation("rbxassetid://84388941697203")
+            SetIdleAnimation("rbxassetid://100930402371608")
+        elseif selected=="Old Civilian" then
+            SetSprintAnimation("rbxassetid://79488319304371")
+            SetWalkAnimation("rbxassetid://138161225743614")
+            SetIdleAnimation("rbxassetid://74309548749074")
+        elseif selected=="Ghost" then
+            SetSprintAnimation("rbxassetid://124260679864309")
+            SetWalkAnimation("rbxassetid://124260679864309")
+            SetIdleAnimation("rbxassetid://110395159339100")
+        end
+        task.wait(.05)
+        ClientAnimations:Reload()
+        WindUI:Notify({
+            Title = "Success",
+            Content = "Applied chosen animations successfully!",
+            Icon = "check",
+            Duration = 3,
+        })
+    end
+})
+
+for i,v in pairs(game:GetService("ReplicatedStorage").ClientModules.Characters:GetChildren()) do if v.Name=="Civilian" or v.Name=="Ghost" then continue elseif v then
+local temp_table = {}
+for _,e in pairs(v.Skins:GetChildren()) do if e and e:FindFirstChildWhichIsA("Model") and e:FindFirstChildWhichIsA("Model"):FindFirstChild("Animations") then
+table.insert(temp_table, e:FindFirstChildWhichIsA("Model").Name)
+end; end
+Animations:Dropdown({
+    Title = ""..v.Name.."'s Animations",
+    Values = temp_table,
+    Multi = false,
+    Value = "Default",
+    Callback = function(selected)
+        if canstart~=true then return end
+        if selected=="Default" then
+            SetSprintAnimation(v:WaitForChild(selected).Animations.Sprint.AnimationId)
+            SetWalkAnimation(v:WaitForChild(selected).Animations.Walk.AnimationId)
+            SetIdleAnimation(v:WaitForChild(selected).Animations.Idle.AnimationId)
+        else
+            SetSprintAnimation(v.Skins:WaitForChild(selected):WaitForChild(selected).Animations.Sprint.AnimationId)
+            SetWalkAnimation(v.Skins:WaitForChild(selected):WaitForChild(selected).Animations.Walk.AnimationId)
+            SetIdleAnimation(v.Skins:WaitForChild(selected):WaitForChild(selected).Animations.Idle.AnimationId)
+        end
+        task.wait(.05)
+        ClientAnimations:Reload()
+        WindUI:Notify({
+            Title = "Success",
+            Content = "Applied chosen animations successfully!",
+            Icon = "check",
+            Duration = 3,
+        })
+    end
+})
+end; end
+
+end)
+
+local Premium = Window:Tab({
+    Title = "Freemium",
+    Desc = "Cool stuff for especially cool people.",
+    Icon = "gravity:sparkles-fill",
+})
+
+local noclip_connection = nil
+local camera_connection = nil
+function ApplyInvisibility(bool)
+if bool == false then
+task.spawn(function()
+for i,v in next, Humanoid:GetPlayingAnimationTracks() do
+v.Priority = Enum.AnimationPriority.Core
+v:AdjustSpeed(tonumber(0))
+v:Stop(tonumber(0))
+end
+end)
+if noclip_connection then
+noclip_connection:Disconnect()
+noclip_connection = nil
+end
+if camera_connection then
+camera_connection:Disconnect()
+camera_connection = nil
+pcall(function()
+workspace.CurrentCamera.CameraSubject = Humanoid
+end)
+end
+elseif bool == true then
+local function nocollision()
+for i,v in pairs(LP.Character:GetDescendants()) do
+if v and v:IsA("BasePart") and v.CanCollide == true and v.Name ~= "HumanoidRootPart" then
+v.CanCollide = false
+end
+end
+if LP.Character:FindFirstChild("HumanoidRootPart") then
+LP.Character:FindFirstChild("HumanoidRootPart").CanCollide = true
+end
+end
+noclip_connection = game:GetService("RunService").Stepped:Connect(nocollision)
+workspace.CurrentCamera.CameraSubject = HumanoidRootPart
+camera_connection = workspace.CurrentCamera:GetPropertyChangedSignal("CameraSubject"):Connect(function()
+workspace.CurrentCamera.CameraSubject = HumanoidRootPart
+end)
+local Anim = Instance.new("Animation")
+Anim.AnimationId = "rbxassetid://90444351114401" -- If you will use my invis, please credit me.
+local loadedanim = Humanoid:LoadAnimation(Anim)
+loadedanim.Priority = Enum.AnimationPriority.Action4
+repeat task.wait() until loadedanim.Length > 0	
+loadedanim:Play()
+repeat task.wait() until loadedanim.IsPlaying
+loadedanim:AdjustSpeed(tonumber(0))
+loadedanim.TimePosition = 2.2
+end
+end
+
+Premium:Toggle({
+    Title = "Invisibility",
+    Callback = function(state)
+       ApplyInvisibility(state)
+       WindUI:Notify({
+            Title = "Success",
+            Content = "Applied invisibility successfully!",
+            Icon = "check",
+            Duration = 3,
+        })
+    end
+})
+
+Premium:Toggle({
+    Title = "Invisibility + God Mode",
+    Callback = function(state)
+       ClientReplicator["Extend Hitbox"] = true
+       ClientReplicator["Studs"] = 9000000
+       WindUI:Notify({
+            Title = "Success",
+            Content = "Applied invisibility and god mode    successfully! ( you are invisible to other player btw )",
+            Icon = "check",
+            Duration = 6,
+        })
+    end
+})
+
+local Other = Window:Tab({
+    Title = "Other",
+    Icon = "gravity:gear",
+})
+
+Other:Button({
+    Title = "Close Hub",
+    Desc = "This will close the hub properly with everything reverted and turned off.",
+    Icon = "mouse-pointer-click",
+    Callback = function()
+        for i,v in pairs(StoredConnections) do
+            pcall(function()
+                i:Disconnect()
+            end)
+            pcall(function()
+                v:Disconnect()
+            end)
+        end
+        AutoBlock = false
+        pcall(function()
+            if NoCooldownSwingConnection1 then
+                NoCooldownSwingConnection1:Disconnect()
+                NoCooldownSwingConnection1 = nil
+            end
+            if NoCooldownSwingConnection2 then
+                NoCooldownSwingConnection2:Disconnect()
+                NoCooldownSwingConnection2 = nil
+            end
+        end)
+        pcall(function()
+            if AntiStunConnection1 then
+                AntiStunConnection1:Disconnect()
+                AntiStunConnection1 = nil
+            end
+        end)
+        pcall(function()
+            if AntiFatigueConnection1 then
+                AntiFatigueConnection1:Disconnect()
+                AntiFatigueConnection1 = nil
+            end
+        end)
+        pcall(function()
+            if AntiSprintDisablingConnection1 then
+                AntiSprintDisablingConnection1:Disconnect()
+                AntiSprintDisablingConnection1 = nil
+            end
+        end)
+        pcall(function()
+            if AntiStaminaRegenPauseConnection1 then
+                AntiStaminaRegenPauseConnection1:Disconnect()
+                AntiStaminaRegenPauseConnection1 = nil
+            end
+        end)
+        pcall(function()
+            if AntiDrowningEffectConnection1 then
+                AntiDrowningEffectConnection1:Disconnect()
+                AntiDrowningEffectConnection1 = nil
+            end
+        end)
+        if GameMovement.required==true then
+            GameMovement.module.StaminaRegen = 33
+            GameMovement.module.StaminaDrain = 12
+            GameMovement.module.KillerStaminaRegen = 36
+            GameMovement.module.KillerStaminaDrain = 11
+        end
+        InfiniteStamina = false
+        NoStaminaLossEnabled = false
+        InGameJumpingEnabled = false
+        DODESP.functions.Toggle(false)
+        Window:Destroy()
+    end
+})
