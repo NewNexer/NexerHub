@@ -283,7 +283,7 @@ Main:Button({
 local SelectGlove = function(g) repeat task.wait(.1) NETWORK.get_remote("SelectGlove"):FireServer(g) until LocalPlayer.leaderstats.Glove.Value==g task.wait(.1) end
 local EnterArena = function(ar) local oldcf = ar.CFrame ar.CanCollide = false ar.CanTouch = true repeat task.wait() pcall(function() ar:PivotTo(HumanoidRootPart.CFrame) end) until (Character and Character:FindFirstChild("entered")) ar:PivotTo(oldcf) ar.CanCollide = true end
 local OverrideVelocity = function() pcall(function() for i,v in next, Character:GetDescendants() do if v and v:IsA("BasePart") then v.Velocity,v.RotVelocity = Vector3.new(0,0,0),Vector3.new(0,0,0) end end end) end
-local TeleportToPosition = function(cFrame,time) local time = time or 1 local starttimee = tick() while tick() - starttimee < time do pcall(function() OverrideVelocity() HumanoidRootPart:PivotTo(cFrame) end) task.wait() end end
+local TeleportToPosition = function(cFrame,time,huh) local huh = huh or false local time = time or 1 local starttimee = tick() while tick() - starttimee < time do pcall(function() OverrideVelocity() if huh==true then for i,v in next, Character:GetChildren() do if v:IsA("BasePart") then v:PivotTo(cFrame) end end elseif huh==false then HumanoidRootPart:PivotTo(cFrame) end end) task.wait() end end
 
 local MainAccountPlayer
 function ReceiveData()
@@ -1351,7 +1351,7 @@ local Fort = Window:Tab({
     Icon = "gravity:sparkles",
 })
 
-Moon:Button({
+Fort:Button({
     Title = "Complete Task 1 (Plank)",
 	Icon = "gravity:sparkles-fill",
     Callback = function()
@@ -1496,7 +1496,7 @@ SelectGlove("Fort")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2, true)
 repeat task.wait(.05)
 if FortTask2==true or FortTask3==true then
 game:GetService("ReplicatedStorage").Fortlol:FireServer()
