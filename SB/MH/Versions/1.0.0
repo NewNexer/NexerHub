@@ -1346,6 +1346,178 @@ end
 })
 
 
+local Fort = Window:Tab({
+    Title = "Fort",
+    Icon = "gravity:sparkles",
+})
+
+Moon:Button({
+    Title = "Complete Task 1 (Plank)",
+	Icon = "gravity:sparkles-fill",
+    Callback = function()
+		if not Character or not HumanoidRootPart or not Humanoid then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			return
+		end
+		if LocalPlayer:WaitForChild("_unlockedGloves").Fort.Value==false and LocalPlayer.leaderstats.Glove.Value~="Fort" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own fort. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			return
+		end
+		if Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			return
+		end
+		if Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			return
+		end
+if LocalPlayer.leaderstats.Glove.Value~="Fort" then
+SelectGlove("Fort")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(CFrame.new(-410,75,-41), 1.5)
+game:GetService("ReplicatedStorage").Fortlol:FireServer()
+task.wait(2)
+TeleportToPosition(CFrame.new(-406,87,-51), 1.5)
+    end
+})
+
+local FortTask2 = false
+Fort:Toggle({
+    Title = "Task 2 (Smash)",
+    Callback = function(state)
+        FortTask2 = state
+    end
+})
+
+local FortTask3 = false
+Fort:Toggle({
+    Title = "Task 3 (Build)",
+    Callback = function(state)
+        FortTask3 = state
+    end
+})
+
+Fort:Divider()
+
+local FortFarming = false
+local FortFarmingToggle
+FortFarmingToggle = Fort:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles",
+    Callback = function(state)
+        FortFarming = state
+		if FortFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			FortFarmingToggle:Set(false)
+			FortFarming = false
+			return
+		end
+		if FortFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			FortFarmingToggle:Set(false)
+			FortFarming = false
+			return
+		end
+		if FortFarming==true and LocalPlayer:WaitForChild("_unlockedGloves").Fort.Value==false and LocalPlayer.leaderstats.Glove.Value~="Fort" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own fort. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			FortFarmingToggle:Set(false)
+			FortFarming = false
+			return
+		end
+		if FortFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			FortFarmingToggle:Set(false)
+			FortFarming = false
+			return
+		end
+		if FortFarming==true and FortTask2==false and FortTask3==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			FortFarmingToggle:Set(false)
+			FortFarming = false
+			return
+		end
+if FortFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="ZZZZZZZ" then
+SelectGlove("ZZZZZZZ")
+task.wait(.333)
+end
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+game:GetService("ReplicatedStorage").ZZZZZZZSleep:FireServer()
+task.wait(1)
+if LocalPlayer.leaderstats.Glove.Value~="Fort" then
+SelectGlove("Fort")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+repeat task.wait(.05)
+if FortTask2==true or FortTask3==true then
+game:GetService("ReplicatedStorage").Fortlol:FireServer()
+task.wait(4)
+end
+until FortFarming==false or Humanoid.Health==0
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+workspace.ChildAdded:Connect(function(fort)
+task.wait(.333)
+if fort.Name=="Part" and fort:FindFirstChild("brownsmoke") and fort.Color==Color3.fromRGB(172, 73, 73) and FortFarming==true and FortTask2==true then
+fort.CanCollide = false
+game:GetService("RunService").RenderStepped:Wait()
+repeat task.wait(.01)
+fort:PivotTo(HumanoidRootPart.CFrame)
+until fort.Transparency==1
+end
+end)
 
 
 local REDACTED = Window:Tab({
