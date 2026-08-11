@@ -599,6 +599,27 @@ StoredConnections[game:GetService("HttpService"):GenerateGUID(false)] = workspac
 BlockSetUp(Child)
 end)
 
+local Revolver = Abilities:Section({
+    Title = "Revolver",
+    Opened = false
+})
+
+local AutoReloadRevolver = false
+Revolver:Toggle({
+    Title = "Auto Reload Revolver ( with no cooldown afterwards )",
+    Callback = function(state)
+        AutoReloadRevolver = state
+    end
+})
+
+local ChaseCheckRevolver = false
+Revolver:Toggle({
+    Title = "Reload Revolver only when not in chase",
+    Callback = function(state)
+        ChaseCheckRevolver = state
+    end
+})
+
 local Dash = Abilities:Section({
     Title = "Dash",
     Opened = false
@@ -1202,9 +1223,11 @@ local Premium = Window:Tab({
     Icon = "gravity:sparkles-fill",
 })
 
+local invisibilityenabledorsmth = false
 local noclip_connection = nil
 local camera_connection = nil
 function ApplyInvisibility(bool)
+invisibilityenabledorsmth = bool
 if bool == false then
 task.spawn(function()
 for i,v in next, Humanoid:GetPlayingAnimationTracks() do
@@ -1279,6 +1302,75 @@ Premium:Toggle({
     end
 })
 
+local ExceptionForKindMode = false
+local CorrectKindMode = Instance.new("BoolValue")
+CorrectKindMode.Name = "KindMode2"
+CorrectKindMode.Value = LocalPlayer.Stats.Settings.KindMode.Value
+CorrectKindMode.Parent = LocalPlayer.Stats.Settings
+LocalPlayer.Stats.Settings.KindMode:GetPropertyChangedSignal("Value"):Connect(function()
+if ExceptionForKindMode==true then return end
+CorrectKindMode.Value = LocalPlayer.Stats.Settings.KindMode.Value
+end)
+
+function GetKindModeState()
+return CorrectKindMode.Value
+end
+
+function SetKindMode(bool)
+if (bool==true and GetKindModeState()==false) or (bool==false and GetKindModeState()==true) then
+game:GetService("ReplicatedStorage").Events.RemoteEvents.Settings:FireServer({LayoutOrder=2,Name="KindMode",Category="Preferences",Bio="Disables being the killer and gaining evilness.",Title="Kind Mode"})
+end
+end
+
+
+local RepressedEvilness = false
+StoredConnections[game:GetService("HttpService"):GenerateGUID(false)] = LocalPlayer.PlayerGui.MainGui.Lobby.Settings.Frame.ScrollingFrame.ChildAdded:Connect(function(Child)
+if RepressedEvilness==true and Child.Name=="KindMode" then
+Child:Destroy()
+end
+end)
+function InitRepressedEvilness()
+LocalPlayer.Stats.InGame:GetPropertyChangedSignal("Value"):Connect(function()
+if RepressedEvilness~=true then return end
+SetKindMode((not LocalPlayer.Stats.InGame.Value))
+repeat task.wait() until LocalPlayer.Stats.Settings.KindMode.Value == (not LocalPlayer.Stats.InGame.Value)
+ExceptionForKindMode = true
+LocalPlayer.Stats.Settings.KindMode.Value = false
+task.delay(0.01, function() ExceptionForKindMode = false end)
+end)
+end
+
+function SetRepressedEvilness(bool)
+RepressedEvilness = bool
+if RepressedEvilness~=true then
+SetKindMode(false)
+return
+end
+if LocalPlayer.PlayerGui.MainGui.Lobby.Settings.Frame.ScrollingFrame:FindFirstChild("KindMode") then
+LocalPlayer.PlayerGui.MainGui.Lobby.Settings.Frame.ScrollingFrame.KindMode:Destroy()
+end
+SetKindMode((not LocalPlayer.Stats.InGame.Value))
+repeat task.wait() until LocalPlayer.Stats.Settings.KindMode.Value == (not LocalPlayer.Stats.InGame.Value)
+ExceptionForKindMode = true
+LocalPlayer.Stats.Settings.KindMode.Value = false
+task.delay(0.01, function() ExceptionForKindMode = false end)
+end
+
+InitRepressedEvilness()
+Premium:Toggle({
+    Title = "Repressed Evilness",
+    Desc = "You will earn evilness just as usual but you will never be the killer.",
+    Callback = function(state)
+       SetRepressedEvilness(state)
+       WindUI:Notify({
+            Title = "Success",
+            Content = "Enabled/Disabled repressed evilness!",
+            Icon = "check",
+            Duration = 3,
+        })
+    end
+})
+
 local Other = Window:Tab({
     Title = "Other",
     Icon = "gravity:gear",
@@ -1348,6 +1440,17 @@ Other:Button({
         NoStaminaLossEnabled = false
         InGameJumpingEnabled = false
         DODESP.functions.Toggle(false)
+        ClientReplicator["Extend Hitbox"] = false
+        ClientReplicator.Unhook()
+        if invisibilityenabledorsmth==true then
+            ApplyInvisibility(false)
+        end
+        if LocalPlayer.Stats.Settings:FindFirstChild("KindMode2") then
+            LocalPlayer.Stats.Settings["KindMode2"]:Destroy()
+        end
+        if RepressedEvilness==true then
+            SetRepressedEvilness(false)
+        end
         Window:Destroy()
     end
 })
