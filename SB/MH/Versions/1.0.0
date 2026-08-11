@@ -316,7 +316,7 @@ OverrideVelocity()
 task.wait()
 end
 end
-if datastring=="slap&kill(fast)" then
+if datastring=="slap&kill(normal)" then
 if not MainAccountPlayer then
 WindUI:Notify({
     Title = "Error",
@@ -331,10 +331,15 @@ local char = plr.Character
 local hrp = char:WaitForChild("HumanoidRootPart",2)
 local hum = char:WaitForChild("Humanoid",2)
 local mainplrdied = false
+local supconnet
 plr.CharacterAdded:Once(function()
 mainplrdied = true
 Humanoid.Health = 0
 LocalPlayer:WaitForChild("Reset"):FireServer()
+if supconnet then
+supconnet:Disconnect()
+supconnet = nil
+end
 end)
 task.spawn(function()
 while mainplrdied~=true do
@@ -354,6 +359,69 @@ end
 end)
 task.wait(.005)
 end
+end)
+supconnet = LocalPlayer.CharacterAdded:Connect(function(chr)
+chr.ChildAdded:Connect(function(Child)
+if Child.Name=="entered" then
+task.wait(4)
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+end)
+end)
+end
+if datastring=="slap&kill(fast)" then
+if not MainAccountPlayer then
+WindUI:Notify({
+    Title = "Error",
+    Content = "Something went wrong. Try connecting the accounts again.",
+    Icon = "triangle-exclamation",
+    Duration = 3,
+})
+return
+end
+local plr = MainAccountPlayer
+local char = plr.Character
+local hrp = char:WaitForChild("HumanoidRootPart",2)
+local hum = char:WaitForChild("Humanoid",2)
+local mainplrdied = false
+local supconnet
+plr.CharacterAdded:Once(function()
+mainplrdied = true
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+if supconnet then
+supconnet:Disconnect()
+supconnet = nil
+end
+end)
+task.spawn(function()
+while mainplrdied~=true do
+pcall(function()
+HumanoidRootPart:PivotTo(hrp.CFrame*CFrame.new(0,-7,10))
+OverrideVelocity()
+end)
+task.wait()
+end
+end)
+task.spawn(function()
+while mainplrdied~=true do
+pcall(function()
+if Character:FindFirstChild("entered")==nil then
+EnterArena(workspace.Lobby["Teleport2"])
+end
+end)
+task.wait(.005)
+end
+end)
+supconnet = LocalPlayer.CharacterAdded:Connect(function(chr)
+chr.ChildAdded:Connect(function(Child)
+if Child.Name=="entered" then
+task.wait(1)
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+end)
 end)
 end
 if datastring=="init_defense" then
