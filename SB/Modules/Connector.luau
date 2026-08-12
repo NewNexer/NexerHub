@@ -32,9 +32,7 @@ end
 
 NETWORK.edit_setting = function(setting, value)
     local ins = NETWORK.get_remote("UpdatePlayerSetting")
-    task.spawn(function()
-        ins:InvokeServer(setting, value)
-    end)
+    ins:InvokeServer(setting, value)
 end
 
 NETWORK.add_connection_queue = function()
