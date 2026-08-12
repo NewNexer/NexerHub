@@ -200,18 +200,16 @@ SetSounds(false)
 local MusicHolder = Instance.new("Sound")
 MusicHolder.Name = "nexermusic"
 MusicHolder.Looped = true
-MusicHolder.SoundId = "rbxassetid://111405430613058"
+MusicHolder.SoundId = "rbxassetid://122625155351130"
 MusicHolder.Volume = 2
 MusicHolder.Parent = game:GetService("SoundService")
 MusicHolder:Play()
 end
 task.delay(2, function()
-if existedbefore==false then
 game:GetService("SoundService"):WaitForChild("nexermusic"):Stop()
 task.wait()
-game:GetService("SoundService"):WaitForChild("nexermusic").SoundId = "rbxassetid://"..tostring(111405430613058)
+game:GetService("SoundService"):WaitForChild("nexermusic").SoundId = "rbxassetid://"..tostring(122625155351130)
 game:GetService("SoundService"):WaitForChild("nexermusic"):Play()
-end
 end)
 
 local Window = WindUI:CreateWindow({
@@ -247,13 +245,13 @@ Main:Divider()
 
 Main:Input({
     Title = "Music Sound ID",
-    Placeholder = "111405430613058",
+    Placeholder = "122625155351130",
     Value = "",
     Callback = function(text)
-		game:GetService("CoreGui"):WaitForChild("nexermusic"):Stop()
+		game:GetService("SoundService"):WaitForChild("nexermusic"):Stop()
 		task.wait()
-        game:GetService("CoreGui"):WaitForChild("nexermusic").SoundId = "rbxassetid://"..tostring(text)
-		game:GetService("CoreGui"):WaitForChild("nexermusic"):Play()
+        game:GetService("SoundService"):WaitForChild("nexermusic").SoundId = "rbxassetid://"..tostring(text)
+		game:GetService("SoundService"):WaitForChild("nexermusic"):Play()
     end
 })
 
@@ -1615,6 +1613,222 @@ fort:PivotTo(HumanoidRootPart.CFrame)
 until fort.Transparency==1
 end
 end)
+
+
+
+local Bomb = Window:Tab({
+    Title = "Bomb",
+    Icon = "gravity:sparkles",
+})
+
+Bomb:Button({
+    Title = "Insta-Complete Task 1 (Throw) (You will get kicked)",
+	Icon = "gravity:sparkles-fill",
+    Callback = function()
+		if not Character or not HumanoidRootPart or not Humanoid then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			return
+		end
+		if LocalPlayer:WaitForChild("_unlockedGloves").Bomb.Value==false and LocalPlayer.leaderstats.Glove.Value~="Bomb" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own bomb. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			return
+		end
+		if Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			return
+		end
+		if Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			return
+		end
+if LocalPlayer.leaderstats.Glove.Value~="Bomb" then
+SelectGlove("Bomb")
+task.wait(.333)
+end
+for i=1,20000 do
+game:GetService("ReplicatedStorage").BombThrow:FireServer("Ebutton")
+end
+    end
+})
+
+local BombTask2 = false
+Bomb:Toggle({
+    Title = "Task 2 (Snipe)",
+    Callback = function(state)
+        BombTask2 = state
+    end
+})
+
+local BombTask3 = false
+Bomb:Toggle({
+    Title = "Task 3 (Knock)",
+    Callback = function(state)
+        BombTask3 = state
+    end
+})
+
+Bomb:Divider()
+
+local BombFarming = false
+local BombFarmingToggle
+BombFarmingToggle = Bomb:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles",
+    Callback = function(state)
+        BombFarming = state
+		if BombFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			BombFarmingToggle:Set(false)
+			BombFarming = false
+			return
+		end
+		if BombFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			BombFarmingToggle:Set(false)
+			BombFarming = false
+			return
+		end
+		if BombFarming==true and LocalPlayer:WaitForChild("_unlockedGloves").Bomb.Value==false and LocalPlayer.leaderstats.Glove.Value~="Bomb" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own bomb. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			BombFarmingToggle:Set(false)
+			BombFarming = false
+			return
+		end
+		if BombFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			BombFarmingToggle:Set(false)
+			BombFarming = false
+			return
+		end
+		if BombFarming==true and BombTask2==false and BombTask3==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			BombFarmingToggle:Set(false)
+			BombFarming = false
+			return
+		end
+if BombFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="Bomb" then
+SelectGlove("Bomb")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+local vector = Vector3.new(0,0,0)
+local newbombthrown = false
+repeat task.wait(.05)
+if BombTask2==true then
+if not workspace:FindFirstChild(LocalPlayer.Name.."_bømb") then
+game.ReplicatedStorage.BombThrow:FireServer("Ebutton")
+repeat task.wait() until workspace:FindFirstChild(LocalPlayer.Name.."_bømb") or BombFarming==false or Humanoid.Health==0
+task.delay(8, function()
+if workspace:FindFirstChild(LocalPlayer.Name.."_bømb")==nil then
+game.ReplicatedStorage.BombThrow:FireServer("Ebutton")
+repeat task.wait() until workspace:FindFirstChild(LocalPlayer.Name.."_bømb")
+newbombthrown = true
+task.wait(.1)
+newbombthrown = false
+else
+game.ReplicatedStorage.BombThrow:FireServer("Ebutton")
+end
+end)
+end
+if workspace:FindFirstChild(LocalPlayer.Name.."_bømb") then
+local checkforbugss = false
+task.delay(10,function()
+if workspace:FindFirstChild(LocalPlayer.Name.."_bømb")==nil then
+checkforbugss = true
+task.wait(.1)
+checkforbugss = false
+end
+end)
+repeat
+if workspace:FindFirstChild(LocalPlayer.Name.."_bømb") then
+HumanoidRootPart:PivotTo(CFrame.new(workspace[LocalPlayer.Name.."_bømb"].Position))
+end
+for _,p in next, Character:GetDescendants() do
+if p:IsA("BasePart") then
+p.Velocity, p.RotVelocity = vector, vector
+end
+end
+task.wait()
+until Character:FindFirstChild("Ragdolled") and Character.Ragdolled.Value==true or BombFarming==false or newbombthrown==true or Humanoid.Health==0 or checkforbugss==true
+end
+local checkforbugs = false
+task.delay(5,function()
+if workspace:FindFirstChild(LocalPlayer.Name.."_bømb")==nil then
+checkforbugs = true
+task.wait(.1)
+checkforbugs = false
+end
+end)
+repeat
+HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,10,0))
+for _,p in next, Character:GetDescendants() do
+if p:IsA("BasePart") then
+p.Velocity, p.RotVelocity = vector, vector
+end
+end
+task.wait()
+until Character:FindFirstChild("Ragdolled") and Character.Ragdolled.Value==false or BombFarming==false or Humanoid.Health==0 or checkforbugs==true
+elseif BombTask2==false and BombTask3==true then
+for i=1,2 do
+game.ReplicatedStorage.BombThrow:FireServer("Ebutton")
+end
+task.wait(6)
+end
+until BombFarming==false or Humanoid.Health==0
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+
+
 
 
 local REDACTED = Window:Tab({
