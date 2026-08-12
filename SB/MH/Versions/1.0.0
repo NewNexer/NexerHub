@@ -282,6 +282,27 @@ Main:Input({
 
 Main:Divider()
 
+local antiafkenabled = false
+local antiafktoggle = Main:Toggle({
+    Title = "Anti-AFK",
+	Icon = "mouse-pointer-click",
+    Callback = function(state)
+        antiafkenabled = state
+		if state==true then
+			game:GetService("VirtualUser"):CaptureController()
+			game:GetService("VirtualUser"):ClickButton2(Vector2.zero)
+		end
+    end
+})
+LocalPlayer.Idled:Connect(function()
+if antiafkenabled then
+game:GetService("VirtualUser"):CaptureController()
+game:GetService("VirtualUser"):ClickButton2(Vector2.zero)
+end
+end)
+antiafktoggle:Set(true)
+
+
 Main:Toggle({
     Title = "Disable Rendering",
 	Icon = "mouse-pointer-click",
