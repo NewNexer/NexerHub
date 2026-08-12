@@ -1583,6 +1583,109 @@ end
 })
 
 
+local Stick = Window:Tab({
+    Title = "Stick",
+    Icon = "gravity:sparkles-fill",
+})
+
+local stickwhotohit = FetchedMannequins
+Stick:Toggle({
+    Title = "9x poke speed",
+	Desc = "Risky - everyone will hear the stick SFX",
+	Icon = "gravity:sparkles-fill",
+    Callback = function(state)
+        if state==true then
+			stickwhotohit = FetchedHumanoids
+		elseif state==false then
+			stickwhotohit = FetchedMannequins
+		end
+    end
+})
+
+local StickTask1 = false
+Stick:Toggle({
+    Title = "Task 1 (poke)",
+	Desc = "No Alt Required - 4x poke speed by default",
+	Icon = "gravity:sparkles-fill",
+    Callback = function(state)
+        StickTask1 = state
+    end
+})
+
+Stick:Divider()
+
+local StickFarming = false
+local StickFarmingToggle
+StickFarmingToggle = Stick:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles-fill",
+    Callback = function(state)
+        StickFarming = state
+		if StickFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			StickFarmingToggle:Set(false)
+			StickFarming = false
+			return
+		end
+		if StickFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			StickFarmingToggle:Set(false)
+			StickFarming = false
+			return
+		end
+		if StickFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			StickFarmingToggle:Set(false)
+			StickFarming = false
+			return
+		end
+		if StickFarming==true and StickTask1==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			StickFarmingToggle:Set(false)
+			StickFarming = false
+			return
+		end
+if StickFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="Stick" then
+SelectGlove("Stick")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+repeat task.wait(.05)
+if StickTask1==true then
+for i,v in next, stickwhotohit do
+game:GetService("ReplicatedStorage").GeneralHit:FireServer(v)
+end
+end
+until StickFarming==false or Humanoid.Health==0
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+
+
 local Fort = Window:Tab({
     Title = "Fort",
     Icon = "gravity:sparkles-fill",
@@ -2108,6 +2211,89 @@ end
 task.wait(2)
 end
 until REDACTEDFarming==false or Humanoid.Health==0
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+
+local spin = Window:Tab({
+    Title = "spin",
+    Icon = "gravity:sparkles-fill",
+})
+
+local spinTask1 = false
+spin:Toggle({
+    Title = "Task 1 (spin)",
+	Icon = "gravity:sparkles-fill",
+    Callback = function(state)
+        spinTask1 = state
+    end
+})
+
+spin:Divider()
+
+local spinFarming = false
+local spinFarmingToggle
+spinFarmingToggle = spin:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles-fill",
+    Callback = function(state)
+        spinFarming = state
+		if spinFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			spinFarmingToggle:Set(false)
+			spinFarming = false
+			return
+		end
+		if spinFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			spinFarmingToggle:Set(false)
+			spinFarming = false
+			return
+		end
+		if spinFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			spinFarmingToggle:Set(false)
+			spinFarming = false
+			return
+		end
+		if spinFarming==true and spinTask1==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			spinFarmingToggle:Set(false)
+			spinFarming = false
+			return
+		end
+if spinFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="spin" then
+SelectGlove("spin")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+repeat task.wait(.05)
+HumanoidRootPart.Anchored = true
+until spinFarming==false or Humanoid.Health==0
 Humanoid.Health = 0
 LocalPlayer:WaitForChild("Reset"):FireServer()
 end
@@ -3154,13 +3340,17 @@ EnterArena(workspace.Lobby["Teleport1"])
 TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
 NETWORK.send_data("slap")
 task.wait(2.5)
+local Imgoingtousephase = false
 repeat task.wait(.8)
 if PhaseTask1==true or PhaseTask3==true then
 task.spawn(function()
 pcall(function()
-if Character.Head.Transparency~=1 then
-task.wait(1)
+if Character.Head.Transparency~=1 and Imgoingtousephase==false then
+Imgoingtousephase = true
+task.wait(1.5)
 game:GetService("ReplicatedStorage").PhaseA:FireServer()
+repeat task.wait() until Character.Head.Transparency==1
+Imgoingtousephase = false
 end
 end)
 end)
@@ -3554,7 +3744,6 @@ task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
 TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
-HumanoidRootPart.Anchored = true
 NETWORK.send_data("slap")
 task.wait(2.5)
 local canslap = true
@@ -3570,7 +3759,6 @@ task.delay(.8, function() canslap = true end)
 end
 end
 until AcrobatFarming==false or Humanoid.Health==0
-HumanoidRootPart.Anchored = false
 Humanoid.Health = 0
 LocalPlayer:WaitForChild("Reset"):FireServer()
 end
@@ -3687,7 +3875,6 @@ task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
 TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
-HumanoidRootPart.Anchored = true
 NETWORK.send_data("init_same_y_level")
 task.wait(2.5)
 local canslap = true
@@ -3697,13 +3884,14 @@ game:GetService("ReplicatedStorage").GeneralAbility:FireServer("E_ABILITY")
 if canslap==true then
 canslap = false
 pcall(function()
+if TinkererTask2==true then
 game:GetService("ReplicatedStorage").TinkererHit:FireServer(AltAccountPlayer.Character.Head)
+end
 end)
 task.delay(.8, function() canslap = true end)
 end
 end
 until TinkererFarming==false or Humanoid.Health==0
-HumanoidRootPart.Anchored = false
 Humanoid.Health = 0
 LocalPlayer:WaitForChild("Reset"):FireServer()
 end
