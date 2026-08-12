@@ -230,6 +230,7 @@ local Window = WindUI:CreateWindow({
     Title = "Mastery Helper",
     Icon = "gravity:logo-github",
     Author = "by Nexer",
+	Theme = "Rose",
     Transparent = true,
     OpenButton = {
         Title = "Mastery Helper",
@@ -249,8 +250,8 @@ local Main = Window:Tab({
 })
 
 Main:Paragraph({
-    Title = "thank you for using this absolutely free script",
-    Desc = "this is probably the best script to farm masteries with idk",
+    Title = "Thank you for using this free script without a key system (i get nothing from this script)",
+    Desc = "Made by nexer",
     Image = "shield-exclamation",
     ImageSize = 20
 })
@@ -3373,8 +3374,17 @@ TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
 NETWORK.send_data("slap")
 task.wait(2.5)
 local Imgoingtousephase = false
+local Didiactivateit = false
 repeat task.wait(.8)
 if PhaseTask1==true or PhaseTask3==true then
+task.spawn(function()
+if Didiactivateit==true then return end
+Didiactivateit = true
+repeat task.wait()
+HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,10,0))
+Humanoid.Sit = false
+until PhaseFarming==false or Humanoid.Health==0
+end)
 task.spawn(function()
 pcall(function()
 if Character.Head.Transparency~=1 and Imgoingtousephase==false then
