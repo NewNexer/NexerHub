@@ -282,6 +282,16 @@ Main:Input({
 
 Main:Divider()
 
+Main:Toggle({
+    Title = "Disable Rendering",
+	Icon = "mouse-pointer-click",
+    Callback = function(state)
+        game:GetService("RunService"):Set3dRenderingEnabled((not state))
+    end
+})
+
+Main:Divider()
+
 Main:Button({
     Title = "Close Hub",
     Icon = "mouse-pointer-click",
@@ -1583,109 +1593,6 @@ end
 })
 
 
-local Stick = Window:Tab({
-    Title = "Stick",
-    Icon = "gravity:sparkles-fill",
-})
-
-local stickwhotohit = FetchedMannequins
-Stick:Toggle({
-    Title = "9x poke speed",
-	Desc = "Risky - everyone will hear the stick SFX",
-	Icon = "gravity:sparkles-fill",
-    Callback = function(state)
-        if state==true then
-			stickwhotohit = FetchedHumanoids
-		elseif state==false then
-			stickwhotohit = FetchedMannequins
-		end
-    end
-})
-
-local StickTask1 = false
-Stick:Toggle({
-    Title = "Task 1 (poke)",
-	Desc = "No Alt Required - 4x poke speed by default",
-	Icon = "gravity:sparkles-fill",
-    Callback = function(state)
-        StickTask1 = state
-    end
-})
-
-Stick:Divider()
-
-local StickFarming = false
-local StickFarmingToggle
-StickFarmingToggle = Stick:Toggle({
-    Title = "Start Farming",
-	Icon = "gravity:sparkles-fill",
-    Callback = function(state)
-        StickFarming = state
-		if StickFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
-        	WindUI:Notify({
-            	Title = "Error",
-            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
-            	Icon = "gravity:triangle-exclamation",
-            	Duration = 4,
-        	})
-			StickFarmingToggle:Set(false)
-			StickFarming = false
-			return
-		end
-		if StickFarming==true and Character:FindFirstChild("entered") then
-        	WindUI:Notify({
-            	Title = "Error",
-            	Content = "Should use in lobby.",
-            	Icon = "gravity:triangle-exclamation",
-            	Duration = 3,
-        	})
-			StickFarmingToggle:Set(false)
-			StickFarming = false
-			return
-		end
-		if StickFarming==true and Humanoid.Health==0 then
-        	WindUI:Notify({
-            	Title = "Error",
-            	Content = "You are dead.",
-            	Icon = "gravity:triangle-exclamation",
-            	Duration = 3,
-        	})
-			StickFarmingToggle:Set(false)
-			StickFarming = false
-			return
-		end
-		if StickFarming==true and StickTask1==false then
-        	WindUI:Notify({
-            	Title = "Error",
-            	Content = "You need to turn on atleast 1 option.",
-            	Icon = "gravity:triangle-exclamation",
-            	Duration = 3,
-        	})
-			StickFarmingToggle:Set(false)
-			StickFarming = false
-			return
-		end
-if StickFarming==true then
-if LocalPlayer.leaderstats.Glove.Value~="Stick" then
-SelectGlove("Stick")
-task.wait(.333)
-end
-EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
-repeat task.wait(.05)
-if StickTask1==true then
-for i,v in next, stickwhotohit do
-game:GetService("ReplicatedStorage").GeneralHit:FireServer(v)
-end
-end
-until StickFarming==false or Humanoid.Health==0
-Humanoid.Health = 0
-LocalPlayer:WaitForChild("Reset"):FireServer()
-end
-    end
-})
-
-
 local Fort = Window:Tab({
     Title = "Fort",
     Icon = "gravity:sparkles-fill",
@@ -2216,6 +2123,110 @@ LocalPlayer:WaitForChild("Reset"):FireServer()
 end
     end
 })
+
+
+local Stick = Window:Tab({
+    Title = "Stick",
+    Icon = "gravity:sparkles-fill",
+})
+
+local stickwhotohit = FetchedMannequins
+Stick:Toggle({
+    Title = "9x poke speed",
+	Desc = "Risky - everyone will hear the stick SFX",
+	Icon = "gravity:sparkles-fill",
+    Callback = function(state)
+        if state==true then
+			stickwhotohit = FetchedHumanoids
+		elseif state==false then
+			stickwhotohit = FetchedMannequins
+		end
+    end
+})
+
+local StickTask1 = false
+Stick:Toggle({
+    Title = "Task 1 (poke)",
+	Desc = "No Alt Required - 4x poke speed by default",
+	Icon = "gravity:sparkles-fill",
+    Callback = function(state)
+        StickTask1 = state
+    end
+})
+
+Stick:Divider()
+
+local StickFarming = false
+local StickFarmingToggle
+StickFarmingToggle = Stick:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles-fill",
+    Callback = function(state)
+        StickFarming = state
+		if StickFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			StickFarmingToggle:Set(false)
+			StickFarming = false
+			return
+		end
+		if StickFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			StickFarmingToggle:Set(false)
+			StickFarming = false
+			return
+		end
+		if StickFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			StickFarmingToggle:Set(false)
+			StickFarming = false
+			return
+		end
+		if StickFarming==true and StickTask1==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			StickFarmingToggle:Set(false)
+			StickFarming = false
+			return
+		end
+if StickFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="Stick" then
+SelectGlove("Stick")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+repeat task.wait(.05)
+if StickTask1==true then
+for i,v in next, stickwhotohit do
+game:GetService("ReplicatedStorage").GeneralHit:FireServer(v)
+end
+end
+until StickFarming==false or Humanoid.Health==0
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+
 
 local spin = Window:Tab({
     Title = "spin",
@@ -3875,7 +3886,7 @@ task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
 TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
-NETWORK.send_data("init_same_y_level")
+NETWORK.send_data("init_close_range_same_y_level")
 task.wait(2.5)
 local canslap = true
 repeat task.wait(.05)
