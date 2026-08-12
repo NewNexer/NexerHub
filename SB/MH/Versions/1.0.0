@@ -25,6 +25,20 @@ Humanoid, Hum = char.Humanoid, char.Humanoid
 end)
 end)
 
+for i,v in next, game:GetService("ReplicatedStorage"):GetChildren() do
+if v:IsA("RemoteEvent") and (v.Name=="Grab" or v.Name=="AdminGUI" or v.Name=="WalkSpeedChanged" or v.Name=="Ban" or v.Name=="PingPongEvent" or v.Name=="Sparky") then
+v:Destroy()
+end
+end
+for i,v in next, game:GetService("ReplicatedStorage").OperaGxRewardsRemotes:GetChildren() do
+if v:IsA("RemoteEvent") and (v.Name=="ToggleApiMode" or v.Name=="SetApiEnv") then
+v:Destroy()
+end
+end
+if game:GetService("Players").LocalPlayer.PlayerScripts:FindFirstChild("ClientAnticheat") then
+game:GetService("Players").LocalPlayer.PlayerScripts.ClientAnticheat:Destroy()
+end
+
 function CreateMessage(a)
 local instancename = (a=="Message" and a) or "Hint"
 local msg = Instance.new(instancename,game:GetService("CoreGui"))
@@ -37,7 +51,7 @@ local msg = CreateMessage()
 msg.Text = "Loading Modules... (0/2)"
 local modules = {
 	{"WindUI", "https://github.com/Footagesus/WindUI/releases/download/".._version.."/main.lua", true},
-	{"AltConnector", "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/SB/Modules/Connector.luau", true}
+	{"AltConnector", "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/SB/Modules/Connector.lua", true}
 }
 if not loaded_modules_sb then
 getgenv().loaded_modules_sb = {}
@@ -200,7 +214,7 @@ SetSounds(false)
 local MusicHolder = Instance.new("Sound")
 MusicHolder.Name = "nexermusic"
 MusicHolder.Looped = true
-MusicHolder.SoundId = "rbxassetid://122625155351130"
+MusicHolder.SoundId = "rbxassetid://108407497849204"
 MusicHolder.Volume = 2
 MusicHolder.Parent = game:GetService("SoundService")
 MusicHolder:Play()
@@ -208,7 +222,7 @@ end
 task.delay(2, function()
 game:GetService("SoundService"):WaitForChild("nexermusic"):Stop()
 task.wait()
-game:GetService("SoundService"):WaitForChild("nexermusic").SoundId = "rbxassetid://"..tostring(122625155351130)
+game:GetService("SoundService"):WaitForChild("nexermusic").SoundId = "rbxassetid://"..tostring(108407497849204)
 game:GetService("SoundService"):WaitForChild("nexermusic"):Play()
 end)
 
@@ -245,7 +259,7 @@ Main:Divider()
 
 Main:Input({
     Title = "Music Sound ID",
-    Placeholder = "122625155351130",
+    Placeholder = "108407497849204",
     Value = "",
     Callback = function(text)
 		game:GetService("SoundService"):WaitForChild("nexermusic"):Stop()
@@ -255,18 +269,16 @@ Main:Input({
     end
 })
 
---[[Main:Slider({
-    Title = "Music Volume",
-    Value = {
-        Min = 0,
-        Max = 10,
-        Default = 2
-    },
-    Step = 1,
-    Callback = function(value)
-        game:GetService("CoreGui"):WaitForChild("nexermusic").Volume = value
+Main:Input({
+    Title = "Music Volume (from 0 to 10)",
+    Placeholder = "2",
+    Value = "",
+    Callback = function(text)
+		if tonumber(text) then
+			game:GetService("SoundService"):WaitForChild("nexermusic").Volume = tonumber(text)
+		end
     end
-})]]
+})
 
 Main:Divider()
 
@@ -314,7 +326,7 @@ OverrideVelocity()
 task.wait()
 end
 end
-if datastring=="slap&kill(normal)" then
+if datastring=="slap_kill_normal" then
 if not MainAccountPlayer then
 WindUI:Notify({
     Title = "Error",
@@ -329,6 +341,7 @@ local char = plr.Character
 local hrp = char:WaitForChild("HumanoidRootPart",2)
 local hum = char:WaitForChild("Humanoid",2)
 local mainplrdied = false
+local firsttimealreadywas = false
 local supconnet
 plr.CharacterAdded:Once(function()
 mainplrdied = true
@@ -353,6 +366,12 @@ while mainplrdied~=true do
 pcall(function()
 if Character:FindFirstChild("entered")==nil then
 EnterArena(workspace.Lobby["Teleport2"])
+if firsttimealreadywas~=true then
+task.wait(4)
+firsttimealreadywas = true
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
 end
 end)
 task.wait(.005)
@@ -368,7 +387,7 @@ end
 end)
 end)
 end
-if datastring=="slap&kill(fast)" then
+if datastring=="slap_kill_fast" then
 if not MainAccountPlayer then
 WindUI:Notify({
     Title = "Error",
@@ -383,6 +402,7 @@ local char = plr.Character
 local hrp = char:WaitForChild("HumanoidRootPart",2)
 local hum = char:WaitForChild("Humanoid",2)
 local mainplrdied = false
+local firsttimealreadywas = false
 local supconnet
 plr.CharacterAdded:Once(function()
 mainplrdied = true
@@ -407,6 +427,12 @@ while mainplrdied~=true do
 pcall(function()
 if Character:FindFirstChild("entered")==nil then
 EnterArena(workspace.Lobby["Teleport2"])
+if firsttimealreadywas~=true then
+task.wait(1)
+firsttimealreadywas = true
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
 end
 end)
 task.wait(.005)
@@ -422,6 +448,32 @@ end
 end)
 end)
 end
+if datastring=="init_bomb" then
+if not MainAccountPlayer then
+WindUI:Notify({
+    Title = "Error",
+    Content = "Something went wrong. Try connecting the accounts again.",
+    Icon = "triangle-exclamation",
+    Duration = 3,
+})
+return
+end
+local plr = MainAccountPlayer
+plr.CharacterAdded:Once(function()
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end)
+EnterArena(workspace.Lobby["Teleport2"])
+while Humanoid.Health~=0 do
+pcall(function()
+if workspace:FindFirstChild(MainAccountPlayer.Name.."_bømb") then
+HumanoidRootPart:PivotTo(CFrame.new(workspace[MainAccountPlayer.Name.."_bømb"].Position))
+end
+end)
+OverrideVelocity()
+task.wait()
+end
+end
 if datastring=="init_defense" then
 if not MainAccountPlayer then
 WindUI:Notify({
@@ -432,6 +484,69 @@ WindUI:Notify({
 })
 return
 end
+end
+if datastring=="init_eggler_task" then
+if not MainAccountPlayer then
+WindUI:Notify({
+    Title = "Error",
+    Content = "Something went wrong. Try connecting the accounts again.",
+    Icon = "triangle-exclamation",
+    Duration = 3,
+})
+return
+end
+local plr = MainAccountPlayer
+local char = plr.Character
+local hrp = char:WaitForChild("HumanoidRootPart",2)
+local hum = char:WaitForChild("Humanoid",2)
+local mainplrdied = false
+local firsttimealreadywas = false
+local supconnet
+plr.CharacterAdded:Once(function()
+mainplrdied = true
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+if supconnet then
+supconnet:Disconnect()
+supconnet = nil
+end
+end)
+task.spawn(function()
+while mainplrdied~=true do
+pcall(function()
+HumanoidRootPart:PivotTo(hrp.CFrame*CFrame.new(0,0,-3))
+OverrideVelocity()
+end)
+task.wait()
+end
+end)
+task.spawn(function()
+while mainplrdied~=true do
+pcall(function()
+if Character:FindFirstChild("entered")==nil then
+EnterArena(workspace.Lobby["Teleport2"])
+if firsttimealreadywas~=true then
+repeat task.wait() until Character:GetAttribute("isEgg")~=nil and Character:GetAttribute("isEgg")==true
+task.wait(1)
+firsttimealreadywas = true
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+end
+end)
+task.wait(.005)
+end
+end)
+supconnet = LocalPlayer.CharacterAdded:Connect(function(chr)
+chr.ChildAdded:Connect(function(Child)
+if Child.Name=="entered" then
+repeat task.wait() until Character:GetAttribute("isEgg")~=nil and Character:GetAttribute("isEgg")==true
+task.wait(1)
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+end)
+end)
 end
 if datastring=="init_run" then
 if not MainAccountPlayer then
@@ -466,28 +581,6 @@ WindUI:Notify({
 return
 end
 end
-if datastring=="init_tinkerer" then
-if not MainAccountPlayer then
-WindUI:Notify({
-    Title = "Error",
-    Content = "Something went wrong. Try connecting the accounts again.",
-    Icon = "triangle-exclamation",
-    Duration = 3,
-})
-return
-end
-end
-if datastring=="init_run" then
-if not MainAccountPlayer then
-WindUI:Notify({
-    Title = "Error",
-    Content = "Something went wrong. Try connecting the accounts again.",
-    Icon = "triangle-exclamation",
-    Duration = 3,
-})
-return
-end
-end
 if datastring=="init_redacted" then
 if not MainAccountPlayer then
 WindUI:Notify({
@@ -505,6 +598,41 @@ end
 task.wait(.5)
 end
 end
+if datastring=="init_rob" then
+if not MainAccountPlayer then
+WindUI:Notify({
+    Title = "Error",
+    Content = "Something went wrong. Try connecting the accounts again.",
+    Icon = "triangle-exclamation",
+    Duration = 3,
+})
+return
+end
+local plr = MainAccountPlayer
+local char = plr.Character
+local hrp = char:WaitForChild("HumanoidRootPart",2)
+local hum = char:WaitForChild("Humanoid",2)
+local mainaccdied = false
+plr.CharacterAdded:Once(function()
+mainaccdied = true
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end)
+while mainaccdied~=true do
+pcall(function()
+HumanoidRootPart:PivotTo(hrp.CFrame*CFrame.new(0,0,-3))
+end)
+pcall(function()
+OverrideVelocity()
+end)
+pcall(function()
+if Character:FindFirstChild("entered")==nil then
+EnterArena(workspace.Lobby["Teleport2"])
+end
+end)
+task.wait()
+end
+end
 if datastring=="init_same_y_level" then
 if not MainAccountPlayer then
 WindUI:Notify({
@@ -514,6 +642,20 @@ WindUI:Notify({
     Duration = 3,
 })
 return
+end
+local plr = MainAccountPlayer
+local char = plr.Character
+local hrp = char:WaitForChild("HumanoidRootPart",2)
+local hum = char:WaitForChild("Humanoid",2)
+plr.CharacterAdded:Once(function()
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end)
+EnterArena(workspace.Lobby["Teleport2"])
+while Humanoid.Health~=0 do
+HumanoidRootPart:PivotTo(hrp.CFrame*CFrame.new(0,0,-10))
+OverrideVelocity()
+task.wait()
 end
 end
 if datastring=="init_close_range_same_y_level" then
@@ -561,7 +703,7 @@ local Connector = Window:Tab({
 
 Connector:Paragraph({
     Title = "Instructions",
-    Desc = "Click on the 'Main Account' on your account where you will farm masteries, and click the 'Alt Account' on your alt account that will help you get masteries.",
+    Desc = "Firstly click on the 'Main Account' on your account where you will farm masteries, afterwards click the 'Alt Account' on your alt account that will help you get masteries.",
     Image = "shield-exclamation",
     ImageSize = 20
 })
@@ -1443,7 +1585,7 @@ end
 
 local Fort = Window:Tab({
     Title = "Fort",
-    Icon = "gravity:sparkles",
+    Icon = "gravity:sparkles-fill",
 })
 
 Fort:Button({
@@ -1520,7 +1662,7 @@ local FortFarming = false
 local FortFarmingToggle
 FortFarmingToggle = Fort:Toggle({
     Title = "Start Farming",
-	Icon = "gravity:sparkles",
+	Icon = "gravity:sparkles-fill",
     Callback = function(state)
         FortFarming = state
 		if FortFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
@@ -1618,7 +1760,16 @@ end)
 
 local Bomb = Window:Tab({
     Title = "Bomb",
-    Icon = "gravity:sparkles",
+    Icon = "gravity:sparkles-fill",
+})
+
+local BombUseAlt = false
+Bomb:Toggle({
+    Title = "Use Alt Account?",
+	Desc = "Alt Account is not necessary for completion, but it will make it faster.",
+    Callback = function(state)
+        BombUseAlt = state
+    end
 })
 
 Bomb:Button({
@@ -1693,7 +1844,7 @@ local BombFarming = false
 local BombFarmingToggle
 BombFarmingToggle = Bomb:Toggle({
     Title = "Start Farming",
-	Icon = "gravity:sparkles",
+	Icon = "gravity:sparkles-fill",
     Callback = function(state)
         BombFarming = state
 		if BombFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
@@ -1760,20 +1911,28 @@ EnterArena(workspace.Lobby["Teleport1"])
 TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
 local vector = Vector3.new(0,0,0)
 local newbombthrown = false
+NETWORK.send_data("init_bomb")
+task.wait(2.5)
 repeat task.wait(.05)
 if BombTask2==true then
 if not workspace:FindFirstChild(LocalPlayer.Name.."_bømb") then
+if BombFarming==true then
 game.ReplicatedStorage.BombThrow:FireServer("Ebutton")
+end
 repeat task.wait() until workspace:FindFirstChild(LocalPlayer.Name.."_bømb") or BombFarming==false or Humanoid.Health==0
 task.delay(8, function()
 if workspace:FindFirstChild(LocalPlayer.Name.."_bømb")==nil then
+if BombFarming==true then
 game.ReplicatedStorage.BombThrow:FireServer("Ebutton")
-repeat task.wait() until workspace:FindFirstChild(LocalPlayer.Name.."_bømb")
+end
+repeat task.wait() until workspace:FindFirstChild(LocalPlayer.Name.."_bømb") or BombFarming==false
 newbombthrown = true
 task.wait(.1)
 newbombthrown = false
 else
+if BombFarming==true then
 game.ReplicatedStorage.BombThrow:FireServer("Ebutton")
+end
 end
 end)
 end
@@ -1817,7 +1976,9 @@ task.wait()
 until Character:FindFirstChild("Ragdolled") and Character.Ragdolled.Value==false or BombFarming==false or Humanoid.Health==0 or checkforbugs==true
 elseif BombTask2==false and BombTask3==true then
 for i=1,2 do
+if BombFarming==true then
 game.ReplicatedStorage.BombThrow:FireServer("Ebutton")
+end
 end
 task.wait(6)
 end
@@ -1830,10 +1991,9 @@ end
 
 
 
-
 local REDACTED = Window:Tab({
     Title = "[REDACTED]",
-    Icon = "gravity:sparkles",
+    Icon = "gravity:sparkles-fill",
 })
 
 local REDACTEDUseAlt = false
@@ -1867,7 +2027,7 @@ local REDACTEDFarming = false
 local REDACTEDFarmingToggle
 REDACTEDFarmingToggle = REDACTED:Toggle({
     Title = "Start Farming",
-	Icon = "gravity:sparkles",
+	Icon = "gravity:sparkles-fill",
     Callback = function(state)
         REDACTEDFarming = state
 		if REDACTEDFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
@@ -1948,6 +2108,2185 @@ end
 task.wait(2)
 end
 until REDACTEDFarming==false or Humanoid.Health==0
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+
+
+local rob = Window:Tab({
+    Title = "rob",
+    Icon = "gravity:sparkles",
+})
+
+rob:Button({
+    Title = "Insta-Spawn Portal (Task 1)",
+	Icon = "gravity:sparkles-fill",
+    Callback = function()
+		if not Character or not HumanoidRootPart or not Humanoid then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			return
+		end
+		if LocalPlayer:WaitForChild("_unlockedGloves").rob.Value==false and LocalPlayer.leaderstats.Glove.Value~="rob" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own rob. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			return
+		end
+		if LocalPlayer:WaitForChild("_unlockedGloves").bob.Value==false and LocalPlayer.leaderstats.Glove.Value~="bob" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own bob. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			return
+		end
+		if Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			return
+		end
+		if Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			return
+		end
+TeleportToPosition(CFrame.new(248,-16,0), 1.5)
+HumanoidRootPart.Anchored = true
+if LocalPlayer.leaderstats.Glove.Value~="rob" then
+SelectGlove("rob")
+task.wait(.333)
+end
+game:GetService("ReplicatedStorage").rob:FireServer()
+task.wait(3.777)
+if LocalPlayer.leaderstats.Glove.Value~="bob" then
+SelectGlove("bob")
+task.wait(.333)
+end
+game:GetService("ReplicatedStorage").bob:FireServer()
+task.wait(2)
+HumanoidRootPart.Anchored = false
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+    end
+})
+
+local robTask2 = false
+rob:Toggle({
+    Title = "Task 2 (Travel)",
+    Callback = function(state)
+        robTask2 = state
+    end
+})
+
+local robTask3 = false
+rob:Toggle({
+    Title = "Task 3 (Absorb)",
+    Callback = function(state)
+        robTask3 = state
+    end
+})
+
+rob:Divider()
+
+local robFarming = false
+local robFarmingToggle
+robFarmingToggle = rob:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles",
+    Callback = function(state)
+        robFarming = state
+		if robFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			robFarmingToggle:Set(false)
+			robFarming = false
+			return
+		end
+		if robFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			robFarmingToggle:Set(false)
+			robFarming = false
+			return
+		end
+		if robFarming==true and LocalPlayer:WaitForChild("_unlockedGloves").rob.Value==false and LocalPlayer.leaderstats.Glove.Value~="rob" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own rob. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			robFarmingToggle:Set(false)
+			robFarming = false
+			return
+		end
+		if robFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			robFarmingToggle:Set(false)
+			robFarming = false
+			return
+		end
+		if robFarming==true and robTask2==false and robTask3==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			robFarmingToggle:Set(false)
+			robFarming = false
+			return
+		end
+		if not AltAccountPlayer and robTask3==true then
+			WindUI:Notify({
+    			Title = "Error",
+    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Icon = "triangle-exclamation",
+    			Duration = 3,
+			})
+			return
+		end
+if robFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="rob" then
+SelectGlove("rob")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+if robTask3==true then
+NETWORK.send_data("init_rob")
+task.wait(2.5)
+end
+local plr = (robTask3==true and AltAccountPlayer) or LocalPlayer
+local char = plr.Character
+local hrp = char:WaitForChild("HumanoidRootPart",2)
+local hum = char:WaitForChild("Humanoid",2)
+repeat task.wait(.05)
+if robTask2==true or robTask3==true then
+game:GetService("ReplicatedStorage").rob:FireServer()
+if robTask2==true then
+HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,math.random(0,1000),0))
+end
+if robTask3==true then
+if robTask2==false then
+HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,10,0))
+end
+hrp:PivotTo(HumanoidRootPart.CFrame)
+end
+end
+until robFarming==false or Humanoid.Health==0
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+workspace.ChildAdded:Connect(function(Child)
+if Child.Name=="rob_"..LocalPlayer.Name.."" and robFarming==true then
+task.wait()
+for i,v in next, Child:GetChildren() do
+if v:IsA("BasePart") then
+v.CanCollide = true
+end
+end
+end
+end)
+
+
+
+local Space = Window:Tab({
+    Title = "Space",
+    Icon = "gravity:sparkles",
+})
+
+local SpaceTask1 = false
+Space:Toggle({
+    Title = "Task 1 (Defy gravity)",
+    Callback = function(state)
+        SpaceTask1 = state
+    end
+})
+
+Space:Button({
+    Title = "Insta-Complete Task 3",
+	Icon = "gravity:sparkles-fill",
+    Callback = function()
+		if not Character or not HumanoidRootPart or not Humanoid then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			return
+		end
+		if LocalPlayer:WaitForChild("_unlockedGloves").Space.Value==false and LocalPlayer.leaderstats.Glove.Value~="Space" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own space. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			return
+		end
+		if Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			return
+		end
+		if Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			return
+		end
+if LocalPlayer:WaitForChild("_unlockedGloves").Ghost.Value==true and LocalPlayer.leaderstats.Glove.Value~="Ghost" then
+SelectGlove("Ghost")
+task.wait(.333)
+end
+game:GetService("ReplicatedStorage").Ghostinvisibilityactivated:FireServer()
+task.wait(1)
+if LocalPlayer.leaderstats.Glove.Value~="Space" then
+SelectGlove("Space")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace.Arena.CannonIsland.Cannon.MovingCannon.CannonPart["Meshes/cannon 1"].CFrame, 2)
+fireproximityprompt(workspace.Arena.CannonIsland.Cannon.MovingCannon:FindFirstChild("JumpInPrompt", true))
+game:GetService("ReplicatedStorage").ZeroGSound:FireServer()
+task.wait(.25)
+for i=1,15 do
+workspace:WaitForChild("Arena"):WaitForChild("CannonIsland"):WaitForChild("Cannon"):WaitForChild("_cannonRemote"):FireServer({y = 9e9,x = 9e9,force = 300},true)
+task.wait(.05)
+end
+TeleportToPosition(CFrame.new(-420,63,-27), 6)
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+    end
+})
+
+local SpaceTask4 = false
+Space:Toggle({
+    Title = "Task 4 (Ambush)",
+    Callback = function(state)
+        SpaceTask4 = state
+    end
+})
+
+Space:Divider()
+
+local SpaceFarming = false
+local SpaceFarmingToggle
+SpaceFarmingToggle = Space:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles",
+    Callback = function(state)
+        SpaceFarming = state
+		if SpaceFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			SpaceFarmingToggle:Set(false)
+			SpaceFarming = false
+			return
+		end
+		if SpaceFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			SpaceFarmingToggle:Set(false)
+			SpaceFarming = false
+			return
+		end
+		if SpaceFarming==true and LocalPlayer:WaitForChild("_unlockedGloves").Space.Value==false and LocalPlayer.leaderstats.Glove.Value~="Space" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own space. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			SpaceFarmingToggle:Set(false)
+			SpaceFarming = false
+			return
+		end
+		if SpaceFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			SpaceFarmingToggle:Set(false)
+			SpaceFarming = false
+			return
+		end
+		if SpaceFarming==true and SpaceTask1==false and SpaceTask4==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			SpaceFarmingToggle:Set(false)
+			SpaceFarming = false
+			return
+		end
+		if not AltAccountPlayer and SpaceTask4==true then
+			WindUI:Notify({
+    			Title = "Error",
+    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Icon = "triangle-exclamation",
+    			Duration = 3,
+			})
+			return
+		end
+if SpaceFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="Space" then
+SelectGlove("Space")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+if SpaceTask4==true then
+NETWORK.send_data("slap")
+task.wait(2.5)
+end
+local plr = (SpaceTask4==true and AltAccountPlayer) or LocalPlayer
+local char = plr.Character
+local hrp = char:WaitForChild("HumanoidRootPart",2)
+local hum = char:WaitForChild("Humanoid",2)
+repeat task.wait(.05)
+if SpaceTask1==true or SpaceTask4==true then
+game:GetService("ReplicatedStorage").ZeroGSound:FireServer()
+if SpaceTask4==true then
+game:GetService("ReplicatedStorage").HtSpace:FireServer(hrp)
+task.wait(.8)
+end
+end
+until SpaceFarming==false or Humanoid.Health==0
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+
+local Gummy = Window:Tab({
+    Title = "Gummy",
+    Icon = "gravity:sparkles",
+})
+
+local GummyTask1 = false
+Gummy:Toggle({
+    Title = "Task 1 (Attach)",
+    Callback = function(state)
+        GummyTask1 = state
+    end
+})
+
+local GummyTask2	 = false
+Gummy:Toggle({
+    Title = "Task 2 (Kill)",
+    Callback = function(state)
+        GummyTask2 = state
+    end
+})
+
+local GummyTask3 = false
+Gummy:Toggle({
+    Title = "Task 3 (Attach 3 or more)",
+    Callback = function(state)
+        GummyTask3 = state
+    end
+})
+
+Gummy:Divider()
+
+local GummyFarming = false
+local GummyFarmingToggle
+GummyFarmingToggle = Gummy:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles",
+    Callback = function(state)
+        GummyFarming = state
+		if GummyFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			GummyFarmingToggle:Set(false)
+			GummyFarming = false
+			return
+		end
+		if GummyFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			GummyFarmingToggle:Set(false)
+			GummyFarming = false
+			return
+		end
+		if GummyFarming==true and LocalPlayer:WaitForChild("_unlockedGloves").Gummy.Value==false and LocalPlayer.leaderstats.Glove.Value~="Gummy" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own gummy. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			GummyFarmingToggle:Set(false)
+			GummyFarming = false
+			return
+		end
+		if GummyFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			GummyFarmingToggle:Set(false)
+			GummyFarming = false
+			return
+		end
+		if GummyFarming==true and GummyTask1==false and GummyTask2==false and GummyTask3==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			GummyFarmingToggle:Set(false)
+			GummyFarming = false
+			return
+		end
+		if not AltAccountPlayer then
+			WindUI:Notify({
+    			Title = "Error",
+    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Icon = "triangle-exclamation",
+    			Duration = 3,
+			})
+			return
+		end
+if GummyFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="Gummy" then
+SelectGlove("Gummy")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+if GummyTask2==true then
+NETWORK.send_data("slap_kill_fast")
+else
+NETWORK.send_data("slap")
+end
+task.wait(2.5)
+local canslap = true
+repeat task.wait(.05)
+if GummyTask1==true or GummyTask2==true or GummyTask3==true then
+if canslap==true then
+canslap = false
+pcall(function()
+game:GetService("ReplicatedStorage").GeneralHit:FireServer(AltAccountPlayer.Character.Head)
+end)
+task.delay(.8, function() canslap = true end)
+end
+end
+until GummyFarming==false or Humanoid.Health==0
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+
+
+local Mace = Window:Tab({
+    Title = "Mace",
+    Icon = "gravity:sparkles",
+})
+
+local MaceTask1 = false
+Mace:Toggle({
+    Title = "Task 1 (Hit in a row without slowing down)",
+    Callback = function(state)
+        MaceTask1 = state
+    end
+})
+
+local MaceTask2	 = false
+Mace:Toggle({
+    Title = "Task 2 (Quick-flick)",
+    Callback = function(state)
+        MaceTask2 = state
+    end
+})
+
+local MaceTask3 = false
+Mace:Toggle({
+    Title = "Task 3 (Bludgeon)",
+    Callback = function(state)
+        MaceTask3 = state
+    end
+})
+
+local MaceTask4 = false
+Mace:Toggle({
+    Title = "Task 4 (Obliterate)",
+    Callback = function(state)
+        MaceTask4 = state
+    end
+})
+
+Mace:Divider()
+
+local MaceFarming = false
+local MaceFarmingToggle
+MaceFarmingToggle = Mace:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles",
+    Callback = function(state)
+        MaceFarming = state
+		if MaceFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			MaceFarmingToggle:Set(false)
+			MaceFarming = false
+			return
+		end
+		if MaceFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			MaceFarmingToggle:Set(false)
+			MaceFarming = false
+			return
+		end
+		if MaceFarming==true and LocalPlayer:WaitForChild("_unlockedGloves").Mace.Value==false and LocalPlayer.leaderstats.Glove.Value~="Mace" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own mace. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			MaceFarmingToggle:Set(false)
+			MaceFarming = false
+			return
+		end
+		if MaceFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			MaceFarmingToggle:Set(false)
+			MaceFarming = false
+			return
+		end
+		if MaceFarming==true and MaceTask1==false and MaceTask2==false and MaceTask3==false and MaceTask4==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			MaceFarmingToggle:Set(false)
+			MaceFarming = false
+			return
+		end
+		if not AltAccountPlayer then
+			WindUI:Notify({
+    			Title = "Error",
+    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Icon = "triangle-exclamation",
+    			Duration = 3,
+			})
+			return
+		end
+if MaceFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="Mace" then
+SelectGlove("Mace")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+if MaceTask4==true then
+NETWORK.send_data("slap_kill_fast")
+else
+NETWORK.send_data("slap")
+end
+task.wait(2.5)
+local canslap = true
+repeat task.wait(.05)
+if MaceTask1==true or MaceTask2==true or MaceTask3==true or MaceTask4==true then
+if MaceTask1==true or MaceTask2==true then
+if LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") then
+LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool").Parent = Character
+task.wait()
+end
+if Character:FindFirstChildWhichIsA("Tool") and Character:FindFirstChildWhichIsA("Tool"):FindFirstChild("Glove") then
+Character:FindFirstChildWhichIsA("Tool").Glove:ApplyImpulse(Vector3.new(math.random(-100,100),55,math.random(-100,100)))
+end
+end
+if canslap==true then
+canslap = false
+pcall(function()
+game:GetService("ReplicatedStorage").GeneralHit:FireServer(AltAccountPlayer.Character.Head, 400)
+end)
+task.delay(.8, function() canslap = true end)
+end
+end
+until MaceFarming==false or Humanoid.Health==0
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+
+
+
+
+
+
+local Dice = Window:Tab({
+    Title = "Dice",
+    Icon = "gravity:sparkles",
+})
+
+local DiceTask1 = false
+Dice:Toggle({
+    Title = "Task 1 (Follow up)",
+    Callback = function(state)
+        DiceTask1 = state
+    end
+})
+
+local DiceTask2	= false
+Dice:Toggle({
+    Title = "Task 2 (Finish players)",
+    Callback = function(state)
+        DiceTask2 = state
+    end
+})
+
+Dice:Button({
+    Title = "Complete Task 3",
+	Desc = "No Alt Required — Doesn't Slap Players",
+	Icon = "gravity:sparkles-fill",
+    Callback = function()
+		if not Character or not HumanoidRootPart or not Humanoid then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			return
+		end
+		if LocalPlayer:WaitForChild("_unlockedGloves").Dice.Value==false and LocalPlayer.leaderstats.Glove.Value~="Dice" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own dice. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			return
+		end
+		if Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			return
+		end
+		if Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			return
+		end
+if LocalPlayer.leaderstats.Glove.Value~="Dice" then
+SelectGlove("Dice")
+task.wait(.333)
+end
+repeat task.wait(.05)
+for i,v in next, FetchedMannequins do
+game:GetService("ReplicatedStorage").DiceHit:FireServer(v)
+end
+until LocalPlayer:WaitForChild("_unlockedGloves").RNG.Value==true or Humanoid.Health==0
+    end
+})
+
+Dice:Divider()
+
+local DiceFarming = false
+local DiceFarmingToggle
+DiceFarmingToggle = Dice:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles",
+    Callback = function(state)
+        DiceFarming = state
+		if DiceFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			DiceFarmingToggle:Set(false)
+			DiceFarming = false
+			return
+		end
+		if DiceFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			DiceFarmingToggle:Set(false)
+			DiceFarming = false
+			return
+		end
+		if DiceFarming==true and LocalPlayer:WaitForChild("_unlockedGloves").Dice.Value==false and LocalPlayer.leaderstats.Glove.Value~="Dice" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own dice. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			DiceFarmingToggle:Set(false)
+			DiceFarming = false
+			return
+		end
+		if DiceFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			DiceFarmingToggle:Set(false)
+			DiceFarming = false
+			return
+		end
+		if DiceFarming==true and DiceTask1==false and DiceTask2==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			DiceFarmingToggle:Set(false)
+			DiceFarming = false
+			return
+		end
+		if not AltAccountPlayer then
+			WindUI:Notify({
+    			Title = "Error",
+    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Icon = "triangle-exclamation",
+    			Duration = 3,
+			})
+			return
+		end
+if DiceFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="Dice" then
+SelectGlove("Dice")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+if DiceTask2==true and DiceTask1~=nil then
+NETWORK.send_data("slap_kill_fast")
+elseif DiceTask2==false and DiceTask1==true then
+NETWORK.send_data("slap")
+end
+task.wait(2.5)
+repeat task.wait(.8)
+if DiceTask1==true or DiceTask2==true then
+pcall(function()
+game:GetService("ReplicatedStorage").DiceHit:FireServer(AltAccountPlayer.Character.Head)
+end)
+end
+until DiceFarming==false or Humanoid.Health==0
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+
+
+
+local Phase = Window:Tab({
+    Title = "Phase",
+    Icon = "gravity:sparkles",
+})
+
+local PhaseTask1 = false
+Phase:Toggle({
+    Title = "Task 1 (Avoid Slap)",
+    Callback = function(state)
+        PhaseTask1 = state
+    end
+})
+
+Phase:Button({
+    Title = "Complete Task 2",
+	Icon = "gravity:sparkles-fill",
+    Callback = function()
+		if not Character or not HumanoidRootPart or not Humanoid then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			return
+		end
+		if LocalPlayer:WaitForChild("_unlockedGloves").Phase.Value==false and LocalPlayer.leaderstats.Glove.Value~="Phase" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own phase. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			return
+		end
+		if Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			return
+		end
+		if Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			return
+		end
+if LocalPlayer:WaitForChild("_unlockedGloves").Ghost.Value==true and LocalPlayer.leaderstats.Glove.Value~="Ghost" then
+SelectGlove("Ghost")
+task.wait(.333)
+end
+game:GetService("ReplicatedStorage").Ghostinvisibilityactivated:FireServer()
+task.wait(1)
+if LocalPlayer.leaderstats.Glove.Value~="Phase" then
+SelectGlove("Phase")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+game:GetService("ReplicatedStorage").PhaseA:FireServer()
+task.wait(.5)
+local Teleports = {
+	[1] = CFrame.new(-4,-12,-217),
+	[2] = CFrame.new(-3,-12,13),
+	[3] = CFrame.new(233,-22,3),
+	[4] = CFrame.new(262,28,197),
+	[5] = CFrame.new(-1,-12,219),
+	[6] = CFrame.new(-125,-12,122),
+	[7] = CFrame.new(-219,-12,1),
+	[8] = CFrame.new(-390,48,-14)
+}
+for i,v in pairs(Teleports) do
+repeat task.wait() HumanoidRootPart:PivotTo(v) until HumanoidRootPart:FindFirstChild("BlackheartREAL")
+repeat task.wait() HumanoidRootPart:PivotTo(v) until HumanoidRootPart:FindFirstChild("BlackheartREAL") == nil
+if i~=8 then
+game:GetService("ReplicatedStorage").PhaseA:FireServer()
+task.wait(.5)
+end
+end
+    end
+})
+
+local PhaseTask3 = false
+Phase:Toggle({
+    Title = "Task 3 (Slap)",
+    Callback = function(state)
+        PhaseTask3 = state
+    end
+})
+
+Phase:Divider()
+
+local PhaseFarming = false
+local PhaseFarmingToggle
+PhaseFarmingToggle = Phase:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles",
+    Callback = function(state)
+        PhaseFarming = state
+		if PhaseFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			PhaseFarmingToggle:Set(false)
+			PhaseFarming = false
+			return
+		end
+		if PhaseFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			PhaseFarmingToggle:Set(false)
+			PhaseFarming = false
+			return
+		end
+		if PhaseFarming==true and LocalPlayer:WaitForChild("_unlockedGloves").Phase.Value==false and LocalPlayer.leaderstats.Glove.Value~="Phase" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own phase. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			PhaseFarmingToggle:Set(false)
+			PhaseFarming = false
+			return
+		end
+		if PhaseFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			PhaseFarmingToggle:Set(false)
+			PhaseFarming = false
+			return
+		end
+		if PhaseFarming==true and PhaseTask1==false and PhaseTask3==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			PhaseFarmingToggle:Set(false)
+			PhaseFarming = false
+			return
+		end
+		if not AltAccountPlayer then
+			WindUI:Notify({
+    			Title = "Error",
+    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Icon = "triangle-exclamation",
+    			Duration = 3,
+			})
+			return
+		end
+if PhaseFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="Phase" then
+SelectGlove("Phase")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+NETWORK.send_data("slap")
+task.wait(2.5)
+repeat task.wait(.8)
+if PhaseTask1==true or PhaseTask3==true then
+task.spawn(function()
+pcall(function()
+if Character.Head.Transparency~=1 then
+task.wait(1)
+game:GetService("ReplicatedStorage").PhaseA:FireServer()
+end
+end)
+end)
+pcall(function()
+game:GetService("ReplicatedStorage").PhaseH:FireServer(AltAccountPlayer.Character.Head)
+end)
+end
+until PhaseFarming==false or Humanoid.Health==0
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+
+
+
+
+local Spring = Window:Tab({
+    Title = "Spring",
+    Icon = "gravity:sparkles",
+})
+
+local SpringTask1 = false
+Spring:Toggle({
+    Title = "Task 1 (Jump Over)",
+    Callback = function(state)
+        SpringTask1 = state
+    end
+})
+
+local SpringTask2 = false
+Spring:Toggle({
+    Title = "Task 2 (Evade)",
+    Callback = function(state)
+        SpringTask2 = state
+    end
+})
+
+local SpringTask3 = false
+Spring:Toggle({
+    Title = "Task 3 (Slap)",
+    Callback = function(state)
+        SpringTask3 = state
+    end
+})
+
+Spring:Divider()
+
+
+function PressKey(keycode)
+local VirtualInputManager = game:GetService("VirtualInputManager")
+VirtualInputManager:SendKeyEvent(true, Enum.KeyCode[keycode], false, game)
+task.wait(0.05)
+VirtualInputManager:SendKeyEvent(false, Enum.KeyCode[keycode], false, game)
+end
+local SpringFarming = false
+local SpringFarmingToggle
+SpringFarmingToggle = Spring:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles",
+    Callback = function(state)
+        SpringFarming = state
+		if SpringFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			SpringFarmingToggle:Set(false)
+			SpringFarming = false
+			return
+		end
+		if SpringFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			SpringFarmingToggle:Set(false)
+			SpringFarming = false
+			return
+		end
+		if SpringFarming==true and LocalPlayer:WaitForChild("_unlockedGloves").Spring.Value==false and LocalPlayer.leaderstats.Glove.Value~="Spring" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own spring. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			SpringFarmingToggle:Set(false)
+			SpringFarming = false
+			return
+		end
+		if SpringFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			SpringFarmingToggle:Set(false)
+			SpringFarming = false
+			return
+		end
+		if SpringFarming==true and SpringTask1==false and SpringTask2==false and SpringTask3==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			SpringFarmingToggle:Set(false)
+			SpringFarming = false
+			return
+		end
+		if not AltAccountPlayer then
+			WindUI:Notify({
+    			Title = "Error",
+    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Icon = "triangle-exclamation",
+    			Duration = 3,
+			})
+			return
+		end
+if SpringFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="Spring" then
+SelectGlove("Spring")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+HumanoidRootPart.Anchored = true
+NETWORK.send_data("slap")
+task.wait(2.5)
+local canslap = true
+repeat task.wait(.05)
+if SpringTask1==true or SpringTask2==true or SpringTask3==true then
+Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+game:GetService("ReplicatedStorage").SpringJump:FireServer()
+PressKey("Space")
+if canslap==true then
+canslap = false
+pcall(function()
+game:GetService("ReplicatedStorage").springhit:FireServer(AltAccountPlayer.Character.Head)
+end)
+task.delay(.8, function() canslap = true end)
+end
+end
+until SpringFarming==false or Humanoid.Health==0
+HumanoidRootPart.Anchored = false
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+
+
+
+local Pinwheel = Window:Tab({
+    Title = "Pinwheel",
+    Icon = "gravity:sparkles",
+})
+
+local PinwheelTask1 = false
+Pinwheel:Toggle({
+    Title = "Task 1 (Ambush)",
+    Callback = function(state)
+        PinwheelTask1 = state
+    end
+})
+
+local PinwheelTask2 = false
+Pinwheel:Toggle({
+    Title = "Task 2 (Defeat)",
+    Callback = function(state)
+        PinwheelTask2 = state
+    end
+})
+
+local PinwheelTask3 = false
+Pinwheel:Toggle({
+    Title = "Task 3 (Combo)",
+    Callback = function(state)
+        PinwheelTask3 = state
+    end
+})
+
+Pinwheel:Divider()
+
+local PinwheelFarming = false
+local PinwheelFarmingToggle
+PinwheelFarmingToggle = Pinwheel:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles",
+    Callback = function(state)
+        PinwheelFarming = state
+		if PinwheelFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			PinwheelFarmingToggle:Set(false)
+			PinwheelFarming = false
+			return
+		end
+		if PinwheelFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			PinwheelFarmingToggle:Set(false)
+			PinwheelFarming = false
+			return
+		end
+		if PinwheelFarming==true and LocalPlayer:WaitForChild("_unlockedGloves").Pinwheel.Value==false and LocalPlayer.leaderstats.Glove.Value~="Pinwheel" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own pinwheel. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			PinwheelFarmingToggle:Set(false)
+			PinwheelFarming = false
+			return
+		end
+		if PinwheelFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			PinwheelFarmingToggle:Set(false)
+			PinwheelFarming = false
+			return
+		end
+		if PinwheelFarming==true and PinwheelTask1==false and PinwheelTask2==false and PinwheelTask3==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			PinwheelFarmingToggle:Set(false)
+			PinwheelFarming = false
+			return
+		end
+		if not AltAccountPlayer then
+			WindUI:Notify({
+    			Title = "Error",
+    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Icon = "triangle-exclamation",
+    			Duration = 3,
+			})
+			return
+		end
+if PinwheelFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="Pinwheel" then
+SelectGlove("Pinwheel")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+HumanoidRootPart.Anchored = true
+NETWORK.send_data("slap")
+task.wait(2.5)
+local canslap = true
+repeat task.wait(.05)
+if PinwheelTask1==true or PinwheelTask2==true or PinwheelTask3==true then
+game:GetService("ReplicatedStorage").Events.pinwheel:FireServer()
+game:GetService("ReplicatedStorage").GeneralAbility:FireServer()
+if canslap==true then
+canslap = false
+pcall(function()
+game:GetService("ReplicatedStorage").GeneralHit:FireServer(AltAccountPlayer.Character.Head)
+end)
+task.delay(.8, function() canslap = true end)
+end
+end
+until PinwheelFarming==false or Humanoid.Health==0
+HumanoidRootPart.Anchored = false
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+
+
+
+local Acrobat = Window:Tab({
+    Title = "Acrobat",
+    Icon = "gravity:sparkles",
+})
+
+local AcrobatTask1 = false
+Acrobat:Toggle({
+    Title = "Task 1 (Excellent combo)",
+    Callback = function(state)
+        AcrobatTask1 = state
+    end
+})
+
+local AcrobatTask2 = false
+Acrobat:Toggle({
+    Title = "Task 2 (Basic combo)",
+    Callback = function(state)
+        AcrobatTask2 = state
+    end
+})
+
+local AcrobatTask3 = false
+Acrobat:Toggle({
+    Title = "Task 3 (Surprise attack)",
+    Callback = function(state)
+        AcrobatTask3 = state
+    end
+})
+
+Acrobat:Divider()
+
+local AcrobatFarming = false
+local AcrobatFarmingToggle
+AcrobatFarmingToggle = Acrobat:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles",
+    Callback = function(state)
+        AcrobatFarming = state
+		if AcrobatFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			AcrobatFarmingToggle:Set(false)
+			AcrobatFarming = false
+			return
+		end
+		if AcrobatFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			AcrobatFarmingToggle:Set(false)
+			AcrobatFarming = false
+			return
+		end
+		if AcrobatFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			AcrobatFarmingToggle:Set(false)
+			AcrobatFarming = false
+			return
+		end
+		if AcrobatFarming==true and AcrobatTask1==false and AcrobatTask2==false and AcrobatTask3==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			AcrobatFarmingToggle:Set(false)
+			AcrobatFarming = false
+			return
+		end
+		if not AltAccountPlayer then
+			WindUI:Notify({
+    			Title = "Error",
+    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Icon = "triangle-exclamation",
+    			Duration = 3,
+			})
+			return
+		end
+if AcrobatFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="Acrobat" then
+SelectGlove("Acrobat")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+HumanoidRootPart.Anchored = true
+NETWORK.send_data("slap")
+task.wait(2.5)
+local canslap = true
+repeat task.wait(.05)
+if AcrobatTask1==true or AcrobatTask2==true or AcrobatTask3==true then
+game:GetService("ReplicatedStorage").Roll:FireServer()
+if canslap==true then
+canslap = false
+pcall(function()
+game:GetService("ReplicatedStorage").AcHit:FireServer(AltAccountPlayer.Character.Head)
+end)
+task.delay(.8, function() canslap = true end)
+end
+end
+until AcrobatFarming==false or Humanoid.Health==0
+HumanoidRootPart.Anchored = false
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+
+
+local Tinkerer = Window:Tab({
+    Title = "Tinkerer",
+    Icon = "gravity:sparkles",
+})
+
+local TinkererTask1 = false
+Tinkerer:Toggle({
+    Title = "Task 1 (Blast)",
+    Callback = function(state)
+        TinkererTask1 = state
+    end
+})
+
+local TinkererTask2 = false
+Tinkerer:Toggle({
+    Title = "Task 2 (Aid)",
+    Callback = function(state)
+        TinkererTask2 = state
+    end
+})
+
+local TinkererTask3 = false
+Tinkerer:Toggle({
+    Title = "Task 3 (Explode)",
+    Callback = function(state)
+        TinkererTask3 = state
+    end
+})
+
+Tinkerer:Divider()
+
+local TinkererFarming = false
+local TinkererFarmingToggle
+TinkererFarmingToggle = Tinkerer:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles",
+    Callback = function(state)
+        TinkererFarming = state
+		if TinkererFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			TinkererFarmingToggle:Set(false)
+			TinkererFarming = false
+			return
+		end
+		if TinkererFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			TinkererFarmingToggle:Set(false)
+			TinkererFarming = false
+			return
+		end
+		if TinkererFarming==true and LocalPlayer:WaitForChild("_unlockedGloves").Tinkerer.Value==false and LocalPlayer.leaderstats.Glove.Value~="Tinkerer" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own tinkerer. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			TinkererFarmingToggle:Set(false)
+			TinkererFarming = false
+			return
+		end
+		if TinkererFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			TinkererFarmingToggle:Set(false)
+			TinkererFarming = false
+			return
+		end
+		if TinkererFarming==true and TinkererTask1==false and TinkererTask2==false and TinkererTask3==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			TinkererFarmingToggle:Set(false)
+			TinkererFarming = false
+			return
+		end
+		if not AltAccountPlayer then
+			WindUI:Notify({
+    			Title = "Error",
+    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Icon = "triangle-exclamation",
+    			Duration = 3,
+			})
+			return
+		end
+if TinkererFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="Tinkerer" then
+SelectGlove("Tinkerer")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+HumanoidRootPart.Anchored = true
+NETWORK.send_data("init_same_y_level")
+task.wait(2.5)
+local canslap = true
+repeat task.wait(.05)
+if TinkererTask1==true or TinkererTask2==true or TinkererTask3==true then
+game:GetService("ReplicatedStorage").GeneralAbility:FireServer("E_ABILITY")
+if canslap==true then
+canslap = false
+pcall(function()
+game:GetService("ReplicatedStorage").TinkererHit:FireServer(AltAccountPlayer.Character.Head)
+end)
+task.delay(.8, function() canslap = true end)
+end
+end
+until TinkererFarming==false or Humanoid.Health==0
+HumanoidRootPart.Anchored = false
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+
+
+
+local Eggler = Window:Tab({
+    Title = "Eggler",
+    Icon = "gravity:sparkles",
+})
+
+Eggler:Button({
+    Title = "Complete Task 1 (Kill 5 eggified players)",
+	Icon = "gravity:sparkles-fill",
+    Callback = function()
+		if not Character or not HumanoidRootPart or not Humanoid then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			return
+		end
+		if LocalPlayer:WaitForChild("_unlockedGloves").Eggler.Value==false and LocalPlayer.leaderstats.Glove.Value~="Eggler" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own eggler. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			return
+		end
+		if Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			return
+		end
+		if Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			return
+		end
+		if not AltAccountPlayer then
+			WindUI:Notify({
+    			Title = "Error",
+    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Icon = "triangle-exclamation",
+    			Duration = 3,
+			})
+			return
+		end
+if LocalPlayer.leaderstats.Glove.Value~="Eggler" then
+SelectGlove("Eggler")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,15,0), 1.5)
+NETWORK.send_data("init_eggler_task")
+task.wait(2.5)
+repeat task.wait(.8)
+pcall(function()
+game:GetService("ReplicatedStorage").GeneralHit:FireServer(AltAccountPlayer.Character.Head)
+end)
+until (Character:GetAttribute("CleanKillStreak")~=nil and Character:GetAttribute("CleanKillStreak")==5) or Humanoid.Health==0
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+    end
+})
+
+local EgglerTask2 = false
+Eggler:Toggle({
+    Title = "Task 2 (Unegg with violence)",
+    Callback = function(state)
+        EgglerTask2 = state
+    end
+})
+
+local EgglerTask3 = false
+Eggler:Toggle({
+    Title = "Task 3 (Deny slap trading)",
+    Callback = function(state)
+        EgglerTask3 = state
+    end
+})
+
+local EgglerTask4 = false
+Eggler:Toggle({
+    Title = "Task 4 (Eggify)",
+    Callback = function(state)
+        EgglerTask4 = state
+    end
+})
+
+
+Eggler:Divider()
+
+local EgglerFarming = false
+local EgglerFarmingToggle
+EgglerFarmingToggle = Eggler:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles",
+    Callback = function(state)
+        EgglerFarming = state
+		if EgglerFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			EgglerFarmingToggle:Set(false)
+			EgglerFarming = false
+			return
+		end
+		if EgglerFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			EgglerFarmingToggle:Set(false)
+			EgglerFarming = false
+			return
+		end
+		if EgglerFarming==true and LocalPlayer:WaitForChild("_unlockedGloves").Eggler.Value==false and LocalPlayer.leaderstats.Glove.Value~="Eggler" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own eggler. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			EgglerFarmingToggle:Set(false)
+			EgglerFarming = false
+			return
+		end
+		if EgglerFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			EgglerFarmingToggle:Set(false)
+			EgglerFarming = false
+			return
+		end
+		if EgglerFarming==true and EgglerTask2==false and EgglerTask3==false and EgglerTask4==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			EgglerFarmingToggle:Set(false)
+			EgglerFarming = false
+			return
+		end
+		if not AltAccountPlayer then
+			WindUI:Notify({
+    			Title = "Error",
+    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Icon = "triangle-exclamation",
+    			Duration = 3,
+			})
+			return
+		end
+if EgglerFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="Eggler" then
+SelectGlove("Eggler")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+HumanoidRootPart.Anchored = true
+NETWORK.send_data("init_close_range_same_y_level")
+task.wait(2.5)
+local canslap = true
+repeat task.wait(.05)
+if EgglerTask2==true or EgglerTask3==true or EgglerTask4==true then
+if EgglerTask2==true or EgglerTask3==true then
+game:GetService("ReplicatedStorage").Events.EgglerRAbility:FireServer()
+end
+if EgglerTask4==true then
+game:GetService("ReplicatedStorage").GeneralAbility:FireServer()
+end
+if canslap==true then
+canslap = false
+pcall(function()
+if EgglerTask2==true or EgglerTask3==true then
+game:GetService("ReplicatedStorage").GeneralHit:FireServer(AltAccountPlayer.Character.Head)
+end
+end)
+task.delay(.8, function() canslap = true end)
+end
+end
+until EgglerFarming==false or Humanoid.Health==0
+HumanoidRootPart.Anchored = false
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+
+
+
+local Phantom = Window:Tab({
+    Title = "Phantom",
+    Icon = "gravity:sparkles",
+})
+
+local PhantomTask1 = false
+Phantom:Toggle({
+    Title = "Task 1 (Jumpscare)",
+    Callback = function(state)
+        PhantomTask1 = state
+    end
+})
+
+local PhantomTask2 = false
+Phantom:Toggle({
+    Title = "Task 2 (Perform a combo)",
+    Callback = function(state)
+        PhantomTask2 = state
+    end
+})
+
+local PhantomTask3 = false
+Phantom:Toggle({
+    Title = "Task 3 (Tap without dying)",
+    Callback = function(state)
+        PhantomTask3 = state
+    end
+})
+
+Phantom:Divider()
+
+local PhantomFarming = false
+local PhantomFarmingToggle
+PhantomFarmingToggle = Phantom:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles",
+    Callback = function(state)
+        PhantomFarming = state
+		if PhantomFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			PhantomFarmingToggle:Set(false)
+			PhantomFarming = false
+			return
+		end
+		if PhantomFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			PhantomFarmingToggle:Set(false)
+			PhantomFarming = false
+			return
+		end
+		if PhantomFarming==true and LocalPlayer:WaitForChild("_unlockedGloves").Phantom.Value==false and LocalPlayer.leaderstats.Glove.Value~="Phantom" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own phantom. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			PhantomFarmingToggle:Set(false)
+			PhantomFarming = false
+			return
+		end
+		if PhantomFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			PhantomFarmingToggle:Set(false)
+			PhantomFarming = false
+			return
+		end
+		if PhantomFarming==true and PhantomTask1==false and PhantomTask2==false and PhantomTask3==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			PhantomFarmingToggle:Set(false)
+			PhantomFarming = false
+			return
+		end
+		if not AltAccountPlayer then
+			WindUI:Notify({
+    			Title = "Error",
+    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Icon = "triangle-exclamation",
+    			Duration = 3,
+			})
+			return
+		end
+if PhantomFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="Phantom" then
+SelectGlove("Phantom")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+HumanoidRootPart.Anchored = true
+NETWORK.send_data("slap")
+task.wait(2.5)
+local canslap = true
+repeat task.wait(.05)
+if PhantomTask1==true or PhantomTask2==true or PhantomTask3==true then
+game:GetService("ReplicatedStorage").PhantomDash:InvokeServer(Character.Head)
+game:GetService("ReplicatedStorage").Events.PhantomSlapStarted:FireServer()
+if canslap==true then
+canslap = false
+pcall(function()
+game:GetService("ReplicatedStorage").PhantomHit:FireServer(AltAccountPlayer.Character.Head)
+end)
+task.delay(.8, function() canslap = true end)
+end
+end
+until PhantomFarming==false or Humanoid.Health==0
+HumanoidRootPart.Anchored = false
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+
+
+
+local Stalker = Window:Tab({
+    Title = "Stalker",
+    Icon = "gravity:sparkles",
+})
+
+local StalkerTask1 = false
+Stalker:Toggle({
+    Title = "Task 1 (Ambush in a row)",
+    Callback = function(state)
+        StalkerTask1 = state
+    end
+})
+
+local StalkerTask2 = false
+Stalker:Toggle({
+    Title = "Task 2 (Ambush)",
+    Callback = function(state)
+        StalkerTask2 = state
+    end
+})
+
+Stalker:Divider()
+
+local StalkerFarming = false
+local StalkerFarmingToggle
+StalkerFarmingToggle = Stalker:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles",
+    Callback = function(state)
+        StalkerFarming = state
+		if StalkerFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			StalkerFarmingToggle:Set(false)
+			StalkerFarming = false
+			return
+		end
+		if StalkerFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			StalkerFarmingToggle:Set(false)
+			StalkerFarming = false
+			return
+		end
+		if StalkerFarming==true and LocalPlayer:WaitForChild("_unlockedGloves").Stalker.Value==false and LocalPlayer.leaderstats.Glove.Value~="Stalker" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own stalker. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			StalkerFarmingToggle:Set(false)
+			StalkerFarming = false
+			return
+		end
+		if StalkerFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			StalkerFarmingToggle:Set(false)
+			StalkerFarming = false
+			return
+		end
+		if StalkerFarming==true and StalkerTask1==false and StalkerTask2==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			StalkerFarmingToggle:Set(false)
+			StalkerFarming = false
+			return
+		end
+		if not AltAccountPlayer then
+			WindUI:Notify({
+    			Title = "Error",
+    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Icon = "triangle-exclamation",
+    			Duration = 3,
+			})
+			return
+		end
+if StalkerFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="Stalker" then
+SelectGlove("Stalker")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+HumanoidRootPart.Anchored = true
+NETWORK.send_data("slap")
+task.wait(2.5)
+local canslap = true
+repeat task.wait(.8)
+if StalkerTask1==true or StalkerTask2==true then
+pcall(function()
+game:GetService("ReplicatedStorage").GeneralHit:FireServer(AltAccountPlayer.Character.Head,false,37)
+end)
+end
+until StalkerFarming==false or Humanoid.Health==0
+HumanoidRootPart.Anchored = false
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+
+
+
+local Killstreak = Window:Tab({
+    Title = "Killstreak",
+    Icon = "gravity:sparkles",
+})
+
+local KillstreakTask1 = false
+Killstreak:Toggle({
+    Title = "Task 1 (Claim souls)",
+    Callback = function(state)
+        KillstreakTask1 = state
+    end
+})
+
+local KillstreakTask3 = false
+Killstreak:Toggle({
+    Title = "Task 3 (Own '1 0 0')",
+    Callback = function(state)
+        KillstreakTask3 = state
+    end
+})
+
+Killstreak:Divider()
+
+local KillstreakFarming = false
+local KillstreakFarmingToggle
+KillstreakFarmingToggle = Killstreak:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles",
+    Callback = function(state)
+        KillstreakFarming = state
+		if KillstreakFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			KillstreakFarmingToggle:Set(false)
+			KillstreakFarming = false
+			return
+		end
+		if KillstreakFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			KillstreakFarmingToggle:Set(false)
+			KillstreakFarming = false
+			return
+		end
+		if KillstreakFarming==true and LocalPlayer:WaitForChild("_unlockedGloves").Killstreak.Value==false and LocalPlayer.leaderstats.Glove.Value~="Killstreak" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own killstreak. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			KillstreakFarmingToggle:Set(false)
+			KillstreakFarming = false
+			return
+		end
+		if KillstreakFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			KillstreakFarmingToggle:Set(false)
+			KillstreakFarming = false
+			return
+		end
+		if KillstreakFarming==true and KillstreakTask1==false and KillstreakTask3==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			KillstreakFarmingToggle:Set(false)
+			KillstreakFarming = false
+			return
+		end
+		if not AltAccountPlayer then
+			WindUI:Notify({
+    			Title = "Error",
+    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Icon = "triangle-exclamation",
+    			Duration = 3,
+			})
+			return
+		end
+if KillstreakFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="Killstreak" then
+SelectGlove("Killstreak")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+NETWORK.send_data("slap_kill_fast")
+task.wait(2.5)
+repeat task.wait(.8)
+if KillstreakTask1==true or KillstreakTask3==true then
+pcall(function()
+game:GetService("ReplicatedStorage").KSHit:FireServer(AltAccountPlayer.Character.Head)
+end)
+end
+until KillstreakFarming==false or Humanoid.Health==0
 Humanoid.Health = 0
 LocalPlayer:WaitForChild("Reset"):FireServer()
 end
