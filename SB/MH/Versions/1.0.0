@@ -234,7 +234,7 @@ local MusicHolder = Instance.new("Sound")
 MusicHolder.Name = "nexermusic"
 MusicHolder.Looped = true
 MusicHolder.SoundId = "rbxassetid://"..tostring(randommusicichosenforyou)..""
-MusicHolder.Volume = 2
+MusicHolder.Volume = 0.5
 MusicHolder.Parent = game:GetService("SoundService")
 MusicHolder:Play()
 end
@@ -291,7 +291,7 @@ Main:Input({
 
 Main:Input({
     Title = "Music Volume (from 0 to 10)",
-    Placeholder = "2",
+    Placeholder = "0.5",
     Value = "",
     Callback = function(text)
 		if tonumber(text) then
