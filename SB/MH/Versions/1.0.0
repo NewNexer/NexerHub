@@ -756,15 +756,9 @@ if Character:FindFirstChild("entered")==nil then
 EnterArena(workspace.Lobby["Teleport2"])
 if firsttimealreadywas~=true then
 firsttimealreadywas = true
-if workspace:FindFirstChild("ObbyItem"..MainAccountPlayer.Name.."LavaBlock") then
-pcall(function()
-workspace["ObbyItem"..MainAccountPlayer.Name.."LavaBlock"].CanCollide = false
-while workspace["ObbyItem"..MainAccountPlayer.Name.."LavaBlock"]~=nil do
-workspace["ObbyItem"..MainAccountPlayer.Name.."LavaBlock"]:PivotTo(HumanoidRootPart.CFrame)
-task.wait()
-end
-end)
-end
+task.wait(5)
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
 end
 end
 end)
