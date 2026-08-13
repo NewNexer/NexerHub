@@ -39,6 +39,17 @@ if game:GetService("Players").LocalPlayer.PlayerScripts:FindFirstChild("ClientAn
 game:GetService("Players").LocalPlayer.PlayerScripts.ClientAnticheat:Destroy()
 end
 
+local somerandommusic = {
+	111405430613058,
+	108407497849204,
+	107992728229480,
+	122625155351130,
+	89503266223024,
+	89707765914199,
+	99154704003183,
+}
+randommusicichosenforyou = somerandommusic[math.random(1,7)]
+
 function CreateMessage(a)
 local instancename = (a=="Message" and a) or "Hint"
 local msg = Instance.new(instancename,game:GetService("CoreGui"))
@@ -49,10 +60,18 @@ end
 local _version = "1.6.66"
 local msg = CreateMessage()
 msg.Text = "Loading Modules... (0/2)"
-local modules = {
+local modules
+if string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "Solara") then
+modules = {
+	{"WindUI", "https://github.com/Footagesus/WindUI/releases/download/".._version.."/main.lua", true},
+	{"AltConnector (Xeno/Solara Version)", "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/SB/Modules/Xeno-Connector.lua", true}
+}
+else
+modules = {
 	{"WindUI", "https://github.com/Footagesus/WindUI/releases/download/".._version.."/main.lua", true},
 	{"AltConnector", "https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/SB/Modules/Connector.lua", true}
 }
+end
 if not loaded_modules_sb then
 getgenv().loaded_modules_sb = {}
 end
@@ -214,7 +233,7 @@ SetSounds(false)
 local MusicHolder = Instance.new("Sound")
 MusicHolder.Name = "nexermusic"
 MusicHolder.Looped = true
-MusicHolder.SoundId = "rbxassetid://108407497849204"
+MusicHolder.SoundId = "rbxassetid://"..tostring(randommusicichosenforyou)..""
 MusicHolder.Volume = 2
 MusicHolder.Parent = game:GetService("SoundService")
 MusicHolder:Play()
@@ -222,7 +241,7 @@ end
 task.delay(2, function()
 game:GetService("SoundService"):WaitForChild("nexermusic"):Stop()
 task.wait()
-game:GetService("SoundService"):WaitForChild("nexermusic").SoundId = "rbxassetid://"..tostring(108407497849204)
+game:GetService("SoundService"):WaitForChild("nexermusic").SoundId = "rbxassetid://"..tostring(randommusicichosenforyou)
 game:GetService("SoundService"):WaitForChild("nexermusic"):Play()
 end)
 
@@ -260,7 +279,7 @@ Main:Divider()
 
 Main:Input({
     Title = "Music Sound ID",
-    Placeholder = "108407497849204",
+    Placeholder = tostring(randommusicichosenforyou),
     Value = "",
     Callback = function(text)
 		game:GetService("SoundService"):WaitForChild("nexermusic"):Stop()
@@ -283,8 +302,8 @@ Main:Input({
 
 Main:Divider()
 
-local antiafkenabled = false
-local antiafktoggle = Main:Toggle({
+antiafkenabled = false
+antiafktoggle = Main:Toggle({
     Title = "Anti-AFK",
 	Icon = "mouse-pointer-click",
     Callback = function(state)
@@ -322,10 +341,15 @@ Main:Button({
     end
 })
 
-local SelectGlove = function(g) repeat task.wait(.1) NETWORK.get_remote("SelectGlove"):FireServer(g) until LocalPlayer.leaderstats.Glove.Value==g task.wait(.1) end
-local EnterArena = function(ar) local oldcf = ar.CFrame ar.CanCollide = false ar.CanTouch = true repeat task.wait() pcall(function() ar:PivotTo(HumanoidRootPart.CFrame) end) until (Character and Character:FindFirstChild("entered")) ar:PivotTo(oldcf) ar.CanCollide = true end
-local OverrideVelocity = function() pcall(function() for i,v in next, Character:GetDescendants() do if v and v:IsA("BasePart") then v.Velocity,v.RotVelocity = Vector3.new(0,0,0),Vector3.new(0,0,0) end end end) end
-local TeleportToPosition = function(cFrame,time,huh) local huh = huh or false local time = time or 1 local starttimee = tick() while tick() - starttimee < time do pcall(function() OverrideVelocity() if huh==true then for i,v in next, Character:GetChildren() do if v:IsA("BasePart") then v:PivotTo(cFrame) end end elseif huh==false then HumanoidRootPart:PivotTo(cFrame) end end) task.wait() end end
+local SelectGlove
+if string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "Solara") then
+SelectGlove = function(g) repeat task.wait(.1) NETWORK.get_remote("SelectGlove"):FireServer(g) until LocalPlayer.leaderstats.Glove.Value==g task.wait(.1) end
+else
+SelectGlove = function(g) repeat task.wait(.1) fireclickdetector(workspace.Lobby[g]:FindFirstChildWhichIsA("ClickDetector", true)) until LocalPlayer.leaderstats.Glove.Value==g task.wait(.1) end
+end
+EnterArena = function(ar) local oldcf = ar.CFrame ar.CanCollide = false ar.CanTouch = true repeat task.wait() pcall(function() ar:PivotTo(HumanoidRootPart.CFrame) end) until (Character and Character:FindFirstChild("entered")) ar:PivotTo(oldcf) ar.CanCollide = true end
+OverrideVelocity = function() pcall(function() for i,v in next, Character:GetDescendants() do if v and v:IsA("BasePart") then v.Velocity,v.RotVelocity = Vector3.new(0,0,0),Vector3.new(0,0,0) end end end) end
+TeleportToPosition = function(cFrame,time,huh) local huh = huh or false local time = time or 1 local starttimee = tick() while tick() - starttimee < time do pcall(function() OverrideVelocity() if huh==true then for i,v in next, Character:GetChildren() do if v:IsA("BasePart") then v:PivotTo(cFrame) end end elseif huh==false then HumanoidRootPart:PivotTo(cFrame) end end) task.wait() end end
 
 local MainAccountPlayer
 function ReceiveData()
@@ -343,17 +367,13 @@ WindUI:Notify({
 })
 return
 end
-local plr = MainAccountPlayer
-local char = plr.Character
-local hrp = char:WaitForChild("HumanoidRootPart",2)
-local hum = char:WaitForChild("Humanoid",2)
-plr.CharacterAdded:Once(function()
+MainAccountPlayer.CharacterAdded:Once(function()
 Humanoid.Health = 0
 LocalPlayer:WaitForChild("Reset"):FireServer()
 end)
 EnterArena(workspace.Lobby["Teleport2"])
 while Humanoid.Health~=0 do
-HumanoidRootPart:PivotTo(hrp.CFrame*CFrame.new(0,-7,10))
+HumanoidRootPart:PivotTo(MainAccountPlayer.Character:WaitForChild("HumanoidRootPart",2).CFrame*CFrame.new(0,-7,10))
 OverrideVelocity()
 task.wait()
 end
@@ -368,14 +388,10 @@ WindUI:Notify({
 })
 return
 end
-local plr = MainAccountPlayer
-local char = plr.Character
-local hrp = char:WaitForChild("HumanoidRootPart",2)
-local hum = char:WaitForChild("Humanoid",2)
 local mainplrdied = false
 local firsttimealreadywas = false
 local supconnet
-plr.CharacterAdded:Once(function()
+MainAccountPlayer.CharacterAdded:Once(function()
 mainplrdied = true
 Humanoid.Health = 0
 LocalPlayer:WaitForChild("Reset"):FireServer()
@@ -387,7 +403,7 @@ end)
 task.spawn(function()
 while mainplrdied~=true do
 pcall(function()
-HumanoidRootPart:PivotTo(hrp.CFrame*CFrame.new(0,-7,10))
+HumanoidRootPart:PivotTo(MainAccountPlayer.Character:WaitForChild("HumanoidRootPart",2).CFrame*CFrame.new(0,-7,10))
 OverrideVelocity()
 end)
 task.wait()
@@ -429,14 +445,10 @@ WindUI:Notify({
 })
 return
 end
-local plr = MainAccountPlayer
-local char = plr.Character
-local hrp = char:WaitForChild("HumanoidRootPart",2)
-local hum = char:WaitForChild("Humanoid",2)
 local mainplrdied = false
 local firsttimealreadywas = false
 local supconnet
-plr.CharacterAdded:Once(function()
+MainAccountPlayer.CharacterAdded:Once(function()
 mainplrdied = true
 Humanoid.Health = 0
 LocalPlayer:WaitForChild("Reset"):FireServer()
@@ -448,7 +460,7 @@ end)
 task.spawn(function()
 while mainplrdied~=true do
 pcall(function()
-HumanoidRootPart:PivotTo(hrp.CFrame*CFrame.new(0,-7,10))
+HumanoidRootPart:PivotTo(MainAccountPlayer.Character:WaitForChild("HumanoidRootPart",2).CFrame*CFrame.new(0,-7,10))
 OverrideVelocity()
 end)
 task.wait()
@@ -490,8 +502,7 @@ WindUI:Notify({
 })
 return
 end
-local plr = MainAccountPlayer
-plr.CharacterAdded:Once(function()
+MainAccountPlayer.CharacterAdded:Once(function()
 Humanoid.Health = 0
 LocalPlayer:WaitForChild("Reset"):FireServer()
 end)
@@ -506,17 +517,6 @@ OverrideVelocity()
 task.wait()
 end
 end
-if datastring=="init_defense" then
-if not MainAccountPlayer then
-WindUI:Notify({
-    Title = "Error",
-    Content = "Something went wrong. Try connecting the accounts again.",
-    Icon = "triangle-exclamation",
-    Duration = 3,
-})
-return
-end
-end
 if datastring=="init_eggler_task" then
 if not MainAccountPlayer then
 WindUI:Notify({
@@ -527,14 +527,10 @@ WindUI:Notify({
 })
 return
 end
-local plr = MainAccountPlayer
-local char = plr.Character
-local hrp = char:WaitForChild("HumanoidRootPart",2)
-local hum = char:WaitForChild("Humanoid",2)
 local mainplrdied = false
 local firsttimealreadywas = false
 local supconnet
-plr.CharacterAdded:Once(function()
+MainAccountPlayer.CharacterAdded:Once(function()
 mainplrdied = true
 Humanoid.Health = 0
 LocalPlayer:WaitForChild("Reset"):FireServer()
@@ -546,7 +542,7 @@ end)
 task.spawn(function()
 while mainplrdied~=true do
 pcall(function()
-HumanoidRootPart:PivotTo(hrp.CFrame*CFrame.new(0,0,-3))
+HumanoidRootPart:PivotTo(MainAccountPlayer.Character:WaitForChild("HumanoidRootPart",2).CFrame*CFrame.new(0,0,-3))
 OverrideVelocity()
 end)
 task.wait()
@@ -580,39 +576,6 @@ end
 end)
 end)
 end
-if datastring=="init_run" then
-if not MainAccountPlayer then
-WindUI:Notify({
-    Title = "Error",
-    Content = "Something went wrong. Try connecting the accounts again.",
-    Icon = "triangle-exclamation",
-    Duration = 3,
-})
-return
-end
-end
-if datastring=="init_brick" then
-if not MainAccountPlayer then
-WindUI:Notify({
-    Title = "Error",
-    Content = "Something went wrong. Try connecting the accounts again.",
-    Icon = "triangle-exclamation",
-    Duration = 3,
-})
-return
-end
-end
-if datastring=="init_engineer" then
-if not MainAccountPlayer then
-WindUI:Notify({
-    Title = "Error",
-    Content = "Something went wrong. Try connecting the accounts again.",
-    Icon = "triangle-exclamation",
-    Duration = 3,
-})
-return
-end
-end
 if datastring=="init_redacted" then
 if not MainAccountPlayer then
 WindUI:Notify({
@@ -640,19 +603,15 @@ WindUI:Notify({
 })
 return
 end
-local plr = MainAccountPlayer
-local char = plr.Character
-local hrp = char:WaitForChild("HumanoidRootPart",2)
-local hum = char:WaitForChild("Humanoid",2)
 local mainaccdied = false
-plr.CharacterAdded:Once(function()
+MainAccountPlayer.CharacterAdded:Once(function()
 mainaccdied = true
 Humanoid.Health = 0
 LocalPlayer:WaitForChild("Reset"):FireServer()
 end)
 while mainaccdied~=true do
 pcall(function()
-HumanoidRootPart:PivotTo(hrp.CFrame*CFrame.new(0,0,-3))
+HumanoidRootPart:PivotTo(MainAccountPlayer.Character:WaitForChild("HumanoidRootPart",2).CFrame*CFrame.new(0,0,-3))
 end)
 pcall(function()
 OverrideVelocity()
@@ -675,17 +634,235 @@ WindUI:Notify({
 })
 return
 end
-local plr = MainAccountPlayer
-local char = plr.Character
-local hrp = char:WaitForChild("HumanoidRootPart",2)
-local hum = char:WaitForChild("Humanoid",2)
-plr.CharacterAdded:Once(function()
+MainAccountPlayer.CharacterAdded:Once(function()
 Humanoid.Health = 0
 LocalPlayer:WaitForChild("Reset"):FireServer()
 end)
 EnterArena(workspace.Lobby["Teleport2"])
 while Humanoid.Health~=0 do
-HumanoidRootPart:PivotTo(hrp.CFrame*CFrame.new(0,0,-10))
+HumanoidRootPart:PivotTo(MainAccountPlayer.Character:WaitForChild("HumanoidRootPart",2).CFrame*CFrame.new(0,0,-10))
+OverrideVelocity()
+task.wait()
+end
+end
+if datastring=="init_snipe" then
+if not MainAccountPlayer then
+WindUI:Notify({
+    Title = "Error",
+    Content = "Something went wrong. Try connecting the accounts again.",
+    Icon = "triangle-exclamation",
+    Duration = 3,
+})
+return
+end
+MainAccountPlayer.CharacterAdded:Once(function()
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end)
+EnterArena(workspace.Lobby["Teleport2"])
+while Humanoid.Health~=0 do
+HumanoidRootPart:PivotTo(MainAccountPlayer.Character:WaitForChild("HumanoidRootPart",2).CFrame*CFrame.new(0,0,-160))
+OverrideVelocity()
+task.wait()
+end
+end
+if datastring=="init_plank_kill" then
+if not MainAccountPlayer then
+WindUI:Notify({
+    Title = "Error",
+    Content = "Something went wrong. Try connecting the accounts again.",
+    Icon = "triangle-exclamation",
+    Duration = 3,
+})
+return
+end
+local mainplrdied = false
+local firsttimealreadywas = false
+local supconnet
+MainAccountPlayer.CharacterAdded:Once(function()
+mainplrdied = true
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+if supconnet then
+supconnet:Disconnect()
+supconnet = nil
+end
+end)
+task.spawn(function()
+while mainplrdied~=true do
+pcall(function()
+HumanoidRootPart:PivotTo(MainAccountPlayer.Character:WaitForChild("HumanoidRootPart",2).CFrame*CFrame.new(0,0,-30))
+OverrideVelocity()
+end)
+task.wait()
+end
+end)
+task.spawn(function()
+while mainplrdied~=true do
+pcall(function()
+if Character:FindFirstChild("entered")==nil then
+EnterArena(workspace.Lobby["Teleport2"])
+if firsttimealreadywas~=true then
+firsttimealreadywas = true
+Character:WaitForChild("Ragdolled",3600):GetPropertyChangedSignal("Value"):Once(function()
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end)
+end
+end
+end)
+task.wait(.005)
+end
+end)
+supconnet = LocalPlayer.CharacterAdded:Connect(function(chr)
+chr.ChildAdded:Connect(function(Child)
+if Child.Name=="entered" then
+Character:WaitForChild("Ragdolled",3600):GetPropertyChangedSignal("Value"):Once(function()
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end)
+end
+end)
+end)
+end
+if datastring=="init_bubble_kill" then
+if not MainAccountPlayer then
+WindUI:Notify({
+    Title = "Error",
+    Content = "Something went wrong. Try connecting the accounts again.",
+    Icon = "triangle-exclamation",
+    Duration = 3,
+})
+return
+end
+local mainplrdied = false
+local firsttimealreadywas = false
+local supconnet
+MainAccountPlayer.CharacterAdded:Once(function()
+mainplrdied = true
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+if supconnet then
+supconnet:Disconnect()
+supconnet = nil
+end
+end)
+task.spawn(function()
+while mainplrdied~=true do
+pcall(function()
+HumanoidRootPart:PivotTo(MainAccountPlayer.Character:WaitForChild("HumanoidRootPart",2).CFrame*CFrame.new(0,0,-10))
+OverrideVelocity()
+end)
+task.wait()
+end
+end)
+task.spawn(function()
+while mainplrdied~=true do
+pcall(function()
+if Character:FindFirstChild("entered")==nil then
+EnterArena(workspace.Lobby["Teleport2"])
+if firsttimealreadywas~=true then
+firsttimealreadywas = true
+Character:WaitForChild("HumanoidRootPart",3600):GetPropertyChangedSignal("AssemblyRootPart"):Once(function()
+repeat task.wait() until Character:GetAttribute("IsBubbled")~=nil and Character:GetAttribute("IsBubbled")==true
+repeat task.wait() until Character:GetAttribute("IsBubbled")~=nil and Character:GetAttribute("IsBubbled")==false
+task.wait(.5)
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end)
+end
+end
+end)
+task.wait(.005)
+end
+end)
+supconnet = LocalPlayer.CharacterAdded:Connect(function(chr)
+chr.ChildAdded:Connect(function(Child)
+if Child.Name=="entered" then
+Character:WaitForChild("HumanoidRootPart",3600):GetPropertyChangedSignal("AssemblyRootPart"):Once(function()
+repeat task.wait() until Character:GetAttribute("IsBubbled")~=nil and Character:GetAttribute("IsBubbled")==true
+repeat task.wait() until Character:GetAttribute("IsBubbled")~=nil and Character:GetAttribute("IsBubbled")==false
+task.wait(.5)
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end)
+end
+end)
+end)
+end
+if datastring=="init_plank_snipe" then
+if not MainAccountPlayer then
+WindUI:Notify({
+    Title = "Error",
+    Content = "Something went wrong. Try connecting the accounts again.",
+    Icon = "triangle-exclamation",
+    Duration = 3,
+})
+return
+end
+MainAccountPlayer.CharacterAdded:Once(function()
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end)
+EnterArena(workspace.Lobby["Teleport2"])
+while Humanoid.Health~=0 do
+HumanoidRootPart:PivotTo(MainAccountPlayer.Character:WaitForChild("HumanoidRootPart",2).CFrame*CFrame.new(0,0,-30))
+OverrideVelocity()
+task.wait()
+end
+end
+if datastring=="init_brick" then
+if not MainAccountPlayer then
+WindUI:Notify({
+    Title = "Error",
+    Content = "Something went wrong. Try connecting the accounts again.",
+    Icon = "triangle-exclamation",
+    Duration = 3,
+})
+return
+end
+local coolconnectin
+coolconnectin = workspace.ChildAdded:Connect(function(Child)
+task.wait(3)
+if Child.Name=="Union" and Child.Position.X>9000 then
+Child.CanCollide = false
+task.spawn(function()
+while Child~=nil do
+Child.CFrame = HumanoidRootPart.CFrame
+task.wait()
+end
+end)
+end
+end)
+MainAccountPlayer.CharacterAdded:Once(function()
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+coolconnectin:Disconnect()
+end)
+EnterArena(workspace.Lobby["Teleport2"])
+while Humanoid.Health~=0 do
+HumanoidRootPart:PivotTo(MainAccountPlayer.Character:WaitForChild("HumanoidRootPart",2).CFrame*CFrame.new(0,0,-25))
+OverrideVelocity()
+task.wait()
+end
+end
+if datastring=="init_underground" then
+if not MainAccountPlayer then
+WindUI:Notify({
+    Title = "Error",
+    Content = "Something went wrong. Try connecting the accounts again.",
+    Icon = "triangle-exclamation",
+    Duration = 3,
+})
+return
+end
+MainAccountPlayer.CharacterAdded:Once(function()
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end)
+EnterArena(workspace.Lobby["Teleport2"])
+while Humanoid.Health~=0 do
+HumanoidRootPart:PivotTo(MainAccountPlayer.Character:WaitForChild("HumanoidRootPart",2).CFrame*CFrame.new(0,-11,0))
 OverrideVelocity()
 task.wait()
 end
@@ -700,17 +877,13 @@ WindUI:Notify({
 })
 return
 end
-local plr = MainAccountPlayer
-local char = plr.Character
-local hrp = char:WaitForChild("HumanoidRootPart",2)
-local hum = char:WaitForChild("Humanoid",2)
-plr.CharacterAdded:Once(function()
+MainAccountPlayer.CharacterAdded:Once(function()
 Humanoid.Health = 0
 LocalPlayer:WaitForChild("Reset"):FireServer()
 end)
 EnterArena(workspace.Lobby["Teleport2"])
 while Humanoid.Health~=0 do
-HumanoidRootPart:PivotTo(hrp.CFrame*CFrame.new(0,0,-3))
+HumanoidRootPart:PivotTo(MainAccountPlayer.Character:WaitForChild("HumanoidRootPart",2).CFrame*CFrame.new(0,0,-3))
 OverrideVelocity()
 task.wait()
 end
@@ -791,6 +964,41 @@ Connector:Button({
     end
 })
 
+
+local BugsFix = Window:Tab({
+    Title = "Bugs Fix",
+    Desc = "Tutorial on how to fix bugs quickly.",
+    Icon = "gravity:bug",
+})
+
+BugsFix:Paragraph({
+    Title = "Can't connect accounts",
+    Desc = "Make sure you are doing everything right, and if it still doesn't work, just rejoin.",
+    Image = "shield-exclamation",
+    ImageSize = 20
+})
+
+BugsFix:Paragraph({
+    Title = "Alt doesn't teleport to arena | Alt doesn't do anything when starting a farm",
+    Desc = "To fix that you will need to rejoin the game from both: Main Account & Alt Account. ( network fix )",
+    Image = "shield-exclamation",
+    ImageSize = 20
+})
+
+BugsFix:Paragraph({
+    Title = "Tasks don't get count | Tasks aren't being completed even though they should",
+    Desc = "To fix that you will need to rejoin the game from both: Main Account & Alt Account. ( network fix )",
+    Image = "shield-exclamation",
+    ImageSize = 20
+})
+
+BugsFix:Paragraph({
+    Title = "Farms don't start | Farm says I don't have the glove even though I do",
+    Desc = "To fix that just equip the glove you need mastery for.",
+    Image = "shield-exclamation",
+    ImageSize = 20
+})
+
 local FetchedHumanoids = {}
 local FetchedMannequins = {}
 for i,v in next, game:GetService("ReplicatedStorage").Assets:GetDescendants() do
@@ -813,12 +1021,13 @@ platform1.Name = "platform1"
 platform1.Parent = workspace
 end
 
-local Glovel = Window:Tab({
+-- Glovel tab
+Glovel = Window:Tab({
     Title = "Glovel",
     Icon = "gravity:sparkles-fill",
 })
 
-local GlovelTask1 = false
+GlovelTask1 = false
 Glovel:Toggle({
     Title = "Task 1 (Dig)",
     Callback = function(state)
@@ -826,7 +1035,7 @@ Glovel:Toggle({
     end
 })
 
-local GlovelTask2 = false
+GlovelTask2 = false
 Glovel:Toggle({
     Title = "Task 2 (Land crits)",
 	Desc = "No Alt Required — 12x slap speed",
@@ -836,7 +1045,7 @@ Glovel:Toggle({
     end
 })
 
-local GlovelTask3 = false
+GlovelTask3 = false
 Glovel:Toggle({
     Title = "Task 3 (Land crits in a row)",
 	Desc = "No Alt Required — 12x slap speed",
@@ -848,8 +1057,8 @@ Glovel:Toggle({
 
 Glovel:Divider()
 
-local GlovelFarming = false
-local GlovelFarmingToggle
+GlovelFarming = false
+GlovelFarmingToggle = nil
 GlovelFarmingToggle = Glovel:Toggle({
     Title = "Start Farming",
 	Icon = "gravity:sparkles-fill",
@@ -937,16 +1146,13 @@ end
     end
 })
 
-
-
-
-
-local Wormhole = Window:Tab({
+-- Wormhole tab
+Wormhole = Window:Tab({
     Title = "Wormhole",
     Icon = "gravity:sparkles-fill",
 })
 
-local WormholeTask1 = false
+WormholeTask1 = false
 Wormhole:Toggle({
     Title = "Task 1 (Ambush)",
 	Desc = "No Alt Required — 12x slap speed",
@@ -956,7 +1162,7 @@ Wormhole:Toggle({
     end
 })
 
-local WormholeTask2 = false
+WormholeTask2 = false
 Wormhole:Toggle({
     Title = "Task 2 (Teleport)",
     Callback = function(state)
@@ -998,8 +1204,8 @@ end
 
 Wormhole:Divider()
 
-local WormholeFarming = false
-local WormholeFarmingToggle
+WormholeFarming = false
+WormholeFarmingToggle = nil
 WormholeFarmingToggle = Wormhole:Toggle({
     Title = "Start Farming",
 	Icon = "gravity:sparkles-fill",
@@ -1088,9 +1294,8 @@ end
     end
 })	
 
-
-
-local Moon = Window:Tab({
+-- Moon tab
+Moon = Window:Tab({
     Title = "Moon",
     Icon = "gravity:sparkles-fill",
 })
@@ -1127,7 +1332,7 @@ end
     end
 })
 
-local MoonTask2 = false
+MoonTask2 = false
 Moon:Toggle({
     Title = "Task 2 (Slap as you land)",
 	Desc = "No Alt Required — 12x slap speed",
@@ -1186,10 +1391,6 @@ Moon:Button({
 			})
 			return
 		end
-local plr = AltAccountPlayer
-local char = plr.Character
-local hrp = char:WaitForChild("HumanoidRootPart",2)
-local hum = char:WaitForChild("Humanoid",2)
 if LocalPlayer.leaderstats.Glove.Value~="Moon" then
 SelectGlove("Moon")
 task.wait(.333)
@@ -1201,7 +1402,7 @@ NETWORK.send_data("slap")
 task.wait(2.5)
 for i=1,50 do
 if Humanoid.Health==0 then break end
-game:GetService("ReplicatedStorage").CelestialHit:FireServer(hrp)
+game:GetService("ReplicatedStorage").CelestialHit:FireServer(AltAccountPlayer.Character:WaitForChild("HumanoidRootPart",2))
 task.wait(.8)
 end
 HumanoidRootPart.Anchored = false
@@ -1212,8 +1413,8 @@ LocalPlayer:WaitForChild("Reset"):FireServer()
 
 Moon:Divider()
 
-local MoonFarming = false
-local MoonFarmingToggle
+MoonFarming = false
+MoonFarmingToggle = nil
 MoonFarmingToggle = Moon:Toggle({
     Title = "Start Farming",
 	Icon = "gravity:sparkles-fill",
@@ -1309,10 +1510,8 @@ end
 
 
 
-
-
-
-local Flash = Window:Tab({
+-- Flash tab
+Flash = Window:Tab({
     Title = "Flash",
     Icon = "gravity:sparkles-fill",
 })
@@ -1349,7 +1548,7 @@ end
     end
 })
 
-local FlashTask2 = false
+FlashTask2 = false
 Flash:Toggle({
     Title = "Task 2 (Ambush)",
 	Desc = "No Alt Required — 12x slap speed",
@@ -1393,8 +1592,8 @@ end
 
 Flash:Divider()
 
-local FlashFarming = false
-local FlashFarmingToggle
+FlashFarming = false
+FlashFarmingToggle = nil
 FlashFarmingToggle = Flash:Toggle({
     Title = "Start Farming",
 	Icon = "gravity:sparkles-fill",
@@ -1485,14 +1684,13 @@ end
 
 
 
-
-
-local UltraInstinct = Window:Tab({
+-- Ultra Instinct tab
+UltraInstinct = Window:Tab({
     Title = "Ultra Instinct",
     Icon = "gravity:sparkles-fill",
 })
 
-local UltraInstinctTask1 = false
+UltraInstinctTask1 = false
 UltraInstinct:Toggle({
     Title = "Task 1 (Counter)",
 	Desc = "No Alt Required — 4x slap speed",
@@ -1502,7 +1700,7 @@ UltraInstinct:Toggle({
     end
 })
 
-local UltraInstinctTask2 = false
+UltraInstinctTask2 = false
 UltraInstinct:Toggle({
     Title = "Task 2 (Dodge in a row)",
 	Desc = "No Alt Required — 4x slap speed",
@@ -1514,8 +1712,8 @@ UltraInstinct:Toggle({
 
 UltraInstinct:Divider()
 
-local UltraInstinctFarming = false
-local UltraInstinctFarmingToggle
+UltraInstinctFarming = false
+UltraInstinctFarmingToggle = nil
 UltraInstinctFarmingToggle = UltraInstinct:Toggle({
     Title = "Start Farming",
 	Icon = "gravity:sparkles-fill",
@@ -1614,8 +1812,8 @@ end
     end
 })
 
-
-local Fort = Window:Tab({
+-- Fort tab
+Fort = Window:Tab({
     Title = "Fort",
     Icon = "gravity:sparkles-fill",
 })
@@ -1672,7 +1870,7 @@ TeleportToPosition(CFrame.new(-406,87,-51), 1.5)
     end
 })
 
-local FortTask2 = false
+FortTask2 = false
 Fort:Toggle({
     Title = "Task 2 (Smash)",
     Callback = function(state)
@@ -1680,7 +1878,7 @@ Fort:Toggle({
     end
 })
 
-local FortTask3 = false
+FortTask3 = false
 Fort:Toggle({
     Title = "Task 3 (Build)",
     Callback = function(state)
@@ -1690,8 +1888,8 @@ Fort:Toggle({
 
 Fort:Divider()
 
-local FortFarming = false
-local FortFarmingToggle
+FortFarming = false
+FortFarmingToggle = nil
 FortFarmingToggle = Fort:Toggle({
     Title = "Start Farming",
 	Icon = "gravity:sparkles-fill",
@@ -1788,14 +1986,13 @@ until fort.Transparency==1
 end
 end)
 
-
-
-local Bomb = Window:Tab({
+-- Bomb tab
+Bomb = Window:Tab({
     Title = "Bomb",
     Icon = "gravity:sparkles-fill",
 })
 
-local BombUseAlt = false
+BombUseAlt = false
 Bomb:Toggle({
     Title = "Use Alt Account?",
 	Desc = "Alt Account is not necessary for completion, but it will make it faster.",
@@ -1854,7 +2051,7 @@ end
     end
 })
 
-local BombTask2 = false
+BombTask2 = false
 Bomb:Toggle({
     Title = "Task 2 (Snipe)",
     Callback = function(state)
@@ -1862,7 +2059,7 @@ Bomb:Toggle({
     end
 })
 
-local BombTask3 = false
+BombTask3 = false
 Bomb:Toggle({
     Title = "Task 3 (Knock)",
     Callback = function(state)
@@ -1872,8 +2069,8 @@ Bomb:Toggle({
 
 Bomb:Divider()
 
-local BombFarming = false
-local BombFarmingToggle
+BombFarming = false
+BombFarmingToggle = nil
 BombFarmingToggle = Bomb:Toggle({
     Title = "Start Farming",
 	Icon = "gravity:sparkles-fill",
@@ -2021,14 +2218,13 @@ end
     end
 })
 
-
-
-local REDACTED = Window:Tab({
+-- REDACTED tab
+REDACTED = Window:Tab({
     Title = "[REDACTED]",
     Icon = "gravity:sparkles-fill",
 })
 
-local REDACTEDUseAlt = false
+REDACTEDUseAlt = false
 REDACTED:Toggle({
     Title = "Use Alt Account?",
 	Desc = "Alt Account is not necessary for completion, but it will make it faster.",
@@ -2037,7 +2233,7 @@ REDACTED:Toggle({
     end
 })
 
-local REDACTEDTask2 = false
+REDACTEDTask2 = false
 REDACTED:Toggle({
     Title = "Task 2 (Contain)",
     Callback = function(state)
@@ -2045,7 +2241,7 @@ REDACTED:Toggle({
     end
 })
 
-local REDACTEDTask3 = false
+REDACTEDTask3 = false
 REDACTED:Toggle({
     Title = "Task 3 (Protect)",
     Callback = function(state)
@@ -2055,8 +2251,8 @@ REDACTED:Toggle({
 
 REDACTED:Divider()
 
-local REDACTEDFarming = false
-local REDACTEDFarmingToggle
+REDACTEDFarming = false
+REDACTEDFarmingToggle = nil
 REDACTEDFarmingToggle = REDACTED:Toggle({
     Title = "Start Farming",
 	Icon = "gravity:sparkles-fill",
@@ -2146,13 +2342,13 @@ end
     end
 })
 
-
-local Stick = Window:Tab({
+-- Stick tab
+Stick = Window:Tab({
     Title = "Stick",
     Icon = "gravity:sparkles-fill",
 })
 
-local stickwhotohit = FetchedMannequins
+stickwhotohit = FetchedMannequins
 Stick:Toggle({
     Title = "9x poke speed",
 	Desc = "Risky - everyone will hear the stick SFX",
@@ -2166,7 +2362,7 @@ Stick:Toggle({
     end
 })
 
-local StickTask1 = false
+StickTask1 = false
 Stick:Toggle({
     Title = "Task 1 (poke)",
 	Desc = "No Alt Required - 4x poke speed by default",
@@ -2178,8 +2374,8 @@ Stick:Toggle({
 
 Stick:Divider()
 
-local StickFarming = false
-local StickFarmingToggle
+StickFarming = false
+StickFarmingToggle = nil
 StickFarmingToggle = Stick:Toggle({
     Title = "Start Farming",
 	Icon = "gravity:sparkles-fill",
@@ -2249,13 +2445,13 @@ end
     end
 })
 
-
-local spin = Window:Tab({
+-- spin tab
+spin = Window:Tab({
     Title = "spin",
     Icon = "gravity:sparkles-fill",
 })
 
-local spinTask1 = false
+spinTask1 = false
 spin:Toggle({
     Title = "Task 1 (spin)",
 	Icon = "gravity:sparkles-fill",
@@ -2266,8 +2462,8 @@ spin:Toggle({
 
 spin:Divider()
 
-local spinFarming = false
-local spinFarmingToggle
+spinFarming = false
+spinFarmingToggle = nil
 spinFarmingToggle = spin:Toggle({
     Title = "Start Farming",
 	Icon = "gravity:sparkles-fill",
@@ -2333,8 +2529,8 @@ end
     end
 })
 
-
-local rob = Window:Tab({
+-- rob tab
+rob = Window:Tab({
     Title = "rob",
     Icon = "gravity:sparkles",
 })
@@ -2407,7 +2603,7 @@ TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
     end
 })
 
-local robTask2 = false
+robTask2 = false
 rob:Toggle({
     Title = "Task 2 (Travel)",
     Callback = function(state)
@@ -2415,7 +2611,7 @@ rob:Toggle({
     end
 })
 
-local robTask3 = false
+robTask3 = false
 rob:Toggle({
     Title = "Task 3 (Absorb)",
     Callback = function(state)
@@ -2425,8 +2621,8 @@ rob:Toggle({
 
 rob:Divider()
 
-local robFarming = false
-local robFarmingToggle
+robFarming = false
+robFarmingToggle = nil
 robFarmingToggle = rob:Toggle({
     Title = "Start Farming",
 	Icon = "gravity:sparkles",
@@ -2507,10 +2703,6 @@ if robTask3==true then
 NETWORK.send_data("init_rob")
 task.wait(2.5)
 end
-local plr = (robTask3==true and AltAccountPlayer) or LocalPlayer
-local char = plr.Character
-local hrp = char:WaitForChild("HumanoidRootPart",2)
-local hum = char:WaitForChild("Humanoid",2)
 repeat task.wait(.05)
 if robTask2==true or robTask3==true then
 game:GetService("ReplicatedStorage").rob:FireServer()
@@ -2521,7 +2713,7 @@ if robTask3==true then
 if robTask2==false then
 HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,10,0))
 end
-hrp:PivotTo(HumanoidRootPart.CFrame)
+AltAccountPlayer.Character:WaitForChild("HumanoidRootPart",2):PivotTo(HumanoidRootPart.CFrame)
 end
 end
 until robFarming==false or Humanoid.Health==0
@@ -2541,14 +2733,13 @@ end
 end
 end)
 
-
-
-local Space = Window:Tab({
+-- Space tab
+Space = Window:Tab({
     Title = "Space",
     Icon = "gravity:sparkles",
 })
 
-local SpaceTask1 = false
+SpaceTask1 = false
 Space:Toggle({
     Title = "Task 1 (Defy gravity)",
     Callback = function(state)
@@ -2621,7 +2812,7 @@ LocalPlayer:WaitForChild("Reset"):FireServer()
     end
 })
 
-local SpaceTask4 = false
+SpaceTask4 = false
 Space:Toggle({
     Title = "Task 4 (Ambush)",
     Callback = function(state)
@@ -2631,8 +2822,8 @@ Space:Toggle({
 
 Space:Divider()
 
-local SpaceFarming = false
-local SpaceFarmingToggle
+SpaceFarming = false
+SpaceFarmingToggle = nil
 SpaceFarmingToggle = Space:Toggle({
     Title = "Start Farming",
 	Icon = "gravity:sparkles",
@@ -2713,15 +2904,11 @@ if SpaceTask4==true then
 NETWORK.send_data("slap")
 task.wait(2.5)
 end
-local plr = (SpaceTask4==true and AltAccountPlayer) or LocalPlayer
-local char = plr.Character
-local hrp = char:WaitForChild("HumanoidRootPart",2)
-local hum = char:WaitForChild("Humanoid",2)
 repeat task.wait(.05)
 if SpaceTask1==true or SpaceTask4==true then
 game:GetService("ReplicatedStorage").ZeroGSound:FireServer()
 if SpaceTask4==true then
-game:GetService("ReplicatedStorage").HtSpace:FireServer(hrp)
+game:GetService("ReplicatedStorage").HtSpace:FireServer(AltAccountPlayer.Character:WaitForChild("HumanoidRootPart",2))
 task.wait(.8)
 end
 end
@@ -2732,12 +2919,13 @@ end
     end
 })
 
-local Gummy = Window:Tab({
+-- Gummy tab
+Gummy = Window:Tab({
     Title = "Gummy",
     Icon = "gravity:sparkles",
 })
 
-local GummyTask1 = false
+GummyTask1 = false
 Gummy:Toggle({
     Title = "Task 1 (Attach)",
     Callback = function(state)
@@ -2745,7 +2933,7 @@ Gummy:Toggle({
     end
 })
 
-local GummyTask2	 = false
+GummyTask2	 = false
 Gummy:Toggle({
     Title = "Task 2 (Kill)",
     Callback = function(state)
@@ -2753,7 +2941,7 @@ Gummy:Toggle({
     end
 })
 
-local GummyTask3 = false
+GummyTask3 = false
 Gummy:Toggle({
     Title = "Task 3 (Attach 3 or more)",
     Callback = function(state)
@@ -2763,8 +2951,8 @@ Gummy:Toggle({
 
 Gummy:Divider()
 
-local GummyFarming = false
-local GummyFarmingToggle
+GummyFarming = false
+GummyFarmingToggle = nil
 GummyFarmingToggle = Gummy:Toggle({
     Title = "Start Farming",
 	Icon = "gravity:sparkles",
@@ -2865,13 +3053,13 @@ end
     end
 })
 
-
-local Mace = Window:Tab({
+-- Mace tab
+Mace = Window:Tab({
     Title = "Mace",
     Icon = "gravity:sparkles",
 })
 
-local MaceTask1 = false
+MaceTask1 = false
 Mace:Toggle({
     Title = "Task 1 (Hit in a row without slowing down)",
     Callback = function(state)
@@ -2879,7 +3067,7 @@ Mace:Toggle({
     end
 })
 
-local MaceTask2	 = false
+MaceTask2	 = false
 Mace:Toggle({
     Title = "Task 2 (Quick-flick)",
     Callback = function(state)
@@ -2887,7 +3075,7 @@ Mace:Toggle({
     end
 })
 
-local MaceTask3 = false
+MaceTask3 = false
 Mace:Toggle({
     Title = "Task 3 (Bludgeon)",
     Callback = function(state)
@@ -2895,7 +3083,7 @@ Mace:Toggle({
     end
 })
 
-local MaceTask4 = false
+MaceTask4 = false
 Mace:Toggle({
     Title = "Task 4 (Obliterate)",
     Callback = function(state)
@@ -2905,8 +3093,8 @@ Mace:Toggle({
 
 Mace:Divider()
 
-local MaceFarming = false
-local MaceFarmingToggle
+MaceFarming = false
+MaceFarmingToggle = nil
 MaceFarmingToggle = Mace:Toggle({
     Title = "Start Farming",
 	Icon = "gravity:sparkles",
@@ -3016,17 +3204,13 @@ end
     end
 })
 
-
-
-
-
-
-local Dice = Window:Tab({
+-- Dice tab
+Dice = Window:Tab({
     Title = "Dice",
     Icon = "gravity:sparkles",
 })
 
-local DiceTask1 = false
+DiceTask1 = false
 Dice:Toggle({
     Title = "Task 1 (Follow up)",
     Callback = function(state)
@@ -3034,7 +3218,7 @@ Dice:Toggle({
     end
 })
 
-local DiceTask2	= false
+DiceTask2	= false
 Dice:Toggle({
     Title = "Task 2 (Finish players)",
     Callback = function(state)
@@ -3097,8 +3281,8 @@ until LocalPlayer:WaitForChild("_unlockedGloves").RNG.Value==true or Humanoid.He
 
 Dice:Divider()
 
-local DiceFarming = false
-local DiceFarmingToggle
+DiceFarming = false
+DiceFarmingToggle = nil
 DiceFarmingToggle = Dice:Toggle({
     Title = "Start Farming",
 	Icon = "gravity:sparkles",
@@ -3194,14 +3378,13 @@ end
     end
 })
 
-
-
-local Phase = Window:Tab({
+-- Phase tab
+Phase = Window:Tab({
     Title = "Phase",
     Icon = "gravity:sparkles",
 })
 
-local PhaseTask1 = false
+PhaseTask1 = false
 Phase:Toggle({
     Title = "Task 1 (Avoid Slap)",
     Callback = function(state)
@@ -3283,7 +3466,7 @@ end
     end
 })
 
-local PhaseTask3 = false
+PhaseTask3 = false
 Phase:Toggle({
     Title = "Task 3 (Slap)",
     Callback = function(state)
@@ -3293,8 +3476,8 @@ Phase:Toggle({
 
 Phase:Divider()
 
-local PhaseFarming = false
-local PhaseFarmingToggle
+PhaseFarming = false
+PhaseFarmingToggle = nil
 PhaseFarmingToggle = Phase:Toggle({
     Title = "Start Farming",
 	Icon = "gravity:sparkles",
@@ -3407,15 +3590,13 @@ end
     end
 })
 
-
-
-
-local Spring = Window:Tab({
+-- Spring tab
+Spring = Window:Tab({
     Title = "Spring",
     Icon = "gravity:sparkles",
 })
 
-local SpringTask1 = false
+SpringTask1 = false
 Spring:Toggle({
     Title = "Task 1 (Jump Over)",
     Callback = function(state)
@@ -3423,7 +3604,7 @@ Spring:Toggle({
     end
 })
 
-local SpringTask2 = false
+SpringTask2 = false
 Spring:Toggle({
     Title = "Task 2 (Evade)",
     Callback = function(state)
@@ -3431,7 +3612,7 @@ Spring:Toggle({
     end
 })
 
-local SpringTask3 = false
+SpringTask3 = false
 Spring:Toggle({
     Title = "Task 3 (Slap)",
     Callback = function(state)
@@ -3448,8 +3629,8 @@ VirtualInputManager:SendKeyEvent(true, Enum.KeyCode[keycode], false, game)
 task.wait(0.05)
 VirtualInputManager:SendKeyEvent(false, Enum.KeyCode[keycode], false, game)
 end
-local SpringFarming = false
-local SpringFarmingToggle
+SpringFarming = false
+SpringFarmingToggle = nil
 SpringFarmingToggle = Spring:Toggle({
     Title = "Start Farming",
 	Icon = "gravity:sparkles",
@@ -3551,14 +3732,13 @@ end
     end
 })
 
-
-
-local Pinwheel = Window:Tab({
+-- Pinwheel tab
+Pinwheel = Window:Tab({
     Title = "Pinwheel",
     Icon = "gravity:sparkles",
 })
 
-local PinwheelTask1 = false
+PinwheelTask1 = false
 Pinwheel:Toggle({
     Title = "Task 1 (Ambush)",
     Callback = function(state)
@@ -3566,7 +3746,7 @@ Pinwheel:Toggle({
     end
 })
 
-local PinwheelTask2 = false
+PinwheelTask2 = false
 Pinwheel:Toggle({
     Title = "Task 2 (Defeat)",
     Callback = function(state)
@@ -3574,7 +3754,7 @@ Pinwheel:Toggle({
     end
 })
 
-local PinwheelTask3 = false
+PinwheelTask3 = false
 Pinwheel:Toggle({
     Title = "Task 3 (Combo)",
     Callback = function(state)
@@ -3584,8 +3764,8 @@ Pinwheel:Toggle({
 
 Pinwheel:Divider()
 
-local PinwheelFarming = false
-local PinwheelFarmingToggle
+PinwheelFarming = false
+PinwheelFarmingToggle = nil
 PinwheelFarmingToggle = Pinwheel:Toggle({
     Title = "Start Farming",
 	Icon = "gravity:sparkles",
@@ -3686,14 +3866,13 @@ end
     end
 })
 
-
-
-local Acrobat = Window:Tab({
+-- Acrobat tab
+Acrobat = Window:Tab({
     Title = "Acrobat",
     Icon = "gravity:sparkles",
 })
 
-local AcrobatTask1 = false
+AcrobatTask1 = false
 Acrobat:Toggle({
     Title = "Task 1 (Excellent combo)",
     Callback = function(state)
@@ -3701,7 +3880,7 @@ Acrobat:Toggle({
     end
 })
 
-local AcrobatTask2 = false
+AcrobatTask2 = false
 Acrobat:Toggle({
     Title = "Task 2 (Basic combo)",
     Callback = function(state)
@@ -3709,7 +3888,7 @@ Acrobat:Toggle({
     end
 })
 
-local AcrobatTask3 = false
+AcrobatTask3 = false
 Acrobat:Toggle({
     Title = "Task 3 (Surprise attack)",
     Callback = function(state)
@@ -3719,8 +3898,8 @@ Acrobat:Toggle({
 
 Acrobat:Divider()
 
-local AcrobatFarming = false
-local AcrobatFarmingToggle
+AcrobatFarming = false
+AcrobatFarmingToggle = nil
 AcrobatFarmingToggle = Acrobat:Toggle({
     Title = "Start Farming",
 	Icon = "gravity:sparkles",
@@ -3807,13 +3986,13 @@ end
     end
 })
 
-
-local Tinkerer = Window:Tab({
+-- Tinkerer tab
+Tinkerer = Window:Tab({
     Title = "Tinkerer",
     Icon = "gravity:sparkles",
 })
 
-local TinkererTask1 = false
+TinkererTask1 = false
 Tinkerer:Toggle({
     Title = "Task 1 (Blast)",
     Callback = function(state)
@@ -3821,7 +4000,7 @@ Tinkerer:Toggle({
     end
 })
 
-local TinkererTask2 = false
+TinkererTask2 = false
 Tinkerer:Toggle({
     Title = "Task 2 (Aid)",
     Callback = function(state)
@@ -3829,7 +4008,7 @@ Tinkerer:Toggle({
     end
 })
 
-local TinkererTask3 = false
+TinkererTask3 = false
 Tinkerer:Toggle({
     Title = "Task 3 (Explode)",
     Callback = function(state)
@@ -3839,8 +4018,8 @@ Tinkerer:Toggle({
 
 Tinkerer:Divider()
 
-local TinkererFarming = false
-local TinkererFarmingToggle
+TinkererFarming = false
+TinkererFarmingToggle = nil
 TinkererFarmingToggle = Tinkerer:Toggle({
     Title = "Start Farming",
 	Icon = "gravity:sparkles",
@@ -3940,9 +4119,8 @@ end
     end
 })
 
-
-
-local Eggler = Window:Tab({
+-- Eggler tab
+Eggler = Window:Tab({
     Title = "Eggler",
     Icon = "gravity:sparkles",
 })
@@ -4014,7 +4192,7 @@ LocalPlayer:WaitForChild("Reset"):FireServer()
     end
 })
 
-local EgglerTask2 = false
+EgglerTask2 = false
 Eggler:Toggle({
     Title = "Task 2 (Unegg with violence)",
     Callback = function(state)
@@ -4022,7 +4200,7 @@ Eggler:Toggle({
     end
 })
 
-local EgglerTask3 = false
+EgglerTask3 = false
 Eggler:Toggle({
     Title = "Task 3 (Deny slap trading)",
     Callback = function(state)
@@ -4030,7 +4208,7 @@ Eggler:Toggle({
     end
 })
 
-local EgglerTask4 = false
+EgglerTask4 = false
 Eggler:Toggle({
     Title = "Task 4 (Eggify)",
     Callback = function(state)
@@ -4038,11 +4216,10 @@ Eggler:Toggle({
     end
 })
 
-
 Eggler:Divider()
 
-local EgglerFarming = false
-local EgglerFarmingToggle
+EgglerFarming = false
+EgglerFarmingToggle = nil
 EgglerFarmingToggle = Eggler:Toggle({
     Title = "Start Farming",
 	Icon = "gravity:sparkles",
@@ -4149,14 +4326,13 @@ end
     end
 })
 
-
-
-local Phantom = Window:Tab({
+-- Phantom tab
+Phantom = Window:Tab({
     Title = "Phantom",
     Icon = "gravity:sparkles",
 })
 
-local PhantomTask1 = false
+PhantomTask1 = false
 Phantom:Toggle({
     Title = "Task 1 (Jumpscare)",
     Callback = function(state)
@@ -4164,7 +4340,7 @@ Phantom:Toggle({
     end
 })
 
-local PhantomTask2 = false
+PhantomTask2 = false
 Phantom:Toggle({
     Title = "Task 2 (Perform a combo)",
     Callback = function(state)
@@ -4172,7 +4348,7 @@ Phantom:Toggle({
     end
 })
 
-local PhantomTask3 = false
+PhantomTask3 = false
 Phantom:Toggle({
     Title = "Task 3 (Tap without dying)",
     Callback = function(state)
@@ -4182,8 +4358,8 @@ Phantom:Toggle({
 
 Phantom:Divider()
 
-local PhantomFarming = false
-local PhantomFarmingToggle
+PhantomFarming = false
+PhantomFarmingToggle = nil
 PhantomFarmingToggle = Phantom:Toggle({
     Title = "Start Farming",
 	Icon = "gravity:sparkles",
@@ -4284,14 +4460,13 @@ end
     end
 })
 
-
-
-local Stalker = Window:Tab({
+-- Stalker tab
+Stalker = Window:Tab({
     Title = "Stalker",
     Icon = "gravity:sparkles",
 })
 
-local StalkerTask1 = false
+StalkerTask1 = false
 Stalker:Toggle({
     Title = "Task 1 (Ambush in a row)",
     Callback = function(state)
@@ -4299,7 +4474,7 @@ Stalker:Toggle({
     end
 })
 
-local StalkerTask2 = false
+StalkerTask2 = false
 Stalker:Toggle({
     Title = "Task 2 (Ambush)",
     Callback = function(state)
@@ -4309,8 +4484,8 @@ Stalker:Toggle({
 
 Stalker:Divider()
 
-local StalkerFarming = false
-local StalkerFarmingToggle
+StalkerFarming = false
+StalkerFarmingToggle = nil
 StalkerFarmingToggle = Stalker:Toggle({
     Title = "Start Farming",
 	Icon = "gravity:sparkles",
@@ -4405,14 +4580,13 @@ end
     end
 })
 
-
-
-local Killstreak = Window:Tab({
+-- Killstreak tab
+Killstreak = Window:Tab({
     Title = "Killstreak",
     Icon = "gravity:sparkles",
 })
 
-local KillstreakTask1 = false
+KillstreakTask1 = false
 Killstreak:Toggle({
     Title = "Task 1 (Claim souls)",
     Callback = function(state)
@@ -4420,7 +4594,7 @@ Killstreak:Toggle({
     end
 })
 
-local KillstreakTask3 = false
+KillstreakTask3 = false
 Killstreak:Toggle({
     Title = "Task 3 (Own '1 0 0')",
     Callback = function(state)
@@ -4430,8 +4604,8 @@ Killstreak:Toggle({
 
 Killstreak:Divider()
 
-local KillstreakFarming = false
-local KillstreakFarmingToggle
+KillstreakFarming = false
+KillstreakFarmingToggle = nil
 KillstreakFarmingToggle = Killstreak:Toggle({
     Title = "Start Farming",
 	Icon = "gravity:sparkles",
@@ -4517,6 +4691,900 @@ game:GetService("ReplicatedStorage").KSHit:FireServer(AltAccountPlayer.Character
 end)
 end
 until KillstreakFarming==false or Humanoid.Health==0
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+
+if workspace:FindFirstChild("platform2")==nil then
+local platform2 = Instance.new("Part")
+platform2.Position = Vector3.new(4390, 115, -1647)
+platform2.Size = Vector3.new(64,4,64)
+platform2.Anchored = true
+platform2.Transparency = 0.5
+platform2.CanCollide = true
+platform2.Name = "platform2"
+platform2.Parent = workspace
+end
+
+-- Cloud tab
+Cloud = Window:Tab({
+    Title = "Cloud",
+    Icon = "gravity:sparkles",
+})
+
+CloudTask1 = false
+Cloud:Toggle({
+    Title = "Task 1 (Death from above)",
+    Callback = function(state)
+        CloudTask1 = state
+    end
+})
+
+CloudTask2 = false
+Cloud:Toggle({
+    Title = "Task 2 (Spend time)",
+    Callback = function(state)
+        CloudTask2 = state
+    end
+})
+
+CloudTask3 = false
+Cloud:Toggle({
+    Title = "Task 3 (Travel)",
+    Callback = function(state)
+        CloudTask3 = state
+    end
+})
+
+CloudTask4 = false
+Cloud:Toggle({
+    Title = "Task 4 (Pick up people)",
+    Callback = function(state)
+        CloudTask4 = state
+    end
+})
+
+Cloud:Divider()
+
+CloudFarming = false
+CloudFarmingToggle = nil
+CloudFarmingToggle = Cloud:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles",
+    Callback = function(state)
+        CloudFarming = state
+		if CloudFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			CloudFarmingToggle:Set(false)
+			CloudFarming = false
+			return
+		end
+		if CloudFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			CloudFarmingToggle:Set(false)
+			CloudFarming = false
+			return
+		end
+		if CloudFarming==true and LocalPlayer:WaitForChild("_unlockedGloves").Cloud.Value==false and LocalPlayer.leaderstats.Glove.Value~="Cloud" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own cloud. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			CloudFarmingToggle:Set(false)
+			CloudFarming = false
+			return
+		end
+		if CloudFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			CloudFarmingToggle:Set(false)
+			CloudFarming = false
+			return
+		end
+		if CloudFarming==true and CloudTask1==false and CloudTask2==false and CloudTask3==false and CloudTask4==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			CloudFarmingToggle:Set(false)
+			CloudFarming = false
+			return
+		end
+		if CloudFarming==true and CloudTask1==true and CloudTask3==true then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Can't combine tasks 1 and 3. Sorry.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			CloudFarmingToggle:Set(false)
+			CloudFarming = false
+			return
+		end
+		if CloudFarming==true and CloudTask1==true and CloudTask4==true then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Can't combine tasks 1 and 4. Sorry.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			CloudFarmingToggle:Set(false)
+			CloudFarming = false
+			return
+		end
+		if not AltAccountPlayer then
+			WindUI:Notify({
+    			Title = "Error",
+    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Icon = "triangle-exclamation",
+    			Duration = 3,
+			})
+			return
+		end
+if CloudFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="Cloud" then
+SelectGlove("Cloud")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform2"].CFrame * CFrame.new(0,10,0), 1.5)
+repeat task.wait()
+if workspace:FindFirstChild(LocalPlayer.Name.."_Cloud")==nil then
+game:GetService("ReplicatedStorage").CloudAbility:FireServer()
+end
+until workspace:FindFirstChild(LocalPlayer.Name.."_Cloud") and workspace[LocalPlayer.Name.."_Cloud"]:FindFirstChild("VehicleSeat")
+TeleportToPosition(workspace[LocalPlayer.Name.."_Cloud"].VehicleSeat.CFrame, 1)
+NETWORK.send_data("init_underground")
+task.wait(2.5)
+local movingcloudh = false
+local launchedflytask = false
+local function startflytaskidk()
+	if movingcloudh==true then return end
+	if not workspace:FindFirstChild(LocalPlayer.Name.."_Cloud") or not workspace[LocalPlayer.Name.."_Cloud"]:FindFirstChild("VehicleSeat") then return end
+    if workspace[LocalPlayer.Name.."_Cloud"].VehicleSeat.Occupant==nil then return end
+    local center = workspace["platform2"].Position
+    local corners = {
+        center + Vector3.new(-20, 0, -20),
+        center + Vector3.new(20, 0, -20),
+        center + Vector3.new(20, 0, 20),
+        center + Vector3.new(-20, 0, 20)
+    }
+    local corneer = 1
+	movingcloudh = true
+	local emptyvar = true
+    repeat task.wait()
+        if workspace:FindFirstChild(LocalPlayer.Name.."_Cloud") and workspace[LocalPlayer.Name.."_Cloud"]:FindFirstChild("VehicleSeat") and workspace[LocalPlayer.Name.."_Cloud"].VehicleSeat.Occupant~=nil then
+			pcall(function()
+            	local tempdirection = (Vector3.new(corners[corneer].X, center.Y, corners[corneer].Z)-workspace[LocalPlayer.Name.."_Cloud"].Position)
+            	local newdirection = Vector3.new(tempdirection.X, 0, tempdirection.Z)
+            	if newdirection.Magnitude < 2 then
+                	corneer = corneer + 1
+                	if corneer > 4 then
+                    	corneer = 1
+                	end
+            	else
+                	workspace[LocalPlayer.Name.."_Cloud"].BodyVelocity.Velocity = newdirection.Unit * 400
+            	end
+            	workspace[LocalPlayer.Name.."_Cloud"].BodyGyro.CFrame = CFrame.lookAt(workspace[LocalPlayer.Name.."_Cloud"].Position, workspace[LocalPlayer.Name.."_Cloud"].Position + newdirection.Unit)
+			end)
+        else
+            break
+        end
+    until emptyvar==false
+	movingcloudh = false
+end
+repeat task.wait(.05)
+if CloudTask1==true or CloudTask2==true or CloudTask3==true or CloudTask4==true then
+if not workspace:FindFirstChild(LocalPlayer.Name.."_Cloud") then
+game:GetService("ReplicatedStorage").CloudAbility:FireServer()
+repeat task.wait() until workspace:FindFirstChild(LocalPlayer.Name.."_Cloud") or CloudFarming==false or Humanoid.Health==0
+task.wait(.25)
+end
+if workspace[LocalPlayer.Name.."_Cloud"].VehicleSeat.Occupant==nil then
+TeleportToPosition(workspace[LocalPlayer.Name.."_Cloud"].VehicleSeat.CFrame, 0.5)
+end
+if CloudTask3==true then
+if launchedflytask==false then
+launchedflytask = true
+task.spawn(function()
+repeat task.wait()
+task.spawn(startflytaskidk)
+until CloudFarming==false or Humanoid.Health==0
+end)
+end
+end
+if CloudTask1==true then
+pcall(function()
+if AltAccountPlayer.Character:FindFirstChild("entered") then
+Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+PressKey("Space")
+task.wait(.75)
+if Humanoid.Sit==true then
+Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+PressKey("Space")
+end
+task.wait(.75)
+game:GetService("ReplicatedStorage").CloudHit:FireServer(AltAccountPlayer.Character.Head)
+end
+end)
+elseif CloudTask4==true then
+pcall(function()
+if AltAccountPlayer.Character:FindFirstChild("entered") then
+repeat task.wait()
+AltAccountPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = workspace[LocalPlayer.Name.."_Cloud"].Seat.CFrame
+until AltAccountPlayer.Character:WaitForChild("Humanoid").Sit==true or CloudFarming==false or Humanoid.Health==0
+task.wait(.5)
+game:GetService("ReplicatedStorage").CloudHit:FireServer(AltAccountPlayer.Character.Head)
+end
+end)
+end
+end
+until CloudFarming==false or Humanoid.Health==0
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+
+-- Brick tab
+Brick = Window:Tab({
+    Title = "Brick",
+    Icon = "gravity:sparkles",
+})
+
+BrickTask1 = false
+Brick:Toggle({
+    Title = "Task 1 (Brick Master)",
+    Callback = function(state)
+        BrickTask2 = state
+    end
+})
+
+BrickTask2 = false
+Brick:Toggle({
+    Title = "Task 2 (Trip people)",
+    Callback = function(state)
+        BrickTask2 = state
+    end
+})
+
+BrickTask3 = false
+Brick:Toggle({
+    Title = "Task 3 (Fling a brick)",
+    Callback = function(state)
+        BrickTask3 = state
+    end
+})
+
+BrickTask4 = false
+Brick:Toggle({
+    Title = "Task 4 (Snipe people)",
+    Callback = function(state)
+        BrickTask4 = state
+    end
+})
+
+Brick:Divider()
+
+BrickFarming = false
+BrickFarmingToggle = nil
+BrickFarmingToggle = Brick:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles",
+    Callback = function(state)
+        BrickFarming = state
+		if BrickFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			BrickFarmingToggle:Set(false)
+			BrickFarming = false
+			return
+		end
+		if BrickFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			BrickFarmingToggle:Set(false)
+			BrickFarming = false
+			return
+		end
+		if BrickFarming==true and LocalPlayer:WaitForChild("_unlockedGloves").Brick.Value==false and LocalPlayer.leaderstats.Glove.Value~="Brick" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own brick. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			BrickFarmingToggle:Set(false)
+			BrickFarming = false
+			return
+		end
+		if BrickFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			BrickFarmingToggle:Set(false)
+			BrickFarming = false
+			return
+		end
+		if BrickFarming==true and BrickTask1==false and BrickTask2==false and BrickTask3==false and BrickTask4==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			BrickFarmingToggle:Set(false)
+			BrickFarming = false
+			return
+		end
+		if not AltAccountPlayer then
+			WindUI:Notify({
+    			Title = "Error",
+    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Icon = "triangle-exclamation",
+    			Duration = 3,
+			})
+			return
+		end
+if BrickFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="Brick" then
+SelectGlove("Brick")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+HumanoidRootPart.Anchored = true
+if BrickTask2==true or BrickTask4==true then
+NETWORK.send_data("init_brick")
+end
+task.wait(2.5)
+local canslap = true
+repeat task.wait(.05)
+if BrickTask1==true or BrickTask2==true or BrickTask3==true or BrickTask4==true then
+game:GetService("ReplicatedStorage").lbrick:FireServer()
+end
+until BrickFarming==false or Humanoid.Health==0
+HumanoidRootPart.Anchored = false
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+workspace.ChildAdded:Connect(function(Child)
+if Child.Name=="Union" and Child.Position.X>9000 and LocalPlayer.PlayerGui:FindFirstChild("BRICKCOUNT") and BrickFarming==true then
+Child.CanCollide = false
+LocalPlayer.PlayerGui.BRICKCOUNT.ImageLabel.TextLabel.Text = tostring(tonumber(LocalPlayer.PlayerGui.BRICKCOUNT.ImageLabel.TextLabel.Text)+1)
+end
+end)
+
+-- Plank tab
+Plank = Window:Tab({
+    Title = "Plank",
+    Icon = "gravity:sparkles",
+})
+
+PlankTask1 = false
+Plank:Toggle({
+    Title = "Task 1 (Ambush)",
+    Callback = function(state)
+        PlankTask1 = state
+    end
+})
+
+PlankTask2 = false
+Plank:Toggle({
+    Title = "Task 2 (Kill)",
+    Callback = function(state)
+        PlankTask2 = state
+    end
+})
+
+PlankTask3 = false
+Plank:Toggle({
+    Title = "Task 3 (Hit)",
+    Callback = function(state)
+        PlankTask3 = state
+    end
+})
+
+Plank:Divider()
+
+PlankFarming = false
+PlankFarmingToggle = nil
+PlankFarmingToggle = Plank:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles",
+    Callback = function(state)
+        PlankFarming = state
+		if PlankFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			PlankFarmingToggle:Set(false)
+			PlankFarming = false
+			return
+		end
+		if PlankFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			PlankFarmingToggle:Set(false)
+			PlankFarming = false
+			return
+		end
+		if PlankFarming==true and LocalPlayer:WaitForChild("_unlockedGloves").Plank.Value==false and LocalPlayer.leaderstats.Glove.Value~="Plank" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own plank. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			PlankFarmingToggle:Set(false)
+			PlankFarming = false
+			return
+		end
+		if PlankFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			PlankFarmingToggle:Set(false)
+			PlankFarming = false
+			return
+		end
+		if PlankFarming==true and PlankTask1==false and PlankTask2==false and PlankTask3==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			PlankFarmingToggle:Set(false)
+			PlankFarming = false
+			return
+		end
+		if PlankFarming==true and PlankTask1==true and (PlankTask2==true or PlankTask3==true) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You can't combine task 1 with other tasks.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			PlankFarmingToggle:Set(false)
+			PlankFarming = false
+			return
+		end
+		if not AltAccountPlayer then
+			WindUI:Notify({
+    			Title = "Error",
+    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Icon = "triangle-exclamation",
+    			Duration = 3,
+			})
+			return
+		end
+if PlankFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="Plank" then
+SelectGlove("Plank")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+HumanoidRootPart.Anchored = true
+if PlankTask1==true then
+HumanoidRootPart.Anchored = false
+NETWORK.send_data("init_underground")
+elseif PlankTask2==true then
+NETWORK.send_data("init_plank_kill")
+elseif PlankTask3==true then
+NETWORK.send_data("init_plank_snipe")
+end
+task.wait(2.5)
+local canslap = true
+local canspawnsuperlongthingy = true
+repeat task.wait()
+if PlankTask1==true or PlankTask2==true or PlankTask3==true then
+if canspawnsuperlongthingy==true then
+canspawnsuperlongthingy = false
+pcall(function()
+game:GetService("ReplicatedStorage").GeneralAbility:FireServer(CFrame.new(0,9000000,0), Vector3.new(120, 3, 0.35))
+end)
+task.delay(.1, function() canspawnsuperlongthingy = true end)
+end
+if PlankTask1==true then
+if Humanoid.Jump==false then
+Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+PressKey("Space")
+end
+pcall(function()
+if workspace:FindFirstChild(""..LocalPlayer.Name.."'s Plank") and (workspace[""..LocalPlayer.Name.."'s Plank"]:GetAttribute("definetilyhammered")~=nil and workspace[""..LocalPlayer.Name.."'s Plank"]:GetAttribute("definetilyhammered")==true) then
+HumanoidRootPart:PivotTo(workspace[""..LocalPlayer.Name.."'s Plank"].CFrame)
+end
+end)
+if canslap==true then
+canslap = false
+pcall(function()
+game:GetService("ReplicatedStorage").GeneralHit:FireServer(AltAccountPlayer.Character.Head)
+end)
+task.delay(.8, function() canslap = true end)
+end
+end
+end
+until PlankFarming==false or Humanoid.Health==0
+HumanoidRootPart.Anchored = false
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+workspace.ChildAdded:Connect(function(Child)
+task.wait(2)
+if Child.Name==""..LocalPlayer.Name.."'s Plank" and PlankFarming==true and PlankTask1==true then
+game:GetService("ReplicatedStorage").Events.PlankRAbility:FireServer("Hammer",Child,0.55)
+Child:SetAttribute("definetilyhammered", true)
+end
+end)
+
+-- Shard tab
+Shard = Window:Tab({
+    Title = "Shard",
+    Icon = "gravity:sparkles",
+})
+
+ShardTask1 = false
+Shard:Toggle({
+    Title = "Task 1 (Slap + shard combo)",
+    Callback = function(state)
+        ShardTask1 = state
+    end
+})
+
+ShardTask2 = false
+Shard:Toggle({
+    Title = "Task 2 (Hit)",
+    Callback = function(state)
+        ShardTask2 = state
+    end
+})
+
+ShardTask3 = false
+Shard:Toggle({
+    Title = "Task 3 (Snipe)",
+    Callback = function(state)
+        ShardTask3 = state
+    end
+})
+
+ShardTask4 = false
+Shard:Toggle({
+    Title = "Task 4 (Extinguish)",
+	Desc = "doesn't work rn sorry lol",
+    Callback = function(state)
+        ShardTask4 = state
+    end
+})
+
+ShardTask5 = false
+Shard:Toggle({
+    Title = "Task 5 (Slap debuffed players)",
+    Callback = function(state)
+        ShardTask5 = state
+    end
+})
+
+Shard:Divider()
+
+ShardFarming = false
+ShardFarmingToggle = nil
+ShardFarmingToggle = Shard:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles",
+    Callback = function(state)
+        ShardFarming = state
+		if ShardFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			ShardFarmingToggle:Set(false)
+			ShardFarming = false
+			return
+		end
+		if ShardFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			ShardFarmingToggle:Set(false)
+			ShardFarming = false
+			return
+		end
+		if ShardFarming==true and LocalPlayer:WaitForChild("_unlockedGloves").Shard.Value==false and LocalPlayer.leaderstats.Glove.Value~="Shard" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own shard. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			ShardFarmingToggle:Set(false)
+			ShardFarming = false
+			return
+		end
+		if ShardFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			ShardFarmingToggle:Set(false)
+			ShardFarming = false
+			return
+		end
+		if ShardFarming==true and ShardTask1==false and ShardTask2==false and ShardTask3==false and ShardTask4==false and ShardTask5==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			ShardFarmingToggle:Set(false)
+			ShardFarming = false
+			return
+		end
+		if ShardFarming==true and ShardTask3==true and (ShardTask1==true or ShardTask4==true or ShardTask5==true) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You can't combine task 3 with tasks 1, 4 or 5.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			ShardFarmingToggle:Set(false)
+			ShardFarming = false
+			return
+		end
+		if not AltAccountPlayer then
+			WindUI:Notify({
+    			Title = "Error",
+    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Icon = "triangle-exclamation",
+    			Duration = 3,
+			})
+			return
+		end
+if ShardFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="Shard" then
+SelectGlove("Shard")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+HumanoidRootPart.Anchored = true
+if ShardTask3==true then
+NETWORK.send_data("init_snipe")
+else
+NETWORK.send_data("init_close_range_same_y_level")
+end
+task.wait(2.5)
+local canslap = true
+local canshard = true
+repeat task.wait(.05)
+if ShardTask1==true or ShardTask2==true or ShardTask3==true or ShardTask4==true or ShardTask5==true then
+if canshard==true and (ShardTask1==true or ShardTask2==true or ShardTask3==true or ShardTask5==true) then
+canshard = false
+pcall(function()
+game:GetService("ReplicatedStorage").Shards:FireServer()
+end)
+task.delay(8, function() canshard = true end)
+end
+if canslap==true and (ShardTask1==true or ShardTask5==true) then
+canslap = false
+pcall(function()
+game:GetService("ReplicatedStorage").ShardHIT:FireServer(AltAccountPlayer.Character.Head)
+end)
+task.delay(.8, function() canslap = true end)
+end
+end
+until ShardFarming==false or Humanoid.Health==0
+HumanoidRootPart.Anchored = false
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+
+-- Bubble tab
+Bubble = Window:Tab({
+    Title = "Bubble",
+    Icon = "gravity:sparkles",
+})
+
+BubbleTask1 = false
+Bubble:Toggle({
+    Title = "Task 1 (Send players)",
+    Callback = function(state)
+        BubbleTask2 = state
+    end
+})
+
+BubbleTask2 = false
+Bubble:Toggle({
+    Title = "Task 2 (Slap players)",
+    Callback = function(state)
+        BubbleTask2 = state
+    end
+})
+
+BubbleTask3 = false
+Bubble:Toggle({
+    Title = "Task 3 (Trap players)",
+    Callback = function(state)
+        BubbleTask3 = state
+    end
+})
+
+BubbleTask4 = false
+Bubble:Toggle({
+    Title = "Task 4 (Capture players)",
+    Callback = function(state)
+        BubbleTask4 = state
+    end
+})
+
+Bubble:Divider()
+
+BubbleFarming = false
+BubbleFarmingToggle = nil
+BubbleFarmingToggle = Bubble:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles",
+    Callback = function(state)
+        BubbleFarming = state
+		if BubbleFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			BubbleFarmingToggle:Set(false)
+			BubbleFarming = false
+			return
+		end
+		if BubbleFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			BubbleFarmingToggle:Set(false)
+			BubbleFarming = false
+			return
+		end
+		if BubbleFarming==true and LocalPlayer:WaitForChild("_unlockedGloves").Bubble.Value==false and LocalPlayer.leaderstats.Glove.Value~="Bubble" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own bubble. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			BubbleFarmingToggle:Set(false)
+			BubbleFarming = false
+			return
+		end
+		if BubbleFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			BubbleFarmingToggle:Set(false)
+			BubbleFarming = false
+			return
+		end
+		if BubbleFarming==true and BubbleTask1==false and BubbleTask2==false and BubbleTask3==false and BubbleTask4==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			BubbleFarmingToggle:Set(false)
+			BubbleFarming = false
+			return
+		end
+		if not AltAccountPlayer then
+			WindUI:Notify({
+    			Title = "Error",
+    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Icon = "triangle-exclamation",
+    			Duration = 3,
+			})
+			return
+		end
+if BubbleFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="Bubble" then
+SelectGlove("Bubble")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+HumanoidRootPart.Anchored = true
+if BubbleTask1==true then
+NETWORK.send_data("init_bubble_kill")
+else
+NETWORK.send_data("init_same_y_level")
+end
+task.wait(2.5)
+local canslap = true
+local waitingforbubbletospawn = false
+repeat task.wait(.05)
+if BubbleTask1==true or BubbleTask2==true or BubbleTask3==true or BubbleTask4==true then
+task.spawn(function()
+if workspace:FindFirstChild("BubbleObject")==nil and waitingforbubbletospawn==false then
+game:GetService("ReplicatedStorage").BubbleThrow:FireServer()
+waitingforbubbletospawn = true
+repeat task.wait() until workspace:FindFirstChild("BubbleObject")
+waitingforbubbletospawn = false
+end
+end)
+if BubbleTask2==true then
+if canslap==true then
+canslap = false
+pcall(function()
+game:GetService("ReplicatedStorage").BubbleHit:FireServer(AltAccountPlayer.Character.Head)
+end)
+task.delay(.8, function() canslap = true end)
+end
+end
+end
+until BubbleFarming==false or Humanoid.Health==0
+HumanoidRootPart.Anchored = false
 Humanoid.Health = 0
 LocalPlayer:WaitForChild("Reset"):FireServer()
 end
