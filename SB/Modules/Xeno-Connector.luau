@@ -6,6 +6,8 @@ local FixedFunctions = loadstring(game:HttpGet("https://raw.githubusercontent.co
 getgenv().fireclickdetector = FixedFunctions.fireclickdetector
 getgenv().fireproximityprompt = FixedFunctions.fireproximityprompt
 
+local receive_connection = nil
+
 NETWORK.get_network = function()
     return (game:GetService("ReplicatedStorage"):FindFirstChild("_NETWORK") and game:GetService("ReplicatedStorage")._NETWORK) 
         or game:GetService("ReplicatedStorage"):FindFirstChild("CMDRGetGloveIDs", true).Parent
@@ -35,6 +37,7 @@ end
 
 NETWORK.edit_setting = function(setting, value)
     NETWORK.get_remote("UpdatePlayerSetting"):InvokeServer(setting, value)
+end
 
 local function get_my_condata()
     local my_data = game:GetService("ReplicatedStorage").PlayerData:FindFirstChild(game.Players.LocalPlayer.Name)
@@ -50,6 +53,9 @@ local function set_my_condata(condata)
 end
 
 function NETWORK.add_connection_queue()
+    if receive_connection then
+        receive_connection = false
+    end
     local guid = game:GetService("HttpService"):GenerateGUID(false)
     local condata = {
         user = game.Players.LocalPlayer.Name,
@@ -88,6 +94,9 @@ function NETWORK.add_connection_queue()
 end
 
 function NETWORK.connect_to_available()
+    if receive_connection then
+        receive_connection = false
+    end
     for _, v in pairs(game:GetService("ReplicatedStorage").PlayerData:GetChildren()) do
         if v.Name ~= game.Players.LocalPlayer.Name and v:FindFirstChild("Settings") and v.Settings:FindFirstChild("Settings") then
             local decoded = game:GetService("HttpService"):JSONDecode(v.Settings.Settings.Value)
@@ -119,33 +128,32 @@ function NETWORK.send_data(data)
 end
 
 function NETWORK.on_data_receive(callback)
+    receive_connection = true
     local last_data = ""
-    local my_name = game.Players.LocalPlayer.Name
     local partner_name_cache = nil
     task.spawn(function()
-        while true do
+        while receive_connection do
             task.wait(0.2)
             if not partner_name_cache then
                 local my_condata = get_my_condata()
                 if my_condata and my_condata.connection then
                     partner_name_cache = my_condata.connection
-                else
-                    continue
                 end
             end
-            local partner_data = game:GetService("ReplicatedStorage").PlayerData:FindFirstChild(partner_name_cache)
-            if not partner_data or not partner_data:FindFirstChild("Settings") or not partner_data.Settings:FindFirstChild("Settings") then
-                partner_name_cache = nil
-                continue
-            end
-            local decoded = game:GetService("HttpService"):JSONDecode(partner_data.Settings.Settings.Value)
-            if not decoded or not decoded._gloveRandomizer or not decoded._gloveRandomizer.Value then
-                continue
-            end
-            local current_data = decoded._gloveRandomizer.Value.data
-            if current_data ~= last_data and current_data ~= "" then
-                last_data = current_data
-                callback(current_data)
+            if partner_name_cache then
+                local partner_data = game:GetService("ReplicatedStorage").PlayerData:FindFirstChild(partner_name_cache)
+                if partner_data and partner_data:FindFirstChild("Settings") and partner_data.Settings:FindFirstChild("Settings") then
+                    local decoded = game:GetService("HttpService"):JSONDecode(partner_data.Settings.Settings.Value)
+                    if decoded and decoded._gloveRandomizer and decoded._gloveRandomizer.Value then
+                        local current_data = decoded._gloveRandomizer.Value.data
+                        if current_data ~= last_data and current_data ~= "" then
+                            last_data = current_data
+                            callback(current_data)
+                        end
+                    end
+                else
+                    partner_name_cache = nil
+                end
             end
         end
     end)
