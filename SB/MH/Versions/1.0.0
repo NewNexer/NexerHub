@@ -30,9 +30,11 @@ if v:IsA("RemoteEvent") and (v.Name=="Grab" or v.Name=="AdminGUI" or v.Name=="Wa
 v:Destroy()
 end
 end
+if game:GetService("ReplicatedStorage"):FindFirstChild("OperaGxRewardsRemotes") then
 for i,v in next, game:GetService("ReplicatedStorage").OperaGxRewardsRemotes:GetChildren() do
 if v:IsA("RemoteEvent") and (v.Name=="ToggleApiMode" or v.Name=="SetApiEnv") then
 v:Destroy()
+end
 end
 end
 if game:GetService("Players").LocalPlayer.PlayerScripts:FindFirstChild("ClientAnticheat") then
@@ -721,6 +723,66 @@ Character:WaitForChild("Ragdolled",3600):GetPropertyChangedSignal("Value"):Once(
 Humanoid.Health = 0
 LocalPlayer:WaitForChild("Reset"):FireServer()
 end)
+end
+end)
+end)
+end
+if datastring=="init_obby" then
+if not MainAccountPlayer then
+WindUI:Notify({
+    Title = "Error",
+    Content = "Something went wrong. Try connecting the accounts again.",
+    Icon = "triangle-exclamation",
+    Duration = 3,
+})
+return
+end
+local mainplrdied = false
+local firsttimealreadywas = false
+local supconnet
+MainAccountPlayer.CharacterAdded:Once(function()
+mainplrdied = true
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+if supconnet then
+supconnet:Disconnect()
+supconnet = nil
+end
+end)
+task.spawn(function()
+while mainplrdied~=true do
+pcall(function()
+if Character:FindFirstChild("entered")==nil then
+EnterArena(workspace.Lobby["Teleport2"])
+if firsttimealreadywas~=true then
+firsttimealreadywas = true
+if workspace:FindFirstChild("ObbyItem"..MainAccountPlayer.Name.."LavaBlock") then
+pcall(function()
+workspace["ObbyItem"..MainAccountPlayer.Name.."LavaBlock"].CanCollide = false
+while Child~=nil do
+workspace["ObbyItem"..MainAccountPlayer.Name.."LavaBlock"]:PivotTo(HumanoidRootPart.CFrame)
+task.wait()
+end
+end)
+end
+end
+end
+end)
+task.wait(.005)
+end
+end)
+supconnet = LocalPlayer.CharacterAdded:Connect(function(chr)
+chr.ChildAdded:Connect(function(Child)
+if Child.Name=="entered" then
+if workspace:FindFirstChild("ObbyItem"..MainAccountPlayer.Name.."LavaBlock") then
+pcall(function()
+workspace["ObbyItem"..MainAccountPlayer.Name.."LavaBlock"].CanCollide = false
+while Child~=nil do
+workspace["ObbyItem"..MainAccountPlayer.Name.."LavaBlock"]:PivotTo(HumanoidRootPart.CFrame)
+task.wait()
+end
+end)
+end
 end
 end)
 end)
@@ -5584,6 +5646,165 @@ end
 end
 end
 until BubbleFarming==false or Humanoid.Health==0
+HumanoidRootPart.Anchored = false
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+
+
+
+-- Obby tab
+Obby = Window:Tab({
+    Title = "Obby",
+    Icon = "gravity:sparkles",
+})
+
+ObbyTask1 = false
+Obby:Toggle({
+    Title = "Task 1 (Slap)",
+    Callback = function(state)
+        ObbyTask1 = state
+    end
+})
+
+ObbyTask2 = false
+Obby:Toggle({
+    Title = "Task 2 (Kill)",
+    Callback = function(state)
+        ObbyTask2 = state
+    end
+})
+
+ObbyTask3 = false
+Obby:Toggle({
+    Title = "Task 3 (Place)",
+    Callback = function(state)
+        ObbyTask3 = state
+    end
+})
+
+Obby:Divider()
+
+ObbyFarming = false
+ObbyFarmingToggle = nil
+ObbyFarmingToggle = Obby:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles",
+    Callback = function(state)
+        ObbyFarming = state
+		if ObbyFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			ObbyFarmingToggle:Set(false)
+			ObbyFarming = false
+			return
+		end
+		if ObbyFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			ObbyFarmingToggle:Set(false)
+			ObbyFarming = false
+			return
+		end
+		if ObbyFarming==true and LocalPlayer:WaitForChild("_unlockedGloves").Obby.Value==false and LocalPlayer.leaderstats.Glove.Value~="Obby" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own obby. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			ObbyFarmingToggle:Set(false)
+			ObbyFarming = false
+			return
+		end
+		if ObbyFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			ObbyFarmingToggle:Set(false)
+			ObbyFarming = false
+			return
+		end
+		if ObbyFarming==true and ObbyTask1==false and ObbyTask2==false and ObbyTask3==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			busFarmingToggle:Set(false)
+			busFarming = false
+			return
+		end
+		if busFarming==true and ObbyTask1==true and (ObbyTask2==true or ObbyTask3==true) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You can't combine task 1 with tasks 2 or 3.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			ObbyFarmingToggle:Set(false)
+			ObbyFarming = false
+			return
+		end
+		if not AltAccountPlayer then
+			WindUI:Notify({
+    			Title = "Error",
+    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Icon = "triangle-exclamation",
+    			Duration = 3,
+			})
+			return
+		end
+if ObbyFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="Obby" then
+SelectGlove("Obby")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+if ObbyTask1==true then
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 1.5)
+HumanoidRootPart.Anchored = true
+NETWORK.send_data("slap")
+elseif ObbyTask2==true then
+TeleportToPosition(CFrame.new(264,13,230), 1.5)
+HumanoidRootPart.Anchored = true
+NETWORK.send_data("init_obby")
+end
+task.wait(2.5)
+local canslap = true
+local canplacethosebricks = true
+repeat task.wait(.05)
+if ObbyTask1==true or ObbyTask2==true or ObbyTask3==true then
+if canslap==true and ObbyTask1==true then
+canslap = false
+pcall(function()
+game:GetService("ReplicatedStorage").GeneralHit:FireServer(AltAccountPlayer.Character.Head)
+end)
+task.delay(.8, function() canslap = true end)
+end
+if canplacethosebricks==true and (ObbyTask2==true or ObbyTask3==true) then
+canplacethosebricks = false
+pcall(function()
+game:GetService("ReplicatedStorage").GeneralAbility:FireServer(CFrame.new(264.77383422852, 10.755375862122, 226.8465423584, 0.97629815340042, -7.4738348843084e-10, -0.21643003821373, 6.0977878302282e-10, 1, -7.025717785325e-10, 0.21643003821373, 5.5394511200291e-10, 0.97629815340042),1)
+end)
+task.delay(2, function() canplacethosebricks = true end)
+end
+end
+until ObbyFarming==false or Humanoid.Health==0
 HumanoidRootPart.Anchored = false
 Humanoid.Health = 0
 LocalPlayer:WaitForChild("Reset"):FireServer()
