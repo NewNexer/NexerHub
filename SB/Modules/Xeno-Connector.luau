@@ -1,6 +1,11 @@
 if NETWORK then return end
 
 getgenv().NETWORK = {}
+
+local FixedFunctions = loadstring(game:HttpGet("https://raw.githubusercontent.com/Articles-Hub/ROBLOXScript/refs/heads/main/SCRIPT/Fix.lua"))()
+getgenv().fireclickdetector = FixedFunctions.fireclickdetector
+getgenv().fireproximityprompt = FixedFunctions.fireproximityprompt
+
 local receive_connection = nil
 
 NETWORK.get_network = function()
