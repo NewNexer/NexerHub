@@ -759,7 +759,7 @@ firsttimealreadywas = true
 if workspace:FindFirstChild("ObbyItem"..MainAccountPlayer.Name.."LavaBlock") then
 pcall(function()
 workspace["ObbyItem"..MainAccountPlayer.Name.."LavaBlock"].CanCollide = false
-while Child~=nil do
+while workspace["ObbyItem"..MainAccountPlayer.Name.."LavaBlock"]~=nil do
 workspace["ObbyItem"..MainAccountPlayer.Name.."LavaBlock"]:PivotTo(HumanoidRootPart.CFrame)
 task.wait()
 end
@@ -777,7 +777,7 @@ if Child.Name=="entered" then
 if workspace:FindFirstChild("ObbyItem"..MainAccountPlayer.Name.."LavaBlock") then
 pcall(function()
 workspace["ObbyItem"..MainAccountPlayer.Name.."LavaBlock"].CanCollide = false
-while Child~=nil do
+while workspace["ObbyItem"..MainAccountPlayer.Name.."LavaBlock"]~=nil do
 workspace["ObbyItem"..MainAccountPlayer.Name.."LavaBlock"]:PivotTo(HumanoidRootPart.CFrame)
 task.wait()
 end
@@ -5779,6 +5779,12 @@ ObbyFarmingToggle = Obby:Toggle({
 			return
 		end
 if ObbyFarming==true then
+if LocalPlayer:WaitForChild("_unlockedGloves").Ghost.Value==true and LocalPlayer.leaderstats.Glove.Value~="Ghost" then
+SelectGlove("Ghost")
+task.wait(.333)
+end
+game:GetService("ReplicatedStorage").Ghostinvisibilityactivated:FireServer()
+task.wait(1)
 if LocalPlayer.leaderstats.Glove.Value~="Obby" then
 SelectGlove("Obby")
 task.wait(.333)
@@ -5810,7 +5816,7 @@ canplacethosebricks = false
 pcall(function()
 game:GetService("ReplicatedStorage").GeneralAbility:FireServer(CFrame.new(264.77383422852, 10.755375862122, 226.8465423584, 0.97629815340042, -7.4738348843084e-10, -0.21643003821373, 6.0977878302282e-10, 1, -7.025717785325e-10, 0.21643003821373, 5.5394511200291e-10, 0.97629815340042),1)
 end)
-task.delay(2, function() canplacethosebricks = true end)
+task.delay(3, function() canplacethosebricks = true end)
 end
 end
 until ObbyFarming==false or Humanoid.Health==0
