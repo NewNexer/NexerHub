@@ -993,7 +993,16 @@ Connector:Button({
             Icon = "check",
             Duration = 3,
         })
-        NETWORK.add_connection_queue()
+        local response = NETWORK.add_connection_queue()
+		if response~=true then
+        WindUI:Notify({
+            Title = "Error",
+            Content = "Timed out. Try again!",
+            Icon = "shield-exclamation",
+            Duration = 5,
+        })
+		return
+		end
         WindUI:Notify({
             Title = "Connection",
             Content = "Connection established with 'Alt Account'!",
