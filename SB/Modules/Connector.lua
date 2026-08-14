@@ -1,5 +1,14 @@
 if NETWORK then return end
 
+local flags = require(game:GetService("ReplicatedStorage").BACKEND.Shared.Flags.FlagService)
+local original = flags.IsEnabled
+flags.IsEnabled = function(flag, ...)
+    if flag == "IgnoreSafety" then
+        return true
+    end
+    return original(flag, ...)
+end
+
 getgenv().NETWORK = {}
 
 local receive_connection = nil
