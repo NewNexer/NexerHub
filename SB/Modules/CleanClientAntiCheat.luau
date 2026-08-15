@@ -1,8 +1,8 @@
-local game = ... or "Slap Battles"
+local place = ... or "Slap Battles"
 
 repeat task.wait(.1) until game:GetService("Players").LocalPlayer
 
-if game=="Slap Battles" then
+if place=="Slap Battles" then
     --[[local all_bad_remotes = {
         "PingPongEvent";
         "SetApiEnv";
@@ -59,7 +59,7 @@ if game=="Slap Battles" then
         fake.Parent = game:GetService("StarterPlayer").StarterPlayerScripts.ClientAnticheat
         real:Destroy()
     end
-elseif game=="Slap Royale" then
+elseif place=="Slap Royale" then
     local all_bad_remotes = {
         "LegacyBan";
         "Ban";
