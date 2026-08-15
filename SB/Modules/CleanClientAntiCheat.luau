@@ -60,6 +60,13 @@ if place=="Slap Battles" then
         fake.Parent = game:GetService("Players").LocalPlayer.PlayerScripts.ClientAnticheat
         real:Destroy()
     end
+    if game:GetService("Players").LocalPlayer.PlayerScripts:FindFirstChild("LegacyClient") and game:GetService("Players").LocalPlayer.PlayerScripts.LegacyClient:FindFirstChild("MusicLoaderI") then
+        local real = game:GetService("Players").LocalPlayer.PlayerScripts.LegacyClient.MusicLoaderI
+        local fake = Instance.new("LocalScript")
+        fake.Name = "MusicLoaderI"
+        fake.Parent = game:GetService("Players").LocalPlayer.PlayerScripts.LegacyClient
+        real:Destroy()
+    end
     if game:GetService("StarterPlayer").StarterPlayerScripts:FindFirstChild("ClientAnticheat") and game:GetService("StarterPlayer").StarterPlayerScripts.ClientAnticheat:FindFirstChild("AntiMobileExploits") then
         local real = game:GetService("StarterPlayer").StarterPlayerScripts.ClientAnticheat.AntiMobileExploits
         local fake = Instance.new("LocalScript")
