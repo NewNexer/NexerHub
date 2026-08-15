@@ -33,9 +33,17 @@ if place=="Slap Battles" then
     end
     for i,v in next, all_bad_remotes do
         if game:GetService("ReplicatedStorage"):FindFirstChild(v) then
-            game:GetService("ReplicatedStorage"):WaitForChild(v):Destroy()
+            local real = game:GetService("ReplicatedStorage"):WaitForChild(v)
+            local fake = Instance.new(real.ClassName)
+            fake.Name = real.Name
+            fake.Parent = real.Parent
+            real:Destroy()
         elseif game:GetService("ReplicatedStorage"):FindFirstChild("OperaGxRewardsRemotes") and game:GetService("ReplicatedStorage").OperaGxRewardsRemotes:FindFirstChild(v) then
-            game:GetService("ReplicatedStorage").OperaGxRewardsRemotes:WaitForChild(v):Destroy()
+            local real = game:GetService("ReplicatedStorage").OperaGxRewardsRemotes:WaitForChild(v)
+            local fake = Instance.new(real.ClassName)
+            fake.Name = real.Name
+            fake.Parent = real.Parent
+            real:Destroy()
         end
     end
     if game:GetService("ReplicatedFirst"):FindFirstChild("Client") and game:GetService("ReplicatedFirst").Client:FindFirstChild("GrabLocal") then
@@ -70,9 +78,17 @@ elseif place=="Slap Royale" then
     }
     for i,v in next, all_bad_remotes do
         if game:GetService("ReplicatedStorage"):FindFirstChild(v) then
-            game:GetService("ReplicatedStorage"):WaitForChild(v):Destroy()
+            local real = game:GetService("ReplicatedStorage"):WaitForChild(v)
+            local fake = Instance.new(real.ClassName)
+            fake.Name = real.Name
+            fake.Parent = real.Parent
+            real:Destroy()
         elseif game:GetService("ReplicatedStorage"):FindFirstChild("Remotes") and game:GetService("ReplicatedStorage").Remotes:FindFirstChild(v) then
-            game:GetService("ReplicatedStorage").Remotes:WaitForChild(v):Destroy()
+            local real = game:GetService("ReplicatedStorage").Remotes:WaitForChild(v)
+            local fake = Instance.new(real.ClassName)
+            fake.Name = real.Name
+            fake.Parent = real.Parent
+            real:Destroy()
         end
     end
     if game:GetService("ReplicatedStorage"):FindFirstChild("Grab", true) then
