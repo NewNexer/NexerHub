@@ -85,3 +85,39 @@ Main:Button({
         end
     end
 })
+
+Main:Button({
+    Title = "Blow everyone's ears out",
+    Callback = function()
+		if (game:GetService("Players").LocalPlayer.Character:FindFirstChild("Impostor")==nil and game:GetService("Players").LocalPlayer.Backpack:FindFirstChild("Impostor")==nil) and not (game:GetService("Players").LocalPlayer.leaderstats.Glove.Value=="Impostor" and (game:GetService("Players").LocalPlayer.Character:FindFirstChild("Default") or game:GetService("Players").LocalPlayer.Backpack:FindFirstChild("Default"))) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Equip ''Impostor'' glove and enter arena!",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			return
+		end
+		if stablern==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Your connection is not stable. Try again later!",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			return
+		end
+        WindUI:Notify({
+            Title = "Success",
+            Content = "Rip headphones users",
+            Icon = "gravity:circle-check",
+            Duration = 6,
+        })
+        game:GetService("ReplicatedStorage").GeneralAbility:FireServer("God's Hand")
+        task.wait(.333)
+        local spam = game:GetService("ReplicatedStorage").Events.Impostor
+        for i=1,10000 do
+            spam:FireServer()
+        end
+    end
+})
