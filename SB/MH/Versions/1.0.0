@@ -1241,7 +1241,7 @@ SelectGlove("Glovel")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 repeat task.wait(.05)
 if GlovelTask1==true and Character and Character:FindFirstChild("Head") then
 if Character.Head.Transparency~=1 then
@@ -1388,7 +1388,7 @@ SelectGlove("Wormhole")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 for i=1,2 do
 game:GetService("ReplicatedStorage").WormholePlace:FireServer()
 task.wait(.15)
@@ -1896,7 +1896,7 @@ SelectGlove("Ultra Instinct")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 repeat task.wait(.05)
 if UltraInstinctTask1==true or UltraInstinctTask2==true then
 repeat task.wait(.1)
@@ -2071,7 +2071,7 @@ if LocalPlayer.leaderstats.Glove.Value~="ZZZZZZZ" then
 SelectGlove("ZZZZZZZ")
 task.wait(.333)
 end
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 game:GetService("ReplicatedStorage").ZZZZZZZSleep:FireServer()
 task.wait(1)
 if LocalPlayer.leaderstats.Glove.Value~="Fort" then
@@ -2079,7 +2079,7 @@ SelectGlove("Fort")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2, true)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2, true)
 repeat task.wait(.05)
 if FortTask2==true or FortTask3==true then
 game:GetService("ReplicatedStorage").Fortlol:FireServer()
@@ -2253,7 +2253,7 @@ SelectGlove("Bomb")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 local vector = Vector3.new(0,0,0)
 local newbombthrown = false
 NETWORK.send_data("04")
@@ -2311,7 +2311,7 @@ checkforbugs = false
 end
 end)
 repeat
-HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,10,0))
+HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)))
 for _,p in next, Character:GetDescendants() do
 if p:IsA("BasePart") then
 p.Velocity, p.RotVelocity = vector, vector
@@ -2723,7 +2723,7 @@ SelectGlove("bus")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 if busTask2==true or busTask3 == true then
 NETWORK.send_data("08")
 task.wait(2.5)
@@ -3017,7 +3017,7 @@ SelectGlove("[REDACTED]")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 if REDACTEDUseAlt==true and REDACTEDTask2==true then
 NETWORK.send_data("16")
 task.wait(2.5)
@@ -3129,7 +3129,7 @@ SelectGlove("Stick")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 repeat task.wait(.05)
 if StickTask1==true then
 for i,v in next, stickwhotohit do
@@ -3217,7 +3217,7 @@ SelectGlove("spin")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 repeat task.wait(.05)
 HumanoidRootPart.Anchored = true
 until spinFarming==false or Humanoid.Health==0
@@ -3297,7 +3297,7 @@ end
 game:GetService("ReplicatedStorage").bob:FireServer()
 task.wait(2)
 HumanoidRootPart.Anchored = false
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
     end
 })
 
@@ -3396,7 +3396,7 @@ SelectGlove("rob")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 if robTask3==true then
 NETWORK.send_data("07")
 task.wait(2.5)
@@ -3409,7 +3409,7 @@ HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,math.rando
 end
 if robTask3==true then
 if robTask2==false then
-HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,10,0))
+HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)))
 end
 AltAccountPlayer.Character:WaitForChild("HumanoidRootPart",2):PivotTo(HumanoidRootPart.CFrame)
 end
@@ -3597,7 +3597,7 @@ SelectGlove("Space")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 if SpaceTask4==true then
 NETWORK.send_data("01")
 task.wait(2.5)
@@ -3726,7 +3726,7 @@ SelectGlove("Gummy")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 if GummyTask2==true then
 NETWORK.send_data("03")
 else
@@ -3868,7 +3868,7 @@ SelectGlove("Mace")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 if MaceTask4==true then
 NETWORK.send_data("03")
 else
@@ -4056,7 +4056,7 @@ SelectGlove("Dice")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 if DiceTask2==true and DiceTask1~=nil then
 NETWORK.send_data("03")
 elseif DiceTask2==false and DiceTask1==true then
@@ -4251,7 +4251,7 @@ SelectGlove("Phase")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 NETWORK.send_data("01")
 task.wait(2.5)
 local Imgoingtousephase = false
@@ -4262,7 +4262,7 @@ task.spawn(function()
 if Didiactivateit==true then return end
 Didiactivateit = true
 repeat task.wait()
-HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(0,10,0))
+HumanoidRootPart:PivotTo(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)))
 Humanoid.Sit = false
 until PhaseFarming==false or Humanoid.Health==0
 end)
@@ -4404,7 +4404,7 @@ SelectGlove("Spring")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 HumanoidRootPart.Anchored = true
 NETWORK.send_data("01")
 task.wait(2.5)
@@ -4539,7 +4539,7 @@ SelectGlove("Pinwheel")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 HumanoidRootPart.Anchored = true
 NETWORK.send_data("01")
 task.wait(2.5)
@@ -4662,7 +4662,7 @@ SelectGlove("Acrobat")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 NETWORK.send_data("01")
 task.wait(2.5)
 local canslap = true
@@ -4793,7 +4793,7 @@ SelectGlove("Tinkerer")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 NETWORK.send_data("16")
 task.wait(2.5)
 local canslap = true
@@ -4994,7 +4994,7 @@ SelectGlove("Eggler")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 HumanoidRootPart.Anchored = true
 NETWORK.send_data("16")
 task.wait(2.5)
@@ -5134,7 +5134,7 @@ SelectGlove("Phantom")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 HumanoidRootPart.Anchored = true
 NETWORK.send_data("01")
 task.wait(2.5)
@@ -5260,7 +5260,7 @@ SelectGlove("Stalker")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 HumanoidRootPart.Anchored = true
 NETWORK.send_data("01")
 task.wait(2.5)
@@ -5380,7 +5380,7 @@ SelectGlove("Killstreak")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 NETWORK.send_data("03")
 task.wait(2.5)
 repeat task.wait(.8)
@@ -5524,7 +5524,7 @@ SelectGlove("Brick")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 HumanoidRootPart.Anchored = true
 if BrickTask2==true or BrickTask4==true then
 NETWORK.send_data("14")
@@ -5669,7 +5669,7 @@ SelectGlove("Plank")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 HumanoidRootPart.Anchored = true
 if PlankTask1==true then
 HumanoidRootPart.Anchored = false
@@ -5862,7 +5862,7 @@ SelectGlove("Shard")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 HumanoidRootPart.Anchored = true
 if ShardTask3==true then
 NETWORK.send_data("09")
@@ -6014,7 +6014,7 @@ SelectGlove("Bubble")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 HumanoidRootPart.Anchored = true
 if BubbleTask1==true then
 NETWORK.send_data("12")
@@ -6145,7 +6145,7 @@ SelectGlove("Booster")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 HumanoidRootPart.Anchored = true
 NETWORK.send_data("15")
 task.wait(2.5)
@@ -6275,7 +6275,7 @@ SelectGlove("Roguelike")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(0,10,0), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
 HumanoidRootPart.Anchored = true
 if RoguelikeTask3==true then
 NETWORK.send_data("02")
