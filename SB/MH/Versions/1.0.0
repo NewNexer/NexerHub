@@ -1,3 +1,14 @@
+if mhloaded then
+local a = Instance.new("Message")
+a.Text = "Need to rejoin to re-execute script again! Rejoining..."
+task.wait(1)
+if #game:GetService("Players"):GetPlayers() <= 1 then
+game:GetService("TeleportService"):Teleport(game.PlaceId, game:GetService("Players").LocalPlayer)
+else
+game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, game:GetService("Players").LocalPlayer)
+end
+end
+
 local LocalPlayer, LP = game:GetService("Players").LocalPlayer, game:GetService("Players").LocalPlayer
 local Character, Char
 local HumanoidRootPart, HRP
@@ -6545,3 +6556,5 @@ LocalPlayer:WaitForChild("Reset"):FireServer()
 end
     end
 })
+
+getgenv().mhloaded = true
