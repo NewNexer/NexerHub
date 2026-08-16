@@ -1014,7 +1014,7 @@ local Connector = Window:Tab({
 
 Connector:Paragraph({
     Title = "Instructions",
-    Desc = "Just write the usernames down here",
+    Desc = "On main account, write your alt's account username in ''Alt Account Username'' input bar\n\nOn alt account, write your m account username in ''Alt Account Username'' input bar",
     Image = "gravity:shield-exclamation",
     ImageSize = 20
 })
