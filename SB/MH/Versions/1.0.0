@@ -6264,7 +6264,9 @@ end
 if Character:FindFirstChildWhichIsA("Tool") then
 Character:FindFirstChildWhichIsA("Tool"):Activate()
 end
+pcall(function()
 game:GetService("ReplicatedStorage").GeneralHit:FireServer(AltAccountPlayer.Character.Head)
+end)
 end
 until RoguelikeFarming==false or Humanoid.Health==0
 HumanoidRootPart.Anchored = false
