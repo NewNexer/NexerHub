@@ -1,6 +1,7 @@
 if mhloaded then
 local a = Instance.new("Message")
 a.Text = "Need to rejoin to re-execute script again! Rejoining..."
+a.Parent = game:GetService("CoreGui")
 pcall(function()
 local qot = queue_on_teleport or queueonteleport
 if qot then
