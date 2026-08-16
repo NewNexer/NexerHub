@@ -6271,3 +6271,270 @@ LocalPlayer:WaitForChild("Reset"):FireServer()
 end
     end
 })
+
+
+
+-- Frostbite tab 
+Frostbite = Window:Tab({
+    Title = "Frostbite",
+    Icon = "gravity:sparkles",
+})
+
+FrostbiteTask2 = false
+Frostbite:Toggle({
+    Title = "Task 2 (Slap frozen)",
+    Callback = function(state)
+        FrostbiteTask2 = state
+    end
+})
+
+FrostbiteTask3 = false
+Frostbite:Toggle({
+    Title = "Task 3 (Freeze 10 players)",
+    Callback = function(state)
+        FrostbiteTask3 = state
+    end
+})
+
+FrostbiteTask4 = false
+Frostbite:Toggle({
+    Title = "Task 4 (Engulf players)",
+    Callback = function(state)
+        FrostbiteTask4 = state
+    end
+})
+
+Frostbite:Divider()
+
+FrostbiteFarming = false
+FrostbiteFarmingToggle = nil
+FrostbiteFarmingToggle = Frostbite:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles",
+    Callback = function(state)
+        FrostbiteFarming = state
+		if FrostbiteFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			FrostbiteFarmingToggle:Set(false)
+			FrostbiteFarming = false
+			return
+		end
+		if FrostbiteFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			FrostbiteFarmingToggle:Set(false)
+			FrostbiteFarming = false
+			return
+		end
+		if FrostbiteFarming==true and LocalPlayer:WaitForChild("_unlockedGloves").Frostbite.Value==false and LocalPlayer.leaderstats.Glove.Value~="Frostbite" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own frostbite. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			FrostbiteFarmingToggle:Set(false)
+			FrostbiteFarming = false
+			return
+		end
+		if FrostbiteFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			FrostbiteFarmingToggle:Set(false)
+			FrostbiteFarming = false
+			return
+		end
+		if FrostbiteFarming==true and FrostbiteTask3==false and FrostbiteTask2==false and FrostbiteTask4==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			FrostbiteFarmingToggle:Set(false)
+			FrostbiteFarming = false
+			return
+		end
+		if not AltAccountPlayer then
+			WindUI:Notify({
+    			Title = "Error",
+    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Icon = "triangle-exclamation",
+    			Duration = 3,
+			})
+			return
+		end
+if FrostbiteFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="Frostbite" then
+SelectGlove("Frostbite")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(CFrame.new(1620, 90, 8934), 2)
+NETWORK.send_data("08")
+task.wait(2.5)
+HumanoidRootPart.Anchored = true
+local canslap = true
+repeat task.wait(.8)
+if FrostbiteTask2==true or FrostbiteTask3==true or FrostbiteTask4==true then
+game:GetService("ReplicatedStorage").GeneralAbility:FireServer(0.3,2)
+if FrostbiteTask2==true then
+pcall(function()
+if AltAccountPlayer.Character:GetAttribute("frostbite")~=nil and AltAccountPlayer.Character:GetAttribute("frostbite")==true then
+game:GetService("ReplicatedStorage").GeneralHit:FireServer(AltAccountPlayer.Character.Head)
+end
+end)
+end
+end
+until FrostbiteFarming==false or Humanoid.Health==0
+HumanoidRootPart.Anchored = false
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
+
+
+--  Moaitab 
+Moai = Window:Tab({
+    Title = "🗿",
+    Icon = "gravity:sparkles",
+})
+
+MoaiTask1 = false
+Moai:Toggle({
+    Title = "Task 1 (Slap)",
+    Callback = function(state)
+        MoaiTask1 = state
+    end
+})
+
+MoaiTask2 = false
+Moai:Toggle({
+    Title = "Task 2 (Stun)",
+    Callback = function(state)
+        MoaiTask2 = state
+    end
+})
+
+MoaiTask3 = false
+Moai:Toggle({
+    Title = "Task 3 (Kill)",
+    Callback = function(state)
+        MoaiTask3 = state
+    end
+})
+
+Moai:Divider()
+
+MoaiFarming = false
+MoaiFarmingToggle = nil
+MoaiFarmingToggle = Moai:Toggle({
+    Title = "Start Farming",
+	Icon = "gravity:sparkles",
+    Callback = function(state)
+        MoaiFarming = state
+		if MoaiFarming==true and (not Character or not HumanoidRootPart or not Humanoid) then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Missing player components, please try again in a few seconds. (Character/HumanoidRootPart/Humanoid)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 4,
+        	})
+			MoaiFarmingToggle:Set(false)
+			MoaiFarming = false
+			return
+		end
+		if MoaiFarming==true and Character:FindFirstChild("entered") then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "Should use in lobby.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			MoaiFarmingToggle:Set(false)
+			MoaiFarming = false
+			return
+		end
+		if MoaiFarming==true and LocalPlayer:WaitForChild("_unlockedGloves")["🗿"].Value==false and LocalPlayer.leaderstats.Glove.Value~="🗿" then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You don't own 🗿. (If you are using rent bug, equip the glove you are getting mastery for and try again)",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 6,
+        	})
+			MoaiFarmingToggle:Set(false)
+			MoaiFarming = false
+			return
+		end
+		if MoaiFarming==true and Humanoid.Health==0 then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You are dead.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			MoaiFarmingToggle:Set(false)
+			MoaiFarming = false
+			return
+		end
+		if MoaiFarming==true and MoaiTask3==false and MoaiTask2==false and MoaiTask1==false then
+        	WindUI:Notify({
+            	Title = "Error",
+            	Content = "You need to turn on atleast 1 option.",
+            	Icon = "gravity:triangle-exclamation",
+            	Duration = 3,
+        	})
+			MoaiFarmingToggle:Set(false)
+			MoaiFarming = false
+			return
+		end
+		if not AltAccountPlayer then
+			WindUI:Notify({
+    			Title = "Error",
+    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Icon = "triangle-exclamation",
+    			Duration = 3,
+			})
+			return
+		end
+if MoaiFarming==true then
+if LocalPlayer.leaderstats.Glove.Value~="🗿" then
+SelectGlove("🗿")
+task.wait(.333)
+end
+EnterArena(workspace.Lobby["Teleport1"])
+TeleportToPosition(CFrame.new(1620, 90, 8934), 2)
+game:GetService("ReplicatedStorage").GeneralAbility:FireServer(CFrame.new(1635.7218017578125, 82.81987762451172, 8933.388671875, -0.0002341950312256813, 8.286217045849753e-09, -1, 2.3056362152829024e-08, 1, 8.280817809236396e-09, 1, -2.30544223711604e-08, -0.0002341950312256813))
+NETWORK.send_data("02")
+task.wait(2.5)
+HumanoidRootPart.Anchored = true
+local canslap = true
+repeat task.wait(1.5)
+if MoaiTask2==true or MoaiTask3==true or MoaiTask1==true then
+if MoaiTask1==true or MoaiTask3==true then
+pcall(function()
+game:GetService("ReplicatedStorage").GeneralHit:FireServer(AltAccountPlayer.Character.Head)
+end)
+end
+end
+until MoaiFarming==false or Humanoid.Health==0
+HumanoidRootPart.Anchored = false
+Humanoid.Health = 0
+LocalPlayer:WaitForChild("Reset"):FireServer()
+end
+    end
+})
