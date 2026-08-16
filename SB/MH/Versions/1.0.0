@@ -1,6 +1,12 @@
 if mhloaded then
 local a = Instance.new("Message")
 a.Text = "Need to rejoin to re-execute script again! Rejoining..."
+pcall(function()
+local qot = queue_on_teleport or queueonteleport
+if qot then
+qot([[loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/SB/MH/Latest.lua"))()]])
+end
+end)
 task.wait(1)
 if #game:GetService("Players"):GetPlayers() <= 1 then
 game:GetService("TeleportService"):Teleport(game.PlaceId, game:GetService("Players").LocalPlayer)
@@ -1012,11 +1018,14 @@ Connector:Paragraph({
     ImageSize = 20
 })
 
+local temptempconnectorstopvar = true
+
 Connector:Input({
     Title = "Main Account Username",
     Placeholder = "Nexer",
     Value = "",
     Callback = function(text)
+		if temptempconnectorstopvar==true then return end
         if not game:GetService("Players"):FindFirstChild(text) then
             WindUI:Notify({
                 Title = "Error",
@@ -1045,6 +1054,7 @@ Connector:Input({
     Placeholder = "Freyaa",
     Value = "",
     Callback = function(text)
+		if temptempconnectorstopvar==true then return end
         if not game:GetService("Players"):FindFirstChild(text) then
             WindUI:Notify({
                 Title = "Error",
@@ -1066,6 +1076,8 @@ Connector:Input({
 	AltAccountPlayer = game:GetService("Players"):WaitForChild(text)
     end
 })
+
+task.delay(0.2, function() temptempconnectorstopvar = false end)
 
 
 local BugsFix = Window:Tab({
