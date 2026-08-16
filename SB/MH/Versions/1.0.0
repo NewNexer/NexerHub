@@ -429,10 +429,7 @@ MainAccountPlayer.CharacterAdded:Once(function()
 mainplrdied = true
 Humanoid.Health = 0
 LocalPlayer:WaitForChild("Reset"):FireServer()
-if supconnet then
 supconnet:Disconnect()
-supconnet = nil
-end
 end)
 task.spawn(function()
 while mainplrdied~=true do
@@ -2531,7 +2528,6 @@ end
 end
 if CloudTask1==true then
 pcall(function()
-if AltAccountPlayer.Character:FindFirstChild("entered") then
 Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
 PressKey("Space")
 task.wait(.75)
@@ -2542,7 +2538,6 @@ end
 task.wait(.75)
 for i,v in next, FetchedHumanoids do
 game:GetService("ReplicatedStorage").CloudHit:FireServer(v)
-end
 end
 end)
 elseif CloudTask4==true then
