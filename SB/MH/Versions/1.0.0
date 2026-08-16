@@ -2734,6 +2734,13 @@ Obby = Window:Tab({
     Icon = "gravity:sparkles-fill",
 })
 
+Obby:Paragraph({
+    Title = "This mastery can be completed without alt only partially.",
+    Desc = "Can't do: Task 2",
+    Image = "gravity:shield-exclamation",
+    ImageSize = 20
+})
+
 ObbyTask1 = false
 Obby:Toggle({
     Title = "Task 1 (Slap)",
