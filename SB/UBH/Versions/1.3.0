@@ -221,10 +221,10 @@ end
 task.wait(2)
 task.spawn(function()
 while task.wait() do
-HumanoidRootPart:PivotTo(workspace.Ruins.Elude.Glove.CFrame)
+workspace.Ruins.Elude.Glove:PivotTo(HumanoidRootPart.CFrame)
 end
 end)
-task.wait(.25)
+task.wait(.5)
 for i,v in pairs(workspace:GetDescendants()) do
 if v:IsA("ClickDetector") then
 fireclickdetector(v)
@@ -1463,11 +1463,12 @@ local SimplifiedObtainments = Window:CreateTab("Simplified Obtainments",0)
 SimplifiedObtainments:CreateButton({Name = "Get Cake Mix for Firework Glove"; Callback = function()
 game:GetService("ReplicatedStorage").Firework:InvokeServer()
 game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("AddItem","Cake Mix")
-game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("EquipItem", "Cake Mix")
+task.wait()
+game:GetService("ReplicatedStorage").AlchemistEvent:FireServer("EquipItem","Cake Mix")
 end; })
 SimplifiedObtainments:CreateButton({Name = "Get Ragdolled 100 times (for Kinetic Glove)"; Callback = function()
 for i=1,110 do
-game.ReplicatedStorage.SelfKnockback:FireServer({Force=0;Direction=Vector3.new(0,1/10,0)})
+game.ReplicatedStorage.SelfKnockback:FireServer({Force=0;Direction=Vector3.new(0.1/10)})
 task.wait(.05)
 end
 end; })
@@ -2034,10 +2035,10 @@ end
 task.wait(2)
 task.spawn(function()
 while task.wait() do
-HumanoidRootPart:PivotTo(workspace.Ruins.Elude.Glove.CFrame)
+workspace.Ruins.Elude.Glove:PivotTo(HumanoidRootPart.CFrame)
 end
 end)
-task.wait(.25)
+task.wait(.5)
 for i,v in pairs(workspace:GetDescendants()) do
 if v:IsA("ClickDetector") then
 fireclickdetector(v)
@@ -2223,8 +2224,8 @@ end; })
 
 AutoObtainment:CreateButton({Name = "Auto-Get Hunter"; Callback = function()
 Instance.new("Message",game.CoreGui).Text = "You're being teleported, please wait..."
-repeat task.wait() until workspace.BountyHunterRoom.Build.Model["Meshes/boxshadow_Cube.005"].Counter.SurfaceGui.TextLabel.Text=="1" and workspace.BountyHunterRoom.Build.Model["Meshes/boxshadow_Cube.005"].PlayerCounter.SurfaceGui.TextLabel.Text=="0/4 Hunters" and HumanoidRootPart and Humanoid and Humanoid.Health~=0
-TouchObject(workspace.BountyHunterRoom.Build.Model["Meshes/boxshadow_Cube.005"].Hitbox)
+repeat task.wait() until workspace.BountyHunterRoom.Build:FindFirstChild("Meshes/boxshadow_Cube.005",true).Counter.SurfaceGui.TextLabel.Text=="1" and workspace.BountyHunterRoom.Build:FindFirstChild("Meshes/boxshadow_Cube.005",true).PlayerCounter.SurfaceGui.TextLabel.Text=="0/4 Hunters" and HumanoidRootPart and Humanoid and Humanoid.Health~=0
+TouchObject(workspace.BountyHunterRoom.Build:FindFirstChild("Meshes/boxshadow_Cube.005",true).Hitbox)
 local tpdata = (queue_on_teleport or queueonteleport)
 tpdata([[if game.PlaceId~=18550498098 then return end
 ]]..GlobalTPData..[[
@@ -2299,8 +2300,8 @@ end; })
 
 AutoObtainment:CreateButton({Name = "Auto-Get Hunter + Avatar"; Callback = function()
 Instance.new("Message",game.CoreGui).Text = "You're being teleported, please wait..."
-repeat task.wait() until workspace.BountyHunterRoom.Build.Model["Meshes/boxshadow_Cube.005"].Counter.SurfaceGui.TextLabel.Text=="1" and workspace.BountyHunterRoom.Build.Model["Meshes/boxshadow_Cube.005"].PlayerCounter.SurfaceGui.TextLabel.Text=="0/4 Hunters" and HumanoidRootPart and Humanoid and Humanoid.Health~=0
-TouchObject(workspace.BountyHunterRoom.Build.Model["Meshes/boxshadow_Cube.005"].Hitbox)
+repeat task.wait() until workspace.BountyHunterRoom.Build:FindFirstChild("Meshes/boxshadow_Cube.005",true).Counter.SurfaceGui.TextLabel.Text=="1" and workspace.BountyHunterRoom.Build:FindFirstChild("Meshes/boxshadow_Cube.005",true).PlayerCounter.SurfaceGui.TextLabel.Text=="0/4 Hunters" and HumanoidRootPart and Humanoid and Humanoid.Health~=0
+TouchObject(workspace.BountyHunterRoom.Build:FindFirstChild("Meshes/boxshadow_Cube.005",true).Hitbox)
 local tpdata = (queue_on_teleport or queueonteleport)
 tpdata([[if game.PlaceId~=18550498098 then return end
 ]]..GlobalTPData..[[
@@ -2373,8 +2374,8 @@ end; })
 
 AutoObtainment:CreateButton({Name = "Auto-Get Relude"; Callback = function()
 Instance.new("Message",game.CoreGui).Text = "You're being teleported, please wait..."
-repeat task.wait() until workspace.BountyHunterRoom.Build.Model["Meshes/boxshadow_Cube.005"].Counter.SurfaceGui.TextLabel.Text=="1" and workspace.BountyHunterRoom.Build.Model["Meshes/boxshadow_Cube.005"].PlayerCounter.SurfaceGui.TextLabel.Text=="0/4 Hunters" and HumanoidRootPart and Humanoid and Humanoid.Health~=0
-TouchObject(workspace.BountyHunterRoom.Build.Model["Meshes/boxshadow_Cube.005"].Hitbox)
+repeat task.wait() until workspace.BountyHunterRoom.Build:FindFirstChild("Meshes/boxshadow_Cube.005",true).Counter.SurfaceGui.TextLabel.Text=="1" and workspace.BountyHunterRoom.Build:FindFirstChild("Meshes/boxshadow_Cube.005",true).PlayerCounter.SurfaceGui.TextLabel.Text=="0/4 Hunters" and HumanoidRootPart and Humanoid and Humanoid.Health~=0
+TouchObject(workspace.BountyHunterRoom.Build:FindFirstChild("Meshes/boxshadow_Cube.005",true).Hitbox)
 local tpdata = (queue_on_teleport or queueonteleport)
 tpdata([[if game.PlaceId~=18550498098 then return end
 ]]..GlobalTPData..[[
@@ -2450,8 +2451,8 @@ end; })
 
 AutoObtainment:CreateButton({Name = "Auto-Get Relude + Avatar"; Callback = function()
 Instance.new("Message",game.CoreGui).Text = "You're being teleported, please wait..."
-repeat task.wait() until workspace.BountyHunterRoom.Build.Model["Meshes/boxshadow_Cube.005"].Counter.SurfaceGui.TextLabel.Text=="1" and workspace.BountyHunterRoom.Build.Model["Meshes/boxshadow_Cube.005"].PlayerCounter.SurfaceGui.TextLabel.Text=="0/4 Hunters" and HumanoidRootPart and Humanoid and Humanoid.Health~=0
-TouchObject(workspace.BountyHunterRoom.Build.Model["Meshes/boxshadow_Cube.005"].Hitbox)
+repeat task.wait() until workspace.BountyHunterRoom.Build:FindFirstChild("Meshes/boxshadow_Cube.005",true).Counter.SurfaceGui.TextLabel.Text=="1" and workspace.BountyHunterRoom.Build:FindFirstChild("Meshes/boxshadow_Cube.005",true).PlayerCounter.SurfaceGui.TextLabel.Text=="0/4 Hunters" and HumanoidRootPart and Humanoid and Humanoid.Health~=0
+TouchObject(workspace.BountyHunterRoom.Build:FindFirstChild("Meshes/boxshadow_Cube.005",true).Hitbox)
 local tpdata = (queue_on_teleport or queueonteleport)
 tpdata([[if game.PlaceId~=18550498098 then return end
 ]]..GlobalTPData..[[
@@ -2776,11 +2777,11 @@ end
 end)
 local FarmBricks = true
 task.spawn(function()
-repeat task.wait(5)
+repeat task.wait(.05)
 game:GetService("ReplicatedStorage").lbrick:FireServer()
 until FarmBricks==false
 end)
-Time = 5000
+Time = 1600
 for i = 1,Time do
 Time = Time - 1
 Instance.new("Message",workspace).Text = "Seconds left to receive: "..Time
@@ -2852,11 +2853,11 @@ end
 end)
 local FarmBricks = true
 task.spawn(function()
-repeat task.wait(5)
+repeat task.wait(.05)
 game:GetService("ReplicatedStorage").lbrick:FireServer()
 until FarmBricks==false
 end)
-Time = 5000
+Time = 3600
 for i = 1,Time do
 Time = Time - 1
 Instance.new("Message",workspace).Text = "Seconds left to receive: "..Time
@@ -3116,10 +3117,10 @@ EquipGlove("God's Hand")
 game.ReplicatedStorage.TimestopJump:FireServer()
 game.ReplicatedStorage.Timestopchoir:FireServer()
 game.ReplicatedStorage.Timestop:FireServer()
-task.wait(5)
+task.wait(3)
 EquipGlove("Replica")
 TeleportToArena(1)
-for i=1,150000 do
+for i=1,200000 do
 game.ReplicatedStorage.Duplicate:FireServer(true)
 end
 a:Destroy()
