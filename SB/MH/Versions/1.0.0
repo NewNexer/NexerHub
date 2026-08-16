@@ -8,7 +8,7 @@ if qot then
 qot([[loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/SB/MH/Latest.lua"))()]])
 end
 end)
-task.wait(1)
+task.wait(2)
 if #game:GetService("Players"):GetPlayers() <= 1 then
 game:GetService("TeleportService"):Teleport(game.PlaceId, game:GetService("Players").LocalPlayer)
 else
