@@ -1241,7 +1241,7 @@ SelectGlove("Glovel")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
+TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 4)
 repeat task.wait(.05)
 if GlovelTask1==true and Character and Character:FindFirstChild("Head") then
 if Character.Head.Transparency~=1 then
@@ -2608,7 +2608,7 @@ bus:Toggle({
 
 busTask2 = false
 bus:Toggle({
-    Title = "Task 2 (Spend time)",
+    Title = "Task 2 (Blasphemy)",
     Callback = function(state)
         busTask2 = state
     end
@@ -2616,7 +2616,7 @@ bus:Toggle({
 
 busTask3 = false
 bus:Toggle({
-    Title = "Task 3 (Travel)",
+    Title = "Task 3 (Hit with bus)",
     Callback = function(state)
         busTask3 = state
     end
