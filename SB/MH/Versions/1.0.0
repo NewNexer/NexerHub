@@ -413,7 +413,7 @@ if datastring=="01" then
 if not MainAccountPlayer then
 WindUI:Notify({
     Title = "Error",
-    Content = "Something went wrong. Try connecting the accounts again.",
+    Content = "Alt account not detected! Please connect the accounts!",
     Icon = "triangle-exclamation",
     Duration = 3,
 })
@@ -434,7 +434,7 @@ if datastring=="02" then
 if not MainAccountPlayer then
 WindUI:Notify({
     Title = "Error",
-    Content = "Something went wrong. Try connecting the accounts again.",
+    Content = "Alt account not detected! Please connect the accounts!",
     Icon = "triangle-exclamation",
     Duration = 3,
 })
@@ -488,7 +488,7 @@ if datastring=="03" then
 if not MainAccountPlayer then
 WindUI:Notify({
     Title = "Error",
-    Content = "Something went wrong. Try connecting the accounts again.",
+    Content = "Alt account not detected! Please connect the accounts!",
     Icon = "triangle-exclamation",
     Duration = 3,
 })
@@ -545,7 +545,7 @@ if datastring=="04" then
 if not MainAccountPlayer then
 WindUI:Notify({
     Title = "Error",
-    Content = "Something went wrong. Try connecting the accounts again.",
+    Content = "Alt account not detected! Please connect the accounts!",
     Icon = "triangle-exclamation",
     Duration = 3,
 })
@@ -570,7 +570,7 @@ if datastring=="05" then
 if not MainAccountPlayer then
 WindUI:Notify({
     Title = "Error",
-    Content = "Something went wrong. Try connecting the accounts again.",
+    Content = "Alt account not detected! Please connect the accounts!",
     Icon = "triangle-exclamation",
     Duration = 3,
 })
@@ -629,7 +629,7 @@ if datastring=="06" then
 if not MainAccountPlayer then
 WindUI:Notify({
     Title = "Error",
-    Content = "Something went wrong. Try connecting the accounts again.",
+    Content = "Alt account not detected! Please connect the accounts!",
     Icon = "triangle-exclamation",
     Duration = 3,
 })
@@ -646,7 +646,7 @@ if datastring=="07" then
 if not MainAccountPlayer then
 WindUI:Notify({
     Title = "Error",
-    Content = "Something went wrong. Try connecting the accounts again.",
+    Content = "Alt account not detected! Please connect the accounts!",
     Icon = "triangle-exclamation",
     Duration = 3,
 })
@@ -677,7 +677,7 @@ if datastring=="08" then
 if not MainAccountPlayer then
 WindUI:Notify({
     Title = "Error",
-    Content = "Something went wrong. Try connecting the accounts again.",
+    Content = "Alt account not detected! Please connect the accounts!",
     Icon = "triangle-exclamation",
     Duration = 3,
 })
@@ -698,7 +698,7 @@ if datastring=="09" then
 if not MainAccountPlayer then
 WindUI:Notify({
     Title = "Error",
-    Content = "Something went wrong. Try connecting the accounts again.",
+    Content = "Alt account not detected! Please connect the accounts!",
     Icon = "triangle-exclamation",
     Duration = 3,
 })
@@ -719,7 +719,7 @@ if datastring=="10" then
 if not MainAccountPlayer then
 WindUI:Notify({
     Title = "Error",
-    Content = "Something went wrong. Try connecting the accounts again.",
+    Content = "Alt account not detected! Please connect the accounts!",
     Icon = "triangle-exclamation",
     Duration = 3,
 })
@@ -778,7 +778,7 @@ if datastring=="11" then
 if not MainAccountPlayer then
 WindUI:Notify({
     Title = "Error",
-    Content = "Something went wrong. Try connecting the accounts again.",
+    Content = "Alt account not detected! Please connect the accounts!",
     Icon = "triangle-exclamation",
     Duration = 3,
 })
@@ -832,7 +832,7 @@ if datastring=="12" then
 if not MainAccountPlayer then
 WindUI:Notify({
     Title = "Error",
-    Content = "Something went wrong. Try connecting the accounts again.",
+    Content = "Alt account not detected! Please connect the accounts!",
     Icon = "triangle-exclamation",
     Duration = 3,
 })
@@ -897,7 +897,7 @@ if datastring=="13" then
 if not MainAccountPlayer then
 WindUI:Notify({
     Title = "Error",
-    Content = "Something went wrong. Try connecting the accounts again.",
+    Content = "Alt account not detected! Please connect the accounts!",
     Icon = "triangle-exclamation",
     Duration = 3,
 })
@@ -918,7 +918,7 @@ if datastring=="14" then
 if not MainAccountPlayer then
 WindUI:Notify({
     Title = "Error",
-    Content = "Something went wrong. Try connecting the accounts again.",
+    Content = "Alt account not detected! Please connect the accounts!",
     Icon = "triangle-exclamation",
     Duration = 3,
 })
@@ -953,7 +953,7 @@ if datastring=="15" then
 if not MainAccountPlayer then
 WindUI:Notify({
     Title = "Error",
-    Content = "Something went wrong. Try connecting the accounts again.",
+    Content = "Alt account not detected! Please connect the accounts!",
     Icon = "triangle-exclamation",
     Duration = 3,
 })
@@ -974,7 +974,7 @@ if datastring=="16" then
 if not MainAccountPlayer then
 WindUI:Notify({
     Title = "Error",
-    Content = "Something went wrong. Try connecting the accounts again.",
+    Content = "Alt account not detected! Please connect the accounts!",
     Icon = "triangle-exclamation",
     Duration = 3,
 })
@@ -1501,7 +1501,7 @@ Moon:Button({
 		if not AltAccountPlayer then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -2470,7 +2470,7 @@ CloudFarmingToggle = Cloud:Toggle({
 		if not AltAccountPlayer and CloudTask4==true then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -2711,7 +2711,7 @@ busFarmingToggle = bus:Toggle({
 		if not AltAccountPlayer and busTask4==true then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -2723,7 +2723,7 @@ SelectGlove("bus")
 task.wait(.333)
 end
 EnterArena(workspace.Lobby["Teleport1"])
-TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,500),10,math.random(-500,500)), 2)
+TeleportToPosition(CFrame.new(-17920,120,3560), 2)
 if busTask2==true or busTask3 == true then
 NETWORK.send_data("08")
 task.wait(2.5)
@@ -2741,7 +2741,7 @@ canshard = false
 pcall(function()
 game:GetService("ReplicatedStorage").busmoment:FireServer()
 end)
-task.delay(6, function() canshard = true end)
+task.delay(7, function() canshard = true end)
 end
 end
 until busFarming==false or Humanoid.Health==0
@@ -2858,7 +2858,7 @@ ObbyFarmingToggle = Obby:Toggle({
 		if not AltAccountPlayer then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -3384,7 +3384,7 @@ robFarmingToggle = rob:Toggle({
 		if not AltAccountPlayer and robTask3==true then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -3585,7 +3585,7 @@ SpaceFarmingToggle = Space:Toggle({
 		if not AltAccountPlayer and SpaceTask4==true then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -3714,7 +3714,7 @@ GummyFarmingToggle = Gummy:Toggle({
 		if not AltAccountPlayer then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -3856,7 +3856,7 @@ MaceFarmingToggle = Mace:Toggle({
 		if not AltAccountPlayer then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -4044,7 +4044,7 @@ DiceFarmingToggle = Dice:Toggle({
 		if not AltAccountPlayer then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -4239,7 +4239,7 @@ PhaseFarmingToggle = Phase:Toggle({
 		if not AltAccountPlayer then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -4392,7 +4392,7 @@ SpringFarmingToggle = Spring:Toggle({
 		if not AltAccountPlayer then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -4527,7 +4527,7 @@ PinwheelFarmingToggle = Pinwheel:Toggle({
 		if not AltAccountPlayer then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -4650,7 +4650,7 @@ AcrobatFarmingToggle = Acrobat:Toggle({
 		if not AltAccountPlayer then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -4781,7 +4781,7 @@ TinkererFarmingToggle = Tinkerer:Toggle({
 		if not AltAccountPlayer then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -4866,7 +4866,7 @@ Eggler:Button({
 		if not AltAccountPlayer then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -4982,7 +4982,7 @@ EgglerFarmingToggle = Eggler:Toggle({
 		if not AltAccountPlayer then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -5122,7 +5122,7 @@ PhantomFarmingToggle = Phantom:Toggle({
 		if not AltAccountPlayer then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -5248,7 +5248,7 @@ StalkerFarmingToggle = Stalker:Toggle({
 		if not AltAccountPlayer then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -5368,7 +5368,7 @@ KillstreakFarmingToggle = Killstreak:Toggle({
 		if not AltAccountPlayer then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -5512,7 +5512,7 @@ BrickFarmingToggle = Brick:Toggle({
 		if not AltAccountPlayer then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -5657,7 +5657,7 @@ PlankFarmingToggle = Plank:Toggle({
 		if not AltAccountPlayer then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -5850,7 +5850,7 @@ ShardFarmingToggle = Shard:Toggle({
 		if not AltAccountPlayer then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -5879,7 +5879,7 @@ canshard = false
 pcall(function()
 game:GetService("ReplicatedStorage").Shards:FireServer()
 end)
-task.delay(8, function() canshard = true end)
+task.delay(9, function() canshard = true end)
 end
 if canslap==true and (ShardTask1==true or ShardTask5==true) then
 canslap = false
@@ -6002,7 +6002,7 @@ BubbleFarmingToggle = Bubble:Toggle({
 		if not AltAccountPlayer then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -6133,7 +6133,7 @@ BoosterFarmingToggle = Booster:Toggle({
 		if not AltAccountPlayer then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -6263,7 +6263,7 @@ RoguelikeFarmingToggle = Roguelike:Toggle({
 		if not AltAccountPlayer then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -6402,7 +6402,7 @@ FrostbiteFarmingToggle = Frostbite:Toggle({
 		if not AltAccountPlayer then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
@@ -6536,7 +6536,7 @@ MoaiFarmingToggle = Moai:Toggle({
 		if not AltAccountPlayer then
 			WindUI:Notify({
     			Title = "Error",
-    			Content = "Something went wrong. Try connecting the accounts again.",
+    			Content = "Alt account not detected! Please connect the accounts!",
     			Icon = "triangle-exclamation",
     			Duration = 3,
 			})
