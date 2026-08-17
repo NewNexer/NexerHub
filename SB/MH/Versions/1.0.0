@@ -3048,7 +3048,7 @@ Stick = Window:Tab({
 
 stickwhotohit = FetchedMannequins
 Stick:Toggle({
-    Title = "9x poke speed",
+    Title = "9x poke speed?",
 	Desc = "Risky - everyone will hear the stick SFX",
 	Icon = "gravity:sparkles-fill",
     Callback = function(state)
@@ -3063,7 +3063,7 @@ Stick:Toggle({
 StickTask1 = false
 Stick:Toggle({
     Title = "Task 1 (poke)",
-	Desc = "No Alt Required - 4x poke speed by default",
+	Desc = "No Alt Required - 4x poke speed by default ( or 9x if you enabled that thingy up here )",
 	Icon = "gravity:sparkles-fill",
     Callback = function(state)
         StickTask1 = state
