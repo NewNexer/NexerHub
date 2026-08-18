@@ -6032,6 +6032,7 @@ repeat task.wait(.05)
 if BubbleTask1==true or BubbleTask2==true or BubbleTask3==true or BubbleTask4==true then
 task.spawn(function()
 if workspace:FindFirstChild("BubbleObject")==nil and waitingforbubbletospawn==false then
+waitingforbubbletospawn = true
 if BubbleTask2==true then
 pcall(function()
 game:GetService("ReplicatedStorage").BubbleHit:FireServer(AltAccountPlayer.Character.Head)
@@ -6039,7 +6040,6 @@ end)
 task.wait(2)
 end
 game:GetService("ReplicatedStorage").BubbleThrow:FireServer()
-waitingforbubbletospawn = true
 repeat task.wait() until workspace:FindFirstChild("BubbleObject")
 waitingforbubbletospawn = false
 end
