@@ -866,8 +866,8 @@ if Character:FindFirstChild("entered")==nil then
 EnterArena(workspace.Lobby["Teleport2"])
 if firsttimealreadywas~=true then
 firsttimealreadywas = true
-repeat task.wait() until tostring(HumanoidRootPart.AssemblyMass)=="inf"
-repeat task.wait() until tostring(HumanoidRootPart.AssemblyMass)~="inf"
+repeat task.wait() until workspace:FindFirstChild("BubbleObject")
+repeat task.wait() until workspace:FindFirstChild("BubbleObject")==nil
 task.wait(.66)
 Humanoid.Health = 0
 LocalPlayer:WaitForChild("Reset"):FireServer()
@@ -880,8 +880,8 @@ end)
 supconnet = LocalPlayer.CharacterAdded:Connect(function(chr)
 chr.ChildAdded:Connect(function(Child)
 if Child.Name=="entered" then
-repeat task.wait() until tostring(HumanoidRootPart.AssemblyMass)=="inf"
-repeat task.wait() until tostring(HumanoidRootPart.AssemblyMass)~="inf"
+repeat task.wait() until workspace:FindFirstChild("BubbleObject")
+repeat task.wait() until workspace:FindFirstChild("BubbleObject")==nil
 task.wait(.66)
 Humanoid.Health = 0
 LocalPlayer:WaitForChild("Reset"):FireServer()
@@ -6018,6 +6018,7 @@ TeleportToPosition(workspace["platform1"].CFrame * CFrame.new(math.random(-500,5
 HumanoidRootPart.Anchored = true
 if BubbleTask1==true then
 NETWORK.send_data("12")
+print("yea i sent 12")
 else
 NETWORK.send_data("08")
 end
