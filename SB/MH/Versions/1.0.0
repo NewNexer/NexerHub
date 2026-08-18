@@ -5505,7 +5505,7 @@ BrickFarmingToggle = Brick:Toggle({
 			BrickFarming = false
 			return
 		end
-		if not AltAccountPlayer then
+		if not AltAccountPlayer and (BrickTask2==true or BrickTask4==true) then
 			WindUI:Notify({
     			Title = "Error",
     			Content = "Alt account not detected! Please connect the accounts!",
