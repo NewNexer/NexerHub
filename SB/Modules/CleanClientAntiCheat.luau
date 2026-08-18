@@ -46,17 +46,6 @@ if place=="Slap Battles" then
             real:Destroy()
         end
     end
-    if game:GetService("ReplicatedStorage"):FindFirstChild("Grab", true) and game:GetService("ReplicatedStorage"):FindFirstChild("Grab", true).Enabled==true then
-        local remote = game:GetService("ReplicatedStorage"):FindFirstChild("Grab", true)
-        remote.OnClientEvent:Connect(function(...)
-            remote:FireServer({
-                MessageError = {},
-                MessageInfo = {"GrabLocal active"},
-                MessageOutput = {},
-                MessageWarning = {},
-            })
-        end)
-    end
     if game:GetService("ReplicatedFirst"):FindFirstChild("Client") and game:GetService("ReplicatedFirst").Client:FindFirstChild("GrabLocal") then
         local real = game:GetService("ReplicatedFirst").Client.GrabLocal
         local fake = Instance.new("LocalScript")
@@ -108,17 +97,6 @@ elseif place=="Slap Royale" then
             fake.Parent = real.Parent
             real:Destroy()
         end
-    end
-    if game:GetService("ReplicatedStorage"):FindFirstChild("Grab", true) and game:GetService("ReplicatedStorage"):FindFirstChild("Grab", true).Enabled==true then
-        local remote = game:GetService("ReplicatedStorage"):FindFirstChild("Grab", true)
-        remote.OnClientEvent:Connect(function(...)
-            remote:FireServer({
-                MessageError = {},
-                MessageInfo = {"GrabLocal active"},
-                MessageOutput = {},
-                MessageWarning = {},
-            })
-        end)
     end
     if game:GetService("ReplicatedFirst"):FindFirstChild("Client") and game:GetService("ReplicatedFirst").Client:FindFirstChild("GrabLocal") then
         local real = game:GetService("ReplicatedFirst").Client.GrabLocal
