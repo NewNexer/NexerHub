@@ -866,15 +866,11 @@ if Character:FindFirstChild("entered")==nil then
 EnterArena(workspace.Lobby["Teleport2"])
 if firsttimealreadywas~=true then
 firsttimealreadywas = true
-Character:SetAttribute("IsBubbled", false)
-task.wait()
-Character:GetAttributeChangedSignal("IsBubbled"):Once(function()
-repeat task.wait() until Character:GetAttribute("IsBubbled")~=nil and Character:GetAttribute("IsBubbled")==true
-repeat task.wait() until Character:GetAttribute("IsBubbled")~=nil and Character:GetAttribute("IsBubbled")==false
-task.wait(.5)
+repeat task.wait() until tostring(HumanoidRootPart.AssemblyMass)=="inf"
+repeat task.wait() until tostring(HumanoidRootPart.AssemblyMass)~="inf"
+task.wait(.66)
 Humanoid.Health = 0
 LocalPlayer:WaitForChild("Reset"):FireServer()
-end)
 end
 end
 end)
@@ -884,15 +880,11 @@ end)
 supconnet = LocalPlayer.CharacterAdded:Connect(function(chr)
 chr.ChildAdded:Connect(function(Child)
 if Child.Name=="entered" then
-Character:SetAttribute("IsBubbled", false)
-task.wait()
-Character:GetAttributeChangedSignal("IsBubbled"):Once(function()
-repeat task.wait() until Character:GetAttribute("IsBubbled")~=nil and Character:GetAttribute("IsBubbled")==true
-repeat task.wait() until Character:GetAttribute("IsBubbled")~=nil and Character:GetAttribute("IsBubbled")==false
-task.wait(.5)
+repeat task.wait() until tostring(HumanoidRootPart.AssemblyMass)=="inf"
+repeat task.wait() until tostring(HumanoidRootPart.AssemblyMass)~="inf"
+task.wait(.66)
 Humanoid.Health = 0
 LocalPlayer:WaitForChild("Reset"):FireServer()
-end)
 end
 end)
 end)
