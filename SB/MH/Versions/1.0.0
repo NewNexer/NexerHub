@@ -6029,7 +6029,7 @@ local waitingforbubbletospawn = false
 repeat task.wait(.05)
 if BubbleTask1==true or BubbleTask2==true or BubbleTask3==true or BubbleTask4==true then
 task.spawn(function()
-if not AltAccountPlayer or not AltAccountPlayer.Character or not AltAccountPlayer.Character:FindFirstChild("Head") or not AltAccountPlayer.Character:FindFirstChild("Humanoid") then return end
+if not AltAccountPlayer or not AltAccountPlayer.Character or not AltAccountPlayer.Character:FindFirstChild("entered") or not AltAccountPlayer.Character:FindFirstChild("Head") or not AltAccountPlayer.Character:FindFirstChild("Humanoid") then return end
 if workspace:FindFirstChild("BubbleObject")==nil and waitingforbubbletospawn==false and AltAccountPlayer.Character.Head.Position.X>9000 and AltAccountPlayer.Character.Humanoid.Health~=0 then
 waitingforbubbletospawn = true
 if BubbleTask2==true then
