@@ -866,7 +866,9 @@ if Character:FindFirstChild("entered")==nil then
 EnterArena(workspace.Lobby["Teleport2"])
 if firsttimealreadywas~=true then
 firsttimealreadywas = true
-Character:WaitForChild("HumanoidRootPart",3600):GetPropertyChangedSignal("AssemblyRootPart"):Once(function()
+Character:SetAttribute("IsBubbled", false)
+task.wait()
+Character:GetAttributeChangedSignal("IsBubbled"):Once(function()
 repeat task.wait() until Character:GetAttribute("IsBubbled")~=nil and Character:GetAttribute("IsBubbled")==true
 repeat task.wait() until Character:GetAttribute("IsBubbled")~=nil and Character:GetAttribute("IsBubbled")==false
 task.wait(.5)
@@ -882,7 +884,9 @@ end)
 supconnet = LocalPlayer.CharacterAdded:Connect(function(chr)
 chr.ChildAdded:Connect(function(Child)
 if Child.Name=="entered" then
-Character:WaitForChild("HumanoidRootPart",3600):GetPropertyChangedSignal("AssemblyRootPart"):Once(function()
+Character:SetAttribute("IsBubbled", false)
+task.wait()
+Character:GetAttributeChangedSignal("IsBubbled"):Once(function()
 repeat task.wait() until Character:GetAttribute("IsBubbled")~=nil and Character:GetAttribute("IsBubbled")==true
 repeat task.wait() until Character:GetAttribute("IsBubbled")~=nil and Character:GetAttribute("IsBubbled")==false
 task.wait(.5)
@@ -6028,21 +6032,18 @@ repeat task.wait(.05)
 if BubbleTask1==true or BubbleTask2==true or BubbleTask3==true or BubbleTask4==true then
 task.spawn(function()
 if workspace:FindFirstChild("BubbleObject")==nil and waitingforbubbletospawn==false then
+if BubbleTask2==true then
+pcall(function()
+game:GetService("ReplicatedStorage").BubbleHit:FireServer(AltAccountPlayer.Character.Head)
+end)
+task.wait(2)
+end
 game:GetService("ReplicatedStorage").BubbleThrow:FireServer()
 waitingforbubbletospawn = true
 repeat task.wait() until workspace:FindFirstChild("BubbleObject")
 waitingforbubbletospawn = false
 end
 end)
-if BubbleTask2==true then
-if canslap==true then
-canslap = false
-pcall(function()
-game:GetService("ReplicatedStorage").BubbleHit:FireServer(AltAccountPlayer.Character.Head)
-end)
-task.delay(2, function() canslap = true end)
-end
-end
 end
 until BubbleFarming==false or Humanoid.Health==0
 HumanoidRootPart.Anchored = false
