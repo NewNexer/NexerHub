@@ -13,6 +13,12 @@ pcall(function()
 Humanoid, Hum = Character.Humanoid, Character.Humanoid
 end)
 
+if string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "Solara") then
+local FixedFunctions = loadstring(game:HttpGet("https://raw.githubusercontent.com/Articles-Hub/ROBLOXScript/refs/heads/main/SCRIPT/Fix.lua"))()
+getgenv().fireclickdetector = FixedFunctions.fireclickdetector
+getgenv().fireproximityprompt = FixedFunctions.fireproximityprompt
+end
+
 local SelectGlove = function(g) repeat task.wait(.1) fireclickdetector(workspace.Lobby[g]:FindFirstChildWhichIsA("ClickDetector",true)) until LocalPlayer.leaderstats.Glove.Value==g task.wait(.1) end
 
 local msghint = Instance.new("Hint")
