@@ -25,6 +25,12 @@ Humanoid, Hum = char.Humanoid, char.Humanoid
 end)
 end)
 
+if string.find(identifyexecutor(), "Xeno") or string.find(identifyexecutor(), "Solara") then
+local FixedFunctions = loadstring(game:HttpGet("https://raw.githubusercontent.com/Articles-Hub/ROBLOXScript/refs/heads/main/SCRIPT/Fix.lua"))()
+getgenv().fireclickdetector = FixedFunctions.fireclickdetector
+getgenv().fireproximityprompt = FixedFunctions.fireproximityprompt
+end
+
 function CreateMessage(a)
 local instancename = (a=="Message" and a) or "Hint"
 local msg = Instance.new(instancename,game:GetService("CoreGui"))
