@@ -387,7 +387,7 @@ WindUI:Notify({
     Title = "Started",
     Content = "Started spawning! ( Reset to stop )",
     Icon = "gravity:triangle-exclamation",
-    Duration = 5,
+    Duration = 6,
 })
 Character:SetAttribute("2_0012",true)
 startspawningreversedclone()
@@ -425,6 +425,15 @@ WindUI:Notify({
 })
 return
 end
+if LocalPlayer.leaderstats.Glove.Value~="Snow" then
+WindUI:Notify({
+    Title = "Error",
+    Content = "Equip Snow!",
+    Icon = "gravity:triangle-exclamation",
+    Duration = 3,
+})
+return
+end
 if Character:GetAttribute("2_0011")~=nil and Character:GetAttribute("2_0011")==true then
 WindUI:Notify({
     Title = "Error",
@@ -438,7 +447,7 @@ WindUI:Notify({
     Title = "Started",
     Content = "Started farming! ( Reset to stop )",
     Icon = "gravity:triangle-exclamation",
-    Duration = 5,
+    Duration = 6,
 })
 Character:SetAttribute("2_0011",true)
 local hit = game:GetService("ReplicatedStorage").SnowHit
