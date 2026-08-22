@@ -324,6 +324,15 @@ local slapfarm100 = Window:Tab({
     Icon = "gravity:thunderbolt-fill",
 })
 
+slapfarm100:Paragraph({
+    Title = "Notice!",
+    Desc = "You still need an account with 12k slaps!",
+    Image = "gravity:shield-exclamation",
+    ImageSize = 20
+})
+
+slapfarm100:Divider()
+
 slapfarm100:Button({
     Title = "Teleport to safe spot",
 	Icon = "gravity:sparkles-fill",
