@@ -326,7 +326,7 @@ local slapfarm100 = Window:Tab({
 
 slapfarm100:Paragraph({
     Title = "Notice!",
-    Desc = "You still need an account with 12k slaps!",
+    Desc = "You still need an account with 12k slaps and counter!",
     Image = "gravity:shield-exclamation",
     ImageSize = 20
 })
