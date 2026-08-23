@@ -1,0 +1,43 @@
+local jobid = game.JobId
+if not game:GetService("Players").LocalPlayer.Character or game:GetService("Players").LocalPlayer.Character:FindFirstChild("entered") then
+game:GetService("StarterGui"):SetCore("SendNotification",{
+	Title = "Error!",
+	Text = "You need to use this script in lobby!",
+	Duration = 36000,
+	Button1 = "Okay!"
+})
+return
+end
+local lastping = -1
+local lastwhenchagned = tick()
+local stablern = true
+game:GetService("RunService").RenderStepped:Connect(function()
+    local ping = (game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString()):match("%d+")
+    if ping ~= lastping then
+        lastping = ping
+        lastwhenchagned = tick()
+        stablern = true
+    elseif tick() - lastwhenchagned > 3 then
+        stablern = false
+    end
+end)
+game:GetService("StarterGui"):SetCore("ResetButtonCallback", false)
+task.spawn(function()
+local Hint = Instance.new("Hint")
+Hint.Text = "Closing the server... ( FE | Usually takes ≈30 seconds )"
+Hint.Parent = game:GetService("CoreGui")
+repeat task.wait() until stablern==false
+repeat task.wait() until stablern==true
+task.wait(1)
+pcall(function() game:GetService("Players").LocalPlayer.Reset:FireServer() end)
+pcall(function()
+for i=1,400 do
+game:GetService("Players").LocalPlayer.Character.HumanoidRootPart:PivotTo(CFrame.new(0,40,0))
+end
+end)
+Hint.Text = "This server no longer exists. ( server '"..jobid.."' dead )"
+end)
+local Remote = game:GetService("ReplicatedStorage").Events.Undead
+for i=1,20000 do
+Remote:FireServer("init")
+end
