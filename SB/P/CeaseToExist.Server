@@ -1,3 +1,13 @@
+local patched = true
+if patched then
+game:GetService("StarterGui"):SetCore("SendNotification",{
+	Title = "Error!",
+	Text = "This script is patched in the new servers!",
+	Duration = 36000,
+	Button1 = "Okay!"
+})
+end
+
 local jobid = game.JobId
 if not game:GetService("Players").LocalPlayer.Character or game:GetService("Players").LocalPlayer.Character:FindFirstChild("entered") then
 game:GetService("StarterGui"):SetCore("SendNotification",{
