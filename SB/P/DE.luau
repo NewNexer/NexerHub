@@ -112,7 +112,7 @@ local pgs = game:GetService("HttpService"):JSONDecode(game:GetService("Replicate
 local plaintable = game:GetService("ReplicatedStorage").PlayerData:WaitForChild(plr.Name):WaitForChild("UnlockedBadges").Value
 for key,value in pairs(pgs) do
 if value > TestSettings["Minimum slaps to detect"] and value > (crs/TestSettings["Slaps Detection"]) then
-if key == "Snow" or key == "Replica" or key == "Reverse" or key == "el gato" or key == "Baller" or key == "Blink" or key == "Boxer" or key == "Mace" or key == "Clock" or key == "Tycoon" or key == "God's Hand" or key == "Reaper" or key=="Lag" then
+if key == "Snow" or key=="Screwdriver" or key == "Replica" or key == "Reverse" or key == "el gato" or key == "Baller" or key == "Blink" or key == "Boxer" or key == "Mace" or key == "Clock" or key == "Tycoon" or key == "God's Hand" or key == "Reaper" or key=="Lag" then
 if key == "Snow" then
 DetectedSlaps["Snow"]="Snow violation [ exploitation of remote 'SnowHit' ; serverhop method ; total farmed: "..tostring(value).." slaps | exploits ]"
 end
