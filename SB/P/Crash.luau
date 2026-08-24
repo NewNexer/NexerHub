@@ -1,5 +1,3 @@
-local place = "Slap Battles"
-loadstring(game:HttpGet("https://raw.githubusercontent.com/NewNexer/NexerHub/refs/heads/main/SB/Modules/CleanClientAntiCheat.luau"))(place)
 local patched = false
 if patched then
 game:GetService("StarterGui"):SetCore("SendNotification",{
