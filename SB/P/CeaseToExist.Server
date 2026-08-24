@@ -30,13 +30,13 @@ repeat task.wait() until stablern==false
 repeat task.wait() until stablern==true
 task.wait(1)
 pcall(function() game:GetService("Players").LocalPlayer.Reset:FireServer() end)
+Hint.Text = "Server is no longer available. ( server '"..jobid.."' dead )"
 pcall(function()
-for i=1,300 do
+for i=1,133 do
 game:GetService("Players").LocalPlayer.Character.HumanoidRootPart:PivotTo(CFrame.new(0,40,0))
 task.wait()
 end
 end)
-Hint.Text = "Server is no longer available. ( server '"..jobid.."' dead )"
 end)
 local Remote = game:GetService("ReplicatedStorage").Events.Undead
 for i=1,20000 do
