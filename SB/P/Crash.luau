@@ -1,4 +1,4 @@
-local patched = false
+local patched = true
 if patched then
 game:GetService("StarterGui"):SetCore("SendNotification",{
 	Title = "Error!",
