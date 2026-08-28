@@ -1,11 +1,12 @@
-local patched = false
+local patched = true
 if patched then
 game:GetService("StarterGui"):SetCore("SendNotification",{
 	Title = "Error!",
-	Text = "This script is patched in the new servers!",
+	Text = "This script is patched!",
 	Duration = 36000,
 	Button1 = "Okay!"
 })
+return
 end
 game:GetService("Players").LocalPlayer.Character:Destroy()
 task.wait()
