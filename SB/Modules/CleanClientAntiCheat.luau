@@ -107,7 +107,7 @@ elseif place=="Slap Royale" then
     end
 end
 
-if hookmetamethod and getnamecallmethod then
+--[[if hookmetamethod and getnamecallmethod then
     pcall(function()
         local Namecall
         Namecall = hookmetamethod(game, "__namecall", function(self, ...)
@@ -118,4 +118,4 @@ if hookmetamethod and getnamecallmethod then
             return Namecall(self, ...)
         end)
     end)
-end
+end]]
