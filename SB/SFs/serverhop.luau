@@ -3,8 +3,10 @@ repeat task.wait(.5) until game:GetService("Players").LocalPlayer and game:IsLoa
 task.spawn(function()
 while task.wait(.005) do
 for i,v in next, game:GetService("Players").LocalPlayer:GetDescendants() do
-if v.ClassName=="LocalScript" or v.ClassName=="ModuleScript" then
-v:Destroy()
+if (v.ClassName=="LocalScript" or v.ClassName=="ModuleScript") then
+pcall(function()
+v.Disabled = true
+end)
 end
 end
 end
