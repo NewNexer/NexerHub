@@ -1,4 +1,20 @@
-local settings = ... or {["snow"]=true;["slapples"]=true;["autoserverhop"]=6}
+repeat task.wait(.5) until game:GetService("Players").LocalPlayer and game:IsLoaded() and workspace:FindFirstChild("Lobby") and game:GetService("Players").LocalPlayer:FindFirstChild("leaderstats")
+
+task.spawn(function()
+while task.wait(.005) do
+for i,v in next, game:GetService("Players").LocalPlayer:GetDescendants() do
+if v.ClassName=="LocalScript" or v.ClassName=="ModuleScript" then
+v:Destroy()
+end
+end
+end
+end)
+
+task.wait(.25)
+
+local settings = ... or {["snow"]=true;["slapples"]=true;["autoserverhop"]=15}
+
+game:GetService("RunService"):Set3dRenderingEnabled(false)
 
 local LocalPlayer, LP = game:GetService("Players").LocalPlayer, game:GetService("Players").LocalPlayer
 local Character, Char
@@ -23,7 +39,7 @@ end)
 
 function Serverhop()
 task.spawn(function()
-while task.wait() do
+while task.wait(.1) do
 local servers = {}
 local req = game:HttpGet("https://games.roblox.com/v1/games/"..tostring(game.PlaceId).."/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true")
 local body = game:GetService("HttpService"):JSONDecode(req)
@@ -59,7 +75,7 @@ local AllPlayers = game:GetService("Players"):GetChildren()
 local RandomPlayer = AllPlayers[math.random(1, #AllPlayers)]
 repeat task.wait()
 RandomPlayer = AllPlayers[math.random(1, #AllPlayers)]
-until RandomPlayer and RandomPlayer ~= LocalPlayer and RandomPlayer.Character and RandomPlayer.Character:FindFirstChild("entered") and RandomPlayer.Character:FindFirstChild("rock") == nil and RandomPlayer.Character:FindFirstChild("RobTransformed") == nil and RandomPlayer.Character:FindFirstChild("stevebody") == nil and RandomPlayer.Character:FindFirstChildWhichIsA("Humanoid") and RandomPlayer.Character:FindFirstChildWhichIsA("Humanoid").Health ~= 0 and RandomPlayer.Character:FindFirstChild("Torso") and RandomPlayer.Character:FindFirstChild("Torso").Transparency~=1 and RandomPlayer.Character.Torso:FindFirstChild("BuddyBox") == nil and RandomPlayer.Character:FindFirstChild("Head") and RandomPlayer.Character.Head:FindFirstChild("ScreamParticles") == nil and RandomPlayer.Character.Head:FindFirstChild("UnoReverseCard") == nil and RandomPlayer.Character.Head:FindFirstChild("UnoDraw4Card") == nil and RandomPlayer.Character.Head.BrickColor ~= "New Yeller" and RandomPlayer.Character:FindFirstChild("HumanoidRootPart") and RandomPlayer.Character.HumanoidRootPart:FindFirstChild("BlackheartREAL") == nil and RandomPlayer.Character.HumanoidRootPart:FindFirstChild("BlockedShield") == nil and Character and HumanoidRootPart and Humanoid
+until RandomPlayer and RandomPlayer ~= LocalPlayer and RandomPlayer.Character and RandomPlayer.Character:FindFirstChild("entered") and RandomPlayer.Character:FindFirstChild("rock") == nil and RandomPlayer.Character:FindFirstChild("RobTransformed") == nil and RandomPlayer.Character:FindFirstChild("stevebody") == nil and RandomPlayer.Character:FindFirstChildWhichIsA("Humanoid") and RandomPlayer.Character:FindFirstChildWhichIsA("Humanoid").Health ~= 0 and RandomPlayer.Character:FindFirstChild("Torso") and RandomPlayer.Character:FindFirstChild("Torso").Transparency~=1 and RandomPlayer.Character.Torso:FindFirstChild("BuddyBox") == nil and RandomPlayer.Character:FindFirstChild("Head") and RandomPlayer.Character.Head:FindFirstChild("ScreamParticles") == nil and RandomPlayer.Character.Head:FindFirstChild("UnoReverseCard") == nil and RandomPlayer.Character.Head:FindFirstChild("UnoDraw4Card") == nil and RandomPlayer.Character.Head.BrickColor ~= "New Yeller" and RandomPlayer.Character:FindFirstChild("HumanoidRootPart") and RandomPlayer.Character.HumanoidRootPart:FindFirstChild("BlackheartREAL") == nil and RandomPlayer.Character.HumanoidRootPart:FindFirstChild("BlockedShield") == nil and RandomPlayer.leaderstats.Glove.Value~="Spectator" and Character and HumanoidRootPart and Humanoid
 return RandomPlayer
 end
 
@@ -91,7 +107,7 @@ game:GetService("ReplicatedStorage").GeneralAbility:FireServer("setcollisiongrou
 local enemy = FindRandomEnemy()
 task.spawn(function()
 while task.wait() do
-HumanoidRootPart:PivotTo(enemy.Character.HumanoidRootPart.CFrame)
+HumanoidRootPart:PivotTo(enemy.Character.HumanoidRootPart.CFrame * CFrame.Angles(math.rad(-90), 0, 0))
 end
 end)
 task.spawn(function()
@@ -108,8 +124,17 @@ end)
 end
 end
 end)
-task.wait(2)
+local attachtime = .777
+local s = pcall(function()
+    attachtime = (tonumber((game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString()):match("%d+")) / 777)
+end)
+if not s then
+    attachtime = .777
+end
+task.wait(attachtime+.777)
 for i=1,2000 do
 game:GetService("ReplicatedStorage").SnowHit:FireServer(enemy.Character.HumanoidRootPart)
 end
+task.wait(attachtime+.777)
+Serverhop()
 end
