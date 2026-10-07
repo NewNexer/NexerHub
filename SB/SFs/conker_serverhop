@@ -14,7 +14,7 @@ end)
 
 task.wait(.25)
 
-local settings = ... or {["conker"]=true;["autoserverhop"]=15;["renderdisable"]=false;["power"]=300}
+local settings = ... or {["conker"]=true;["autoserverhop"]=15;["renderdisable"]=false;["power"]=900000}
 
 if settings.renderdisable and settings.renderdisable==true then
 game:GetService("RunService"):Set3dRenderingEnabled(false)
@@ -132,7 +132,7 @@ for i,v in next, workspace:GetChildren() do
         end)
     end
 end
-task.wait(.0777)
+task.wait(.122)
 end
 else
 for i=1,300 do
@@ -143,7 +143,7 @@ for i,v in next, workspace:GetChildren() do
         end)
     end
 end
-task.wait(.0777)
+task.wait(.122)
 end
 end
 task.wait(attachtime+.777)
