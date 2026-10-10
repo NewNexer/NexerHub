@@ -370,6 +370,27 @@ end
 function KickPlayer(username, a, b)
     local username = username or ""
     local done = false
+    local step = 0
+    local lastpt = tick()
+    local function updater(text)
+        b.Text = text
+        step = step + 1
+        lastpt = tick()
+    end
+    local onemoreconn
+    onemoreconn = game:GetService("RunService").Heartbeat:Connect(function()
+        if done then
+            if onemoreconn then onemoreconn:Disconnect() onemoreconn = nil end
+            return
+        end
+        if tick() - lastpt > 10  then
+            done = true
+            if onemoreconn then onemoreconn:Disconnect() onemoreconn = nil end
+            a.Text = "Failed to kick "..username.."."
+            b.Text = "Timeout: Stuck on step "..step.." for more than 10 seconds."
+        end
+    end)
+    
     task.spawn(function()
         local dots = 0
         while not done do
@@ -393,46 +414,53 @@ function KickPlayer(username, a, b)
     end
     steps[8] = 100
     local step = 1
-    b.Text = "Processing... | 0% completed."
+    updater("Processing... | 0% completed.")
     game:GetService("RunService").RenderStepped:Wait()
     if not game:GetService("Players"):FindFirstChild(username) then 
         done = true
+        if timeoutConnection then timeoutConnection:Disconnect() end
         a.Text = "Failed to kick "..username.."."
         b.Text = "No players with such username were found."
         return
     end
     if not game:GetService("Players")[username].Character then 
         done = true
+        if timeoutConnection then timeoutConnection:Disconnect() end
         a.Text = "Failed to kick "..username.."."
         b.Text = "Target is missing Character."
         return
     end
     if not game:GetService("Players")[username].Character:FindFirstChild("HumanoidRootPart") then 
         done = true
+        if timeoutConnection then timeoutConnection:Disconnect() end
         a.Text = "Failed to kick "..username.."."
         b.Text = "Target is missing HumanoidRootPart."
         return
     end
     if game:GetService("Players")[username].Character:FindFirstChild("Humanoid").Health==0 then 
         done = true
+        if timeoutConnection then timeoutConnection:Disconnect() end
         a.Text = "Failed to kick "..username.."."
         b.Text = "Target is dead."
         return
     end
     if game:GetService("Players")[username].Character:FindFirstChild("Humanoid").Sit==true then 
         done = true
+        if timeoutConnection then timeoutConnection:Disconnect() end
         a.Text = "Failed to kick "..username.."."
         b.Text = "Target is sitting somewhere."
         return
     end
     if not game:GetService("Players")[username].Character:FindFirstChild("isInArena") then 
         done = true
+        if timeoutConnection then timeoutConnection:Disconnect() end
         a.Text = "Failed to kick "..username.."."
         b.Text = "Target is missing isInArena value."
         return
     end
     if game:GetService("Players")[username].Character.isInArena.Value==false then 
         done = true
+        if timeoutConnection then timeoutConnection:Disconnect() end
         if game:GetService("Players")[username].Character:FindFirstChild("entered") then
             a.Text = "Failed to kick "..username.."."
             b.Text = "Target is currently in an Immortal state."
@@ -443,7 +471,7 @@ function KickPlayer(username, a, b)
             return
         end
     end
-    b.Text = "Processing... | "..steps[step].."% completed."
+    updater("Processing... | "..steps[step].."% completed.")
     step = step + 1
     game:GetService("RunService").RenderStepped:Wait()
     if LocalPlayer.leaderstats.Slaps.Value>665 and Character.Torso.Transparency~=1 then
@@ -454,34 +482,42 @@ function KickPlayer(username, a, b)
         if workspace:FindFirstChild("Firework_"..LocalPlayer.Name) then return end
         repeat game:GetService("ReplicatedStorage").GeneralAbility:FireServer("setcollisiongroup","NoCollideCharacterCollisionGroup") task.wait(.1) until workspace:FindFirstChild("Firework_"..LocalPlayer.Name) and workspace["Firework_"..LocalPlayer.Name]:FindFirstChild("VehicleSeat")
     end
-    b.Text = "Processing... | "..steps[step].."% completed."
+    updater("Processing... | "..steps[step].."% completed.")
     step = step + 1
     game:GetService("RunService").RenderStepped:Wait()
     SelectGlove("Firework")
-    b.Text = "Processing... | "..steps[step].."% completed."
+    updater("Processing... | "..steps[step].."% completed.")
     step = step + 1
     game:GetService("RunService").RenderStepped:Wait()
     TeleportToPosition((CFrame.new(workspace.Lobby.brazil.platform.Position)*CFrame.new(0,5,0)), 1, false)
-    b.Text = "Processing... | "..steps[step].."% completed."
+    updater("Processing... | "..steps[step].."% completed.")
     step = step + 1
     if game:GetService("ReplicatedStorage"):FindFirstChild("firework") then
         game:GetService("ReplicatedStorage").firework:Destroy()
     end
-    b.Text = "Processing... | "..steps[step].."% completed."
+    updater("Processing... | "..steps[step].."% completed.")
     step = step + 1
     SpawnFirework()
-    b.Text = "Processing... | "..steps[step].."% completed."
+    updater("Processing... | "..steps[step].."% completed.")
     step = step + 1
-    repeat task.wait() SpawnFirework() game:GetService("Players")[username].Character.HumanoidRootPart:PivotTo(workspace["Firework_"..LocalPlayer.Name].VehicleSeat.CFrame) until game:GetService("Players")[username].Character.Humanoid.Sit==true
+    repeat 
+        task.wait() 
+        SpawnFirework() 
+        if not done then
+            game:GetService("Players")[username].Character.HumanoidRootPart:PivotTo(workspace["Firework_"..LocalPlayer.Name].VehicleSeat.CFrame)
+        end
+    until game:GetService("Players")[username].Character.Humanoid.Sit==true or done
+    if done then return end
     task.wait(.5)
-    b.Text = "Processing... | "..steps[step].."% completed."
+    updater("Processing... | "..steps[step].."% completed.")
     step = step + 1
     done = true
+    if timeoutConnection then timeoutConnection:Disconnect() end
     a.Text = "Kicked "..username.."."
     b.Text = "Target was kicked. | 100% completed."
     return
 end
---[[
+
 local HideScreeen = false
 KickTab:Toggle({
     Title = "Hide Screen",
@@ -489,7 +525,7 @@ KickTab:Toggle({
     Callback = function(state)
         HideScreeen = state
     end
-})]]
+})
 
 local gh = gethui or get_hui or gethiddengui or get_hidden_gui
 signals[tostring(game:GetService("HttpService"):GenerateGUID(false))] = gh().ChildAdded:Connect(function(c)
