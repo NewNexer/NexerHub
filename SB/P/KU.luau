@@ -390,7 +390,7 @@ function KickPlayer(username, a, b)
             return
         end
         if tick() - lastpt > 10 then
-            abort("Failed to kick "..username..".", "Timeout: Stuck on step "..step.." for more than 10 seconds.")
+            return abort("Failed to kick "..username..".", "Timeout: Stuck on step "..step.." for more than 10 seconds.")
         end
     end)
     task.spawn(function()
@@ -454,8 +454,10 @@ function KickPlayer(username, a, b)
     end
     local function SpawnFirework()
         if workspace:FindFirstChild("Firework_"..LocalPlayer.Name) then return end
-        repeat 
-            game:GetService("ReplicatedStorage").GeneralAbility:FireServer("setcollisiongroup","NoCollideCharacterCollisionGroup") 
+        repeat
+            if done~=true then
+                game:GetService("ReplicatedStorage").GeneralAbility:FireServer("setcollisiongroup","NoCollideCharacterCollisionGroup")
+            end
             task.wait(.1) 
         until done or (workspace:FindFirstChild("Firework_"..LocalPlayer.Name) and workspace["Firework_"..LocalPlayer.Name]:FindFirstChild("VehicleSeat"))
     end
@@ -533,7 +535,7 @@ KickTab:Button({
         local savedpossss = HumanoidRootPart.CFrame
         local a,b,c = RougeCover()
         muteall()
-        KickPlayer(UsernameOfTarget, a, b)
+        KickPlayer(UsernameOfTarget, a, b, c, savedpossss)
         TeleportToPosition(savedpossss, 1, false)
         game:GetService("ReplicatedStorage").Ghostinvisibilitydeactivated:FireServer()
         SelectGlove("spin")
