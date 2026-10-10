@@ -377,20 +377,22 @@ function KickPlayer(username, a, b)
         step = step + 1
         lastpt = tick()
     end
+    local function abort(failt, faild)
+        done = true
+        if onemoreconn then onemoreconn:Disconnect() onemoreconn = nil end
+        a.Text = failt
+        b.Text = faild
+    end
     local onemoreconn
     onemoreconn = game:GetService("RunService").Heartbeat:Connect(function()
         if done then
             if onemoreconn then onemoreconn:Disconnect() onemoreconn = nil end
             return
         end
-        if tick() - lastpt > 10  then
-            done = true
-            if onemoreconn then onemoreconn:Disconnect() onemoreconn = nil end
-            a.Text = "Failed to kick "..username.."."
-            b.Text = "Timeout: Stuck on step "..step.." for more than 10 seconds."
+        if tick() - lastpt > 10 then
+            abort("Failed to kick "..username..".", "Timeout: Stuck on step "..step.." for more than 10 seconds.")
         end
     end)
-    
     task.spawn(function()
         local dots = 0
         while not done do
@@ -416,103 +418,82 @@ function KickPlayer(username, a, b)
     local step = 1
     updater("Processing... | 0% completed.")
     game:GetService("RunService").RenderStepped:Wait()
+    if done then return end
     if not game:GetService("Players"):FindFirstChild(username) then 
-        done = true
-        if timeoutConnection then timeoutConnection:Disconnect() end
-        a.Text = "Failed to kick "..username.."."
-        b.Text = "No players with such username were found."
-        return
+        return abort("Failed to kick "..username..".", "No players with such username were found.")
     end
     if not game:GetService("Players")[username].Character then 
-        done = true
-        if timeoutConnection then timeoutConnection:Disconnect() end
-        a.Text = "Failed to kick "..username.."."
-        b.Text = "Target is missing Character."
-        return
+        return abort("Failed to kick "..username..".", "Target is missing Character.")
     end
     if not game:GetService("Players")[username].Character:FindFirstChild("HumanoidRootPart") then 
-        done = true
-        if timeoutConnection then timeoutConnection:Disconnect() end
-        a.Text = "Failed to kick "..username.."."
-        b.Text = "Target is missing HumanoidRootPart."
-        return
+        return abort("Failed to kick "..username..".", "Target is missing HumanoidRootPart.")
     end
     if game:GetService("Players")[username].Character:FindFirstChild("Humanoid").Health==0 then 
-        done = true
-        if timeoutConnection then timeoutConnection:Disconnect() end
-        a.Text = "Failed to kick "..username.."."
-        b.Text = "Target is dead."
-        return
+        return abort("Failed to kick "..username..".", "Target is dead.")
     end
     if game:GetService("Players")[username].Character:FindFirstChild("Humanoid").Sit==true then 
-        done = true
-        if timeoutConnection then timeoutConnection:Disconnect() end
-        a.Text = "Failed to kick "..username.."."
-        b.Text = "Target is sitting somewhere."
-        return
+        return abort("Failed to kick "..username..".", "Target is sitting somewhere.")
     end
     if not game:GetService("Players")[username].Character:FindFirstChild("isInArena") then 
-        done = true
-        if timeoutConnection then timeoutConnection:Disconnect() end
-        a.Text = "Failed to kick "..username.."."
-        b.Text = "Target is missing isInArena value."
-        return
+        return abort("Failed to kick "..username..".", "Target is missing isInArena value.")
     end
     if game:GetService("Players")[username].Character.isInArena.Value==false then 
-        done = true
-        if timeoutConnection then timeoutConnection:Disconnect() end
         if game:GetService("Players")[username].Character:FindFirstChild("entered") then
-            a.Text = "Failed to kick "..username.."."
-            b.Text = "Target is currently in an Immortal state."
-            return
+            return abort("Failed to kick "..username..".", "Target is currently in an Immortal state.")
         else
-            a.Text = "Failed to kick "..username.."."
-            b.Text = "Target is not in the Arena."
-            return
+            return abort("Failed to kick "..username..".", "Target is not in the Arena.")
         end
     end
     updater("Processing... | "..steps[step].."% completed.")
     step = step + 1
     game:GetService("RunService").RenderStepped:Wait()
+    if done then return end
     if LocalPlayer.leaderstats.Slaps.Value>665 and Character.Torso.Transparency~=1 then
         SelectGlove("Ghost")
         game:GetService("ReplicatedStorage").Ghostinvisibilityactivated:FireServer()
     end
     local function SpawnFirework()
         if workspace:FindFirstChild("Firework_"..LocalPlayer.Name) then return end
-        repeat game:GetService("ReplicatedStorage").GeneralAbility:FireServer("setcollisiongroup","NoCollideCharacterCollisionGroup") task.wait(.1) until workspace:FindFirstChild("Firework_"..LocalPlayer.Name) and workspace["Firework_"..LocalPlayer.Name]:FindFirstChild("VehicleSeat")
+        repeat 
+            game:GetService("ReplicatedStorage").GeneralAbility:FireServer("setcollisiongroup","NoCollideCharacterCollisionGroup") 
+            task.wait(.1) 
+        until done or (workspace:FindFirstChild("Firework_"..LocalPlayer.Name) and workspace["Firework_"..LocalPlayer.Name]:FindFirstChild("VehicleSeat"))
     end
     updater("Processing... | "..steps[step].."% completed.")
     step = step + 1
     game:GetService("RunService").RenderStepped:Wait()
+    if done then return end
     SelectGlove("Firework")
     updater("Processing... | "..steps[step].."% completed.")
     step = step + 1
     game:GetService("RunService").RenderStepped:Wait()
+    if done then return end
     TeleportToPosition((CFrame.new(workspace.Lobby.brazil.platform.Position)*CFrame.new(0,5,0)), 1, false)
     updater("Processing... | "..steps[step].."% completed.")
     step = step + 1
+    if done then return end
     if game:GetService("ReplicatedStorage"):FindFirstChild("firework") then
         game:GetService("ReplicatedStorage").firework:Destroy()
     end
     updater("Processing... | "..steps[step].."% completed.")
     step = step + 1
+    if done then return end
     SpawnFirework()
     updater("Processing... | "..steps[step].."% completed.")
     step = step + 1
-    repeat 
-        task.wait() 
+    if done then return end
+    repeat task.wait() 
         SpawnFirework() 
         if not done then
             game:GetService("Players")[username].Character.HumanoidRootPart:PivotTo(workspace["Firework_"..LocalPlayer.Name].VehicleSeat.CFrame)
         end
-    until game:GetService("Players")[username].Character.Humanoid.Sit==true or done
+    until (game:GetService("Players")[username].Character.Humanoid.Sit==true) or done
     if done then return end
     task.wait(.5)
     updater("Processing... | "..steps[step].."% completed.")
     step = step + 1
     done = true
-    if timeoutConnection then timeoutConnection:Disconnect() end
+    if onemoreconn then onemoreconn:Disconnect() onemoreconn = nil end
     a.Text = "Kicked "..username.."."
     b.Text = "Target was kicked. | 100% completed."
     return
