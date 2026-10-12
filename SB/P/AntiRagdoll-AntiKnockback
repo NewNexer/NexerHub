@@ -1,0 +1,132 @@
+repeat task.wait(.5) until game:GetService("Players").LocalPlayer and game:IsLoaded()
+
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local Character, HumanoidRootPart, Humanoid
+pcall(function()
+	Character = LocalPlayer.Character
+end)
+pcall(function()
+	HumanoidRootPart = Character:WaitForChild("HumanoidRootPart",3)
+end)
+pcall(function()
+	Humanoid = Character:WaitForChild("Humanoid",3)
+end)
+LocalPlayer.CharacterAdded:Connect(function(AddedCharacter)
+	pcall(function()
+		Character = nil
+		HumanoidRootPart = nil
+		Humanoid = nil
+		task.wait()
+		Character = AddedCharacter
+		repeat task.wait() until Character:FindFirstChild("HumanoidRootPart")
+		HumanoidRootPart = Character:WaitForChild("HumanoidRootPart",3)
+		repeat task.wait() until Character:FindFirstChild("Humanoid")
+		Humanoid = Character:WaitForChild("Humanoid",3)
+	end)
+end)
+
+local NETWORK = (game:GetService("ReplicatedStorage"):FindFirstChild("_NETWORK") and game:GetService("ReplicatedStorage")._NETWORK) or game:GetService("ReplicatedStorage"):FindFirstChild("CMDRGetGloveIDs", true).Parent
+
+if not NETWORK then return end
+
+local EncodedRemotesFound = false
+for i,v in next, NETWORK:GetChildren() do
+	if v and v.Name:find("{") then
+		EncodedRemotesFound = true
+	end
+end
+
+local DisabledFlagService = false
+if require and EncodedRemotesFound==true and (game:GetService("ReplicatedStorage"):FindFirstChild("BACKEND") and game:GetService("ReplicatedStorage").BACKEND:FindFirstChild("Shared") and game:GetService("ReplicatedStorage").BACKEND.Shared:FindFirstChild("Flags") and game:GetService("ReplicatedStorage").BACKEND.Shared.Flags:FindFirstChild("FlagService")) then
+	local flags = require(game:GetService("ReplicatedStorage").BACKEND.Shared.Flags.FlagService)
+	local original = flags.IsEnabled
+	flags.IsEnabled = function(flag, ...)
+		if flag == "IgnoreSafety" then
+	        return true
+	    end
+	    return original(flag, ...)
+	end
+	DisabledFlagService = true
+	local Processed = false
+	task.spawn(function()
+		while task.wait(.5) do
+			for i,v in next, NETWORK:GetChildren() do
+				if v and v.Name:find("[STUDIO]") then
+					Processed = true
+					break
+				end
+			end
+		end
+	end)
+	repeat task.wait() until Processed == true
+end
+
+repeat task.wait() until NETWORK:FindFirstChild("KnockbackCharacter") or NETWORK:FindFirstChild("KnockbackCharacter [STUDIO]")
+local KnockbackCharacterRemote = nil
+local KnockbackCharacter = function(duration) Instance.new("RemoteEvent"):FireServer({RagdollDuration=duration}) end
+if NETWORK:FindFirstChild("KnockbackCharacter") then
+	KnockbackCharacterRemote = NETWORK:WaitForChild("KnockbackCharacter")
+elseif NETWORK:FindFirstChild("KnockbackCharacter [STUDIO]") then
+	KnockbackCharacterRemote = NETWORK:WaitForChild("KnockbackCharacter [STUDIO]")
+end
+if KnockbackCharacterRemote~=nil then
+    KnockbackCharacter = function(duration) KnockbackCharacterRemote:FireServer({RagdollDuration=duration}) end
+end
+
+Character.Ragdolled:GetPropertyChangedSignal("Value"):Connect(function()
+	if Character.Ragdolled.Value==true then
+		KnockbackCharacter(0)
+	end
+end)
+Humanoid:GetPropertyChangedSignal("PlatformStand"):Connect(function()
+	if Humanoid.PlatformStand then
+		if Character and Character:FindFirstChild("Ragdolled") then
+            task.spawn(function()
+                for i,v in next, HumanoidRootPart:GetChildren() do
+                    if (v.Name=="BodyVelocity" or v.Name=="BodyAngularVelocity" or v.Name=="LinearVelocity") or v.Name:find("Knockback") then
+                        v:Destroy()
+                    end
+                end
+            end)
+			task.spawn(function()
+				local SavedPosition = HumanoidRootPart.CFrame
+				repeat task.wait() HumanoidRootPart.Anchored = true HumanoidRootPart:PivotTo(SavedPosition) until Character.Ragdolled.Value==false
+				for i=1,60 do
+					HumanoidRootPart.Anchored = false
+					HumanoidRootPart:PivotTo(SavedPosition)
+					task.wait()
+				end
+			end)
+		end
+		Humanoid.PlatformStand = false
+		Humanoid.AutoRotate = true
+		Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+		Humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+		if Character:FindFirstChild("Torso") then
+			for i,v in next, Character.Torso:GetChildren() do
+				if v and v:IsA("BallSocketConstraint") then
+					v.UpperAngle = 0
+					v.TwistLowerAngle = 0
+					v.TwistUpperAngle = 0
+				end
+			end
+		end
+		for i,v in next, Character:GetDescendants() do
+			if v and v:IsA("BasePart") then
+				if v.Name:find("Fake ") then
+					v:Destroy()
+				end
+				v.Velocity = Vector3.new(0,0,0)
+				if (isscriptable and setscriptable and sethiddenproperty) then
+					if isscriptable(v, "RotVelocity")~=true then
+						pcall(setscriptable, v, "RotVelocity", true)
+					end
+					pcall(sethiddenproperty, v, "RotVelocity", Vector3.new(0,0,0))
+				end
+				pcall(function()
+					v.RotVelocity = Vector3.new(0,0,0)
+				end)
+			end
+		end
+	end
+end)
