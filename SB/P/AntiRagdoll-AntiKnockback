@@ -61,7 +61,8 @@ if require and EncodedRemotesFound==true and (game:GetService("ReplicatedStorage
 	repeat task.wait() until Processed == true
 end
 
-repeat task.wait() until NETWORK:FindFirstChild("KnockbackCharacter") or NETWORK:FindFirstChild("KnockbackCharacter [STUDIO]")
+Timeout = tick()
+repeat task.wait() until NETWORK:FindFirstChild("KnockbackCharacter") or NETWORK:FindFirstChild("KnockbackCharacter [STUDIO]") or (tick()-Timeout)>5
 local KnockbackCharacterRemote = nil
 local KnockbackCharacter = function(duration) Instance.new("RemoteEvent"):FireServer({RagdollDuration=duration}) end
 if NETWORK:FindFirstChild("KnockbackCharacter") then
@@ -78,6 +79,7 @@ Character.Ragdolled:GetPropertyChangedSignal("Value"):Connect(function()
 		KnockbackCharacter(0)
 	end
 end)
+
 Humanoid:GetPropertyChangedSignal("PlatformStand"):Connect(function()
 	if Humanoid.PlatformStand then
 		if Character and Character:FindFirstChild("Ragdolled") then
