@@ -210,7 +210,7 @@ local Window = WindUI:CreateWindow({
     HideSearchBar = false,
     ScrollBarEnabled = true,
     BackgroundImageTransparency = 0.88,
-    Background = ((isfile(RandomThemeData.Background) and getcustomasset(RandomThemeData.Background)) or nil),
+    Background = ((isfile(RandomThemeData.Background) and getcustomasset(RandomThemeData.Background)) or "rbxassetid://0"),
     
     OpenButton = {
         Title = "Kick Utility",
