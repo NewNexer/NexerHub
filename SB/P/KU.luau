@@ -61,8 +61,9 @@ if require and EncodedRemotesFound==true and (game:GetService("ReplicatedStorage
 	repeat task.wait() until Processed == true
 end
 
-
-repeat task.wait() until NETWORK:FindFirstChild("SelectGlove") or NETWORK:FindFirstChild("SelectGlove [STUDIO]")
+local Timeout
+Timeout = tick()
+repeat task.wait() until NETWORK:FindFirstChild("SelectGlove") or NETWORK:FindFirstChild("SelectGlove [STUDIO]") or (tick()-Timeout)>5
 local SelectGloveRemote = nil
 local SelectGlove = function(glove, verify) local verify = verify or true Instance.new("RemoteEvent"):FireServer(glove) if verify==true then local SelectGloveHold = tick() repeat task.wait() until LocalPlayer.leaderstats.Glove.Value==glove or tick() - SelectGloveHold >= 2 end task.wait(.1) end
 if NETWORK:FindFirstChild("SelectGlove") then
@@ -74,7 +75,8 @@ if SelectGloveRemote~=nil then
     SelectGlove = function(glove, verify) local verify = verify or true SelectGloveRemote:FireServer(glove) if verify==true then local SelectGloveHold = tick() repeat task.wait() until LocalPlayer.leaderstats.Glove.Value==glove or tick() - SelectGloveHold >= 2 end task.wait(.1) end
 end
 
-repeat task.wait() until NETWORK:FindFirstChild("ActivateBadgeQuest") or NETWORK:FindFirstChild("ActivateBadgeQuest [STUDIO]")
+Timeout = tick()
+repeat task.wait() until NETWORK:FindFirstChild("ActivateBadgeQuest") or NETWORK:FindFirstChild("ActivateBadgeQuest [STUDIO]") or (tick()-Timeout)>5
 local ActivateBadgeQuestRemote = nil
 local ActivateBadgeQuest = function(quest) Instance.new("RemoteEvent"):FireServer(quest) end
 if NETWORK:FindFirstChild("ActivateBadgeQuest") then
@@ -86,7 +88,8 @@ if ActivateBadgeQuestRemote~=nil then
 	ActivateBadgeQuest = function(quest) ActivateBadgeQuestRemote:FireServer(quest) end
 end
 
-repeat task.wait() until NETWORK:FindFirstChild("CollectBadgeQuestReward") or NETWORK:FindFirstChild("CollectBadgeQuestReward [STUDIO]")
+Timeout = tick()
+repeat task.wait() until NETWORK:FindFirstChild("CollectBadgeQuestReward") or NETWORK:FindFirstChild("CollectBadgeQuestReward [STUDIO]") or (tick()-Timeout)>5
 local CollectBadgeQuestRewardRemote = nil
 local CollectBadgeQuestReward = function(quest) Instance.new("RemoteEvent"):FireServer(quest) end
 if NETWORK:FindFirstChild("CollectBadgeQuestReward") then
@@ -96,6 +99,19 @@ elseif NETWORK:FindFirstChild("CollectBadgeQuestReward [STUDIO]") then
 end
 if CollectBadgeQuestRewardRemote~=nil then
 	CollectBadgeQuestReward = function(quest) CollectBadgeQuestRewardRemote:FireServer(quest) end
+end
+
+Timeout = tick()
+repeat task.wait() until NETWORK:FindFirstChild("KnockbackCharacter") or NETWORK:FindFirstChild("KnockbackCharacter [STUDIO]") or (tick()-Timeout)>5
+local KnockbackCharacterRemote = nil
+local KnockbackCharacter = function(duration) Instance.new("RemoteEvent"):FireServer({RagdollDuration=duration}) end
+if NETWORK:FindFirstChild("KnockbackCharacter") then
+	KnockbackCharacterRemote = NETWORK:WaitForChild("KnockbackCharacter")
+elseif NETWORK:FindFirstChild("KnockbackCharacter [STUDIO]") then
+	KnockbackCharacterRemote = NETWORK:WaitForChild("KnockbackCharacter [STUDIO]")
+end
+if KnockbackCharacterRemote~=nil then
+    KnockbackCharacter = function(duration) KnockbackCharacterRemote:FireServer({RagdollDuration=duration}) end
 end
 
 local EnterArena = function(Arena) local oldcf = Arena.CFrame Arena.CanCollide = false Arena.CanTouch = true repeat task.wait() pcall(function() Arena:PivotTo(HumanoidRootPart.CFrame) end) until (Character and Character:FindFirstChild("entered")) Arena:PivotTo(oldcf) Arena.CanCollide = true end
@@ -156,10 +172,11 @@ local Pictures = {
 }
 for i,v in next, Pictures do
 if (writefile and readfile and isfile) and not isfile("NexerStuff/Pictures/"..(i:gsub(" ", "_"))..".png") then
-print("loading "..tostring("NexerStuff/Pictures/"..(i:gsub(" ", "_"))..".png").."")
-writefile("NexerStuff/Pictures/"..(i:gsub(" ", "_"))..".png", game:HttpGet(v))
-print("loaded "..tostring("NexerStuff/Pictures/"..(i:gsub(" ", "_"))..".png").."")
-repeat task.wait() until isfile("NexerStuff/Pictures/"..(i:gsub(" ", "_"))..".png")
+task.spawn(function() pcall(function() writefile("NexerStuff/Pictures/"..(i:gsub(" ", "_"))..".png", game:HttpGet(v)) end) end)
+Timeout = tick()
+repeat task.wait(.1) until isfile("NexerStuff/Pictures/"..(i:gsub(" ", "_"))..".png") or (tick()-Timeout)>11
+startmessage.Text = "Asset '"..tostring(i).."' failed to load. Skipping... (0/3)"
+task.wait(2)
 end
 end
 local ScreenCoverHandler = loadstring(game:HttpGet("https://gist.githubusercontent.com/NewNexer/dd8da43598f67527899a9b7458474fba/raw/27bc91300fe07bf994d8a7174aa0dbaca19c9373/coverhandler.luau"))()
@@ -193,7 +210,7 @@ local Window = WindUI:CreateWindow({
     HideSearchBar = false,
     ScrollBarEnabled = true,
     BackgroundImageTransparency = 0.88,
-    Background = getcustomasset(RandomThemeData.Background),
+    Background = ((isfile(RandomThemeData.Background) and getcustomasset(RandomThemeData.Background)) or nil),
     
     OpenButton = {
         Title = "Kick Utility",
@@ -428,6 +445,9 @@ function KickPlayer(username, a, b)
     if not game:GetService("Players")[username].Character:FindFirstChild("HumanoidRootPart") then 
         return abort("Failed to kick "..username..".", "Target is missing HumanoidRootPart.")
     end
+    if game:GetService("Players")[username].Character.HumanoidRootPart.Anchored==true or game:GetService("Players")[username].Character:FindFirstChild("rock") then 
+        return abort("Failed to kick "..username..".", "Target can't be moved.")
+    end
     if game:GetService("Players")[username].Character:FindFirstChild("Humanoid").Health==0 then 
         return abort("Failed to kick "..username..".", "Target is dead.")
     end
@@ -501,7 +521,7 @@ function KickPlayer(username, a, b)
     return
 end
 
-local HideScreeen = false
+--[[local HideScreeen = false
 KickTab:Toggle({
     Title = "Hide Screen",
     Value = false,
@@ -515,7 +535,7 @@ signals[tostring(game:GetService("HttpService"):GenerateGUID(false))] = gh().Chi
     if HideScreeen==true and c.Name:find("TemplateCover_") then
         c.Enabled = false
     end
-end)
+end)]]
 
 
 KickTab:Button({
