@@ -558,6 +558,9 @@ KickTab:Button({
         muteall()
         KickPlayer(UsernameOfTarget, a, b, c, savedpossss)
         TeleportToPosition(savedpossss, 1, false)
+        if workspace:FindFirstChild("Firework_"..LocalPlayer.Name) then
+            workspace["Firework_"..LocalPlayer.Name]:Destroy()
+        end
         game:GetService("ReplicatedStorage").Ghostinvisibilitydeactivated:FireServer()
         SelectGlove("spin")
         game:GetService("ReplicatedStorage").GeneralAbility:FireServer("setcollisiongroup","DefaultCharacterCollisionGroup")
