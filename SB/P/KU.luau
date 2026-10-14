@@ -61,64 +61,6 @@ if require and EncodedRemotesFound==true and (game:GetService("ReplicatedStorage
 	repeat task.wait() until Processed == true
 end
 
-local Timeout
-Timeout = tick()
-repeat task.wait() until NETWORK:FindFirstChild("SelectGlove") or NETWORK:FindFirstChild("SelectGlove [STUDIO]") or (tick()-Timeout)>5
-local SelectGloveRemote = nil
-local SelectGlove = function(glove, verify) local verify = verify or true Instance.new("RemoteEvent"):FireServer(glove) if verify==true then local SelectGloveHold = tick() repeat task.wait() until LocalPlayer.leaderstats.Glove.Value==glove or tick() - SelectGloveHold >= 2 end task.wait(.1) end
-if NETWORK:FindFirstChild("SelectGlove") then
-	SelectGloveRemote = NETWORK:WaitForChild("SelectGlove")
-elseif NETWORK:FindFirstChild("SelectGlove [STUDIO]") then
-	SelectGloveRemote = NETWORK:WaitForChild("SelectGlove [STUDIO]")
-end
-if SelectGloveRemote~=nil then
-    SelectGlove = function(glove, verify) local verify = verify or true SelectGloveRemote:FireServer(glove) if verify==true then local SelectGloveHold = tick() repeat task.wait() until LocalPlayer.leaderstats.Glove.Value==glove or tick() - SelectGloveHold >= 2 end task.wait(.1) end
-end
-
-Timeout = tick()
-repeat task.wait() until NETWORK:FindFirstChild("ActivateBadgeQuest") or NETWORK:FindFirstChild("ActivateBadgeQuest [STUDIO]") or (tick()-Timeout)>5
-local ActivateBadgeQuestRemote = nil
-local ActivateBadgeQuest = function(quest) Instance.new("RemoteEvent"):FireServer(quest) end
-if NETWORK:FindFirstChild("ActivateBadgeQuest") then
-	ActivateBadgeQuestRemote = NETWORK:WaitForChild("ActivateBadgeQuest")
-elseif NETWORK:FindFirstChild("ActivateBadgeQuest [STUDIO]") then
-	ActivateBadgeQuestRemote = NETWORK:WaitForChild("ActivateBadgeQuest [STUDIO]")
-end
-if ActivateBadgeQuestRemote~=nil then
-	ActivateBadgeQuest = function(quest) ActivateBadgeQuestRemote:FireServer(quest) end
-end
-
-Timeout = tick()
-repeat task.wait() until NETWORK:FindFirstChild("CollectBadgeQuestReward") or NETWORK:FindFirstChild("CollectBadgeQuestReward [STUDIO]") or (tick()-Timeout)>5
-local CollectBadgeQuestRewardRemote = nil
-local CollectBadgeQuestReward = function(quest) Instance.new("RemoteEvent"):FireServer(quest) end
-if NETWORK:FindFirstChild("CollectBadgeQuestReward") then
-	CollectBadgeQuestRewardRemote = NETWORK:WaitForChild("CollectBadgeQuestReward")
-elseif NETWORK:FindFirstChild("CollectBadgeQuestReward [STUDIO]") then
-	CollectBadgeQuestRewardRemote = NETWORK:WaitForChild("CollectBadgeQuestReward [STUDIO]")
-end
-if CollectBadgeQuestRewardRemote~=nil then
-	CollectBadgeQuestReward = function(quest) CollectBadgeQuestRewardRemote:FireServer(quest) end
-end
-
-Timeout = tick()
-repeat task.wait() until NETWORK:FindFirstChild("KnockbackCharacter") or NETWORK:FindFirstChild("KnockbackCharacter [STUDIO]") or (tick()-Timeout)>5
-local KnockbackCharacterRemote = nil
-local KnockbackCharacter = function(duration) Instance.new("RemoteEvent"):FireServer({RagdollDuration=duration}) end
-if NETWORK:FindFirstChild("KnockbackCharacter") then
-	KnockbackCharacterRemote = NETWORK:WaitForChild("KnockbackCharacter")
-elseif NETWORK:FindFirstChild("KnockbackCharacter [STUDIO]") then
-	KnockbackCharacterRemote = NETWORK:WaitForChild("KnockbackCharacter [STUDIO]")
-end
-if KnockbackCharacterRemote~=nil then
-    KnockbackCharacter = function(duration) KnockbackCharacterRemote:FireServer({RagdollDuration=duration}) end
-end
-
-local EnterArena = function(Arena) local oldcf = Arena.CFrame Arena.CanCollide = false Arena.CanTouch = true repeat task.wait() pcall(function() Arena:PivotTo(HumanoidRootPart.CFrame) end) until (Character and Character:FindFirstChild("entered")) Arena:PivotTo(oldcf) Arena.CanCollide = true end
-local TouchObject = function(object, seconds) local oldobjectcancollide = object.CanCollide local oldobjectcframe = object.CFrame local seconds = seconds or 1/20 if not HumanoidRootPart then return end object.CanCollide = false local start = tick() while tick() - start < seconds do pcall(function() object:PivotTo(HumanoidRootPart.CFrame) end) task.wait() end pcall(function() object:PivotTo(oldobjectcframe) end) pcall(function() object.CanCollide = oldobjectcancollide end) end
-local OverrideVelocity = function() pcall(function() for i,v in next, Character:GetDescendants() do if v and v:IsA("BasePart") then v.Velocity,v.RotVelocity = Vector3.new(0,0,0),Vector3.new(0,0,0) end end end) end
-local TeleportToPosition = function(cFrame,time,huh) local huh = huh or false local time = time or 1 local starttimee = tick() while tick() - starttimee < time do pcall(function() OverrideVelocity() if huh==true then for i,v in next, Character:GetChildren() do if v:IsA("BasePart") then v:PivotTo(cFrame) end end elseif huh==false then HumanoidRootPart:PivotTo(cFrame) end end) task.wait() end end
-
 for i,v in next, workspace.Lobby.brazil:GetDescendants() do
 if v:IsA("TouchTransmitter") then
 v:Destroy()
@@ -155,6 +97,65 @@ return msg
 end
 local startmessage = CreateMessage()
 startmessage.Text = "Loading Assets... (0/3)"
+
+local Timeout
+Timeout = tick()
+repeat task.wait() until NETWORK:FindFirstChild("SelectGlove") or NETWORK:FindFirstChild("SelectGlove [STUDIO]") or (tick()-Timeout)>5
+local SelectGloveRemote = nil
+local SelectGlove = function(glove, verify) local verify = verify or true Instance.new("RemoteEvent"):FireServer(glove) if verify==true then local SelectGloveHold = tick() repeat task.wait() until LocalPlayer.leaderstats.Glove.Value==glove or tick() - SelectGloveHold >= 2 end task.wait(.1) end
+if NETWORK:FindFirstChild("SelectGlove") then
+	SelectGloveRemote = NETWORK:WaitForChild("SelectGlove")
+elseif NETWORK:FindFirstChild("SelectGlove [STUDIO]") then
+	SelectGloveRemote = NETWORK:WaitForChild("SelectGlove [STUDIO]")
+end
+if SelectGloveRemote~=nil then
+    SelectGlove = function(glove, verify) local verify = verify or true SelectGloveRemote:FireServer(glove) if verify==true then local SelectGloveHold = tick() repeat task.wait() until LocalPlayer.leaderstats.Glove.Value==glove or tick() - SelectGloveHold >= 2 end task.wait(.1) end
+end
+
+--[[Timeout = tick()
+repeat task.wait() until NETWORK:FindFirstChild("ActivateBadgeQuest") or NETWORK:FindFirstChild("ActivateBadgeQuest [STUDIO]") or (tick()-Timeout)>5
+local ActivateBadgeQuestRemote = nil
+local ActivateBadgeQuest = function(quest) Instance.new("RemoteEvent"):FireServer(quest) end
+if NETWORK:FindFirstChild("ActivateBadgeQuest") then
+	ActivateBadgeQuestRemote = NETWORK:WaitForChild("ActivateBadgeQuest")
+elseif NETWORK:FindFirstChild("ActivateBadgeQuest [STUDIO]") then
+	ActivateBadgeQuestRemote = NETWORK:WaitForChild("ActivateBadgeQuest [STUDIO]")
+end
+if ActivateBadgeQuestRemote~=nil then
+	ActivateBadgeQuest = function(quest) ActivateBadgeQuestRemote:FireServer(quest) end
+end]]
+
+--[[Timeout = tick()
+repeat task.wait() until NETWORK:FindFirstChild("CollectBadgeQuestReward") or NETWORK:FindFirstChild("CollectBadgeQuestReward [STUDIO]") or (tick()-Timeout)>5
+local CollectBadgeQuestRewardRemote = nil
+local CollectBadgeQuestReward = function(quest) Instance.new("RemoteEvent"):FireServer(quest) end
+if NETWORK:FindFirstChild("CollectBadgeQuestReward") then
+	CollectBadgeQuestRewardRemote = NETWORK:WaitForChild("CollectBadgeQuestReward")
+elseif NETWORK:FindFirstChild("CollectBadgeQuestReward [STUDIO]") then
+	CollectBadgeQuestRewardRemote = NETWORK:WaitForChild("CollectBadgeQuestReward [STUDIO]")
+end
+if CollectBadgeQuestRewardRemote~=nil then
+	CollectBadgeQuestReward = function(quest) CollectBadgeQuestRewardRemote:FireServer(quest) end
+end]]
+
+--[[Timeout = tick()
+repeat task.wait() until NETWORK:FindFirstChild("KnockbackCharacter") or NETWORK:FindFirstChild("KnockbackCharacter [STUDIO]") or (tick()-Timeout)>5
+local KnockbackCharacterRemote = nil
+local KnockbackCharacter = function(duration) Instance.new("RemoteEvent"):FireServer({RagdollDuration=duration}) end
+if NETWORK:FindFirstChild("KnockbackCharacter") then
+	KnockbackCharacterRemote = NETWORK:WaitForChild("KnockbackCharacter")
+elseif NETWORK:FindFirstChild("KnockbackCharacter [STUDIO]") then
+	KnockbackCharacterRemote = NETWORK:WaitForChild("KnockbackCharacter [STUDIO]")
+end
+if KnockbackCharacterRemote~=nil then
+    KnockbackCharacter = function(duration) KnockbackCharacterRemote:FireServer({RagdollDuration=duration}) end
+end]]
+
+local EnterArena = function(Arena) local oldcf = Arena.CFrame Arena.CanCollide = false Arena.CanTouch = true repeat task.wait() pcall(function() Arena:PivotTo(HumanoidRootPart.CFrame) end) until (Character and Character:FindFirstChild("entered")) Arena:PivotTo(oldcf) Arena.CanCollide = true end
+local TouchObject = function(object, seconds) local oldobjectcancollide = object.CanCollide local oldobjectcframe = object.CFrame local seconds = seconds or 1/20 if not HumanoidRootPart then return end object.CanCollide = false local start = tick() while tick() - start < seconds do pcall(function() object:PivotTo(HumanoidRootPart.CFrame) end) task.wait() end pcall(function() object:PivotTo(oldobjectcframe) end) pcall(function() object.CanCollide = oldobjectcancollide end) end
+local OverrideVelocity = function() pcall(function() for i,v in next, Character:GetDescendants() do if v and v:IsA("BasePart") then v.Velocity,v.RotVelocity = Vector3.new(0,0,0),Vector3.new(0,0,0) end end end) end
+local TeleportToPosition = function(cFrame,time,huh) local huh = huh or false local time = time or 1 local starttimee = tick() while tick() - starttimee < time do pcall(function() OverrideVelocity() if huh==true then for i,v in next, Character:GetChildren() do if v:IsA("BasePart") then v:PivotTo(cFrame) end end elseif huh==false then HumanoidRootPart:PivotTo(cFrame) end end) task.wait() end end
+
 if (makefolder and isfolder) and not isfolder("NexerStuff") then
 makefolder("NexerStuff")
 repeat task.wait() until isfolder("NexerStuff")
