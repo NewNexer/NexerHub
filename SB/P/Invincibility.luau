@@ -62,7 +62,9 @@ if require and EncodedRemotesFound==true and (game:GetService("ReplicatedStorage
 end
 
 
-repeat task.wait() until NETWORK:FindFirstChild("SelectGlove") or NETWORK:FindFirstChild("SelectGlove [STUDIO]")
+local Timeout
+Timeout = tick()
+repeat task.wait() until NETWORK:FindFirstChild("SelectGlove") or NETWORK:FindFirstChild("SelectGlove [STUDIO]") or (tick()-Timeout)>5
 local SelectGloveRemote = nil
 local SelectGlove = function(glove, verify) local verify = verify or true Instance.new("RemoteEvent"):FireServer(glove) if verify==true then local SelectGloveHold = tick() repeat task.wait() until LocalPlayer.leaderstats.Glove.Value==glove or tick() - SelectGloveHold >= 2 end task.wait(.1) end
 if NETWORK:FindFirstChild("SelectGlove") then
@@ -72,30 +74,6 @@ elseif NETWORK:FindFirstChild("SelectGlove [STUDIO]") then
 end
 if SelectGloveRemote~=nil then
     SelectGlove = function(glove, verify) local verify = verify or true SelectGloveRemote:FireServer(glove) if verify==true then local SelectGloveHold = tick() repeat task.wait() until LocalPlayer.leaderstats.Glove.Value==glove or tick() - SelectGloveHold >= 2 end task.wait(.1) end
-end
-
-repeat task.wait() until NETWORK:FindFirstChild("ActivateBadgeQuest") or NETWORK:FindFirstChild("ActivateBadgeQuest [STUDIO]")
-local ActivateBadgeQuestRemote = nil
-local ActivateBadgeQuest = function(quest) Instance.new("RemoteEvent"):FireServer(quest) end
-if NETWORK:FindFirstChild("ActivateBadgeQuest") then
-	ActivateBadgeQuestRemote = NETWORK:WaitForChild("ActivateBadgeQuest")
-elseif NETWORK:FindFirstChild("ActivateBadgeQuest [STUDIO]") then
-	ActivateBadgeQuestRemote = NETWORK:WaitForChild("ActivateBadgeQuest [STUDIO]")
-end
-if ActivateBadgeQuestRemote~=nil then
-	ActivateBadgeQuest = function(quest) ActivateBadgeQuestRemote:FireServer(quest) end
-end
-
-repeat task.wait() until NETWORK:FindFirstChild("CollectBadgeQuestReward") or NETWORK:FindFirstChild("CollectBadgeQuestReward [STUDIO]")
-local CollectBadgeQuestRewardRemote = nil
-local CollectBadgeQuestReward = function(quest) Instance.new("RemoteEvent"):FireServer(quest) end
-if NETWORK:FindFirstChild("CollectBadgeQuestReward") then
-	CollectBadgeQuestRewardRemote = NETWORK:WaitForChild("CollectBadgeQuestReward")
-elseif NETWORK:FindFirstChild("CollectBadgeQuestReward [STUDIO]") then
-	CollectBadgeQuestRewardRemote = NETWORK:WaitForChild("CollectBadgeQuestReward [STUDIO]")
-end
-if CollectBadgeQuestRewardRemote~=nil then
-	CollectBadgeQuestReward = function(quest) CollectBadgeQuestRewardRemote:FireServer(quest) end
 end
 
 local EnterArena = function(Arena) local oldcf = Arena.CFrame Arena.CanCollide = false Arena.CanTouch = true repeat task.wait() pcall(function() Arena:PivotTo(HumanoidRootPart.CFrame) end) until (Character and Character:FindFirstChild("entered")) Arena:PivotTo(oldcf) Arena.CanCollide = true end
