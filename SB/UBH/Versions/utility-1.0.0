@@ -5437,17 +5437,24 @@ end
 StartDefending()
 task.wait(20)
 TakeSoulCandy()
-task.delay(2, function()
+task.spawn(function()
     while true do
-        if workspace.DropZone.NPC.NPC.ProximityPrompt.Enabled==true then
-            pcall(fireproximityprompt, workspace.DropZone.NPC.NPC.ProximityPrompt)
+        if workspace.DropZone.NPC.NPC:FindFirstChild("ProximityPrompt", true).Enabled==true then
+            pcall(fireproximityprompt, workspace.DropZone.NPC.NPC:FindFirstChild("ProximityPrompt", true))
         end
-        task.wait(.777)
+        task.wait(1.777)
     end
 end)
 StartDefending()
-task.wait(11)
-CollectGlove()]])
+task.wait(2)
+task.spawn(function()
+    while true do
+        pcall(function()
+            fireproximityprompt(workspace.EndSequence.RevenantGlove:FindFirstChild("ProximityPrompt", true))
+        end)
+        task.wait(1.777)
+    end
+end)]])
 	repeat task.wait() until workspace.Arena.Halloween_Decorations:FindFirstChild("TrickOrTreatTeleport",true).Counter.SurfaceGui.TextLabel.Text=="1" and workspace.Arena.Halloween_Decorations:FindFirstChild("TrickOrTreatTeleport",true).PlayerCounter.SurfaceGui.TextLabel.Text=="0/4 Players" and HumanoidRootPart and Humanoid and Humanoid.Health~=0
 	TouchObject(workspace.Arena.Halloween_Decorations:FindFirstChild("TrickOrTreatTeleport",true).Hitbox)
     end
