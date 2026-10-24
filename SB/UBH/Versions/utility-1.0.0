@@ -6669,7 +6669,8 @@ local ServerhopFarmSettings = {
     ["Siphon"] = false,
     ["Hammer"] = false,
     ["Slapples"] = false,
-    ["SortOrder"] = "Asc"
+    ["SortOrder"] = "Asc",
+    ["DisableModules"] = false
 }
 
 local ServerhopFarmObtainments = Window:Tab({
@@ -6742,6 +6743,14 @@ ServerhopFarmObtainments:Toggle({
         elseif state==false then
             ServerhopFarmSettings.SortOrder = "Desc"
         end
+    end
+})
+
+ServerhopFarmObtainments:Toggle({
+    Title = "Disable Slap Battles Modules",
+    Desc = "(more performance)",
+    Callback = function(state)
+        ServerhopFarmSettings.DisableModules = state
     end
 })
 
