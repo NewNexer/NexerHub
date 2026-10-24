@@ -42,14 +42,19 @@ local Configuration = DecodeConfiguration(...) or {
     ["MATERIALIZE"] = false,
     ["Siphon"] = false,
     ["Hammer"] = false,
-    ["Slapples"] = false
+    ["Slapples"] = false,
+	["SortOrder"] = "Asc"
 }
+
+if not Configuration.SortOrder then
+	Configuration.SortOrder = "Asc"
+end
 
 function Serverhop()
 task.spawn(function()
 while task.wait() do
 local servers = {}
-local req = game:HttpGet("https://games.roblox.com/v1/games/"..tostring(game.PlaceId).."/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true")
+local req = game:HttpGet("https://games.roblox.com/v1/games/"..tostring(game.PlaceId).."/servers/Public?sortOrder="..tostring(Configuration.SortOrder).."&limit=100&excludeFullGames=true")
 local body = game:GetService("HttpService"):JSONDecode(req)
 if body and body.data then
 for i, v in next, body.data do
