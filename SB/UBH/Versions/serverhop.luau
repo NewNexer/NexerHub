@@ -43,12 +43,21 @@ local Configuration = DecodeConfiguration(...) or {
     ["Siphon"] = false,
     ["Hammer"] = false,
     ["Slapples"] = false,
-	["SortOrder"] = "Asc"
+	["SortOrder"] = "Asc",
+	["DisableModules"] = false
 }
 
-if not Configuration.SortOrder then
-	Configuration.SortOrder = "Asc"
-end
+pcall(function()
+	if not Configuration.SortOrder then
+		Configuration.SortOrder = "Asc"
+	end
+end)
+
+pcall(function()
+	if not Configuration.DisableModules then
+		Configuration.DisableModules = false
+	end
+end)
 
 function Serverhop()
 task.spawn(function()
