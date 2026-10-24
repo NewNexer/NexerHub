@@ -5435,14 +5435,18 @@ for i=1,2 do
 	DepositCandy()
 end
 StartDefending()
-task.wait(2)
-repeat task.wait(.05) until workspace:FindFirstChild("EndSequnce") and workspace.EndSequence:FindFirstChild("SoulCandy") and workspace.EndSequence.SoulCandy:FindFirstChild("Model") and workspace.EndSequence.SoulCandy.Model:FindFirstChild("Model") and workspace.EndSequence.SoulCandy.Model.Model:FindFirstChild("ProximityPrompt", true)
-task.wait(2)
+task.wait(20)
 TakeSoulCandy()
-repeat InteractWithCornifier() until workspace.DropZone.NPC.NPC.ProximityPrompt.Enabled==false
+task.delay(2, function()
+    while true do
+        if workspace.DropZone.NPC.NPC.ProximityPrompt.Enabled==true then
+            pcall(fireproximityprompt, workspace.DropZone.NPC.NPC.ProximityPrompt)
+        end
+        task.wait(.777)
+    end
+end)
 StartDefending()
-repeat task.wait(.05) until workspace.EndSequence:FindFirstChild("RevenantGlove") and workspace.EndSequence.RevenantGlove:FindFirstChild("glove") and workspace.EndSequence.RevenantGlove.glove:FindFirstChild("ProximityPrompt")
-task.wait(2)
+task.wait(11)
 CollectGlove()]])
 	repeat task.wait() until workspace.Arena.Halloween_Decorations:FindFirstChild("TrickOrTreatTeleport",true).Counter.SurfaceGui.TextLabel.Text=="1" and workspace.Arena.Halloween_Decorations:FindFirstChild("TrickOrTreatTeleport",true).PlayerCounter.SurfaceGui.TextLabel.Text=="0/4 Players" and HumanoidRootPart and Humanoid and Humanoid.Health~=0
 	TouchObject(workspace.Arena.Halloween_Decorations:FindFirstChild("TrickOrTreatTeleport",true).Hitbox)
