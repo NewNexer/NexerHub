@@ -214,7 +214,7 @@ local Window = WindUI:CreateWindow({
     },
 
     User = {
-        Enabled = true,
+        Enabled = false,
         Anonymous = true,
         Callback = function()
             print("clicked to the 'user icon'")
