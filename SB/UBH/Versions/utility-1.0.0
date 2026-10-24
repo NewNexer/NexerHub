@@ -6668,7 +6668,8 @@ local ServerhopFarmSettings = {
     ["MATERIALIZE"] = false,
     ["Siphon"] = false,
     ["Hammer"] = false,
-    ["Slapples"] = false
+    ["Slapples"] = false,
+    ["SortOrder"] = "Asc"
 }
 
 local ServerhopFarmObtainments = Window:Tab({
@@ -6729,6 +6730,18 @@ ServerhopFarmObtainments:Toggle({
     Title = "Collect Slapples",
     Callback = function(state)
         ServerhopFarmSettings.Slapples = state
+    end
+})
+
+ServerhopFarmObtainments:Toggle({
+    Title = "Small Servers",
+    Value = true,
+    Callback = function(state)
+        if state==true then
+            ServerhopFarmSettings.SortOrder = "Asc"
+        elseif state==false then
+            ServerhopFarmSettings.SortOrder = "Desc"
+        end
     end
 })
 
