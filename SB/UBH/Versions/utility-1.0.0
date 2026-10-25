@@ -2889,7 +2889,7 @@ for i=1,50 do
 	task.wait()
 end
 repeat task.wait() until LocalPlayer.PlayerGui.DavidShrineQTE.Enabled==true
-task.wait(.5)
+task.wait(5)
 game:GetService("ReplicatedStorage").Remotes.UpdateDavidQTE:FireServer("Victory")
 repeat task.wait(1) until game:GetService("BadgeService"):UserHasBadgeAsync(LocalPlayer.UserId, 1060832194529561)
 game:GetService("TeleportService"):Teleport(6403373529)]])
@@ -5965,7 +5965,7 @@ for i=1,50 do
 	task.wait()
 end
 repeat task.wait() until LocalPlayer.PlayerGui.DavidShrineQTE.Enabled==true
-task.wait(.5)
+task.wait(5)
 game:GetService("ReplicatedStorage").Remotes.UpdateDavidQTE:FireServer("Victory")
 local qot = queue_on_teleport or queueonteleport or queue_on_tp or queueontp
 qot([=====[if game.PlaceId~=115782629143468 then return end
