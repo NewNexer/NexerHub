@@ -1928,7 +1928,7 @@ RegisterObtainmentButton("Automatic", {
         end
         TeleportToPosition(CFrame.new(0,-49990,0),1)
         repeat task.wait() until Character:FindFirstChild("Torso")==nil
-        task.wait(2.6)
+        task.wait(2.2)
         task.spawn(function()
             for i=1,10 do
                 print("hah")
@@ -1939,7 +1939,6 @@ RegisterObtainmentButton("Automatic", {
                         end)
                     end
                 end
-                task.wait(.1)
             end
         end)
         repeat task.wait() until Character and Character:FindFirstChild("Torso")
