@@ -6397,7 +6397,9 @@ for i = 1,Time do
     task.wait(1)
     workspace:FindFirstChildWhichIsA("Message"):Destroy()
 end
-task.wait(2)
+task.wait(1.8)
+HumanoidRootPart.Anchored = false
+task.wait(0.2)
 repeat task.wait() HumanoidRootPart:PivotTo(workspace.Ruins.Elude.Glove.CFrame) until LocalPlayer.PlayerGui.Victory.Enabled==true
 LocalPlayer.PlayerGui.Victory.Enabled = false
 for i,v in pairs(workspace:GetDescendants()) do
