@@ -3769,6 +3769,7 @@ end)]])
 
 RegisterObtainmentButton("Instant", {
     Title = "Instant Jester",
+    Desc = "You must have Elude.",
     Icon = "gravity:sparkles",
     Callback = function()
         if obtainmentmsg~=nil and typeof(obtainmentmsg)=="Instance" and obtainmentmsg.Parent==game:GetService("CoreGui") then
