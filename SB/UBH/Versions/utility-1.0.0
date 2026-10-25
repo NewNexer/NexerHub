@@ -5535,7 +5535,7 @@ local Noclip = function(state)
 	end
 end
 Noclip(true)
-
+task.wait(10)
 for i=1,4 do
 TeleportToPosition(CFrame.new(-1827,-69,308), 2)
 task.wait(1)
