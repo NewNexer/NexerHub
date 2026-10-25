@@ -2892,7 +2892,7 @@ repeat task.wait() until LocalPlayer.PlayerGui.DavidShrineQTE.Enabled==true
 task.wait(.5)
 game:GetService("ReplicatedStorage").Remotes.UpdateDavidQTE:FireServer("Victory")
 game:GetService("ReplicatedStorage").Remotes.UpdateDavidQTE:Destroy()
-repeat task.wait(1) until game:GetService("BadgeService"):UserHasBadgeAsync(LocalPlayer.UserId, 1060832194529561)
+repeat task.wait(.5) until game:GetService("BadgeService"):UserHasBadgeAsync(LocalPlayer.UserId, 1060832194529561)
 game:GetService("TeleportService"):Teleport(6403373529)]])
 
 task.spawn(function()
@@ -3263,7 +3263,7 @@ end
 end
 end
 end)
-repeat task.wait(1) until game:GetService("BadgeService"):UserHasBadgeAsync(LocalPlayer.UserId, 2153911928)
+repeat task.wait(.5) until game:GetService("BadgeService"):UserHasBadgeAsync(LocalPlayer.UserId, 2153911928)
 game:GetService("TeleportService"):Teleport(6403373529)]])
 	TeleportToPosition(CFrame.new(17891,-23.8,-3517), 2)
 	game:GetService("ReplicatedStorage").GeneralAbility:FireServer()
@@ -3360,7 +3360,7 @@ task.wait(.05)
 game:GetService("ReplicatedStorage"):WaitForChild("TowerDefenceAssets"):WaitForChild("TD_Event"):FireServer("PlaceDefence",{cf = CFrame.new(31.84327507019043, 9.149999618530273, 6.6344146728515625, 1, 0, 0, 0, 1, 0, 0, 0, 1),defencename = "Defence2"})
 end
 end)
-repeat task.wait(1) until game:GetService("BadgeService"):UserHasBadgeAsync(LocalPlayer.UserId, 3318257806017965)
+repeat task.wait(.5) until game:GetService("BadgeService"):UserHasBadgeAsync(LocalPlayer.UserId, 3318257806017965)
 game:GetService("TeleportService"):Teleport(6403373529)]])
 	TeleportToPosition(CFrame.new(17891,-23.8,-3517), 2)
 	game:GetService("ReplicatedStorage").GeneralAbility:FireServer()
@@ -6001,7 +6001,7 @@ while true do
     task.wait(.133)
     pcall(function() HumanoidRootPart:PivotTo(CFrame.new(0,math.random(100,300),0)) end)
 end]=====])
-repeat task.wait(1) until game:GetService("BadgeService"):UserHasBadgeAsync(LocalPlayer.UserId, 1060832194529561)
+repeat task.wait(.5) until game:GetService("BadgeService"):UserHasBadgeAsync(LocalPlayer.UserId, 1060832194529561)
 game:GetService("TeleportService"):Teleport(115782629143468)
 ]====])
 
