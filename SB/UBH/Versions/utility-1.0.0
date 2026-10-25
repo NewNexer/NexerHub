@@ -5561,7 +5561,8 @@ pcall(fireproximityprompt, workspace.Shed.StartDoor["Cylinder.025"].Attachment.P
 repeat task.wait() until LocalPlayer.PlayerGui.Transition.Frame.BackgroundTransparency~=1
 repeat task.wait() until LocalPlayer.PlayerGui.Transition.Frame.BackgroundTransparency==1
 TeleportToPosition(CFrame.new(-343,19,340), 1)
-task.wait(25)
+repeat task.wait(.05) until workspace.CurrentCamera.CameraType==Enum.CameraType.Scriptable
+repeat task.wait(.05) until workspace.CurrentCamera.CameraType==Enum.CameraType.Custom
 TeleportToPosition(CFrame.new(-83,3,1520), 1)]])
 	repeat task.wait() until workspace.Arena.Halloween_Decorations:FindFirstChild("TeleportMain",true).Counter.SurfaceGui.TextLabel.Text=="1" and workspace.Arena.Halloween_Decorations:FindFirstChild("TeleportMain",true).PlayerCounter.SurfaceGui.TextLabel.Text=="0/4 Players" and HumanoidRootPart and Humanoid and Humanoid.Health~=0
 	TouchObject(workspace.Arena.Halloween_Decorations:FindFirstChild("TeleportMain",true).Hitbox)
