@@ -130,6 +130,8 @@ function Library:CreateWindow(options)
     options = options or {}
     local parent = options.Parent or Players.LocalPlayer:WaitForChild("PlayerGui")
     local hotkey = options.ToggleKey or Enum.KeyCode.RightShift
+    local cursorKey = options.CursorKey
+    local forceCursor = options.ForceCursor == true
     local width = math.clamp(options.Width or 560, 440, 760)
     local height = math.clamp(options.Height or 452, 320, 650)
     local screen = make("ScreenGui", nil, {
@@ -137,11 +139,13 @@ function Library:CreateWindow(options)
         DisplayOrder = options.DisplayOrder or 30, ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
     })
     local canvas = frame(screen, full, UDim2.new(), 1)
-    local modal = tile(canvas, "", full, UDim2.new(), 1)
-    modal.Name = "Modal"
-    modal:FindFirstChildOfClass("UIStroke").Enabled = false
-    modal.Modal = options.CaptureMouse ~= false
-    modal.Selectable = false
+    local modal
+    if options.CaptureMouse == true then
+        modal = make("TextButton", canvas, {
+            Name = "Modal", Size = full, BackgroundTransparency = 1, Text = "",
+            Modal = true, Selectable = false, Visible = false,
+        })
+    end
 
     local shell = frame(canvas, UDim2.fromOffset(width, height), UDim2.fromScale(0.5, 0.5), theme.TrayTransparency)
     shell.Name = "Window"
@@ -164,7 +168,11 @@ function Library:CreateWindow(options)
     make("UIPadding", tabs, {PaddingLeft = UDim.new(0, 4), PaddingTop = UDim.new(0, 4)})
     local body = frame(shell, UDim2.new(1, -24, 1, -128), UDim2.fromOffset(12, 108), 1)
     local hint = "[" .. hotkey.Name .. "]"
-    words(shell, hint .. "  Hide menu", UDim2.new(1, -24, 0, 19), UDim2.new(0, 12, 1, -19), 13, right)
+    local footer = hint .. "  Hide menu"
+    if cursorKey and Input.KeyboardEnabled then
+        footer = "[Hold " .. cursorKey.Name .. "]  Cursor     " .. footer
+    end
+    words(shell, footer, UDim2.new(1, -24, 0, 19), UDim2.new(0, 12, 1, -19), 13, right)
     local reopen = tile(canvas, hint .. "  Menu", UDim2.fromOffset(130, 28), UDim2.new(1, -142, 0, 34), theme.TileTransparency)
     reopen.Name = "Reopen"
     local feed = frame(canvas, UDim2.fromOffset(300, 132), UDim2.new(1, -312, 0.5, 4), 1)
@@ -175,7 +183,8 @@ function Library:CreateWindow(options)
         Gui = screen, _shell = shell, _modal = modal, _reopen = reopen, _showReopen = options.ShowReopen ~= false,
         _tabs = tabs, _body = body, _feed = feed, _pages = {}, _notifications = {}, _connections = {}, _binds = {},
         _nextNotice = 0, _offset = options.Offset or Vector2.zero, _visible = true,
-        _cursorBinding = options.ForceCursor and ("SurvivorUI_" .. HttpService:GenerateGUID(false)) or nil,
+        _forceCursor = forceCursor,
+        _cursorBinding = (forceCursor or cursorKey) and ("SurvivorUI_" .. HttpService:GenerateGUID(false)) or nil,
     }, Window)
 
     local function position(offset)
@@ -210,7 +219,17 @@ function Library:CreateWindow(options)
     table.insert(window._connections, Input.InputEnded:Connect(function(input)
         local pointer = window._pointer
         if pointer and input == pointer.Input then window._pointer = nil end
+        if input.KeyCode == cursorKey and window._cursorHeld then
+            window._cursorHeld = false
+            window:_updateCursor()
+        end
     end))
+    if cursorKey then
+        table.insert(window._connections, Input.WindowFocusReleased:Connect(function()
+            window._cursorHeld = false
+            window:_updateCursor()
+        end))
+    end
     table.insert(window._connections, Input.InputBegan:Connect(function(input, processed)
         if Input:GetFocusedTextBox() or input.UserInputType ~= Enum.UserInputType.Keyboard then return end
         if window._capture then
@@ -222,6 +241,11 @@ function Library:CreateWindow(options)
         if processed then return end
         if input.KeyCode == hotkey then
             window:SetVisible(not window._visible)
+            return
+        end
+        if input.KeyCode == cursorKey and window._visible then
+            window._cursorHeld = true
+            window:_updateCursor()
             return
         end
         for _, binding in ipairs(window._binds) do
@@ -250,26 +274,33 @@ function Window:_releaseCursor()
     self._cursorBefore = nil
 end
 
+function Window:_updateCursor()
+    if not (self._visible and (self._forceCursor or self._cursorHeld)) then
+        self:_releaseCursor()
+        return
+    end
+    if self._cursorBefore then return end
+    self._cursorBefore = {Behavior = Input.MouseBehavior, Icon = Input.MouseIconEnabled}
+    RunService:BindToRenderStep(self._cursorBinding, Enum.RenderPriority.Last.Value + 1, function()
+        Input.MouseBehavior = Enum.MouseBehavior.Default
+        Input.MouseIconEnabled = true
+    end)
+end
+
 function Window:SetVisible(visible)
     if self._destroyed then return end
     self._visible = visible == true
     self._shell.Visible = self._visible
-    self._modal.Visible = self._visible and self._modal.Modal
+    if self._modal then self._modal.Visible = self._visible end
     self._reopen.Visible = not self._visible and self._showReopen
-    if self._visible and self._cursorBinding and not self._cursorBefore then
-        self._cursorBefore = {Behavior = Input.MouseBehavior, Icon = Input.MouseIconEnabled}
-        RunService:BindToRenderStep(self._cursorBinding, Enum.RenderPriority.Last.Value + 1, function()
-            Input.MouseBehavior = Enum.MouseBehavior.Default
-            Input.MouseIconEnabled = true
-        end)
-    end
     if not self._visible then
-        self:_releaseCursor()
+        self._cursorHeld = false
         self._pointer = nil
         local capture = self._capture
         self._capture = nil
         if capture then capture(Enum.KeyCode.Escape) end
     end
+    self:_updateCursor()
 end
 
 function Window:Destroy()
