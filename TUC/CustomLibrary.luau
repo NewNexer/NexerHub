@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local Input = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
+local SoundService = game:GetService("SoundService")
 
 local Library = {}
 local Window = {}
@@ -24,6 +25,7 @@ local theme = table.freeze({
     Stamina = Color3.fromRGB(85, 170, 255),
     StaminaTrack = Color3.fromRGB(85, 85, 255),
     BarText = Color3.fromRGB(0, 0, 255),
+    TabHover = Color3.fromRGB(208, 208, 208),
     TrayTransparency = 0.9,
     TileTransparency = 0.8,
     EmoteTransparency = 0.7,
@@ -72,6 +74,19 @@ local function words(parent, content, size, position, textSize, align, color, we
     })
 end
 
+local function bindClickSound(control)
+    local screen = control:FindFirstAncestorWhichIsA("ScreenGui")
+    local sound = screen and screen:FindFirstChild("ClickSound")
+    if not sound then return end
+
+    local function play() SoundService:PlayLocalSound(sound) end
+    if control:IsA("GuiButton") then
+        control.Activated:Connect(play)
+    elseif control:IsA("TextBox") then
+        control.Focused:Connect(play)
+    end
+end
+
 local function tile(parent, content, size, position, alpha)
     local button = make("TextButton", parent, {
         Size = size, Position = position, BackgroundColor3 = white,
@@ -80,6 +95,7 @@ local function tile(parent, content, size, position, alpha)
         TextColor3 = white, TextStrokeColor3 = black, TextStrokeTransparency = 0.5,
         TextTruncate = Enum.TextTruncate.AtEnd,
     })
+    bindClickSound(button)
     round(button)
     return button, outline(button, black, 0.8, 1)
 end
@@ -138,6 +154,8 @@ function Library:CreateWindow(options)
         Name = options.Id or "SurvivorUI", ResetOnSpawn = false,
         DisplayOrder = options.DisplayOrder or 30, ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
     })
+    make("Sound", screen, {Name = "ClickSound", SoundId = "rbxassetid://12221976", Volume = 0.5})
+    local hoverSound = make("Sound", screen, {Name = "TabHoverSound", SoundId = "rbxassetid://12222170", Volume = 0.4})
     local canvas = frame(screen, full, UDim2.new(), 1)
     local modal
     if options.CaptureMouse == true then
@@ -181,6 +199,7 @@ function Library:CreateWindow(options)
 
     local window = setmetatable({
         Gui = screen, _shell = shell, _modal = modal, _reopen = reopen, _showReopen = options.ShowReopen ~= false,
+        _hoverSound = hoverSound,
         _tabs = tabs, _body = body, _feed = feed, _pages = {}, _notifications = {}, _connections = {}, _binds = {},
         _nextNotice = 0, _offset = options.Offset or Vector2.zero, _visible = true,
         _forceCursor = forceCursor,
@@ -344,6 +363,12 @@ function Window:CreateTab(options)
     stack(page, 10)
     local tab = setmetatable({_window = self, _page = page, _stroke = stroke, _sections = 0}, Tab)
     table.insert(self._pages, tab)
+    button.MouseEnter:Connect(function()
+        if not Input.MouseEnabled then return end
+        button.BackgroundColor3 = theme.TabHover
+        SoundService:PlayLocalSound(self._hoverSound)
+    end)
+    button.MouseLeave:Connect(function() button.BackgroundColor3 = white end)
     button.Activated:Connect(function() tab:Select() end)
     if #self._pages == 1 then tab:Select() end
     return tab
@@ -420,6 +445,7 @@ function Section:AddSlider(options)
         BackgroundColor3 = options.HealthStyle and theme.Danger or theme.StaminaTrack,
         BorderSizePixel = 0, AutoButtonColor = false,
     })
+    bindClickSound(track)
     round(track, 0.4)
     local fill = frame(track, full, UDim2.new(), 0, options.HealthStyle and theme.Health or theme.Stamina)
     round(fill, 0.4)
@@ -490,6 +516,7 @@ function Section:AddInput(options)
         PlaceholderColor3 = white, FontFace = font, TextColor3 = white, TextSize = 16,
         TextStrokeColor3 = black, TextStrokeTransparency = 0.5,
     })
+    bindClickSound(box)
     round(box)
     local stroke = outline(box, black, 0.8, 1)
     local control = valueControl(options.Default or "", function(value)
